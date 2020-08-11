@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29613.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenFTTH.APIGateway", "OpenFTTH.APIGateway\OpenFTTH.APIGateway.csproj", "{74EC242E-4E36-47D4-8AF5-6601A901397C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenFTTH.APIGateway.RouteNetwork", "OpenFTTH.APIGateway.RouteNetwork\OpenFTTH.APIGateway.RouteNetwork.csproj", "{229E7675-4089-4BA8-B26C-588F22CD2485}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{74EC242E-4E36-47D4-8AF5-6601A901397C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{74EC242E-4E36-47D4-8AF5-6601A901397C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{74EC242E-4E36-47D4-8AF5-6601A901397C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{74EC242E-4E36-47D4-8AF5-6601A901397C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{229E7675-4089-4BA8-B26C-588F22CD2485}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{229E7675-4089-4BA8-B26C-588F22CD2485}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{229E7675-4089-4BA8-B26C-588F22CD2485}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{229E7675-4089-4BA8-B26C-588F22CD2485}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1DB50536-F305-4178-A66B-483B1C17937A}
+	EndGlobalSection
+EndGlobal
