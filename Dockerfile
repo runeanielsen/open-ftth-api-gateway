@@ -18,5 +18,6 @@ WORKDIR /app
 
 COPY --from=build-env /app/OpenFTTH.APIGateway/out .
 ENTRYPOINT ["dotnet", "OpenFTTH.APIGateway.dll"]
-EXPOSE 5000
-EXPOSE 5001
+
+ENV ASPNETCORE_URLS=http://+80
+EXPOSE 80
