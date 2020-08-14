@@ -13,6 +13,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using OpenFTTH.APIGateway.GraphQL.Schemas;
+using OpenFTTH.APIGateway.Remote;
+using OpenFTTH.APIGateway.RouteNetwork;
+using OpenFTTH.APIGateway.RouteNetwork.GraphQL.Queries;
 using OpenFTTH.APIGateway.RouteNetwork.GraphQL.Subscriptions;
 using OpenFTTH.APIGateway.RouteNetwork.GraphQL.Types;
 using OpenFTTH.APIGateway.Settings;
@@ -60,21 +63,36 @@ namespace OpenFTTH.APIGateway
             .AddWebSockets()
             .AddDataLoader();
 
-            // Kafka stuff
+            // Settings
             services.Configure<KafkaSetting>(kafkaSettings =>
                             Configuration.GetSection("Kafka").Bind(kafkaSettings));
+
+            services.Configure<RemoteServicesSetting>(remoteServiceSettings =>
+                            Configuration.GetSection("RemoteServices").Bind(remoteServiceSettings));
 
             // Web stuff
             services.AddRazorPages();
 
-            // GraphQL schema stuff
-            services.AddScoped<OpenFTTHSchema>();
-            services.AddSingleton<RouteNetworkEventSubscription>();
-            services.AddSingleton<RouteNetworkEventType>();
-
-            // Services used by API
+            // Services used by the API gateways
             services.AddHostedService<RouteNetworkEventConsumer>();
             services.AddSingleton<IToposTypedEventObservable<RouteNetworkEvent>, ToposTypedEventObservable<RouteNetworkEvent>>();
+
+
+            services.AddSingleton<QueryServiceClient<RouteNetworkServiceQueries>>(x =>
+                new QueryServiceClient<RouteNetworkServiceQueries>(
+                    x.GetRequiredService<Microsoft.Extensions.Logging.ILogger<QueryServiceClient<RouteNetworkServiceQueries>>>(), 
+                    Configuration.GetSection("RemoteServices:RouteNetworkService").Value)
+                );
+            
+
+            // GraphQL schema stuff
+            services.AddScoped<OpenFTTHSchema>();
+
+            services.AddSingleton<RouteNetworkEventSubscription>();
+            services.AddSingleton<RouteNetworkEventType>();
+            services.AddSingleton<RouteNetworkServiceQueries>();
+            services.AddSingleton<RouteNodeType>();
+            services.AddSingleton<NamingInfoType>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

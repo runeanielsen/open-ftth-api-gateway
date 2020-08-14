@@ -16,7 +16,8 @@
     <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="8.1.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="3.1.6" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.9.10" />
-    <PackageReference Include="OpenFTTH.Events" Version="1.0.0-alpha" />
+    <PackageReference Include="OpenFTTH.Events" Version="1.0.2-alpha" />
+    <PackageReference Include="OpenFTTH.RouteNetworkService.Queries" Version="1.0.0-alpha" />
     <PackageReference Include="Serilog" Version="2.9.0" />
     <PackageReference Include="Serilog.Extensions.Logging" Version="3.0.1" />
     <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
@@ -24,6 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\OpenFTTH.APIGateway.Remote\OpenFTTH.APIGateway.Remote.csproj" />
     <ProjectReference Include="..\OpenFTTH.APIGateway.RouteNetwork\OpenFTTH.APIGateway.RouteNetwork.csproj" />
   </ItemGroup>
 </Project>
