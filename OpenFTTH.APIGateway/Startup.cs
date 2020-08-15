@@ -105,7 +105,6 @@ namespace OpenFTTH.APIGateway
             else
             {
                 app.UseExceptionHandler("/Error");
-                app.UseHsts();
             }
 
             app.UseWebSockets();
