@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.AspNetCore.Authentication.Certificate;
 using OpenFTTH.APIGateway.GraphQL.Schemas;
 using OpenFTTH.APIGateway.Remote;
 using OpenFTTH.APIGateway.RouteNetwork;
@@ -52,6 +53,10 @@ namespace OpenFTTH.APIGateway
              .CreateLogger();
 
             services.AddLogging(loggingBuilder => loggingBuilder.AddSerilog(dispose: true));
+
+            services.AddAuthentication(
+                CertificateAuthenticationDefaults.AuthenticationScheme)
+                .AddCertificate();
 
             // GraphQL stuff
             services.Configure<KestrelServerOptions>(options => options.AllowSynchronousIO = true);
@@ -106,6 +111,8 @@ namespace OpenFTTH.APIGateway
             {
                 app.UseExceptionHandler("/Error");
             }
+
+            app.UseAuthentication();
 
             app.UseWebSockets();
             app.UseGraphQLWebSockets<OpenFTTHSchema>("/graphql");
