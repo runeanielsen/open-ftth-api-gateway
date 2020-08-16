@@ -2,6 +2,8 @@
 using GraphQL.Types;
 using Microsoft.Extensions.Logging;
 using OpenFTTH.APIGateway.Remote;
+using OpenFTTH.APIGateway.RouteNetwork.GraphQL.Mutations;
+using OpenFTTH.APIGateway.RouteNetwork.GraphQL.Test;
 using OpenFTTH.APIGateway.RouteNetwork.GraphQL.Types;
 using OpenFTTH.RouteNetworkService.Queries;
 using System;
@@ -29,6 +31,14 @@ namespace OpenFTTH.APIGateway.RouteNetwork.GraphQL.Queries
                     }
 
                     logger.LogDebug("Route node query: " + id);
+
+                    // For quick testing... should be removed
+                    if (RouteNodeState.State.ContainsKey(id))
+                    {
+                        logger.LogDebug("Got a test id. Will therefore *not* call the route network service, but just fetch data from an in-memory state!");
+                        return RouteNodeState.State[id];
+                    }
+
 
                     var routeNodeData = routeNetworkQueries.Query<RouteNodeQuery, RouteNodeQueryResult>(new RouteNodeQuery(id));
 
