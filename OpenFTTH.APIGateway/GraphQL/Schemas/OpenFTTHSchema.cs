@@ -2,6 +2,7 @@
 using GraphQL.Resolvers;
 using GraphQL.Subscription;
 using GraphQL.Types;
+using OpenFTTH.APIGateway.GraphQL.Mutations;
 using OpenFTTH.APIGateway.GraphQL.Queries;
 using OpenFTTH.APIGateway.GraphQL.Subscriptions;
 using OpenFTTH.APIGateway.RouteNetwork.GraphQL.Subscriptions;
@@ -25,7 +26,7 @@ namespace OpenFTTH.APIGateway.GraphQL.Schemas
 
             Subscription = resolver.Resolve<OpenFTTHSubscriptions>();
 
-            //Mutation = resolver.Resolve<Mutations>();
+            Mutation = resolver.Resolve<OpenFTTHMutations>();
             RegisterType<RouteNetworkEventType>();
         }
     }

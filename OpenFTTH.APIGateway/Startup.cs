@@ -28,6 +28,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
+using OpenFTTH.APIGateway.RouteNetwork.GraphQL.Mutations;
+using OpenFTTH.APIGateway.GraphQL.Mutations;
 
 namespace OpenFTTH.APIGateway
 {
@@ -98,6 +100,10 @@ namespace OpenFTTH.APIGateway
             services.AddSingleton<RouteNetworkServiceQueries>();
             services.AddSingleton<RouteNodeType>();
             services.AddSingleton<NamingInfoType>();
+
+            services.AddSingleton<OpenFTTHMutations>();
+            services.AddSingleton<RouteNodeMutations1>();
+            services.AddSingleton<RouteNodeMutations2>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
