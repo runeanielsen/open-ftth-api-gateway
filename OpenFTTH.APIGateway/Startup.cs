@@ -54,10 +54,6 @@ namespace OpenFTTH.APIGateway
 
             services.AddLogging(loggingBuilder => loggingBuilder.AddSerilog(dispose: true));
 
-            services.AddAuthentication(
-                CertificateAuthenticationDefaults.AuthenticationScheme)
-                .AddCertificate();
-
             // GraphQL stuff
             services.Configure<KestrelServerOptions>(options => options.AllowSynchronousIO = true);
 
@@ -88,7 +84,6 @@ namespace OpenFTTH.APIGateway
                     x.GetRequiredService<Microsoft.Extensions.Logging.ILogger<QueryServiceClient<RouteNetworkServiceQueries>>>(), 
                     Configuration.GetSection("RemoteServices:RouteNetworkService").Value)
                 );
-            
 
             // GraphQL schema stuff
             services.AddScoped<OpenFTTHSchema>();
@@ -111,8 +106,6 @@ namespace OpenFTTH.APIGateway
             {
                 app.UseExceptionHandler("/Error");
             }
-
-            app.UseAuthentication();
 
             app.UseWebSockets();
             app.UseGraphQLWebSockets<OpenFTTHSchema>("/graphql");

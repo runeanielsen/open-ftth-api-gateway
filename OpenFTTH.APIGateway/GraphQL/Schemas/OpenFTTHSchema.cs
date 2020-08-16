@@ -29,7 +29,4 @@ namespace OpenFTTH.APIGateway.GraphQL.Schemas
             RegisterType<RouteNetworkEventType>();
         }
     }
-
-
-
 }

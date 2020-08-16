@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,7 +20,12 @@ namespace OpenFTTH.APIGateway.Remote
 
         public async Task<ResponseType> Query<RequestType, ResponseType>(RequestType queryCommand)
         {
-            using (var httpClient = new HttpClient())
+            var clientHandler = new HttpClientHandler();
+            // This is an ugly hack, the reason that this is needed is because of certicates generated does not work on Linux
+            // It won't provide security risk as long as you use a Service Mesh for TLS - if you don't use a SM, then find a solution.
+            clientHandler.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; };
+
+            using (var httpClient = new HttpClient(clientHandler))
             {
                 string requestUrl = _serviceUrl + "/query";
 
