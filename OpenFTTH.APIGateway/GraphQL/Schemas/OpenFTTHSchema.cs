@@ -22,8 +22,6 @@ namespace OpenFTTH.APIGateway.GraphQL.Schemas
         {
             Query = resolver.Resolve<OpenFTTHQueries>();
 
-            //Subscription = resolver.Resolve<PersonSubscription>();
-
             Subscription = resolver.Resolve<OpenFTTHSubscriptions>();
 
             Mutation = resolver.Resolve<OpenFTTHMutations>();

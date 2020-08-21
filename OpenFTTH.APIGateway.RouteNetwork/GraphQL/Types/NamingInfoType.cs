@@ -15,4 +15,14 @@ namespace OpenFTTH.APIGateway.RouteNetwork.GraphQL.Types
             Field(x => x.Description, type: typeof(StringGraphType)).Description("Long name");
         }
     }
+
+    public class NamingInfoInputType : InputObjectGraphType<NamingInfo>
+    {
+        public NamingInfoInputType(ILogger<NamingInfoType> logger)
+        {
+            Field(x => x.Name, type: typeof(StringGraphType)).Description("Short name");
+            Field(x => x.Description, type: typeof(StringGraphType)).Description("Long name");
+        }
+    }
+
 }

@@ -22,6 +22,9 @@ using OpenFTTH.Events.RouteNetwork;
 using Serilog;
 using OpenFTTH.APIGateway.RouteNetwork.GraphQL.Mutations;
 using OpenFTTH.APIGateway.GraphQL.Mutations;
+using OpenFTTH.APIGateway.RouteNetwork.GraphQL;
+using OpenFTTH.APIGateway.GraphQL.Queries;
+using OpenFTTH.APIGateway.GraphQL.Subscriptions;
 
 namespace OpenFTTH.APIGateway
 {
@@ -51,10 +54,10 @@ namespace OpenFTTH.APIGateway
             // GraphQL stuff
             services.Configure<KestrelServerOptions>(options => options.AllowSynchronousIO = true);
 
-            services.AddScoped<IDependencyResolver>(s => new FuncDependencyResolver(s.GetRequiredService));
+            services.AddSingleton<IDependencyResolver>(s => new FuncDependencyResolver(s.GetRequiredService));
 
             services.AddGraphQL(o => { o.ExposeExceptions = true; })
-            .AddGraphTypes(ServiceLifetime.Scoped)
+            .AddGraphTypes(ServiceLifetime.Singleton)
             .AddWebSockets()
             .AddDataLoader();
 
@@ -68,29 +71,24 @@ namespace OpenFTTH.APIGateway
             // Web stuff
             services.AddRazorPages();
 
-            // Services used by the API gateways
-            services.AddHostedService<RouteNetworkEventConsumer>();
-            services.AddSingleton<IToposTypedEventObservable<RouteNetworkEvent>, ToposTypedEventObservable<RouteNetworkEvent>>();
+            // GraphQL root schema
+            services.AddSingleton<OpenFTTHSchema>();
+            services.AddSingleton<OpenFTTHQueries>();
+            services.AddSingleton<OpenFTTHMutations>();
+            services.AddSingleton<OpenFTTHSubscriptions>();
 
-
+            // Route network stuff
             services.AddSingleton<QueryServiceClient<RouteNetworkServiceQueries>>(x =>
                 new QueryServiceClient<RouteNetworkServiceQueries>(
-                    x.GetRequiredService<Microsoft.Extensions.Logging.ILogger<QueryServiceClient<RouteNetworkServiceQueries>>>(), 
+                    x.GetRequiredService<Microsoft.Extensions.Logging.ILogger<QueryServiceClient<RouteNetworkServiceQueries>>>(),
                     Configuration.GetSection("RemoteServices:RouteNetworkService").Value)
                 );
 
-            // GraphQL schema stuff
-            services.AddScoped<OpenFTTHSchema>();
+            ConfigureRouteNetworkService.Register(services);
 
-            services.AddSingleton<RouteNetworkEventSubscription>();
-            services.AddSingleton<RouteNetworkEventType>();
-            services.AddSingleton<RouteNetworkServiceQueries>();
-            services.AddSingleton<RouteNodeType>();
-            services.AddSingleton<NamingInfoType>();
+            services.AddHostedService<RouteNetworkEventConsumer>();
+            services.AddSingleton<IToposTypedEventObservable<RouteNetworkEvent>, ToposTypedEventObservable<RouteNetworkEvent>>();
 
-            services.AddSingleton<OpenFTTHMutations>();
-            services.AddSingleton<RouteNodeMutations1>();
-            services.AddSingleton<RouteNodeMutations2>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
