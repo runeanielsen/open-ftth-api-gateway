@@ -27,6 +27,8 @@ namespace OpenFTTH.APIGateway
 {
     public class Startup
     {
+        readonly string AllowedOrigins = "_myAllowSpecificOrigins";
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -68,6 +70,18 @@ namespace OpenFTTH.APIGateway
             // Web stuff
             services.AddRazorPages();
 
+            // CORS
+            services.AddCors(options =>
+            {
+                options.AddPolicy(name: AllowedOrigins,
+                                  builder =>
+                                  {
+                                      builder.AllowAnyOrigin();
+                                      builder.AllowAnyMethod();
+                                      builder.AllowAnyHeader();
+                                  });
+            });
+
             // Services used by the API gateways
             services.AddHostedService<RouteNetworkEventConsumer>();
             services.AddSingleton<IToposTypedEventObservable<RouteNetworkEvent>, ToposTypedEventObservable<RouteNetworkEvent>>();
@@ -75,7 +89,7 @@ namespace OpenFTTH.APIGateway
 
             services.AddSingleton<QueryServiceClient<RouteNetworkServiceQueries>>(x =>
                 new QueryServiceClient<RouteNetworkServiceQueries>(
-                    x.GetRequiredService<Microsoft.Extensions.Logging.ILogger<QueryServiceClient<RouteNetworkServiceQueries>>>(), 
+                    x.GetRequiredService<Microsoft.Extensions.Logging.ILogger<QueryServiceClient<RouteNetworkServiceQueries>>>(),
                     Configuration.GetSection("RemoteServices:RouteNetworkService").Value)
                 );
 
@@ -104,6 +118,8 @@ namespace OpenFTTH.APIGateway
             {
                 app.UseExceptionHandler("/Error");
             }
+
+            app.UseCors(AllowedOrigins);
 
             app.UseWebSockets();
             app.UseGraphQLWebSockets<OpenFTTHSchema>("/graphql");
