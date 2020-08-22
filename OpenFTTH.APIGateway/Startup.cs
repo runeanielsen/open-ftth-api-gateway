@@ -30,6 +30,8 @@ namespace OpenFTTH.APIGateway
 {
     public class Startup
     {
+        readonly string AllowedOrigins = "_myAllowSpecificOrigins";
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -71,11 +73,9 @@ namespace OpenFTTH.APIGateway
             // Web stuff
             services.AddRazorPages();
 
-            // GraphQL root schema
-            services.AddSingleton<OpenFTTHSchema>();
-            services.AddSingleton<OpenFTTHQueries>();
-            services.AddSingleton<OpenFTTHMutations>();
-            services.AddSingleton<OpenFTTHSubscriptions>();
+            // Services used by the API gateways
+            services.AddHostedService<RouteNetworkEventConsumer>();
+            services.AddSingleton<IToposTypedEventObservable<RouteNetworkEvent>, ToposTypedEventObservable<RouteNetworkEvent>>();
 
             // Route network stuff
             services.AddSingleton<QueryServiceClient<RouteNetworkServiceQueries>>(x =>
@@ -102,6 +102,8 @@ namespace OpenFTTH.APIGateway
             {
                 app.UseExceptionHandler("/Error");
             }
+
+            app.UseCors(AllowedOrigins);
 
             app.UseWebSockets();
             app.UseGraphQLWebSockets<OpenFTTHSchema>("/graphql");
