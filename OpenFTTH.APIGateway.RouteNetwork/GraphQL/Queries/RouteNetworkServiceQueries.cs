@@ -33,19 +33,33 @@ namespace OpenFTTH.APIGateway.RouteNetwork.GraphQL.Queries
                     logger.LogDebug("Route node query: " + id);
 
                     // For quick testing... should be removed
-                    if (RouteNodeState.State.ContainsKey(id))
-                    {
-                        logger.LogDebug("Got a test id. Will therefore *not* call the route network service, but just fetch data from an in-memory state!");
-                        return RouteNodeState.State[id];
-                    }
+                    return RouteNetworkFakeState.GetRouteNodeState(id);
 
-
-                    var routeNodeData = routeNetworkQueries.Query<RouteNodeQuery, RouteNodeQueryResult>(new RouteNodeQuery(id));
-
-                    return routeNodeData;
+                    // Call the route network service
+                    return routeNetworkQueries.Query<RouteNodeQuery, RouteNodeQueryResult>(new RouteNodeQuery(id));
                 }
             );
-        
+
+
+            Field<RouteSegmentType>(
+               "routeSegment",
+               arguments: new QueryArguments(new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "Id" }),
+               resolve: context =>
+               {
+                   Guid id;
+                   if (!Guid.TryParse(context.GetArgument<string>("id"), out id))
+                   {
+                       context.Errors.Add(new ExecutionError("Wrong value for guid"));
+                       return null;
+                   }
+
+                   logger.LogDebug("Route segment query: " + id);
+
+                  // For quick testing... should be removed
+                  return RouteNetworkFakeState.GetRouteNodeState(id);
+               }
+           );
+
         }
 
     }

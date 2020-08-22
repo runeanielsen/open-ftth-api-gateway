@@ -73,9 +73,23 @@ namespace OpenFTTH.APIGateway
             // Web stuff
             services.AddRazorPages();
 
-            // Services used by the API gateways
-            services.AddHostedService<RouteNetworkEventConsumer>();
-            services.AddSingleton<IToposTypedEventObservable<RouteNetworkEvent>, ToposTypedEventObservable<RouteNetworkEvent>>();
+            // GraphQL root schema
+            services.AddSingleton<OpenFTTHSchema>();
+            services.AddSingleton<OpenFTTHQueries>();
+            services.AddSingleton<OpenFTTHMutations>();
+            services.AddSingleton<OpenFTTHSubscriptions>();
+
+            // CORS
+            services.AddCors(options =>
+            {
+                options.AddPolicy(name: AllowedOrigins,
+                                  builder =>
+                                  {
+                                      builder.AllowAnyOrigin();
+                                      builder.AllowAnyMethod();
+                                      builder.AllowAnyHeader();
+                                  });
+            });
 
             // Route network stuff
             services.AddSingleton<QueryServiceClient<RouteNetworkServiceQueries>>(x =>

@@ -9,15 +9,15 @@ using System.Text;
 
 namespace OpenFTTH.APIGateway.RouteNetwork.GraphQL.Mutations
 {
-    public class RouteNodeMutations : ObjectGraphType
+    public class RouteSegmentMutations : ObjectGraphType
     {
-        public RouteNodeMutations()
+        public RouteSegmentMutations()
         {
-            Description = "Route node mutations";
+            Description = "Route segment mutations";
 
-            Field<RouteNodeType>(
+            Field<RouteSegmentType>(
               "updateNamingInfo",
-              description: "Mutation used to update the name and/or description of a route node",
+              description: "Mutation used to update the name and/or description of a route segment",
               arguments: new QueryArguments(
                   new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "id" },
                   new QueryArgument<NonNullGraphType<NamingInfoInputType>> { Name = "input" }
@@ -25,16 +25,16 @@ namespace OpenFTTH.APIGateway.RouteNetwork.GraphQL.Mutations
               resolve: context =>
               {
                   var id = context.GetArgument<Guid>("id");
-                  var state = RouteNetworkFakeState.GetRouteNodeState(id);
+                  var state = RouteNetworkFakeState.GetRouteSegmentState(id);
                   state.NamingInfo = context.GetArgument<NamingInfo>("input");
-                  return RouteNetworkFakeState.UpdateRouteNodeState(state);
+                  return RouteNetworkFakeState.UpdateRouteSegmentState(state);
               }
             );
 
 
-            Field<RouteNodeType>(
+            Field<RouteSegmentType>(
                "updateLifecyleInfo",
-               description: "Mutation used to update the lifecycle related properties of a route node",
+               description: "Mutation used to update the lifecycle related properties of a route segment",
                arguments: new QueryArguments(
                    new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "id" },
                    new QueryArgument<NonNullGraphType<LifecycleInfoInputType>> { Name = "input" }
@@ -42,16 +42,16 @@ namespace OpenFTTH.APIGateway.RouteNetwork.GraphQL.Mutations
                resolve: context =>
                {
                    var id = context.GetArgument<Guid>("id");
-                   var state = RouteNetworkFakeState.GetRouteNodeState(id);
+                   var state = RouteNetworkFakeState.GetRouteSegmentState(id);
                    state.LifecycleInfo = context.GetArgument<LifecycleInfo>("input");
-                   return RouteNetworkFakeState.UpdateRouteNodeState(state);
+                   return RouteNetworkFakeState.UpdateRouteSegmentState(state);
                }
             );
 
 
-            Field<RouteNodeType>(
+            Field<RouteSegmentType>(
                "updateMappingInfo",
-               description: "Mutation used to update mapping/digitizing info related properties of a route node",
+               description: "Mutation used to update mapping/digitizing info related properties of a route segment",
                arguments: new QueryArguments(
                    new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "id" },
                    new QueryArgument<NonNullGraphType<MappingInfoInputType>> { Name = "input" }
@@ -59,15 +59,15 @@ namespace OpenFTTH.APIGateway.RouteNetwork.GraphQL.Mutations
                resolve: context =>
                {
                    var id = context.GetArgument<Guid>("id");
-                   var state = RouteNetworkFakeState.GetRouteNodeState(id);
+                   var state = RouteNetworkFakeState.GetRouteSegmentState(id);
                    state.MappingInfo = context.GetArgument<MappingInfo>("input");
-                   return RouteNetworkFakeState.UpdateRouteNodeState(state);
+                   return RouteNetworkFakeState.UpdateRouteSegmentState(state);
                }
             );
 
-            Field<RouteNodeType>(
+            Field<RouteSegmentType>(
               "updateSafetyInfo",
-              description: "Mutation used to update safety information of a node.",
+              description: "Mutation used to update safety information of a segment.",
               arguments: new QueryArguments(
                   new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "id" },
                   new QueryArgument<NonNullGraphType<SafetyInfoInputType>> { Name = "input" }
@@ -75,25 +75,25 @@ namespace OpenFTTH.APIGateway.RouteNetwork.GraphQL.Mutations
               resolve: context =>
               {
                   var id = context.GetArgument<Guid>("id");
-                  var state = RouteNetworkFakeState.GetRouteNodeState(id);
+                  var state = RouteNetworkFakeState.GetRouteSegmentState(id);
                   state.SafetyInfo = context.GetArgument<SafetyInfo>("input");
-                  return RouteNetworkFakeState.UpdateRouteNodeState(state);
+                  return RouteNetworkFakeState.UpdateRouteSegmentState(state);
               }
             );
 
-            Field<RouteNodeType>(
-            "updateRouteNodeInfo",
-            description: "Mutation used to update route node specific properties",
+            Field<RouteSegmentType>(
+            "updateRouteSegmentInfo",
+            description: "Mutation used to update route segment specific properties",
             arguments: new QueryArguments(
                 new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "id" },
-                new QueryArgument<NonNullGraphType<RouteNodeInfoInputType>> { Name = "input" }
+                new QueryArgument<NonNullGraphType<RouteSegmentInfoInputType>> { Name = "input" }
             ),
             resolve: context =>
             {
                 var id = context.GetArgument<Guid>("id");
-                var state = RouteNetworkFakeState.GetRouteNodeState(id);
-                state.RouteNodeInfo = context.GetArgument<RouteNodeInfo>("input");
-                return RouteNetworkFakeState.UpdateRouteNodeState(state);
+                var state = RouteNetworkFakeState.GetRouteSegmentState(id);
+                state.RouteSegmentInfo = context.GetArgument<RouteSegmentInfo>("input");
+                return RouteNetworkFakeState.UpdateRouteSegmentState(state);
             }
             );
         }

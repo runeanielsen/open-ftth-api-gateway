@@ -17,6 +17,7 @@ namespace OpenFTTH.APIGateway.RouteNetwork.GraphQL
 
             services.AddSingleton<RouteNetworkServiceQueries>();
             services.AddSingleton<RouteNodeMutations>();
+            services.AddSingleton<RouteSegmentMutations>();
 
             // General types
             services.AddSingleton<RouteNetworkEventType>();
@@ -42,6 +43,12 @@ namespace OpenFTTH.APIGateway.RouteNetwork.GraphQL
             services.AddSingleton<RouteNodeKindEnumType>();
             services.AddSingleton<RouteNodeFunctionEnumType>();
 
+
+            // Route segment specific types
+            services.AddSingleton<RouteSegmentType>();
+            services.AddSingleton<RouteSegmentInfoType>();
+            services.AddSingleton<RouteSegmentInfoInputType>();
+            services.AddSingleton<RouteSegmentKindEnumType>();
         }
     }
 }

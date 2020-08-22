@@ -15,7 +15,7 @@ namespace OpenFTTH.APIGateway.GraphQL.Mutations
             Description = "Entry point for sending mutations to the various underlying services";
 
             Field<RouteNodeMutations>("routeNode", resolve: context => new { });
-            //Field<RouteNodeMutations2>("routeNodeMutations_test2", resolve: context => new { });
+            Field<RouteSegmentMutations>("routeSegment", resolve: context => new { });
         }
     }
 

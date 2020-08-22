@@ -5,26 +5,39 @@ using System.Text;
 
 namespace OpenFTTH.APIGateway.RouteNetwork.GraphQL.Test
 {
-    public static class RouteNodeState
+    public static class RouteNetworkFakeState
     {
-        public static Dictionary<Guid, RouteNodeQueryResult> State = new Dictionary<Guid, RouteNodeQueryResult>()
+        private static Dictionary<Guid, RouteNodeQueryResult> _routeNodes = new Dictionary<Guid, RouteNodeQueryResult>();
+        private static Dictionary<Guid, RouteSegmentQueryResult> _routeSegments = new Dictionary<Guid, RouteSegmentQueryResult>();
+
+
+        public static RouteNodeQueryResult GetRouteNodeState(Guid id)
         {
-            {
-                Guid.Parse("20116798-dfa6-4311-a99a-a60ed0dd7097"),
-                new RouteNodeQueryResult()
-                {
-                    RouteNodeId = Guid.Parse("20116798-dfa6-4311-a99a-a60ed0dd7097"),
-                    NamingInfo = new Events.Core.Infos.NamingInfo("test obj 1 name", "test obj 1 description")
-                }
-            },
-            {
-                Guid.Parse("4eac7486-523f-4373-8cd4-57bab1336721"),
-                new RouteNodeQueryResult()
-                {
-                    RouteNodeId = Guid.Parse("20116798-dfa6-4311-a99a-a60ed0dd7097"),
-                    NamingInfo = new Events.Core.Infos.NamingInfo("test obj 2 name", "test obj 2 description")
-                }
-            },
-        };
+            if (!_routeNodes.ContainsKey(id))
+                _routeNodes.Add(id, new RouteNodeQueryResult() { RouteNodeId = id });
+
+            return _routeNodes[id];
+        }
+
+        public static RouteNodeQueryResult UpdateRouteNodeState(RouteNodeQueryResult routeNode)
+        {
+            _routeNodes[routeNode.RouteNodeId] = routeNode;
+            return routeNode;
+        }
+
+        public static RouteSegmentQueryResult GetRouteSegmentState(Guid id)
+        {
+            if (!_routeSegments.ContainsKey(id))
+                _routeSegments.Add(id, new RouteSegmentQueryResult() { RouteSegmentId = id });
+
+            return _routeSegments[id];
+        }
+
+        public static RouteSegmentQueryResult UpdateRouteSegmentState(RouteSegmentQueryResult routeSegment)
+        {
+            _routeSegments[routeSegment.RouteSegmentId] = routeSegment;
+            return routeSegment;
+        }
+
     }
 }
