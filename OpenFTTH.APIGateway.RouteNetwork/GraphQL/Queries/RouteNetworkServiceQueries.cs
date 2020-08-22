@@ -56,7 +56,7 @@ namespace OpenFTTH.APIGateway.RouteNetwork.GraphQL.Queries
                    logger.LogDebug("Route segment query: " + id);
 
                   // For quick testing... should be removed
-                  return RouteNetworkFakeState.GetRouteNodeState(id);
+                  return RouteNetworkFakeState.GetRouteSegmentState(id);
                }
            );
 
