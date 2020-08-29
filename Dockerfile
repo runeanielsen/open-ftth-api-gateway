@@ -5,6 +5,7 @@ COPY ./*sln ./
 
 COPY ./OpenFTTH.APIGateway/*.csproj ./OpenFTTH.APIGateway/
 COPY ./OpenFTTH.APIGateway.RouteNetwork/*.csproj ./OpenFTTH.APIGateway.RouteNetwork/
+COPY ./OpenFTTH.APIGateway.GeographicalAreaUpdated/*.csproj ./OpenFTTH.APIGateway.GeographicalAreaUpdated/
 COPY ./OpenFTTH.APIGateway.Remote/*.csproj ./OpenFTTH.APIGateway.Remote/
 
 RUN dotnet restore --packages ./packages
