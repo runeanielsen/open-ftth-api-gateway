@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="DAX.EventProcessing.Dispatcher" Version="1.0.1-alpha" />
+    <PackageReference Include="DAX.EventProcessing.Dispatcher" Version="1.0.5" />
     <PackageReference Include="GraphQL.Server.Transports.AspNetCore" Version="3.4.0" />
     <PackageReference Include="GraphQL.Server.Transports.WebSockets" Version="3.4.0" />
     <PackageReference Include="GraphQL.Server.Ui.GraphiQL" Version="3.4.0" />
@@ -16,15 +16,17 @@
     <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="8.1.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="3.1.6" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.9.10" />
-    <PackageReference Include="OpenFTTH.Events" Version="1.0.7-alpha" />
+    <PackageReference Include="OpenFTTH.Events" Version="1.0.11" />
     <PackageReference Include="OpenFTTH.RouteNetworkService.Queries" Version="1.0.5-alpha" />
     <PackageReference Include="Serilog" Version="2.9.0" />
     <PackageReference Include="Serilog.Extensions.Logging" Version="3.0.1" />
+    <PackageReference Include="Serilog.Settings.Configuration" Version="3.1.0" />
     <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
     <PackageReference Include="Serilog.Sinks.Debug" Version="1.0.1" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\OpenFTTH.APIGateway.GeographicalAreaUpdated\OpenFTTH.APIGateway.GeographicalAreaUpdated.csproj" />
     <ProjectReference Include="..\OpenFTTH.APIGateway.Remote\OpenFTTH.APIGateway.Remote.csproj" />
     <ProjectReference Include="..\OpenFTTH.APIGateway.RouteNetwork\OpenFTTH.APIGateway.RouteNetwork.csproj" />
   </ItemGroup>

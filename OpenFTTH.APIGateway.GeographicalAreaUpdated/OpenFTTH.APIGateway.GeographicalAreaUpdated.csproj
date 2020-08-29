@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DAX.EventProcessing.Dispatcher" Version="1.0.5" />
+    <PackageReference Include="GraphQL" Version="2.4.0" />
+    <PackageReference Include="OpenFTTH.Events" Version="1.0.11" />
+  </ItemGroup>
+
+</Project>

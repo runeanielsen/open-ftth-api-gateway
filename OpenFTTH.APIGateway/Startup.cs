@@ -19,12 +19,14 @@ using OpenFTTH.APIGateway.RouteNetwork.GraphQL.Types;
 using OpenFTTH.APIGateway.Settings;
 using OpenFTTH.APIGateway.Workers;
 using OpenFTTH.Events.RouteNetwork;
+using OpenFTTH.Events.Geo;
 using Serilog;
 using OpenFTTH.APIGateway.RouteNetwork.GraphQL.Mutations;
 using OpenFTTH.APIGateway.GraphQL.Mutations;
 using OpenFTTH.APIGateway.RouteNetwork.GraphQL;
 using OpenFTTH.APIGateway.GraphQL.Queries;
 using OpenFTTH.APIGateway.GraphQL.Subscriptions;
+using OpenFTTH.APIGateway.GeographicalAreaUpdated.GraphQL.Types;
 
 namespace OpenFTTH.APIGateway
 {
@@ -44,15 +46,24 @@ namespace OpenFTTH.APIGateway
             services.AddOptions();
 
             // Logging
+            var configuration = new ConfigurationBuilder()
+               .AddJsonFile("appsettings.json", true, false)
+               .AddEnvironmentVariables().Build();
+
             Log.Logger = new LoggerConfiguration()
-             .Enrich.FromLogContext()
-             .MinimumLevel.Verbose()
-             .WriteTo.Console()
-             .WriteTo.Debug()
-             .CreateLogger();
+                .ReadFrom.Configuration(configuration)
+                .CreateLogger();
 
-            services.AddLogging(loggingBuilder => loggingBuilder.AddSerilog(dispose: true));
+           
+            services.AddLogging(loggingBuilder =>
+                {
+                    var logger = new LoggerConfiguration()
+                        .ReadFrom.Configuration(configuration)
+                        .CreateLogger();
 
+                    loggingBuilder.AddSerilog(dispose: true);
+                });
+                       
             // GraphQL stuff
             services.Configure<KestrelServerOptions>(options => options.AllowSynchronousIO = true);
 
@@ -102,6 +113,15 @@ namespace OpenFTTH.APIGateway
 
             services.AddHostedService<RouteNetworkEventConsumer>();
             services.AddSingleton<IToposTypedEventObservable<RouteNetworkEvent>, ToposTypedEventObservable<RouteNetworkEvent>>();
+
+            // Geographical area updated
+            services.AddHostedService<GeographicalAreaUpdatedEventConsumer>();
+            services.AddSingleton<IToposTypedEventObservable<ObjectsWithinGeographicalAreaUpdated>, ToposTypedEventObservable<ObjectsWithinGeographicalAreaUpdated>>();
+            services.AddSingleton<GeographicalAreaUpdatedEventSubscription>();
+            services.AddSingleton<ObjectsWithinGeographicalAreaUpdatedType>();
+            services.AddSingleton<EnvelopeType>();
+            services.AddSingleton<IdChangeSetType>();
+            services.AddSingleton<ChangeTypeEnumType>();
 
         }
 

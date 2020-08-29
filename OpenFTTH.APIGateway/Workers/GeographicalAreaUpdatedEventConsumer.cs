@@ -8,20 +8,21 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using OpenFTTH.APIGateway.Settings;
+using OpenFTTH.Events.Geo;
 using OpenFTTH.Events.RouteNetwork;
 using Topos.Config;
 
 namespace OpenFTTH.APIGateway.Workers
 {
-    public class RouteNetworkEventConsumer : BackgroundService
+    public class GeographicalAreaUpdatedEventConsumer : BackgroundService
     {
-        private readonly ILogger<RouteNetworkEventConsumer> _logger;
-        private readonly IToposTypedEventObservable<RouteNetworkEvent> _eventDispatcher;
+        private readonly ILogger<GeographicalAreaUpdatedEventConsumer> _logger;
+        private readonly IToposTypedEventObservable<ObjectsWithinGeographicalAreaUpdated> _eventDispatcher;
         private readonly KafkaSetting _kafkaSetting;
 
         private IDisposable _kafkaConsumer;
 
-        public RouteNetworkEventConsumer(ILogger<RouteNetworkEventConsumer> logger, IOptions<KafkaSetting> kafkaSetting, IToposTypedEventObservable<RouteNetworkEvent> eventDispatcher)
+        public GeographicalAreaUpdatedEventConsumer(ILogger<GeographicalAreaUpdatedEventConsumer> logger, IOptions<KafkaSetting> kafkaSetting, IToposTypedEventObservable<ObjectsWithinGeographicalAreaUpdated> eventDispatcher)
         {
             _logger = logger;
             _kafkaSetting = kafkaSetting.Value;
@@ -30,15 +31,15 @@ namespace OpenFTTH.APIGateway.Workers
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            _logger.LogInformation("Starting route network event consumer worker at: {time}", DateTimeOffset.Now);
+            _logger.LogInformation("Starting geographical area updated event consumer worker at: {time}", DateTimeOffset.Now);
 
             try
             {
-                _kafkaConsumer = _eventDispatcher.Config("route_network_event_" + Guid.NewGuid(), c => c.UseKafka(_kafkaSetting.Server))
-                              .Logging(l => l.UseSerilog())
-                              .Positions(p => p.StoreInFileSystem(_kafkaSetting.PositionFilePath))
-                              .Topics(t => t.Subscribe(_kafkaSetting.RouteNetworkEventTopic))
-                              .Start();
+                _kafkaConsumer = _eventDispatcher.Config("geographical_area_updated_event_" + Guid.NewGuid(), c => c.UseKafka(_kafkaSetting.Server))
+                          .Logging(l => l.UseSerilog())
+                          .Positions(p => p.StoreInFileSystem(_kafkaSetting.PositionFilePath))
+                          .Topics(t => t.Subscribe(_kafkaSetting.GeographicalAreaUpdatedTopic))
+                          .Start();
             }
             catch (Exception ex)
             {
