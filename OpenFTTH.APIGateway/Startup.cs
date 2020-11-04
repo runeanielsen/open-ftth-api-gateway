@@ -28,6 +28,9 @@ using OpenFTTH.APIGateway.GraphQL.Queries;
 using OpenFTTH.APIGateway.GraphQL.Subscriptions;
 using OpenFTTH.APIGateway.GeographicalAreaUpdated.GraphQL.Types;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
+using Newtonsoft.Json.Converters;
 
 namespace OpenFTTH.APIGateway
 {
@@ -44,6 +47,16 @@ namespace OpenFTTH.APIGateway
 
         public void ConfigureServices(IServiceCollection services)
         {
+            // To support event deserialization we need setup newtonsoft to this
+            JsonConvert.DefaultSettings = (() =>
+            {
+                var settings = new JsonSerializerSettings();
+                settings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+                settings.Converters.Add(new StringEnumConverter());
+                settings.TypeNameHandling = TypeNameHandling.Auto;
+                return settings;
+            });
+
             services.AddOptions();
 
             // Logging
@@ -67,14 +80,6 @@ namespace OpenFTTH.APIGateway
 
             // GraphQL stuff
             services.Configure<KestrelServerOptions>(options => options.AllowSynchronousIO = true);
-
-
-            /*
-            services.AddGraphQL()
-            .AddGraphTypes(ServiceLifetime.Singleton)
-            .AddWebSockets()
-            .AddDataLoader();
-            */
 
             services.AddGraphQL((options, provider) =>
             {
@@ -128,8 +133,8 @@ namespace OpenFTTH.APIGateway
 
             ConfigureRouteNetworkService.Register(services);
 
-            //services.AddHostedService<RouteNetworkEventConsumer>();
-            services.AddSingleton<IToposTypedEventObservable<RouteNetworkEvent>, ToposTypedEventObservable<RouteNetworkEvent>>();
+            services.AddHostedService<RouteNetworkEventConsumer>();
+            services.AddSingleton<IToposTypedEventObservable<RouteNetworkEditOperationOccuredEvent>, ToposTypedEventObservable<RouteNetworkEditOperationOccuredEvent>>();
 
             // Geographical area updated
             services.AddHostedService<GeographicalAreaUpdatedEventConsumer>();

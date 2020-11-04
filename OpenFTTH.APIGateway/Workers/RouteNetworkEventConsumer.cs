@@ -17,12 +17,12 @@ namespace OpenFTTH.APIGateway.Workers
     public class RouteNetworkEventConsumer : BackgroundService
     {
         private readonly ILogger<RouteNetworkEventConsumer> _logger;
-        private readonly IToposTypedEventObservable<RouteNetworkEvent> _eventDispatcher;
+        private readonly IToposTypedEventObservable<RouteNetworkEditOperationOccuredEvent> _eventDispatcher;
         private readonly KafkaSetting _kafkaSetting;
 
         private IDisposable _kafkaConsumer;
 
-        public RouteNetworkEventConsumer(ILogger<RouteNetworkEventConsumer> logger, IOptions<KafkaSetting> kafkaSetting, IToposTypedEventObservable<RouteNetworkEvent> eventDispatcher)
+        public RouteNetworkEventConsumer(ILogger<RouteNetworkEventConsumer> logger, IOptions<KafkaSetting> kafkaSetting, IToposTypedEventObservable<RouteNetworkEditOperationOccuredEvent> eventDispatcher)
         {
             _logger = logger;
             _kafkaSetting = kafkaSetting.Value;
@@ -39,7 +39,7 @@ namespace OpenFTTH.APIGateway.Workers
                 var offset = GetLatestOffset();
 
                 _kafkaConsumer = _eventDispatcher.Config("route_network_event_" + Guid.NewGuid(), c => c.UseKafka(_kafkaSetting.Server))
-                              .Logging(l => l.UseSerilog())
+                              //.Logging(l => l.UseSerilog())
                               .Positions(p => p.StoreInFileSystem(_kafkaSetting.PositionFilePath))
                               .Topics(t => t.Subscribe(_kafkaSetting.RouteNetworkEventTopic))
                               .Start();

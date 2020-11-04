@@ -11,7 +11,7 @@ namespace OpenFTTH.APIGateway.RouteNetwork.GraphQL.Types
     {
         public RouteNetworkEditOperationOccuredEventType(IDataLoaderContextAccessor dataLoader)
         {
-            Description = "Route network event has occured";
+            Description = "Route network edit operation has occured";
 
             Field(x => x.EventId, type: typeof(IdGraphType)).Description("Event id");
             Field(x => x.EventType, type: typeof(StringGraphType)).Description("Event type");

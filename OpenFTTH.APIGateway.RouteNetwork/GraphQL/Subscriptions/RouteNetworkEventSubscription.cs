@@ -15,9 +15,9 @@ namespace OpenFTTH.APIGateway.RouteNetwork.GraphQL.Subscriptions
 {
     public class RouteNetworkEventSubscription
     {
-        private readonly IToposTypedEventObservable<RouteNetworkEvent> _toposTypedEventObserable;
+        private readonly IToposTypedEventObservable<RouteNetworkEditOperationOccuredEvent> _toposTypedEventObserable;
 
-        public RouteNetworkEventSubscription(IToposTypedEventObservable<RouteNetworkEvent> toposTypedEventObserable)
+        public RouteNetworkEventSubscription(IToposTypedEventObservable<RouteNetworkEditOperationOccuredEvent> toposTypedEventObserable)
         {
             _toposTypedEventObserable = toposTypedEventObserable;
         }
@@ -28,17 +28,17 @@ namespace OpenFTTH.APIGateway.RouteNetwork.GraphQL.Subscriptions
             {
                 Name = "routeEvents",
                 Type = typeof(RouteNetworkEditOperationOccuredEventType),
-                Resolver = new FuncFieldResolver<RouteNetworkEvent>(ResolveEvent),
-                Subscriber = new EventStreamResolver<RouteNetworkEvent>(SubscribeEvents)
+                Resolver = new FuncFieldResolver<RouteNetworkEditOperationOccuredEvent>(ResolveEvent),
+                Subscriber = new EventStreamResolver<RouteNetworkEditOperationOccuredEvent>(SubscribeEvents)
             });
         }
 
-        private RouteNetworkEvent ResolveEvent(IResolveFieldContext context)
+        private RouteNetworkEditOperationOccuredEvent ResolveEvent(IResolveFieldContext context)
         {
-            return context.Source as RouteNetworkEvent;
+            return context.Source as RouteNetworkEditOperationOccuredEvent;
         }
 
-        private IObservable<RouteNetworkEvent> SubscribeEvents(IResolveEventStreamContext context)
+        private IObservable<RouteNetworkEditOperationOccuredEvent> SubscribeEvents(IResolveEventStreamContext context)
         {
             return _toposTypedEventObserable.OnEvent;
         }
