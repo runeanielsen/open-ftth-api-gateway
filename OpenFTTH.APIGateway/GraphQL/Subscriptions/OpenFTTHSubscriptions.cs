@@ -12,7 +12,7 @@ namespace OpenFTTH.APIGateway.GraphQL.Subscriptions
 {
     public class OpenFTTHSubscriptions : ObjectGraphType
     {
-        public OpenFTTHSubscriptions(ILogger<OpenFTTHSubscriptions> logger, IDependencyResolver resolver, RouteNetworkEventSubscription routeNetworkEventSubscription, GeographicalAreaUpdatedEventSubscription geographicalAreaUpdatedEventSubscription)
+        public OpenFTTHSubscriptions(ILogger<OpenFTTHSubscriptions> logger, RouteNetworkEventSubscription routeNetworkEventSubscription, GeographicalAreaUpdatedEventSubscription geographicalAreaUpdatedEventSubscription)
         {
             Description = "GraphQL API for subscriping to various events in the Open FTTH system";
 

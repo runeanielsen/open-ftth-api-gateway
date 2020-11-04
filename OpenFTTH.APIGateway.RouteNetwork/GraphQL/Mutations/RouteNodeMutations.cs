@@ -1,4 +1,5 @@
-﻿using GraphQL.Types;
+﻿using GraphQL;
+using GraphQL.Types;
 using OpenFTTH.APIGateway.RouteNetwork.GraphQL.Test;
 using OpenFTTH.APIGateway.RouteNetwork.GraphQL.Types;
 using OpenFTTH.Events.Core.Infos;

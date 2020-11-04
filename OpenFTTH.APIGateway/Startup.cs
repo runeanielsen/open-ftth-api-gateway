@@ -27,6 +27,7 @@ using OpenFTTH.APIGateway.RouteNetwork.GraphQL;
 using OpenFTTH.APIGateway.GraphQL.Queries;
 using OpenFTTH.APIGateway.GraphQL.Subscriptions;
 using OpenFTTH.APIGateway.GeographicalAreaUpdated.GraphQL.Types;
+using Microsoft.Extensions.Logging;
 
 namespace OpenFTTH.APIGateway
 {
@@ -54,7 +55,7 @@ namespace OpenFTTH.APIGateway
                 .ReadFrom.Configuration(configuration)
                 .CreateLogger();
 
-           
+
             services.AddLogging(loggingBuilder =>
                 {
                     var logger = new LoggerConfiguration()
@@ -63,16 +64,32 @@ namespace OpenFTTH.APIGateway
 
                     loggingBuilder.AddSerilog(dispose: true);
                 });
-                       
+
             // GraphQL stuff
             services.Configure<KestrelServerOptions>(options => options.AllowSynchronousIO = true);
 
-            services.AddSingleton<IDependencyResolver>(s => new FuncDependencyResolver(s.GetRequiredService));
 
-            services.AddGraphQL(o => { o.ExposeExceptions = true; })
+            /*
+            services.AddGraphQL()
             .AddGraphTypes(ServiceLifetime.Singleton)
             .AddWebSockets()
             .AddDataLoader();
+            */
+
+            services.AddGraphQL((options, provider) =>
+            {
+                options.EnableMetrics = true;
+                var logger = provider.GetRequiredService<ILogger<Startup>>();
+                options.UnhandledExceptionDelegate = ctx => logger.LogError("{Error} occured", ctx.OriginalException.Message);
+            })
+            // Add required services for de/serialization
+            .AddSystemTextJson(deserializerSettings => { }, serializerSettings => { }) // For .NET Core 3+
+                                                                                       //.AddNewtonsoftJson(deserializerSettings => { }, serializerSettings => { }) // For everything else
+            .AddErrorInfoProvider(opt => opt.ExposeExceptionStackTrace = true)
+            .AddWebSockets() // Add required services for web socket support
+            .AddDataLoader() // Add required services for DataLoader support
+            .AddGraphTypes(typeof(Startup)); // Add all IGraphType implementors in assembly which Startup exists 
+
 
             // Settings
             services.Configure<KafkaSetting>(kafkaSettings =>
@@ -111,7 +128,7 @@ namespace OpenFTTH.APIGateway
 
             ConfigureRouteNetworkService.Register(services);
 
-            services.AddHostedService<RouteNetworkEventConsumer>();
+            //services.AddHostedService<RouteNetworkEventConsumer>();
             services.AddSingleton<IToposTypedEventObservable<RouteNetworkEvent>, ToposTypedEventObservable<RouteNetworkEvent>>();
 
             // Geographical area updated
@@ -141,7 +158,11 @@ namespace OpenFTTH.APIGateway
 
             app.UseWebSockets();
             app.UseGraphQLWebSockets<OpenFTTHSchema>("/graphql");
-            app.UseGraphQL<OpenFTTHSchema>("/graphql");
+            
+            
+            //app.UseGraphQL<OpenFTTHSchema>("/graphql");
+            app.UseGraphQL<OpenFTTHSchema, GraphQLHttpMiddlewareWithLogs<OpenFTTHSchema>>("/graphql");
+
             app.UseGraphQLPlayground(new GraphQLPlaygroundOptions
             {
                 Path = "/ui/playground",

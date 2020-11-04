@@ -1,4 +1,5 @@
 ﻿using DAX.EventProcessing.Dispatcher;
+using GraphQL;
 using GraphQL.Resolvers;
 using GraphQL.Subscription;
 using GraphQL.Types;
@@ -33,12 +34,12 @@ namespace OpenFTTH.APIGateway.RouteNetwork.GraphQL.Subscriptions
             });
         }
 
-        private ObjectsWithinGeographicalAreaUpdated ResolveEvent(ResolveFieldContext context)
+        private ObjectsWithinGeographicalAreaUpdated ResolveEvent(IResolveFieldContext context)
         {
             return context.Source as ObjectsWithinGeographicalAreaUpdated;
         }
 
-        private IObservable<ObjectsWithinGeographicalAreaUpdated> SubscribeEvents(ResolveEventStreamContext context)
+        private IObservable<ObjectsWithinGeographicalAreaUpdated> SubscribeEvents(IResolveEventStreamContext context)
         {
             return _toposTypedEventObserable.OnEvent;
         }

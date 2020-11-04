@@ -1,4 +1,5 @@
 ﻿using DAX.EventProcessing.Dispatcher;
+using GraphQL;
 using GraphQL.Resolvers;
 using GraphQL.Subscription;
 using GraphQL.Types;
@@ -26,18 +27,18 @@ namespace OpenFTTH.APIGateway.RouteNetwork.GraphQL.Subscriptions
             objectGraphType.AddField(new EventStreamFieldType
             {
                 Name = "routeEvents",
-                Type = typeof(RouteNetworkEventType),
+                Type = typeof(RouteNetworkEditOperationOccuredEventType),
                 Resolver = new FuncFieldResolver<RouteNetworkEvent>(ResolveEvent),
                 Subscriber = new EventStreamResolver<RouteNetworkEvent>(SubscribeEvents)
             });
         }
 
-        private RouteNetworkEvent ResolveEvent(ResolveFieldContext context)
+        private RouteNetworkEvent ResolveEvent(IResolveFieldContext context)
         {
             return context.Source as RouteNetworkEvent;
         }
 
-        private IObservable<RouteNetworkEvent> SubscribeEvents(ResolveEventStreamContext context)
+        private IObservable<RouteNetworkEvent> SubscribeEvents(IResolveEventStreamContext context)
         {
             return _toposTypedEventObserable.OnEvent;
         }

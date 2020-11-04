@@ -20,7 +20,7 @@ namespace OpenFTTH.APIGateway.RouteNetwork.GraphQL
             services.AddSingleton<RouteSegmentMutations>();
 
             // General types
-            services.AddSingleton<RouteNetworkEventType>();
+            services.AddSingleton<RouteNetworkEditOperationOccuredEventType>();
             services.AddSingleton<NamingInfoType>();
             services.AddSingleton<NamingInfoInputType>();
 

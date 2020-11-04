@@ -17,15 +17,15 @@ namespace OpenFTTH.APIGateway.GraphQL.Schemas
 {
     public class OpenFTTHSchema : Schema
     {
-        public OpenFTTHSchema(IDependencyResolver resolver)
-            : base(resolver)
+        public OpenFTTHSchema(IServiceProvider serviceProvider, OpenFTTHQueries queries, OpenFTTHSubscriptions subscriptions, OpenFTTHMutations mutations) : base(serviceProvider)
         {
-            Query = resolver.Resolve<OpenFTTHQueries>();
+            Query = queries;
 
-            Subscription = resolver.Resolve<OpenFTTHSubscriptions>();
+            Subscription = subscriptions;
 
-            Mutation = resolver.Resolve<OpenFTTHMutations>();
-            RegisterType<RouteNetworkEventType>();
+            Mutation = mutations;
+
+            RegisterType<RouteNetworkEditOperationOccuredEventType>();
         }
     }
 }

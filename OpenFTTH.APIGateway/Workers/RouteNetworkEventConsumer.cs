@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Confluent.Kafka;
 using DAX.EventProcessing.Dispatcher;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -34,6 +35,9 @@ namespace OpenFTTH.APIGateway.Workers
 
             try
             {
+
+                var offset = GetLatestOffset();
+
                 _kafkaConsumer = _eventDispatcher.Config("route_network_event_" + Guid.NewGuid(), c => c.UseKafka(_kafkaSetting.Server))
                               .Logging(l => l.UseSerilog())
                               .Positions(p => p.StoreInFileSystem(_kafkaSetting.PositionFilePath))
@@ -46,6 +50,30 @@ namespace OpenFTTH.APIGateway.Workers
             }
 
             await Task.CompletedTask;
+        }
+
+        private long GetLatestOffset()
+        {
+            var conf = new ConsumerConfig
+            {
+                GroupId = "route_network_event_get_offset_" + Guid.NewGuid(),
+                BootstrapServers = _kafkaSetting.Server,
+                // Note: The AutoOffsetReset property determines the start offset in the event
+                // there are not yet any committed offsets for the consumer group for the
+                // topic/partitions of interest. By default, offsets are committed
+                // automatically, so in this example, consumption will only start from the
+                // earliest message in the topic 'my-topic' the first time you run the program.
+                AutoOffsetReset = AutoOffsetReset.Latest
+            };
+            using (var c = new ConsumerBuilder<Ignore, string>(conf).Build())
+            {
+                c.Subscribe(_kafkaSetting.RouteNetworkEventTopic);
+
+                var test = c.Consume();
+
+                var position = c.Position(new TopicPartition(_kafkaSetting.RouteNetworkEventTopic, new Partition()));
+                return position.Value;
+            }
         }
 
         public override async Task StopAsync(CancellationToken stoppingToken)
