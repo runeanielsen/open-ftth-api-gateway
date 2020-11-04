@@ -68,7 +68,6 @@ namespace OpenFTTH.APIGateway
                 .ReadFrom.Configuration(configuration)
                 .CreateLogger();
 
-
             services.AddLogging(loggingBuilder =>
                 {
                     var logger = new LoggerConfiguration()
@@ -162,10 +161,9 @@ namespace OpenFTTH.APIGateway
             app.UseCors(AllowedOrigins);
 
             app.UseWebSockets();
+
             app.UseGraphQLWebSockets<OpenFTTHSchema>("/graphql");
             
-            
-            //app.UseGraphQL<OpenFTTHSchema>("/graphql");
             app.UseGraphQL<OpenFTTHSchema, GraphQLHttpMiddlewareWithLogs<OpenFTTHSchema>>("/graphql");
 
             app.UseGraphQLPlayground(new GraphQLPlaygroundOptions
