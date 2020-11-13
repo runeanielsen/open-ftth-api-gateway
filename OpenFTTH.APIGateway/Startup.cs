@@ -31,6 +31,10 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using Newtonsoft.Json.Converters;
+using OpenFTTH.APIGateway.Work.GraphQL;
+using OpenFTTH.WorkService;
+using OpenFTTH.WorkService.InMemTestImpl;
+using OpenFTTH.APIGateway.CoreTypes;
 
 namespace OpenFTTH.APIGateway
 {
@@ -123,17 +127,26 @@ namespace OpenFTTH.APIGateway
                                   });
             });
 
-            // Route network stuff
+            // Core types
+            RegisterCoreTypes.Register(services);
+
+            // Route network service stuff
             services.AddSingleton<QueryServiceClient<RouteNetworkServiceQueries>>(x =>
                 new QueryServiceClient<RouteNetworkServiceQueries>(
                     x.GetRequiredService<Microsoft.Extensions.Logging.ILogger<QueryServiceClient<RouteNetworkServiceQueries>>>(),
                     Configuration.GetSection("RemoteServices:RouteNetworkService").Value)
                 );
 
-            ConfigureRouteNetworkService.Register(services);
+            RegisterRouteNetworkServiceTypes.Register(services);
 
             services.AddHostedService<RouteNetworkEventConsumer>();
             services.AddSingleton<IToposTypedEventObservable<RouteNetworkEditOperationOccuredEvent>, ToposTypedEventObservable<RouteNetworkEditOperationOccuredEvent>>();
+
+
+            // Work service stuff
+            RegisterWorkServiceTypes.Register(services);
+            services.AddSingleton<IWorkServiceAPI, InMemWorkServiceImpl>();
+
 
             // Geographical area updated
             services.AddHostedService<GeographicalAreaUpdatedEventConsumer>();

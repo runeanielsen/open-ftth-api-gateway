@@ -9,7 +9,7 @@ using System.Text;
 
 namespace OpenFTTH.APIGateway.RouteNetwork.GraphQL
 {
-    public static class ConfigureRouteNetworkService
+    public static class RegisterRouteNetworkServiceTypes
     {
         public static void Register(IServiceCollection services)
         {

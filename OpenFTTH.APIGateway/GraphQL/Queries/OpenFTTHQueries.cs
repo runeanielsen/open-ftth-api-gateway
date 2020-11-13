@@ -1,6 +1,7 @@
 ﻿using GraphQL.Types;
 using Microsoft.Extensions.Logging;
 using OpenFTTH.APIGateway.RouteNetwork.GraphQL.Queries;
+using OpenFTTH.APIGateway.Work.GraphQL.Queries;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,7 +17,9 @@ namespace OpenFTTH.APIGateway.GraphQL.Queries
 
             Field<StringGraphType>("apiVersion", resolve: context => VersionInfo.VersionString());
 
-            Field<RouteNetworkServiceQueries>("routeNetwork", resolve: context => new { });
+            Field<RouteNetworkServiceQueries>("routeNetworkService", resolve: context => new { });
+
+            Field<WorkServiceQueries>("workService", resolve: context => new { });
         }
     }
 }
