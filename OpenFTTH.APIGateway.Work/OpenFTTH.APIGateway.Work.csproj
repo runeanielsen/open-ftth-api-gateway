@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\OepnFTTH.APIGateway.GraphQLCoreTypes\OpenFTTH.APIGateway.CoreTypes.csproj" />
+    <ProjectReference Include="..\OpenFTTH.APIGateway.CoreTypes\OpenFTTH.APIGateway.CoreTypes.csproj" />
     <ProjectReference Include="..\OpenFTTH.WorkService.API\OpenFTTH.WorkService.API.csproj" />
     <ProjectReference Include="..\OpenFTTH.WorkService\OpenFTTH.WorkService.csproj" />
   </ItemGroup>

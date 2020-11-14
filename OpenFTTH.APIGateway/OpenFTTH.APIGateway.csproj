@@ -27,7 +27,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\OepnFTTH.APIGateway.GraphQLCoreTypes\OpenFTTH.APIGateway.CoreTypes.csproj" />
     <ProjectReference Include="..\OpenFTTH.APIGateway.GeographicalAreaUpdated\OpenFTTH.APIGateway.GeographicalAreaUpdated.csproj" />
     <ProjectReference Include="..\OpenFTTH.APIGateway.Remote\OpenFTTH.APIGateway.Remote.csproj" />
     <ProjectReference Include="..\OpenFTTH.APIGateway.RouteNetwork\OpenFTTH.APIGateway.RouteNetwork.csproj" />
