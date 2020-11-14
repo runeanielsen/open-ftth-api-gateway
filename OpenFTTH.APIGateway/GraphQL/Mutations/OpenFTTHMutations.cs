@@ -16,6 +16,7 @@ namespace OpenFTTH.APIGateway.GraphQL.Mutations
 
             Field<RouteNodeMutations>("routeNode", resolve: context => new { });
             Field<RouteSegmentMutations>("routeSegment", resolve: context => new { });
+            Field<UserWorkContextMutations>("userContext", resolve: context => new { });
         }
     }
 

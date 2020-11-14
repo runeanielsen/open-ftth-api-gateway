@@ -1,5 +1,4 @@
-﻿using OpenFTTH.WorkService.Queries;
-using System;
+﻿using System;
 using System.Threading.Tasks;
 
 namespace OpenFTTH.WorkService
@@ -7,5 +6,7 @@ namespace OpenFTTH.WorkService
     public interface IWorkServiceAPI
     {
         IQueryResult Query(IQueryCommand queryCommand);
+
+        IMutationResult Mutate(IMutationCommand mutationCommand);
     }
 }

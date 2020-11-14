@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using GraphQL;
 using GraphQL.Types;
 using Microsoft.Extensions.Logging;
 using OpenFTTH.APIGateway.Work.GraphQL.Types;
@@ -26,6 +27,20 @@ namespace OpenFTTH.APIGateway.Work.GraphQL.Queries
                     var queryRequest = new ProjectsAndWorkTasksQuery();
 
                     return ((ProjectsAndWorkTasksQueryResult)_workService.Query(queryRequest)).Projects;
+                }
+            );
+
+            Field<UserWorkContextType>(
+                name: "userWorkContext",
+                description: "Used to get work task status information specific to a particular user.",
+                arguments: new QueryArguments(new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "userName" }),
+                resolve: context =>
+                {
+                    var userName = context.GetArgument<string>("userName");
+
+                    var queryRequest = new UserWorkContextQuery(userName);
+
+                    return ((UserWorkContextQueryResult)_workService.Query(queryRequest)).UserWorkContext;
                 }
             );
 

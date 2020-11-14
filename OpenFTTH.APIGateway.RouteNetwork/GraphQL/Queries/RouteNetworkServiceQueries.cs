@@ -36,7 +36,7 @@ namespace OpenFTTH.APIGateway.RouteNetwork.GraphQL.Queries
                     return RouteNetworkFakeState.GetRouteNodeState(id);
 
                     // Call the route network service
-                    return routeNetworkQueries.Query<RouteNodeQuery, RouteNodeQueryResult>(new RouteNodeQuery(id));
+                    //return routeNetworkQueries.Query<RouteNodeQuery, RouteNodeQueryResult>(new RouteNodeQuery(id));
                 }
             );
 

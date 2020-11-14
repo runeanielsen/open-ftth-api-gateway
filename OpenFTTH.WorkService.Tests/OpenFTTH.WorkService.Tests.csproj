@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\OpenFTTH.WorkService.Queries\OpenFTTH.WorkService.Queries.csproj" />
+    <ProjectReference Include="..\OpenFTTH.WorkService.API\OpenFTTH.WorkService.API.csproj" />
     <ProjectReference Include="..\OpenFTTH.WorkService\OpenFTTH.WorkService.csproj" />
   </ItemGroup>
 

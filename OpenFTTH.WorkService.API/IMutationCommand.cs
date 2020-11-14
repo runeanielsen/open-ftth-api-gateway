@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace OpenFTTH.WorkService.Queries
+namespace OpenFTTH.WorkService
 {
-    public interface IQueryCommand
+    public interface IMutationCommand
     {
     }
 }

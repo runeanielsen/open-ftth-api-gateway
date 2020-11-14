@@ -10,7 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\OpenFTTH.WorkService.Queries\OpenFTTH.WorkService.Queries.csproj" />
+    <ProjectReference Include="..\OpenFTTH.WorkService.API\OpenFTTH.WorkService.API.csproj" />
   </ItemGroup>
 
 </Project>
