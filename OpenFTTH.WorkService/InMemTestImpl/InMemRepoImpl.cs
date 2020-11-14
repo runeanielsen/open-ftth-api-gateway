@@ -15,6 +15,9 @@ namespace OpenFTTH.WorkService.InMemTestImpl
         public InMemRepoImpl()
         {
             // throw in some test data
+
+
+            // Dataopretning
             Projects = new Dictionary<Guid, Project>();
 
             var project1 = new Project(Guid.Parse("55783514-4481-4f62-a321-e025c62741ac"), "Dataopretning");
@@ -28,9 +31,29 @@ namespace OpenFTTH.WorkService.InMemTestImpl
             Projects.Add(project1.MRID, project1);
 
 
-            var project2 = new Project(Guid.Parse("68929c17-400d-4379-9794-137879c5959a"), "Kundetilslutning");
+            // Anlægsprojekter
+
+            var project2 = new Project(Guid.Parse("9c27006c-b03e-401d-bdb4-3d0c5f4f915a"), "Anlægsprojekter");
 
             project2.AddWorkOrder(
+                new WorkTask(Guid.Parse("f9883306-4692-48f9-b1bd-8fca5706a2d3"), "Nyt område Hindhøjen", new Point(566673, 6235825))
+                {
+                    AddressString = "Hindhøjen",
+                    CentralOfficeArea = "HINSON",
+                    FlexPointArea = "F3320",
+                    Technology = "PON",
+                    Status = "Til projektering",
+                    WorkTaskType = "Access-netværk"
+                });
+
+            Projects.Add(project2.MRID, project2);
+
+
+            // Kundetilslutninger
+
+            var project3 = new Project(Guid.Parse("68929c17-400d-4379-9794-137879c5959a"), "Kundetilslutning");
+
+            project3.AddWorkOrder(
                 new WorkTask(Guid.Parse("523a168d-c14f-4fb9-b64a-b3adc2fee628"), "PON Privat 692345", new Point(566156, 6237162))
                 {
                     AddressString = "Svalevej 5, Hinnerup",
@@ -43,7 +66,7 @@ namespace OpenFTTH.WorkService.InMemTestImpl
                     WorkTaskType = "Privat kundetilslutning"
                 });
 
-            project2.AddWorkOrder(
+            project3.AddWorkOrder(
                 new WorkTask(Guid.Parse("08ce7a8f-4ad9-4b03-8386-86d3cebf408a"), "PON Privat 703443", new Point(566139, 6237187))
                 {
                     AddressString = "Svalevej 7, Hinnerup",
@@ -56,7 +79,7 @@ namespace OpenFTTH.WorkService.InMemTestImpl
                     WorkTaskType = "Privat kundetilslutning"
                 });
 
-            project2.AddWorkOrder(
+            project3.AddWorkOrder(
                 new WorkTask(Guid.Parse("efb70f56-7d0e-41a8-9a48-82a30aa48395"), "PON Privat 712323", new Point(566367, 6237104))
                 {
                     AddressString = "Nørrevangen 54, Hinnerup",
@@ -69,7 +92,7 @@ namespace OpenFTTH.WorkService.InMemTestImpl
                     WorkTaskType = "Privat kundetilslutning"
                 });
 
-            project2.AddWorkOrder(
+            project3.AddWorkOrder(
               new WorkTask(Guid.Parse("086a5364-2cd4-481e-80d3-4f2d2025904d"), "PtP Erhverv 125377", new Point(565264, 6236742))
               {
                   AddressString = "Vestergade 82, Hinnerup",
@@ -82,7 +105,7 @@ namespace OpenFTTH.WorkService.InMemTestImpl
                   WorkTaskType = "Erhverv kundetilslutning"
               });
 
-            Projects.Add(project2.MRID, project2);
+            Projects.Add(project3.MRID, project3);
         }
 
         public UserWorkContext GetUserWorkContext(string userName)
