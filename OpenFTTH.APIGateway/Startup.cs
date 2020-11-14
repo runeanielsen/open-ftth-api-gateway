@@ -86,7 +86,7 @@ namespace OpenFTTH.APIGateway
 
             services.AddGraphQL((options, provider) =>
             {
-                options.EnableMetrics = true;
+                options.EnableMetrics = false;
                 var logger = provider.GetRequiredService<ILogger<Startup>>();
                 options.UnhandledExceptionDelegate = ctx => logger.LogError("{Error} occured", ctx.OriginalException.Message);
             })
