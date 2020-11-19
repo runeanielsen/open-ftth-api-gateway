@@ -11,6 +11,7 @@ namespace OpenFTTH.WorkService.QueryModel
     public class WorkTask
     {
         public Guid MRID { get; }
+        public Project Project { get; }
         public String Name { get; }
         public Geometry? Location { get; }
         public String? AddressString { get; set;  }
@@ -22,9 +23,12 @@ namespace OpenFTTH.WorkService.QueryModel
         public string? Technology { get; set; }
         public string Status { get; set; }
 
-        public WorkTask(Guid mRID, string name, Geometry? location = null)
+        
+
+        public WorkTask(Guid mRID, Project project, string name, Geometry? location = null)
         {
             MRID = mRID;
+            Project = project;
             Name = name;
             Location = location;
         }

@@ -3,6 +3,7 @@ using OpenFTTH.WorkService.QueryModel;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 
 namespace OpenFTTH.WorkService.InMemTestImpl
 {
@@ -23,10 +24,10 @@ namespace OpenFTTH.WorkService.InMemTestImpl
             var project1 = new Project(Guid.Parse("55783514-4481-4f62-a321-e025c62741ac"), "Dataopretning");
 
             project1.AddWorkOrder(
-                new WorkTask(Guid.Parse("dd07c615-0497-48f0-825f-ccac0c7596d0"), "Dataopretning af tracénet"));
+                new WorkTask(Guid.Parse("dd07c615-0497-48f0-825f-ccac0c7596d0"), project1, "Dataopretning af tracénet"));
 
             project1.AddWorkOrder(
-                new WorkTask(Guid.Parse("4640df62-f4a9-4490-9400-f7ef88b64bfa"), "Dataopretning af Bentley rør-konnektivitet"));
+                new WorkTask(Guid.Parse("4640df62-f4a9-4490-9400-f7ef88b64bfa"), project1, "Dataopretning af Bentley rør-konnektivitet"));
 
             Projects.Add(project1.MRID, project1);
 
@@ -36,7 +37,7 @@ namespace OpenFTTH.WorkService.InMemTestImpl
             var project2 = new Project(Guid.Parse("9c27006c-b03e-401d-bdb4-3d0c5f4f915a"), "Anlægsprojekter");
 
             project2.AddWorkOrder(
-                new WorkTask(Guid.Parse("f9883306-4692-48f9-b1bd-8fca5706a2d3"), "Nyt område Hindhøjen", new Point(566673, 6235825))
+                new WorkTask(Guid.Parse("f9883306-4692-48f9-b1bd-8fca5706a2d3"), project2, "Nyt område Hindhøjen", new Point(566673, 6235825))
                 {
                     AddressString = "Hindhøjen",
                     CentralOfficeArea = "HINSON",
@@ -54,7 +55,7 @@ namespace OpenFTTH.WorkService.InMemTestImpl
             var project3 = new Project(Guid.Parse("68929c17-400d-4379-9794-137879c5959a"), "Kundetilslutning");
 
             project3.AddWorkOrder(
-                new WorkTask(Guid.Parse("523a168d-c14f-4fb9-b64a-b3adc2fee628"), "PON Privat 692345", new Point(566156, 6237162))
+                new WorkTask(Guid.Parse("523a168d-c14f-4fb9-b64a-b3adc2fee628"), project3, "PON Privat 692345", new Point(566156, 6237162))
                 {
                     AddressString = "Svalevej 5, Hinnerup",
                     CentralOfficeArea = "HINSON",
@@ -67,7 +68,7 @@ namespace OpenFTTH.WorkService.InMemTestImpl
                 });
 
             project3.AddWorkOrder(
-                new WorkTask(Guid.Parse("08ce7a8f-4ad9-4b03-8386-86d3cebf408a"), "PON Privat 703443", new Point(566139, 6237187))
+                new WorkTask(Guid.Parse("08ce7a8f-4ad9-4b03-8386-86d3cebf408a"), project3, "PON Privat 703443", new Point(566139, 6237187))
                 {
                     AddressString = "Svalevej 7, Hinnerup",
                     CentralOfficeArea = "HINSON",
@@ -80,7 +81,7 @@ namespace OpenFTTH.WorkService.InMemTestImpl
                 });
 
             project3.AddWorkOrder(
-                new WorkTask(Guid.Parse("efb70f56-7d0e-41a8-9a48-82a30aa48395"), "PON Privat 712323", new Point(566367, 6237104))
+                new WorkTask(Guid.Parse("efb70f56-7d0e-41a8-9a48-82a30aa48395"), project3, "PON Privat 712323", new Point(566367, 6237104))
                 {
                     AddressString = "Nørrevangen 54, Hinnerup",
                     CentralOfficeArea = "HINSON",
@@ -93,7 +94,7 @@ namespace OpenFTTH.WorkService.InMemTestImpl
                 });
 
             project3.AddWorkOrder(
-              new WorkTask(Guid.Parse("086a5364-2cd4-481e-80d3-4f2d2025904d"), "PtP Erhverv 125377", new Point(565264, 6236742))
+              new WorkTask(Guid.Parse("086a5364-2cd4-481e-80d3-4f2d2025904d"), project3, "PtP Erhverv 125377", new Point(565264, 6236742))
               {
                   AddressString = "Vestergade 82, Hinnerup",
                   CentralOfficeArea = "HINSON",
@@ -118,20 +119,31 @@ namespace OpenFTTH.WorkService.InMemTestImpl
 
         public UserWorkContext SetUserCurrentWorkTask(string userName, Guid currentWorkTaskId)
         {
+            if (GetWorkTaskById(currentWorkTaskId) == null)
+                throw new ArgumentException("WorkTask with id: " + currentWorkTaskId + " does not exists!");
+
             if (!_userWorkContextByName.ContainsKey(userName))
             {
                 _userWorkContextByName[userName] = new UserWorkContext()
                 {
                     UserName = userName,
-                    CurrentWorkTask = currentWorkTaskId
+                    CurrentWorkTask = GetWorkTaskById(currentWorkTaskId)
                 };
             }
             else
             {
-                _userWorkContextByName[userName].CurrentWorkTask = currentWorkTaskId;
+                _userWorkContextByName[userName].CurrentWorkTask = GetWorkTaskById(currentWorkTaskId);
             }
 
             return _userWorkContextByName[userName];
+        }
+
+        private WorkTask GetWorkTaskById(Guid id)
+        {
+            if (Projects.Values.Any(p => p.WorkTasks.Any(w => w.MRID == id)))
+                return Projects.Values.First(p => p.WorkTasks.Any(w => w.MRID == id)).WorkTasks.First(w => w.MRID == id);
+
+            return null;
         }
     }
 }

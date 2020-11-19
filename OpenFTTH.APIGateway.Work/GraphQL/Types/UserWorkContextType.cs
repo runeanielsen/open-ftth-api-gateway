@@ -12,7 +12,7 @@ namespace OpenFTTH.APIGateway.Work.GraphQL.Types
         public UserWorkContextType(ILogger<UserWorkContextType> logger)
         {
             Field(x => x.UserName, type: typeof(StringGraphType)).Description("User name/id");
-            Field(x => x.CurrentWorkTask, type: typeof(StringGraphType)).Description("CurrentWorkTask");
+            Field(x => x.CurrentWorkTask, type: typeof(WorkTaskType)).Description("CurrentWorkTask");
         }
     }
 }

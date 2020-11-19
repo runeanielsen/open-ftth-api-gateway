@@ -8,6 +8,6 @@ namespace OpenFTTH.WorkService.QueryModel
     {
         public string UserName { get; set; }
 
-        public Guid CurrentWorkTask { get; set; }
+        public WorkTask CurrentWorkTask { get; set; }
     }
 }

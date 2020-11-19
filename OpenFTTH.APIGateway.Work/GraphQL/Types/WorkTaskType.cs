@@ -25,8 +25,7 @@ namespace OpenFTTH.APIGateway.Work.GraphQL.Types
             Field(x => x.SplicePointArea, type: typeof(StringGraphType)).Description("Splice point area");
             Field(x => x.InstallationId, type: typeof(StringGraphType)).Description("Installation id");
             Field(x => x.Technology, type: typeof(StringGraphType)).Description("Technology (PON, PtP etc)");
-            
-
+            Field(x => x.Project, type: typeof(ProjectType)).Description("Project");
 
             Field<GeometryType>(
                name: "geometry",
