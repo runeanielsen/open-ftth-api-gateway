@@ -7,6 +7,8 @@ namespace OpenFTTH.Work.API.Queries
 {
     public class UserWorkContextQueryResult : IQueryResult
     {
-        public UserWorkContext UserWorkContext { get; set; }
+        public UserWorkContextQueryResult(UserWorkContext userWorkContext) => UserWorkContext = userWorkContext;
+        
+        public UserWorkContext UserWorkContext { get; }
     }
 }

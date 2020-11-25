@@ -124,11 +124,7 @@ namespace OpenFTTH.WorkService.InMemTestImpl
 
             if (!_userWorkContextByName.ContainsKey(userName))
             {
-                _userWorkContextByName[userName] = new UserWorkContext()
-                {
-                    UserName = userName,
-                    CurrentWorkTask = GetWorkTaskById(currentWorkTaskId)
-                };
+                _userWorkContextByName[userName] = new UserWorkContext(userName, GetWorkTaskById(currentWorkTaskId));
             }
             else
             {

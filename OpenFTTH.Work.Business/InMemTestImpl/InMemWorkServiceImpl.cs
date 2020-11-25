@@ -46,17 +46,17 @@ namespace OpenFTTH.WorkService.InMemTestImpl
 
         private ProjectsAndWorkTasksQueryResult Query(ProjectsAndWorkTasksQuery query)
         {
-            return new ProjectsAndWorkTasksQueryResult() { Projects = _data.Projects.Values.ToList() };
+            return new ProjectsAndWorkTasksQueryResult(_data.Projects.Values.ToList());
         }
 
         private UserWorkContextQueryResult Query(UserWorkContextQuery query)
         {
-            return new UserWorkContextQueryResult() { UserWorkContext = _data.GetUserWorkContext(query.UserName) };
+            return new UserWorkContextQueryResult(_data.GetUserWorkContext(query.UserName));
         }
 
         private SetUserCurrentWorkTaskMutationResult Mutate(SetUserCurrentWorkTaskMutation mutation)
         {
-            return new SetUserCurrentWorkTaskMutationResult() { UserWorkContext = _data.SetUserCurrentWorkTask(mutation.UserName, mutation.WorkTaskId) };
+            return new SetUserCurrentWorkTaskMutationResult(_data.SetUserCurrentWorkTask(mutation.UserName, mutation.WorkTaskId));
         }
     }
 }

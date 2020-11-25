@@ -5,14 +5,6 @@ VisualStudioVersion = 16.0.29613.14
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenFTTH.APIGateway", "OpenFTTH.APIGateway\OpenFTTH.APIGateway.csproj", "{74EC242E-4E36-47D4-8AF5-6601A901397C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenFTTH.APIGateway.RouteNetwork", "OpenFTTH.APIGateway.RouteNetwork\OpenFTTH.APIGateway.RouteNetwork.csproj", "{229E7675-4089-4BA8-B26C-588F22CD2485}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenFTTH.APIGateway.Remote", "OpenFTTH.APIGateway.Remote\OpenFTTH.APIGateway.Remote.csproj", "{A034B014-D9AE-4FFE-9AA3-1F315F45CCD3}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenFTTH.APIGateway.GeographicalAreaUpdated", "OpenFTTH.APIGateway.GeographicalAreaUpdated\OpenFTTH.APIGateway.GeographicalAreaUpdated.csproj", "{1639BCAB-8F73-4B7E-A07F-E967F2751266}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenFTTH.APIGateway.Work", "OpenFTTH.APIGateway.Work\OpenFTTH.APIGateway.Work.csproj", "{541BB87A-293A-47DA-B203-13666C1268D9}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenFTTH.Work.Business", "OpenFTTH.Work.Business\OpenFTTH.Work.Business.csproj", "{5FF78588-4892-4723-9009-BECB184CF2CA}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenFTTH.Work.API", "OpenFTTH.Work.API\OpenFTTH.Work.API.csproj", "{4C16619A-AFF8-4B20-A27A-8F7CF0275BA7}"
@@ -20,8 +12,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WorkService", "WorkService", "{C497BAA2-241C-4203-9F47-A5021FCA4A4F}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenFTTH.Work.Tests", "OpenFTTH.Work.Tests\OpenFTTH.Work.Tests.csproj", "{0065F950-4E90-46C2-BFE4-D58E97A185D2}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenFTTH.APIGateway.CoreTypes", "OpenFTTH.APIGateway.CoreTypes\OpenFTTH.APIGateway.CoreTypes.csproj", "{B5486591-0170-4F46-8C16-CDA158508FE4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,22 +23,6 @@ Global
 		{74EC242E-4E36-47D4-8AF5-6601A901397C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{74EC242E-4E36-47D4-8AF5-6601A901397C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{74EC242E-4E36-47D4-8AF5-6601A901397C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{229E7675-4089-4BA8-B26C-588F22CD2485}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{229E7675-4089-4BA8-B26C-588F22CD2485}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{229E7675-4089-4BA8-B26C-588F22CD2485}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{229E7675-4089-4BA8-B26C-588F22CD2485}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A034B014-D9AE-4FFE-9AA3-1F315F45CCD3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A034B014-D9AE-4FFE-9AA3-1F315F45CCD3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A034B014-D9AE-4FFE-9AA3-1F315F45CCD3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A034B014-D9AE-4FFE-9AA3-1F315F45CCD3}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1639BCAB-8F73-4B7E-A07F-E967F2751266}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1639BCAB-8F73-4B7E-A07F-E967F2751266}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1639BCAB-8F73-4B7E-A07F-E967F2751266}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1639BCAB-8F73-4B7E-A07F-E967F2751266}.Release|Any CPU.Build.0 = Release|Any CPU
-		{541BB87A-293A-47DA-B203-13666C1268D9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{541BB87A-293A-47DA-B203-13666C1268D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{541BB87A-293A-47DA-B203-13666C1268D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{541BB87A-293A-47DA-B203-13666C1268D9}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5FF78588-4892-4723-9009-BECB184CF2CA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5FF78588-4892-4723-9009-BECB184CF2CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5FF78588-4892-4723-9009-BECB184CF2CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -61,10 +35,6 @@ Global
 		{0065F950-4E90-46C2-BFE4-D58E97A185D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0065F950-4E90-46C2-BFE4-D58E97A185D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0065F950-4E90-46C2-BFE4-D58E97A185D2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B5486591-0170-4F46-8C16-CDA158508FE4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B5486591-0170-4F46-8C16-CDA158508FE4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B5486591-0170-4F46-8C16-CDA158508FE4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B5486591-0170-4F46-8C16-CDA158508FE4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

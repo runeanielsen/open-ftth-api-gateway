@@ -7,6 +7,7 @@ namespace OpenFTTH.Work.API.Mutations
 {
     public class SetUserCurrentWorkTaskMutationResult : IMutationResult
     {
-        public UserWorkContext UserWorkContext { get; set; }
+        public SetUserCurrentWorkTaskMutationResult(UserWorkContext userWorkContext) => UserWorkContext = userWorkContext;
+        public UserWorkContext UserWorkContext { get; }
     }
 }

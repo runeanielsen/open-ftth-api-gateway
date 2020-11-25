@@ -7,6 +7,8 @@ namespace OpenFTTH.Work.API.Queries
 {
     public class ProjectsAndWorkTasksQueryResult : IQueryResult
     {
-        public List<Project> Projects { get; set; }
+        public ProjectsAndWorkTasksQueryResult(List<Project> projects) => Projects = projects;
+
+        public List<Project> Projects { get; }
     }
 }

@@ -21,7 +21,7 @@ namespace OpenFTTH.Work.API.Model
         public string? FlexPointArea { get; set; }
         public string? SplicePointArea { get; set; }
         public string? Technology { get; set; }
-        public string Status { get; set; }
+        public string? Status { get; set; }
 
         
 
