@@ -1,0 +1,28 @@
+﻿using OpenFTTH.CQRS;
+using OpenFTTH.Work.API.Mutations;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace OpenFTTH.Work.Business.InMemTestImpl
+{
+    public class InMemCommandHandler :
+        ICommandHandler<SetUserCurrentWorkTaskMutation, SetUserCurrentWorkTaskMutationResult>
+    {
+        private readonly InMemRepoImpl _data;
+
+        public InMemCommandHandler(InMemRepoImpl data)
+        {
+            _data = data;
+        }
+
+        public Task<SetUserCurrentWorkTaskMutationResult> HandleAsync(SetUserCurrentWorkTaskMutation command)
+        {
+            return Task.FromResult<SetUserCurrentWorkTaskMutationResult>(
+                new SetUserCurrentWorkTaskMutationResult(_data.SetUserCurrentWorkTask(command.UserName, command.WorkTaskId))
+            );
+        }
+    }
+}

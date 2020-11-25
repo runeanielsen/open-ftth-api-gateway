@@ -1,6 +1,7 @@
 ﻿using GraphQL;
 using GraphQL.Types;
 using OpenFTTH.APIGateway.GraphQL.Work.Types;
+using OpenFTTH.CQRS;
 using OpenFTTH.Work.API;
 using OpenFTTH.Work.API.Mutations;
 using System;
@@ -9,11 +10,11 @@ namespace OpenFTTH.APIGateway.GraphQL.Work.Mutations
 {
     public class UserWorkContextMutations : ObjectGraphType
     {
-        private readonly IWorkServiceAPI _workService;
+        private readonly ICommandDispatcher _commandDispatcher;
 
-        public UserWorkContextMutations(IWorkServiceAPI workService)
+        public UserWorkContextMutations(ICommandDispatcher commandDispatcher)
         {
-            _workService = workService;
+            _commandDispatcher = commandDispatcher;
 
             Description = "User context information mutations";
 
@@ -24,12 +25,12 @@ namespace OpenFTTH.APIGateway.GraphQL.Work.Mutations
                   new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "userName" },
                   new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "workTaskId" }
               ),
-              resolve: context =>
+              resolve: context => 
               {
                   var userName = context.GetArgument<string>("userName");
                   var workTaskId  = context.GetArgument<Guid>("workTaskId");
 
-                  var mutationResult = workService.Mutate(new SetUserCurrentWorkTaskMutation(userName, workTaskId)) as SetUserCurrentWorkTaskMutationResult;
+                  var mutationResult = this._commandDispatcher.HandleAsync<SetUserCurrentWorkTaskMutation, SetUserCurrentWorkTaskMutationResult>(new SetUserCurrentWorkTaskMutation(userName, workTaskId)).Result;
 
                   return mutationResult.UserWorkContext;
               }

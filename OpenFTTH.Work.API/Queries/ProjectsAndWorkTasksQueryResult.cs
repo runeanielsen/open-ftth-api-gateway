@@ -5,7 +5,7 @@ using System.Text;
 
 namespace OpenFTTH.Work.API.Queries
 {
-    public class ProjectsAndWorkTasksQueryResult : IQueryResult
+    public class ProjectsAndWorkTasksQueryResult
     {
         public ProjectsAndWorkTasksQueryResult(List<Project> projects) => Projects = projects;
 

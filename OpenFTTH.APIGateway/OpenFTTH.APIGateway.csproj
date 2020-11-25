@@ -27,6 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\OpenFTTH.CQRS\OpenFTTH.CQRS.csproj" />
     <ProjectReference Include="..\OpenFTTH.Work.API\OpenFTTH.Work.API.csproj" />
     <ProjectReference Include="..\OpenFTTH.Work.Business\OpenFTTH.Work.Business.csproj" />
   </ItemGroup>

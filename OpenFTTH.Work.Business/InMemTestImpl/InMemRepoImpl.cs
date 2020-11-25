@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Linq;
 
-namespace OpenFTTH.WorkService.InMemTestImpl
+namespace OpenFTTH.Work.Business.InMemTestImpl
 {
     public class InMemRepoImpl
     {

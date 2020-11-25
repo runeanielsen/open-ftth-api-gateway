@@ -1,4 +1,5 @@
-﻿using OpenFTTH.Work.API;
+﻿using OpenFTTH.CQRS;
+using OpenFTTH.Work.API;
 using OpenFTTH.Work.API.Mutations;
 using OpenFTTH.Work.API.Queries;
 using System;
@@ -7,8 +8,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OpenFTTH.WorkService.InMemTestImpl
+namespace OpenFTTH.Work.Business.InMemTestImpl
 {
+    /*
     /// <summary>
     /// Simple in-memory implementation of the WorkService API to be used for testing and demo purpose
     /// </summary>
@@ -31,7 +33,7 @@ namespace OpenFTTH.WorkService.InMemTestImpl
         }
 
 
-        public IMutationResult Mutate(IMutationCommand mutationCommand)
+        public IMutationResult Mutate(ICommand mutationCommand)
         {
             switch (mutationCommand)
             {
@@ -40,7 +42,6 @@ namespace OpenFTTH.WorkService.InMemTestImpl
             }
 
             throw new ArgumentException("No implementation found for mutation command: " + mutationCommand.GetType().FullName);
-
         }
 
 
@@ -58,5 +59,7 @@ namespace OpenFTTH.WorkService.InMemTestImpl
         {
             return new SetUserCurrentWorkTaskMutationResult(_data.SetUserCurrentWorkTask(mutation.UserName, mutation.WorkTaskId));
         }
+        
     }
+    */
 }

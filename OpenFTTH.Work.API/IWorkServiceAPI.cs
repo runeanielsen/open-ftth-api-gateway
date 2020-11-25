@@ -1,9 +1,13 @@
-﻿namespace OpenFTTH.Work.API
+﻿using OpenFTTH.CQRS;
+
+namespace OpenFTTH.Work.API
 {
+    /*
     public interface IWorkServiceAPI
     {
         IQueryResult Query(IQueryCommand queryCommand);
 
-        IMutationResult Mutate(IMutationCommand mutationCommand);
+        IMutationResult Mutate(ICommand<TResult> mutationCommand);
     }
+    */
 }

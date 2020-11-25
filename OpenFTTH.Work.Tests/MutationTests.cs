@@ -1,6 +1,6 @@
 using OpenFTTH.Work.API.Mutations;
 using OpenFTTH.Work.API.Queries;
-using OpenFTTH.WorkService.InMemTestImpl;
+using OpenFTTH.Work.Business.InMemTestImpl;
 using System;
 using Xunit;
 
@@ -11,24 +11,30 @@ namespace OpenFTTH.WorkService.Tests
         [Fact]
         public void SetUserCurrentWorkTask_ThatDontExists_MustThrowException()
         {
-            var workService = new InMemWorkServiceImpl();
+            var inMemRepo = new InMemRepoImpl();
+
+            var inMemCommandHandler = new InMemCommandHandler(inMemRepo);
 
             // Some work task id that don't exists
             Guid workTaskId = Guid.NewGuid();
 
-            Assert.Throws<ArgumentException>(() => workService.Mutate(new SetUserCurrentWorkTaskMutation("hans", workTaskId)) as SetUserCurrentWorkTaskMutationResult);
+            Assert.Throws<ArgumentException>(() => inMemCommandHandler.HandleAsync(new SetUserCurrentWorkTaskMutation("hans", workTaskId)).Result);
         }
 
         [Fact]
         public void SetUserCurrentWorkTask_ThatExists_QueryMustReturnWorkTask()
         {
-            var workService = new InMemWorkServiceImpl();
+            var repo = new InMemRepoImpl();
+
+            var commandHandler = new InMemCommandHandler(repo);
+
+            var queryHandler = new InMemQueryHandler(repo);
 
             Guid workTaskId = Guid.Parse("08ce7a8f-4ad9-4b03-8386-86d3cebf408a");
 
-            var mutationResult = workService.Mutate(new SetUserCurrentWorkTaskMutation("hans", workTaskId)) as SetUserCurrentWorkTaskMutationResult;
+            var mutationResult = commandHandler.HandleAsync(new SetUserCurrentWorkTaskMutation("hans", workTaskId)).Result;
 
-            var queryResult = workService.Query(new UserWorkContextQuery("hans")) as UserWorkContextQueryResult;
+            var queryResult = queryHandler.HandleAsync(new UserWorkContextQuery("hans")).Result;
 
             Assert.Equal(workTaskId, queryResult.UserWorkContext.CurrentWorkTask.MRID);
 

@@ -25,11 +25,14 @@ using OpenFTTH.APIGateway.Notifications.GeographicalAreaUpdated.Subscriptions;
 using OpenFTTH.APIGateway.Remote;
 using OpenFTTH.APIGateway.Settings;
 using OpenFTTH.APIGateway.Workers;
+using OpenFTTH.CQRS;
 using OpenFTTH.Events.Geo;
 using OpenFTTH.Events.RouteNetwork;
 using OpenFTTH.Work.API;
-using OpenFTTH.WorkService.InMemTestImpl;
+using OpenFTTH.Work.Business.InMemTestImpl;
 using Serilog;
+using System;
+using System.Linq;
 
 namespace OpenFTTH.APIGateway
 {
@@ -138,9 +141,17 @@ namespace OpenFTTH.APIGateway
             services.AddSingleton<IToposTypedEventObservable<RouteNetworkEditOperationOccuredEvent>, ToposTypedEventObservable<RouteNetworkEditOperationOccuredEvent>>();
 
 
-            // Work service stuff
+            // Work service mockup stuff
             RegisterWorkServiceTypes.Register(services);
-            services.AddSingleton<IWorkServiceAPI, InMemWorkServiceImpl>();
+            services.AddSingleton<InMemRepoImpl, InMemRepoImpl>();
+
+            //services.AddSingleton<IWorkServiceAPI, InMemWorkServiceImpl>();
+
+            AddCommandQueryHandlers(services, typeof(ICommandHandler<,>));
+            AddCommandQueryHandlers(services, typeof(IQueryHandler<,>));
+
+            services.AddSingleton<ICommandDispatcher, CommandDispatcher>();
+            services.AddSingleton<IQueryDispatcher, QueryDispatcher>();
 
 
             // Geographical area updated
@@ -189,5 +200,28 @@ namespace OpenFTTH.APIGateway
                 Path = "/ui/voyager"
             });
         }
+
+        private static void AddCommandQueryHandlers(IServiceCollection services, Type handlerInterface)
+        {
+            var assembly = AppDomain.CurrentDomain.Load("OpenFTTH.Work.Business");
+
+            var handlers = assembly.GetTypes()
+                .Where(t => t.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == handlerInterface)
+            ).ToList();
+
+            foreach (var handler in handlers)
+            {
+                var interfaces = handler.GetInterfaces();
+                foreach (var i in interfaces)
+                {
+                    if (i.IsGenericType && i.GetGenericTypeDefinition() == handlerInterface)
+                    {
+                        services.AddSingleton(i, handler);
+                    }
+                }
+            }
+        }
     }
 }
+
+

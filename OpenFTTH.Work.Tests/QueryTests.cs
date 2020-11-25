@@ -1,5 +1,5 @@
 using OpenFTTH.Work.API.Queries;
-using OpenFTTH.WorkService.InMemTestImpl;
+using OpenFTTH.Work.Business.InMemTestImpl;
 using System;
 using Xunit;
 
@@ -10,9 +10,11 @@ namespace OpenFTTH.WorkService.Tests
         [Fact]
         public void TestProjectsAndWorkTasksQuery()
         {
-            var workService = new InMemWorkServiceImpl();
+            var repo = new InMemRepoImpl();
 
-            var queryResult = workService.Query(new ProjectsAndWorkTasksQuery()) as ProjectsAndWorkTasksQueryResult;
+            var queryHandler = new InMemQueryHandler(repo);
+
+            var queryResult = queryHandler.HandleAsync(new ProjectsAndWorkTasksQuery()).Result;
 
             // Check that minimum 2 projects are returned
             Assert.True(queryResult.Projects.Count > 1);
@@ -20,7 +22,6 @@ namespace OpenFTTH.WorkService.Tests
             // Check that the two first projects has minumum 2 work tasks
             Assert.True(queryResult.Projects[0].WorkTasks.Count > 1);
             Assert.True(queryResult.Projects[1].WorkTasks.Count > 0);
-
         }
     }
 }

@@ -2,6 +2,7 @@
 using GraphQL.Types;
 using Microsoft.Extensions.Logging;
 using OpenFTTH.APIGateway.GraphQL.Work.Types;
+using OpenFTTH.CQRS;
 using OpenFTTH.Work.API;
 using OpenFTTH.Work.API.Queries;
 
@@ -9,10 +10,11 @@ namespace OpenFTTH.APIGateway.GraphQL.Work.Queries
 {
     public class WorkServiceQueries : ObjectGraphType
     {
-        private readonly IWorkServiceAPI _workService;
-        public WorkServiceQueries(ILogger<WorkServiceQueries> logger, IWorkServiceAPI workService)
+        private readonly IQueryDispatcher _queryDispatcher;
+
+        public WorkServiceQueries(ILogger<WorkServiceQueries> logger, IQueryDispatcher queryDispatcher)
         {
-            _workService = workService;
+            _queryDispatcher = queryDispatcher;
 
             Description = "GraphQL API for querying work order related data";
 
@@ -23,7 +25,9 @@ namespace OpenFTTH.APIGateway.GraphQL.Work.Queries
                 {
                     var queryRequest = new ProjectsAndWorkTasksQuery();
 
-                    return ((ProjectsAndWorkTasksQueryResult)_workService.Query(queryRequest)).Projects;
+                    var queryResult = this._queryDispatcher.HandleAsync<ProjectsAndWorkTasksQuery, ProjectsAndWorkTasksQueryResult>(queryRequest).Result;
+
+                    return queryResult.Projects;
                 }
             );
 
@@ -37,7 +41,9 @@ namespace OpenFTTH.APIGateway.GraphQL.Work.Queries
 
                     var queryRequest = new UserWorkContextQuery(userName);
 
-                    return ((UserWorkContextQueryResult)_workService.Query(queryRequest)).UserWorkContext;
+                    var queryResult = this._queryDispatcher.HandleAsync<UserWorkContextQuery, UserWorkContextQueryResult>(queryRequest).Result;
+
+                    return queryResult.UserWorkContext;
                 }
             );
 
