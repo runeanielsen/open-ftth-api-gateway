@@ -5,8 +5,8 @@ using GraphQL;
 using GraphQL.Types;
 using Microsoft.Extensions.Logging;
 using OpenFTTH.APIGateway.Work.GraphQL.Types;
-using OpenFTTH.WorkService;
-using OpenFTTH.WorkService.Queries;
+using OpenFTTH.Work.API;
+using OpenFTTH.Work.API.Queries;
 
 namespace OpenFTTH.APIGateway.Work.GraphQL.Queries
 {

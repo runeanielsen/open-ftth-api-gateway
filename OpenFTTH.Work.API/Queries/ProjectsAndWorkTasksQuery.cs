@@ -1,7 +1,7 @@
 ﻿using MediatR;
 using System;
 
-namespace OpenFTTH.WorkService.Queries
+namespace OpenFTTH.Work.API.Queries
 {
     public class ProjectsAndWorkTasksQuery : IQueryCommand
     {

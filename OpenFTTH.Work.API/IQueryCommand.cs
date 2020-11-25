@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace OpenFTTH.WorkService
+namespace OpenFTTH.Work.API
 {
     public interface IQueryCommand
     {

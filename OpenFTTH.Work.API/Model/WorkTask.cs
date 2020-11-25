@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace OpenFTTH.WorkService.QueryModel
+namespace OpenFTTH.Work.API.Model
 {
     /// <summary>
     /// AKA work order

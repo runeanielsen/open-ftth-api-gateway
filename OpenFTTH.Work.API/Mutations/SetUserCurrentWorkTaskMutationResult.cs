@@ -1,9 +1,9 @@
-﻿using OpenFTTH.WorkService.QueryModel;
+﻿using OpenFTTH.Work.API.Model;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace OpenFTTH.WorkService.API.Mutations
+namespace OpenFTTH.Work.API.Mutations
 {
     public class SetUserCurrentWorkTaskMutationResult : IMutationResult
     {

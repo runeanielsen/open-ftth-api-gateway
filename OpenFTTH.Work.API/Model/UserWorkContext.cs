@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace OpenFTTH.WorkService.QueryModel
+namespace OpenFTTH.Work.API.Model
 {
     public class UserWorkContext
     {

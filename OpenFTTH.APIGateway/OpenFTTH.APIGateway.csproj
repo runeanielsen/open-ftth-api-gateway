@@ -31,5 +31,7 @@
     <ProjectReference Include="..\OpenFTTH.APIGateway.Remote\OpenFTTH.APIGateway.Remote.csproj" />
     <ProjectReference Include="..\OpenFTTH.APIGateway.RouteNetwork\OpenFTTH.APIGateway.RouteNetwork.csproj" />
     <ProjectReference Include="..\OpenFTTH.APIGateway.Work\OpenFTTH.APIGateway.Work.csproj" />
+    <ProjectReference Include="..\OpenFTTH.Work.API\OpenFTTH.Work.API.csproj" />
+    <ProjectReference Include="..\OpenFTTH.Work.Business\OpenFTTH.Work.Business.csproj" />
   </ItemGroup>
 </Project>

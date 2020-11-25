@@ -1,6 +1,6 @@
 ﻿using GraphQL.Types;
 using Microsoft.Extensions.Logging;
-using OpenFTTH.WorkService.QueryModel;
+using OpenFTTH.Work.API.Model;
 using System;
 using System.Collections.Generic;
 using System.Text;

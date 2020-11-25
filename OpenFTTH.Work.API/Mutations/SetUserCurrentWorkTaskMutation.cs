@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace OpenFTTH.WorkService.API.Mutations
+namespace OpenFTTH.Work.API.Mutations
 {
     public class SetUserCurrentWorkTaskMutation : IMutationCommand
     {

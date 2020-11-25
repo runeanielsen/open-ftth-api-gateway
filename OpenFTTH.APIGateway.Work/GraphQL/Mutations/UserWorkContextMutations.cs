@@ -1,8 +1,8 @@
 ﻿using GraphQL;
 using GraphQL.Types;
 using OpenFTTH.APIGateway.Work.GraphQL.Types;
-using OpenFTTH.WorkService;
-using OpenFTTH.WorkService.API.Mutations;
+using OpenFTTH.Work.API;
+using OpenFTTH.Work.API.Mutations;
 using System;
 using System.Collections.Generic;
 using System.Text;

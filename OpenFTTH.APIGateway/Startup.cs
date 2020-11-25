@@ -15,13 +15,11 @@ using OpenFTTH.APIGateway.GraphQL.Schemas;
 using OpenFTTH.APIGateway.Remote;
 using OpenFTTH.APIGateway.RouteNetwork.GraphQL.Queries;
 using OpenFTTH.APIGateway.RouteNetwork.GraphQL.Subscriptions;
-using OpenFTTH.APIGateway.RouteNetwork.GraphQL.Types;
 using OpenFTTH.APIGateway.Settings;
 using OpenFTTH.APIGateway.Workers;
 using OpenFTTH.Events.RouteNetwork;
 using OpenFTTH.Events.Geo;
 using Serilog;
-using OpenFTTH.APIGateway.RouteNetwork.GraphQL.Mutations;
 using OpenFTTH.APIGateway.GraphQL.Mutations;
 using OpenFTTH.APIGateway.RouteNetwork.GraphQL;
 using OpenFTTH.APIGateway.GraphQL.Queries;
@@ -32,9 +30,9 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using Newtonsoft.Json.Converters;
 using OpenFTTH.APIGateway.Work.GraphQL;
-using OpenFTTH.WorkService;
-using OpenFTTH.WorkService.InMemTestImpl;
 using OpenFTTH.APIGateway.CoreTypes;
+using OpenFTTH.Work.API;
+using OpenFTTH.WorkService.InMemTestImpl;
 
 namespace OpenFTTH.APIGateway
 {

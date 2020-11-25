@@ -1,5 +1,6 @@
-﻿using OpenFTTH.WorkService.API.Mutations;
-using OpenFTTH.WorkService.Queries;
+﻿using OpenFTTH.Work.API;
+using OpenFTTH.Work.API.Mutations;
+using OpenFTTH.Work.API.Queries;
 using System;
 using System.Collections.Generic;
 using System.Linq;

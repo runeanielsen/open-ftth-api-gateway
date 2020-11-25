@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace OpenFTTH.WorkService
+namespace OpenFTTH.Work.API
 {
     public interface IWorkServiceAPI
     {
