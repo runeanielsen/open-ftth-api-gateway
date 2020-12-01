@@ -35,9 +35,6 @@ namespace OpenFTTH.APIGateway.GraphQL.Work.Mutations
                   return mutationResult.UserWorkContext;
               }
             );
-
-
-        
         }
     }
 }

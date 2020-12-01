@@ -5,11 +5,11 @@ using System.Threading.Tasks;
 
 namespace OpenFTTH.CQRS
 {
-    public class CommandDispatcher : ICommandDispatcher
+    public class InProcessCommandDispatcher : ICommandDispatcher
     {
         private IServiceProvider _serviceProvider;
 
-        public CommandDispatcher(IServiceProvider serviceProvider)
+        public InProcessCommandDispatcher(IServiceProvider serviceProvider)
         {
             this._serviceProvider = serviceProvider;
         }

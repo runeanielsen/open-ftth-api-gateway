@@ -1,11 +1,12 @@
-﻿using OpenFTTH.Work.API.Model;
+﻿using OpenFTTH.CQRS;
+using OpenFTTH.Work.API.Model;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace OpenFTTH.Work.API.Queries
 {
-    public class UserWorkContextQueryResult : IQueryResult
+    public class UserWorkContextQueryResult : IQuery<UserWorkContextQueryResult>
     {
         public UserWorkContextQueryResult(UserWorkContext userWorkContext) => UserWorkContext = userWorkContext;
         

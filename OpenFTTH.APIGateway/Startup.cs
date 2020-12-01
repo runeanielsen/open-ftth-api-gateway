@@ -150,8 +150,8 @@ namespace OpenFTTH.APIGateway
             AddCommandQueryHandlers(services, typeof(ICommandHandler<,>));
             AddCommandQueryHandlers(services, typeof(IQueryHandler<,>));
 
-            services.AddSingleton<ICommandDispatcher, CommandDispatcher>();
-            services.AddSingleton<IQueryDispatcher, QueryDispatcher>();
+            services.AddSingleton<ICommandDispatcher, InProcessCommandDispatcher>();
+            services.AddSingleton<IQueryDispatcher, InProcessQueryDispatcher>();
 
 
             // Geographical area updated
