@@ -8,4 +8,12 @@
     <ProjectReference Include="..\OpenFTTH.CQRS\OpenFTTH.CQRS.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Model\DiagramLayout\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NetTopologySuite" Version="2.1.0" />
+  </ItemGroup>
+
 </Project>
