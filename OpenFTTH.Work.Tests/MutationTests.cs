@@ -13,7 +13,7 @@ namespace OpenFTTH.WorkService.Tests
         {
             var inMemRepo = new InMemRepoImpl();
 
-            var inMemCommandHandler = new InMemCommandHandler(inMemRepo);
+            var inMemCommandHandler = new SetUserCurrentWorkTaskCommandHandler(inMemRepo);
 
             // Some work task id that don't exists
             Guid workTaskId = Guid.NewGuid();
@@ -26,9 +26,9 @@ namespace OpenFTTH.WorkService.Tests
         {
             var repo = new InMemRepoImpl();
 
-            var commandHandler = new InMemCommandHandler(repo);
+            var commandHandler = new SetUserCurrentWorkTaskCommandHandler(repo);
 
-            var queryHandler = new InMemQueryHandler(repo);
+            var queryHandler = new UserWorkContextQueryHandler(repo);
 
             Guid workTaskId = Guid.Parse("08ce7a8f-4ad9-4b03-8386-86d3cebf408a");
 

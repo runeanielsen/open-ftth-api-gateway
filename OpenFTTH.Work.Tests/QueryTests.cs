@@ -12,7 +12,7 @@ namespace OpenFTTH.WorkService.Tests
         {
             var repo = new InMemRepoImpl();
 
-            var queryHandler = new InMemQueryHandler(repo);
+            var queryHandler = new ProjectsAndWorkTasksQueryHandler(repo);
 
             var queryResult = queryHandler.HandleAsync(new ProjectsAndWorkTasksQuery()).Result;
 

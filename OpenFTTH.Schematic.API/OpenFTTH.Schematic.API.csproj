@@ -10,7 +10,7 @@
 
   <ItemGroup>
     <PackageReference Include="NetTopologySuite" Version="2.1.0" />
-    <PackageReference Include="OpenFTTH.CQRS" Version="1.0.0" />
+    <PackageReference Include="OpenFTTH.CQRS" Version="1.0.2" />
   </ItemGroup>
 
 </Project>

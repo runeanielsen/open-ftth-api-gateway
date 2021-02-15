@@ -8,12 +8,12 @@ using System.Threading.Tasks;
 
 namespace OpenFTTH.Work.Business.InMemTestImpl
 {
-    public class InMemCommandHandler :
+    public class SetUserCurrentWorkTaskCommandHandler :
         ICommandHandler<SetUserCurrentWorkTaskMutation, SetUserCurrentWorkTaskMutationResult>
     {
         private readonly InMemRepoImpl _data;
 
-        public InMemCommandHandler(InMemRepoImpl data)
+        public SetUserCurrentWorkTaskCommandHandler(InMemRepoImpl data)
         {
             _data = data;
         }

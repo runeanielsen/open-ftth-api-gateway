@@ -3,7 +3,6 @@ using GraphQL.Types;
 using Microsoft.Extensions.Logging;
 using OpenFTTH.APIGateway.GraphQL.Work.Types;
 using OpenFTTH.CQRS;
-using OpenFTTH.Work.API;
 using OpenFTTH.Work.API.Queries;
 
 namespace OpenFTTH.APIGateway.GraphQL.Work.Queries
