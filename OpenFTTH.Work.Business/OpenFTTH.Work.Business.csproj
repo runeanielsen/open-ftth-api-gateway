@@ -7,10 +7,10 @@
   <ItemGroup>
     <PackageReference Include="NetTopologySuite" Version="2.1.0" />
     <PackageReference Include="NetTopologySuite.IO.GeoJSON" Version="2.0.4" />
+    <PackageReference Include="OpenFTTH.CQRS" Version="1.0.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\OpenFTTH.CQRS\OpenFTTH.CQRS.csproj" />
     <ProjectReference Include="..\OpenFTTH.Work.API\OpenFTTH.Work.API.csproj" />
   </ItemGroup>
 
