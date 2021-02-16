@@ -1,4 +1,4 @@
-## Example GraphQL Query
+## Example Query
 
 ```graphql
 query {
