@@ -19,11 +19,13 @@ using OpenFTTH.APIGateway.GraphQL.Notifications.GeographicalAreaUpdated.Types;
 using OpenFTTH.APIGateway.GraphQL.Root;
 using OpenFTTH.APIGateway.GraphQL.RouteNetwork;
 using OpenFTTH.APIGateway.GraphQL.RouteNetwork.Queries;
+using OpenFTTH.APIGateway.GraphQL.UtilityNetwork;
 using OpenFTTH.APIGateway.GraphQL.Work;
 using OpenFTTH.APIGateway.Logging;
 using OpenFTTH.APIGateway.Notifications.GeographicalAreaUpdated.Subscriptions;
 using OpenFTTH.APIGateway.Remote;
 using OpenFTTH.APIGateway.Settings;
+using OpenFTTH.APIGateway.Test;
 using OpenFTTH.APIGateway.Workers;
 using OpenFTTH.CQRS;
 using OpenFTTH.Events.Geo;
@@ -85,7 +87,7 @@ namespace OpenFTTH.APIGateway
             // Event Sourcing and CQRS Stuff
             var assembliesWithBusinessLogic = new Assembly[] {
                 AppDomain.CurrentDomain.Load("OpenFTTH.Schematic.Business"),
-                AppDomain.CurrentDomain.Load("OpenFTTH.Work.Business"),
+                AppDomain.CurrentDomain.Load("OpenFTTH.UtilityGraphService.Business"),
                 AppDomain.CurrentDomain.Load("OpenFTTH.Work.Business")
             };
 
@@ -162,7 +164,8 @@ namespace OpenFTTH.APIGateway
             RegisterWorkServiceTypes.Register(services);
             services.AddSingleton<InMemRepoImpl, InMemRepoImpl>();
 
-           
+            // Utilty Network stuff
+            RegisterUtilityNetworkTypes.Register(services);
 
 
             // Geographical area updated
@@ -210,6 +213,11 @@ namespace OpenFTTH.APIGateway
                 GraphQLEndPoint = "/graphql",
                 Path = "/ui/voyager"
             });
+
+
+            var commandDispatcher = app.ApplicationServices.GetService<ICommandDispatcher>();
+            new ConduitTypesTestDataGenerator(commandDispatcher).Run();
+
         }
     }
 }

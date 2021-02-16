@@ -13,7 +13,7 @@ namespace OpenFTTH.APIGateway.GraphQL.Work.Types
 {
     public class WorkTaskType : ObjectGraphType<WorkTask>
     {
-        public WorkTaskType(ILogger<ProjectType> logger)
+        public WorkTaskType(ILogger<WorkTaskType> logger)
         {
             Field(x => x.MRID, type: typeof(IdGraphType)).Description("Master Resource Identifier UUID Property");
             Field(x => x.Name, type: typeof(StringGraphType)).Description("Name/descrription of work task");
