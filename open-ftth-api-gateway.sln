@@ -13,8 +13,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WorkService", "WorkService"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenFTTH.Work.Tests", "OpenFTTH.Work.Tests\OpenFTTH.Work.Tests.csproj", "{0065F950-4E90-46C2-BFE4-D58E97A185D2}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenFTTH.APIGateway.Tests", "OpenFTTH.APIGateway.Tests\OpenFTTH.APIGateway.Tests.csproj", "{E2804141-A112-477B-B287-E4FF50C296F3}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenFTTH.APIGateway.IntegrationTests", "OpenFTTH.APIGateway.IntegrationTests\OpenFTTH.APIGateway.IntegrationTests.csproj", "{9D680995-B0DA-4579-9081-3284B38568D6}"
 EndProject
 Global
@@ -39,10 +37,6 @@ Global
 		{0065F950-4E90-46C2-BFE4-D58E97A185D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0065F950-4E90-46C2-BFE4-D58E97A185D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0065F950-4E90-46C2-BFE4-D58E97A185D2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E2804141-A112-477B-B287-E4FF50C296F3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E2804141-A112-477B-B287-E4FF50C296F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E2804141-A112-477B-B287-E4FF50C296F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E2804141-A112-477B-B287-E4FF50C296F3}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9D680995-B0DA-4579-9081-3284B38568D6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{9D680995-B0DA-4579-9081-3284B38568D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9D680995-B0DA-4579-9081-3284B38568D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
