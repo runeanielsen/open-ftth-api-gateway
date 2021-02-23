@@ -1,4 +1,4 @@
-## Example Query
+## Example Mutation
 
 ```graphql
 mutation
