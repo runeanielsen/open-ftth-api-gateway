@@ -34,7 +34,7 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork
             
 
             // Route node specific types
-            services.AddSingleton<RouteNodeType>();
+            services.AddSingleton<RouteNetworkElementType>();
             services.AddSingleton<RouteNodeInfoType>();
             services.AddSingleton<RouteNodeInfoInputType>();
             services.AddSingleton<RouteNodeKindEnumType>();

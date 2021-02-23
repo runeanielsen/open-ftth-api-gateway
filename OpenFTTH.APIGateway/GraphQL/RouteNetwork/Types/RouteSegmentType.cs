@@ -9,7 +9,7 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Types
 {
     public class RouteSegmentType : ObjectGraphType<RouteSegmentQueryResult>
     {
-        public RouteSegmentType(ILogger<RouteNodeType> logger)
+        public RouteSegmentType(ILogger<RouteNetworkElementType> logger)
         {
             Field(x => x.RouteSegmentId, type: typeof(IdGraphType)).Description("Guid property");
 

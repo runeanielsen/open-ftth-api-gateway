@@ -1,18 +1,16 @@
 ﻿using GraphQL.Types;
 using Microsoft.Extensions.Logging;
-using OpenFTTH.RouteNetworkService.Queries;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using OpenFTTH.RouteNetwork.API.Model;
 
 namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Types
 {
-    public class RouteNodeType : ObjectGraphType<RouteNodeQueryResult>
+    public class RouteNetworkElementType : ObjectGraphType<RouteNetworkElement>
     {
-        public RouteNodeType(ILogger<RouteNodeType> logger)
+        public RouteNetworkElementType(ILogger<RouteNetworkElementType> logger)
         {
-            Field(x => x.RouteNodeId, type: typeof(IdGraphType)).Description("Guid property");
-
+            Field(x => x.Id, type: typeof(IdGraphType)).Description("Guid property");
+            Field(x => x.Kind, type: typeof(IdGraphType)).Description("Route Node or Segemtn");
+            Field(x => x.RouteSegmentInfo, type: typeof(RouteSegmentInfoType)).Description("Route node specific properties");
             Field(x => x.RouteNodeInfo, type: typeof(RouteNodeInfoType)).Description("Route node specific properties");
             Field(x => x.NamingInfo, type: typeof(NamingInfoType)).Description("Asset info");
             Field(x => x.LifecycleInfo, type: typeof(LifecycleInfoType)).Description("Lifecycle info");

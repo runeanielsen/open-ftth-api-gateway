@@ -14,7 +14,7 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
         {
             Description = "Route node mutations";
 
-            Field<RouteNodeType>(
+            Field<RouteNetworkElementType>(
               "updateNamingInfo",
               description: "Mutation used to update the name and/or description of a route node",
               arguments: new QueryArguments(
@@ -31,7 +31,7 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
             );
 
 
-            Field<RouteNodeType>(
+            Field<RouteNetworkElementType>(
                "updateLifecyleInfo",
                description: "Mutation used to update the lifecycle related properties of a route node",
                arguments: new QueryArguments(
@@ -48,7 +48,7 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
             );
 
 
-            Field<RouteNodeType>(
+            Field<RouteNetworkElementType>(
                "updateMappingInfo",
                description: "Mutation used to update mapping/digitizing info related properties of a route node",
                arguments: new QueryArguments(
@@ -64,7 +64,7 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                }
             );
 
-            Field<RouteNodeType>(
+            Field<RouteNetworkElementType>(
               "updateSafetyInfo",
               description: "Mutation used to update safety information of a node.",
               arguments: new QueryArguments(
@@ -80,7 +80,7 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
               }
             );
 
-            Field<RouteNodeType>(
+            Field<RouteNetworkElementType>(
             "updateRouteNodeInfo",
             description: "Mutation used to update route node specific properties",
             arguments: new QueryArguments(
