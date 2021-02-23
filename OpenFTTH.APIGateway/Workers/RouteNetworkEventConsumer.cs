@@ -11,6 +11,7 @@ using Microsoft.Extensions.Options;
 using OpenFTTH.APIGateway.Settings;
 using OpenFTTH.Events.RouteNetwork;
 using Topos.Config;
+using Topos.InMem;
 
 namespace OpenFTTH.APIGateway.Workers
 {
@@ -19,7 +20,7 @@ namespace OpenFTTH.APIGateway.Workers
         private readonly ILogger<RouteNetworkEventConsumer> _logger;
         private readonly IToposTypedEventObservable<RouteNetworkEditOperationOccuredEvent> _eventDispatcher;
         private readonly KafkaSetting _kafkaSetting;
-
+        private InMemPositionsStorage _positionsStorage = new InMemPositionsStorage();
         private IDisposable _kafkaConsumer;
 
         public RouteNetworkEventConsumer(ILogger<RouteNetworkEventConsumer> logger, IOptions<KafkaSetting> kafkaSetting, IToposTypedEventObservable<RouteNetworkEditOperationOccuredEvent> eventDispatcher)
@@ -35,16 +36,19 @@ namespace OpenFTTH.APIGateway.Workers
 
             try
             {
+                _kafkaConsumer = _eventDispatcher.Config("route_network_event_" + Guid.NewGuid(), c => {
+                    var kafkaConfig = c.UseKafka(_kafkaSetting.Server);
 
-                _kafkaConsumer = _eventDispatcher.Config("route_network_event_" + Guid.NewGuid(), c => c.UseKafka(_kafkaSetting.Server))
-                              .Logging(l => l.UseSerilog())
-                              .Positions(p => {
-                                  p.StoreInFileSystem(_kafkaSetting.PositionFilePath);
-                                  p.SetInitialPosition(StartFromPosition.Now);
-                                }
-                              )
-                              .Topics(t => t.Subscribe(_kafkaSetting.RouteNetworkEventTopic))
-                              .Start();
+                    if (_kafkaSetting.CertificateFilename != null)
+                    {
+                        kafkaConfig.WithCertificate(_kafkaSetting.CertificateFilename);
+                    }
+                })
+               .Logging(l => l.UseSerilog())
+               .Positions(p => p.StoreInMemory(_positionsStorage))
+               .Topics(t => t.Subscribe(_kafkaSetting.RouteNetworkEventTopic))
+               .Start();
+
             }
             catch (Exception ex)
             {

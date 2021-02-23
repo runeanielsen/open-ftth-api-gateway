@@ -137,7 +137,6 @@ namespace OpenFTTH.APIGateway
             var assembliesWithBusinessLogic = new Assembly[] {
                 AppDomain.CurrentDomain.Load("OpenFTTH.RouteNetwork.Business"),
                 AppDomain.CurrentDomain.Load("OpenFTTH.UtilityGraphService.Business"),
-                AppDomain.CurrentDomain.Load("OpenFTTH.Schematic.Business"),
                 AppDomain.CurrentDomain.Load("OpenFTTH.Work.Business")
             };
 
