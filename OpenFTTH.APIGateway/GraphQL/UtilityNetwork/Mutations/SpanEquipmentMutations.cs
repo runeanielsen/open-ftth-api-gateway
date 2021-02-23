@@ -8,9 +8,11 @@ using OpenFTTH.APIGateway.RouteNetwork.GraphQL.Test;
 using OpenFTTH.CQRS;
 using OpenFTTH.Events.Core.Infos;
 using OpenFTTH.Events.RouteNetwork.Infos;
+using OpenFTTH.EventSourcing;
 using OpenFTTH.RouteNetwork.API.Commands;
 using OpenFTTH.RouteNetwork.API.Model;
 using OpenFTTH.UtilityGraphService.API.Commands;
+using OpenFTTH.UtilityGraphService.Business.SpanEquipments.Projections;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,7 +21,7 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
 {
     public class SpanEquipmentMutations : ObjectGraphType
     {
-        public SpanEquipmentMutations(ICommandDispatcher commandDispatcher)
+        public SpanEquipmentMutations(ICommandDispatcher commandDispatcher, IEventStore eventStore)
         {
             Description = "Span equipment mutations";
 
@@ -35,9 +37,12 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
               resolve: context =>
               {
                   var spanEquipmentId = context.GetArgument<Guid>("spanEquipmentId");
-                  var spanEquipmentSpecificationId = context.GetArgument<Guid>("spanEquipmentId");
+                  var spanEquipmentSpecificationId = context.GetArgument<Guid>("spanEquipmentSpecificationId");
                   var routeSegmentIds = context.GetArgument<List<Guid>>("routeSegmentIds");
                   var namingInfo = context.GetArgument<NamingInfo>("namingInfo");
+
+
+                  var spanEquipments = eventStore.Projections.Get<SpanEquipmentsProjection>().SpanEquipments;
 
                   // First register the walk in the route network where the client want to place the span equipment
                   var walkOfInterestId = Guid.NewGuid();
@@ -55,7 +60,7 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                   var placeSpanEquipmentCommand = new PlaceSpanEquipmentInRouteNetwork(spanEquipmentId, spanEquipmentSpecificationId, registerWalkOfInterestCommandResult.Value);
                   var placeSpanEquipmentResult = commandDispatcher.HandleAsync<PlaceSpanEquipmentInRouteNetwork, Result>(placeSpanEquipmentCommand).Result;
 
-                  return new CommandResult(registerWalkOfInterestCommandResult);
+                  return new CommandResult(placeSpanEquipmentResult);
                   
               }
             );
