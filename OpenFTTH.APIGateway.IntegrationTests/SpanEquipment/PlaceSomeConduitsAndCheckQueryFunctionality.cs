@@ -53,7 +53,7 @@ namespace OpenFTTH.APIGateway.IntegrationTests.SpanEquipment
             var registerWalkOfInterestCommandResult = await _commandDispatcher.HandleAsync<RegisterWalkOfInterest, Result<RouteNetworkInterest>>(registerWalkOfInterestCommand);
 
             // Now place the conduit in walk
-            var placeSpanEquipmentCommand = new PlaceSpanEquipmentInRouteNetwork(Guid.NewGuid(), _conduitSpecs.Multi_ÿ40_5x10, registerWalkOfInterestCommandResult.Value);
+            var placeSpanEquipmentCommand = new PlaceSpanEquipmentInRouteNetwork(Guid.NewGuid(), _conduitSpecs.Multi_√ò40_5x10, registerWalkOfInterestCommandResult.Value);
             var placeSpanEquipmentResult = await _commandDispatcher.HandleAsync<PlaceSpanEquipmentInRouteNetwork, Result>(placeSpanEquipmentCommand);
 
             // Assert
@@ -74,7 +74,7 @@ namespace OpenFTTH.APIGateway.IntegrationTests.SpanEquipment
             var registerWalkOfInterestCommandResult = await _commandDispatcher.HandleAsync<RegisterWalkOfInterest, Result<RouteNetworkInterest>>(registerWalkOfInterestCommand);
 
             // Now place the conduit in walk
-            var placeSpanEquipmentCommand = new PlaceSpanEquipmentInRouteNetwork(Guid.NewGuid(), _conduitSpecs.Multi_ÿ50_10x10, registerWalkOfInterestCommandResult.Value);
+            var placeSpanEquipmentCommand = new PlaceSpanEquipmentInRouteNetwork(Guid.NewGuid(), _conduitSpecs.Multi_√ò50_10x10, registerWalkOfInterestCommandResult.Value);
             var placeSpanEquipmentResult = await _commandDispatcher.HandleAsync<PlaceSpanEquipmentInRouteNetwork, Result>(placeSpanEquipmentCommand);
 
             // Assert
@@ -83,9 +83,9 @@ namespace OpenFTTH.APIGateway.IntegrationTests.SpanEquipment
         }
 
         [Fact, Order(3)]
-        public async void Placeÿ40Flex_from_HH_2_to_FP_2()
+        public async void Place√ò40Flex_from_HH_2_to_FP_2()
         {
-            // Place a ÿ40 flex conduit here:
+            // Place a √ò40 flex conduit here:
             // (HH_2) <- (S3) -> (FP_2)
 
             // First register the walk in the route network where we want to place the conduit
@@ -95,7 +95,7 @@ namespace OpenFTTH.APIGateway.IntegrationTests.SpanEquipment
             var registerWalkOfInterestCommandResult = await _commandDispatcher.HandleAsync<RegisterWalkOfInterest, Result<RouteNetworkInterest>>(registerWalkOfInterestCommand);
 
             // Now place the conduit in walk
-            var placeSpanEquipmentCommand = new PlaceSpanEquipmentInRouteNetwork(Guid.NewGuid(), _conduitSpecs.Flex_ÿ40_Red, registerWalkOfInterestCommandResult.Value);
+            var placeSpanEquipmentCommand = new PlaceSpanEquipmentInRouteNetwork(Guid.NewGuid(), _conduitSpecs.Flex_√ò40_Red, registerWalkOfInterestCommandResult.Value);
             var placeSpanEquipmentResult = await _commandDispatcher.HandleAsync<PlaceSpanEquipmentInRouteNetwork, Result>(placeSpanEquipmentCommand);
 
             // Assert
@@ -104,9 +104,9 @@ namespace OpenFTTH.APIGateway.IntegrationTests.SpanEquipment
         }
 
         [Fact, Order(4)]
-        public async void Placeÿ40Flex_from_CC_1_to_SP_1()
+        public async void Place√ò40Flex_from_CC_1_to_SP_1()
         {
-            // Place a ÿ40 flex conduit here:
+            // Place a √ò40 flex conduit here:
             // (CC_1) <- (S5) -> (SP_1)
 
             // First register the walk in the route network where we want to place the conduit
@@ -116,7 +116,7 @@ namespace OpenFTTH.APIGateway.IntegrationTests.SpanEquipment
             var registerWalkOfInterestCommandResult = await _commandDispatcher.HandleAsync<RegisterWalkOfInterest, Result<RouteNetworkInterest>>(registerWalkOfInterestCommand);
 
             // Now place the conduit in walk
-            var placeSpanEquipmentCommand = new PlaceSpanEquipmentInRouteNetwork(Guid.NewGuid(), _conduitSpecs.Flex_ÿ40_Red, registerWalkOfInterestCommandResult.Value);
+            var placeSpanEquipmentCommand = new PlaceSpanEquipmentInRouteNetwork(Guid.NewGuid(), _conduitSpecs.Flex_√ò40_Red, registerWalkOfInterestCommandResult.Value);
             var placeSpanEquipmentResult = await _commandDispatcher.HandleAsync<PlaceSpanEquipmentInRouteNetwork, Result>(placeSpanEquipmentCommand);
 
             // Assert
