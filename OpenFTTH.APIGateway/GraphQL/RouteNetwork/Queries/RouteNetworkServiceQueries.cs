@@ -10,7 +10,7 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Queries
 {
     public class RouteNetworkServiceQueries : ObjectGraphType
     {
-        public RouteNetworkServiceQueries(ILogger<RouteNetworkServiceQueries> logger, QueryServiceClient<RouteNetworkServiceQueries> routeNetworkQueries)
+        public RouteNetworkServiceQueries(ILogger<RouteNetworkServiceQueries> logger)
         {
             Description = "GraphQL API for querying data owned by route nodes and route segments";
 

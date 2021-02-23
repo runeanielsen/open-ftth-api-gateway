@@ -9,6 +9,7 @@ namespace OpenFTTH.APIGateway.CoreTypes
     {
         public static void Register(IServiceCollection services)
         {
+            services.AddSingleton<CommandResultType>();
             services.AddSingleton<GeometryType>();
         }
     }

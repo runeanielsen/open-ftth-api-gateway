@@ -32,6 +32,8 @@ using OpenFTTH.Events.Geo;
 using OpenFTTH.Events.RouteNetwork;
 using OpenFTTH.EventSourcing;
 using OpenFTTH.EventSourcing.InMem;
+using OpenFTTH.RouteNetwork.Business.StateHandling;
+using OpenFTTH.RouteNetwork.Business.StateHandling.Network;
 using OpenFTTH.Work.API;
 using OpenFTTH.Work.Business.InMemTestImpl;
 using Serilog;
@@ -84,19 +86,6 @@ namespace OpenFTTH.APIGateway
                     loggingBuilder.AddSerilog(dispose: true);
                 });
 
-            // Event Sourcing and CQRS Stuff
-            var assembliesWithBusinessLogic = new Assembly[] {
-                AppDomain.CurrentDomain.Load("OpenFTTH.Schematic.Business"),
-                AppDomain.CurrentDomain.Load("OpenFTTH.UtilityGraphService.Business"),
-                AppDomain.CurrentDomain.Load("OpenFTTH.Work.Business")
-            };
-
-            services.AddSingleton<IEventStore, InMemEventStore>();
-
-            services.AddProjections(assembliesWithBusinessLogic);
-
-            services.AddCQRS(assembliesWithBusinessLogic);
-
 
             // GraphQL stuff
             services.Configure<KestrelServerOptions>(options => options.AllowSynchronousIO = true);
@@ -144,21 +133,22 @@ namespace OpenFTTH.APIGateway
                                   });
             });
 
+            // Event Sourcing and CQRS Stuff
+            var assembliesWithBusinessLogic = new Assembly[] {
+                AppDomain.CurrentDomain.Load("OpenFTTH.RouteNetwork.Business"),
+                AppDomain.CurrentDomain.Load("OpenFTTH.UtilityGraphService.Business"),
+                AppDomain.CurrentDomain.Load("OpenFTTH.Schematic.Business"),
+                AppDomain.CurrentDomain.Load("OpenFTTH.Work.Business")
+            };
+
+            services.AddSingleton<IEventStore, InMemEventStore>();
+
+            services.AddProjections(assembliesWithBusinessLogic);
+
+            services.AddCQRS(assembliesWithBusinessLogic);
+
             // Core types
             RegisterCoreTypes.Register(services);
-
-            // Route network service stuff
-            services.AddSingleton<QueryServiceClient<RouteNetworkServiceQueries>>(x =>
-                new QueryServiceClient<RouteNetworkServiceQueries>(
-                    x.GetRequiredService<Microsoft.Extensions.Logging.ILogger<QueryServiceClient<RouteNetworkServiceQueries>>>(),
-                    Configuration.GetSection("RemoteServices:RouteNetworkService").Value)
-                );
-
-            RegisterRouteNetworkServiceTypes.Register(services);
-
-            services.AddHostedService<RouteNetworkEventConsumer>();
-            services.AddSingleton<IToposTypedEventObservable<RouteNetworkEditOperationOccuredEvent>, ToposTypedEventObservable<RouteNetworkEditOperationOccuredEvent>>();
-
 
             // Work service mockup stuff
             RegisterWorkServiceTypes.Register(services);
@@ -166,6 +156,14 @@ namespace OpenFTTH.APIGateway
 
             // Utilty Network stuff
             RegisterUtilityNetworkTypes.Register(services);
+
+            // Route Network stuff
+            RegisterRouteNetworkServiceTypes.Register(services);
+            
+            services.AddSingleton<IRouteNetworkState, InMemRouteNetworkState>();
+            services.AddSingleton<IRouteNetworkRepository, InMemRouteNetworkRepository>();
+            services.AddHostedService<RouteNetworkEventConsumer>();
+            services.AddSingleton<IToposTypedEventObservable<RouteNetworkEditOperationOccuredEvent>, ToposTypedEventObservable<RouteNetworkEditOperationOccuredEvent>>();
 
 
             // Geographical area updated
