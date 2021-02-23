@@ -4,18 +4,17 @@ using GraphQL.Types;
 using OpenFTTH.APIGateway.CoreTypes;
 using OpenFTTH.APIGateway.GraphQL.Core.Model;
 using OpenFTTH.APIGateway.GraphQL.RouteNetwork.Types;
-using OpenFTTH.APIGateway.RouteNetwork.GraphQL.Test;
+using OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Types;
 using OpenFTTH.CQRS;
 using OpenFTTH.Events.Core.Infos;
-using OpenFTTH.Events.RouteNetwork.Infos;
 using OpenFTTH.EventSourcing;
 using OpenFTTH.RouteNetwork.API.Commands;
 using OpenFTTH.RouteNetwork.API.Model;
 using OpenFTTH.UtilityGraphService.API.Commands;
+using OpenFTTH.UtilityGraphService.API.Model.UtilityNetwork;
 using OpenFTTH.UtilityGraphService.Business.SpanEquipments.Projections;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
 {
@@ -32,6 +31,7 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                   new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "spanEquipmentId" },
                   new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "spanEquipmentSpecificationId" },
                   new QueryArgument<ListGraphType<IdGraphType>> { Name = "routeSegmentIds" },
+                  new QueryArgument<MarkingInfoInputType> { Name = "markingInfo" },
                   new QueryArgument<NamingInfoInputType> { Name = "namingInfo" }
               ),
               resolve: context =>
@@ -39,6 +39,7 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                   var spanEquipmentId = context.GetArgument<Guid>("spanEquipmentId");
                   var spanEquipmentSpecificationId = context.GetArgument<Guid>("spanEquipmentSpecificationId");
                   var routeSegmentIds = context.GetArgument<List<Guid>>("routeSegmentIds");
+                  var markingInfo = context.GetArgument<MarkingInfo>("markingInfo");
                   var namingInfo = context.GetArgument<NamingInfo>("namingInfo");
 
 
@@ -57,15 +58,18 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                   }
 
                   // Now place the conduit in the walk
-                  var placeSpanEquipmentCommand = new PlaceSpanEquipmentInRouteNetwork(spanEquipmentId, spanEquipmentSpecificationId, registerWalkOfInterestCommandResult.Value);
+                  var placeSpanEquipmentCommand = new PlaceSpanEquipmentInRouteNetwork(spanEquipmentId, spanEquipmentSpecificationId, registerWalkOfInterestCommandResult.Value)
+                  {
+                      NamingInfo = namingInfo,
+                      MarkingInfo = markingInfo
+                  };
+
                   var placeSpanEquipmentResult = commandDispatcher.HandleAsync<PlaceSpanEquipmentInRouteNetwork, Result>(placeSpanEquipmentCommand).Result;
 
                   return new CommandResult(placeSpanEquipmentResult);
                   
               }
             );
-
-
           
         }
     }
