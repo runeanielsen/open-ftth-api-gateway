@@ -1,15 +1,12 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using DAX.EventProcessing.Dispatcher;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using OpenFTTH.APIGateway.Settings;
 using OpenFTTH.Events.Geo;
-using OpenFTTH.Events.RouteNetwork;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 using Topos.Config;
 
 namespace OpenFTTH.APIGateway.Workers
@@ -35,11 +32,18 @@ namespace OpenFTTH.APIGateway.Workers
 
             try
             {
-                _kafkaConsumer = _eventDispatcher.Config("geographical_area_updated_event_" + Guid.NewGuid(), c => c.UseKafka(_kafkaSetting.Server))
-                          .Logging(l => l.UseSerilog())
-                          .Positions(p => p.StoreInFileSystem(_kafkaSetting.PositionFilePath))
-                          .Topics(t => t.Subscribe(_kafkaSetting.GeographicalAreaUpdatedTopic))
-                          .Start();
+                _kafkaConsumer = _eventDispatcher.Config("geographical_area_updated_event_" + Guid.NewGuid(), c => {
+                    var kafkaConfig = c.UseKafka(_kafkaSetting.Server);
+
+                    if (_kafkaSetting.CertificateFilename != null)
+                    {
+                        kafkaConfig.WithCertificate(_kafkaSetting.CertificateFilename);
+                    }
+                })
+              .Logging(l => l.UseSerilog())
+              .Positions(p => p.StoreInFileSystem(_kafkaSetting.PositionFilePath))
+              .Topics(t => t.Subscribe(_kafkaSetting.RouteNetworkEventTopic))
+              .Start();
             }
             catch (Exception ex)
             {

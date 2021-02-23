@@ -18,12 +18,10 @@ using OpenFTTH.APIGateway.CoreTypes;
 using OpenFTTH.APIGateway.GraphQL.Notifications.GeographicalAreaUpdated.Types;
 using OpenFTTH.APIGateway.GraphQL.Root;
 using OpenFTTH.APIGateway.GraphQL.RouteNetwork;
-using OpenFTTH.APIGateway.GraphQL.RouteNetwork.Queries;
 using OpenFTTH.APIGateway.GraphQL.UtilityNetwork;
 using OpenFTTH.APIGateway.GraphQL.Work;
 using OpenFTTH.APIGateway.Logging;
 using OpenFTTH.APIGateway.Notifications.GeographicalAreaUpdated.Subscriptions;
-using OpenFTTH.APIGateway.Remote;
 using OpenFTTH.APIGateway.Settings;
 using OpenFTTH.APIGateway.Test;
 using OpenFTTH.APIGateway.Workers;
@@ -32,13 +30,11 @@ using OpenFTTH.Events.Geo;
 using OpenFTTH.Events.RouteNetwork;
 using OpenFTTH.EventSourcing;
 using OpenFTTH.EventSourcing.InMem;
-using OpenFTTH.RouteNetwork.Business.StateHandling;
-using OpenFTTH.RouteNetwork.Business.StateHandling.Network;
-using OpenFTTH.Work.API;
+using OpenFTTH.RouteNetwork.Business.RouteElements.EventHandling;
+using OpenFTTH.RouteNetwork.Business.RouteElements.StateHandling;
 using OpenFTTH.Work.Business.InMemTestImpl;
 using Serilog;
 using System;
-using System.Linq;
 using System.Reflection;
 
 namespace OpenFTTH.APIGateway
@@ -158,12 +154,13 @@ namespace OpenFTTH.APIGateway
 
             // Route Network stuff
             RegisterRouteNetworkServiceTypes.Register(services);
-            
+
+            services.AddSingleton<RouteNetworkEventHandler, RouteNetworkEventHandler>();
             services.AddSingleton<IRouteNetworkState, InMemRouteNetworkState>();
             services.AddSingleton<IRouteNetworkRepository, InMemRouteNetworkRepository>();
-            services.AddHostedService<RouteNetworkEventConsumer>();
             services.AddSingleton<IToposTypedEventObservable<RouteNetworkEditOperationOccuredEvent>, ToposTypedEventObservable<RouteNetworkEditOperationOccuredEvent>>();
 
+            services.AddHostedService<RouteNetworkEventConsumer>();
 
             // Geographical area updated
             services.AddHostedService<GeographicalAreaUpdatedEventConsumer>();

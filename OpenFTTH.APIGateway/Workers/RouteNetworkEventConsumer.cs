@@ -1,15 +1,14 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using Confluent.Kafka;
 using DAX.EventProcessing.Dispatcher;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using OpenFTTH.APIGateway.Settings;
 using OpenFTTH.Events.RouteNetwork;
+using OpenFTTH.RouteNetwork.Business.RouteElements.EventHandling;
+using OpenFTTH.RouteNetwork.Business.RouteElements.StateHandling;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 using Topos.Config;
 using Topos.InMem;
 
@@ -19,15 +18,19 @@ namespace OpenFTTH.APIGateway.Workers
     {
         private readonly ILogger<RouteNetworkEventConsumer> _logger;
         private readonly IToposTypedEventObservable<RouteNetworkEditOperationOccuredEvent> _eventDispatcher;
+        private readonly RouteNetworkEventHandler _routeNetworkEventHandler;
+        private readonly IRouteNetworkState _routeNetworkState;
         private readonly KafkaSetting _kafkaSetting;
         private InMemPositionsStorage _positionsStorage = new InMemPositionsStorage();
         private IDisposable _kafkaConsumer;
 
-        public RouteNetworkEventConsumer(ILogger<RouteNetworkEventConsumer> logger, IOptions<KafkaSetting> kafkaSetting, IToposTypedEventObservable<RouteNetworkEditOperationOccuredEvent> eventDispatcher)
+        public RouteNetworkEventConsumer(ILogger<RouteNetworkEventConsumer> logger, IOptions<KafkaSetting> kafkaSetting, IToposTypedEventObservable<RouteNetworkEditOperationOccuredEvent> eventDispatcher, RouteNetworkEventHandler routeNetworkEventHandler, IRouteNetworkState routeNetworkState)
         {
             _logger = logger;
             _kafkaSetting = kafkaSetting.Value;
             _eventDispatcher = eventDispatcher;
+            _routeNetworkEventHandler = routeNetworkEventHandler;
+            _routeNetworkState = routeNetworkState;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -36,7 +39,7 @@ namespace OpenFTTH.APIGateway.Workers
 
             try
             {
-                _kafkaConsumer = _eventDispatcher.Config("route_network_event_" + Guid.NewGuid(), c => {
+                var toposConfig = _eventDispatcher.Config("route_network_event_" + Guid.NewGuid(), c => {
                     var kafkaConfig = c.UseKafka(_kafkaSetting.Server);
 
                     if (_kafkaSetting.CertificateFilename != null)
@@ -46,9 +49,13 @@ namespace OpenFTTH.APIGateway.Workers
                 })
                .Logging(l => l.UseSerilog())
                .Positions(p => p.StoreInMemory(_positionsStorage))
-               .Topics(t => t.Subscribe(_kafkaSetting.RouteNetworkEventTopic))
-               .Start();
+               .Topics(t => t.Subscribe(_kafkaSetting.RouteNetworkEventTopic));
 
+                _eventDispatcher.OnEvent.Subscribe(_routeNetworkEventHandler);
+
+                ((InMemRouteNetworkState)_routeNetworkState).FinishLoadMode();
+
+                _kafkaConsumer = toposConfig.Start();
             }
             catch (Exception ex)
             {

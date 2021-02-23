@@ -3,8 +3,7 @@ using OpenFTTH.APIGateway.IntegrationTests.TestData;
 using OpenFTTH.CQRS;
 using OpenFTTH.EventSourcing;
 using OpenFTTH.EventSourcing.InMem;
-using OpenFTTH.RouteNetwork.Business.StateHandling;
-using OpenFTTH.RouteNetwork.Business.StateHandling.Network;
+using OpenFTTH.RouteNetwork.Business.RouteElements.StateHandling;
 using System;
 using System.Reflection;
 

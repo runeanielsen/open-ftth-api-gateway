@@ -1,4 +1,4 @@
-﻿using OpenFTTH.RouteNetwork.Business.StateHandling;
+﻿using OpenFTTH.RouteNetwork.Business.RouteElements.StateHandling;
 using System;
 
 namespace OpenFTTH.APIGateway.IntegrationTests.TestData
