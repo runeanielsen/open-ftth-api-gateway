@@ -1,4 +1,4 @@
-## Example Query
+## Example Mutation
 
 ```graphql
 mutation
@@ -31,20 +31,9 @@ mutation
 }
 ```
 
-## Ok result
-```json
-{
-  "data": {
-    "spanEquipment": {
-      "placSpanEquipmentInRouteNetwork": {
-        "isSuccess": "True",
-        "errorCode": null,
-        "errorMessage": null
-      }
-    }
-  }
-}
-```
+The mutation first sends a RegisterWalkOfInterest command to the Route Network service.
+
+Hereafter it sends a PlaceSpanEquipmentInRouteNetwork command to the Utility Network service.
 
 ## Ok result
 ```json
@@ -60,6 +49,7 @@ mutation
   }
 }
 ```
+
 
 ## Failed result
 ```json
@@ -78,6 +68,7 @@ mutation
 
 ## Error Codes
 [Register Walk Of Interest Error Codes](https://github.com/DAXGRID/open-ftth-route-network-service/blob/master/OpenFTTH.RouteNetwork.API/Commands/RegisterWalkOfInterestErrorCodes.cs)
+
 [Place Span Equipment Error Codes](https://github.com/DAXGRID/open-ftth-utility-graph-service/blob/master/OpenFTTH.UtilityGraphService.API/Commands/PlaceSpanEquipmentInRouteNetworkErrorCodes.cs)
 
 
