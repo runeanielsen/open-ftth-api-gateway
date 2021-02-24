@@ -13,6 +13,7 @@ mutation
         "19fa6101-785d-498b-97e5-a15e8e8d2745",
         "bf0034cd-f805-4f73-be68-bd5e18281565"
       ]
+      manufacturerId: "47e87d16-a1f0-488a-8c3e-cb3a4f3e8926",
       markingInfo: {
         markingColor: "Red tape"
         markingText: "Super duper telco"
@@ -31,9 +32,15 @@ mutation
 }
 ```
 
+## Params
+ManufacturerId, markingInfo and namingInfo is optionally. The rest is mandatory.
+
+
+## Description
 The mutation first sends a RegisterWalkOfInterest command to the Route Network service.
 
 Hereafter it sends a PlaceSpanEquipmentInRouteNetwork command to the Utility Network service.
+
 
 ## Ok result
 ```json
