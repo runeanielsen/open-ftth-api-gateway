@@ -30,7 +30,8 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
               arguments: new QueryArguments(
                   new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "spanEquipmentId" },
                   new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "spanEquipmentSpecificationId" },
-                  new QueryArgument<ListGraphType<IdGraphType>> { Name = "routeSegmentIds" },
+                  new QueryArgument<NonNullGraphType<ListGraphType<IdGraphType>>> { Name = "routeSegmentIds" },
+                  new QueryArgument<IdGraphType> { Name = "manufacturerId" },
                   new QueryArgument<MarkingInfoInputType> { Name = "markingInfo" },
                   new QueryArgument<NamingInfoInputType> { Name = "namingInfo" }
               ),
@@ -39,6 +40,7 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                   var spanEquipmentId = context.GetArgument<Guid>("spanEquipmentId");
                   var spanEquipmentSpecificationId = context.GetArgument<Guid>("spanEquipmentSpecificationId");
                   var routeSegmentIds = context.GetArgument<List<Guid>>("routeSegmentIds");
+                  var manufacturerId = context.GetArgument<Guid>("manufacturerId");
                   var markingInfo = context.GetArgument<MarkingInfo>("markingInfo");
                   var namingInfo = context.GetArgument<NamingInfo>("namingInfo");
 
@@ -60,6 +62,7 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                   // Now place the conduit in the walk
                   var placeSpanEquipmentCommand = new PlaceSpanEquipmentInRouteNetwork(spanEquipmentId, spanEquipmentSpecificationId, registerWalkOfInterestCommandResult.Value)
                   {
+                      ManufacturerId = manufacturerId == Guid.Empty ? null : manufacturerId,
                       NamingInfo = namingInfo,
                       MarkingInfo = markingInfo
                   };
