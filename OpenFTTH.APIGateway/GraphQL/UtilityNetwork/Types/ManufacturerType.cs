@@ -11,7 +11,7 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Types
             Field(x => x.Id, type: typeof(IdGraphType)).Description("Master Resource Identifier UUID Property");
             Field(x => x.Name, type: typeof(StringGraphType)).Description("Short name");
             Field(x => x.Description, type: typeof(StringGraphType)).Description("Long description");
-            Field(x => x.Deprecated, type: typeof(StringGraphType)).Description("Whereas the manufacturer is still used in new projects");
+            Field(x => x.Deprecated, type: typeof(BooleanGraphType)).Description("Whereas the manufacturer is still used in new projects");
         }
     }
 }
