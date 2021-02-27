@@ -23,8 +23,8 @@
     <PackageReference Include="OpenFTTH.RouteNetwork.API" Version="1.1.1" />
     <PackageReference Include="OpenFTTH.RouteNetwork.Business" Version="1.1.1" />
     <PackageReference Include="OpenFTTH.RouteNetworkService.Queries" Version="1.0.5" />
-    <PackageReference Include="OpenFTTH.Schematic.API" Version="0.0.2" />
-    <PackageReference Include="OpenFTTH.Schematic.Business" Version="0.0.2" />
+    <PackageReference Include="OpenFTTH.Schematic.API" Version="0.0.3" />
+    <PackageReference Include="OpenFTTH.Schematic.Business" Version="0.0.3" />
     <PackageReference Include="OpenFTTH.UtilityGraphService.API" Version="1.0.3" />
     <PackageReference Include="OpenFTTH.UtilityGraphService.Business" Version="1.0.3" />
     <PackageReference Include="Serilog" Version="2.10.0" />
