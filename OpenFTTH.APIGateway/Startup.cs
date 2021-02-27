@@ -15,6 +15,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 using OpenFTTH.APIGateway.CoreTypes;
+using OpenFTTH.APIGateway.GraphQL.Core.Types;
 using OpenFTTH.APIGateway.GraphQL.Notifications.GeographicalAreaUpdated.Types;
 using OpenFTTH.APIGateway.GraphQL.Root;
 using OpenFTTH.APIGateway.GraphQL.RouteNetwork;

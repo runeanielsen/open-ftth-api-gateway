@@ -1,10 +1,7 @@
 ﻿using GraphQL.DataLoader;
 using GraphQL.Types;
+using OpenFTTH.APIGateway.GraphQL.Core.Types;
 using OpenFTTH.Events.Geo;
-using OpenFTTH.Events.RouteNetwork;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace OpenFTTH.APIGateway.GraphQL.Notifications.GeographicalAreaUpdated.Types
 {

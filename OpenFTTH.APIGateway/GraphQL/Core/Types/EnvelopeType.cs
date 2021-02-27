@@ -1,10 +1,7 @@
 ﻿using GraphQL.Types;
 using OpenFTTH.Events.Geo;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace OpenFTTH.APIGateway.GraphQL.Notifications.GeographicalAreaUpdated.Types
+namespace OpenFTTH.APIGateway.GraphQL.Core.Types
 {
     public class EnvelopeType : ObjectGraphType<EnvelopeInfo>
     {
