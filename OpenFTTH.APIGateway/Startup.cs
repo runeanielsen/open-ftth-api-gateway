@@ -19,6 +19,7 @@ using OpenFTTH.APIGateway.GraphQL.Core.Types;
 using OpenFTTH.APIGateway.GraphQL.Notifications.GeographicalAreaUpdated.Types;
 using OpenFTTH.APIGateway.GraphQL.Root;
 using OpenFTTH.APIGateway.GraphQL.RouteNetwork;
+using OpenFTTH.APIGateway.GraphQL.Schematic;
 using OpenFTTH.APIGateway.GraphQL.UtilityNetwork;
 using OpenFTTH.APIGateway.GraphQL.Work;
 using OpenFTTH.APIGateway.Logging;
@@ -134,6 +135,7 @@ namespace OpenFTTH.APIGateway
             var assembliesWithBusinessLogic = new Assembly[] {
                 AppDomain.CurrentDomain.Load("OpenFTTH.RouteNetwork.Business"),
                 AppDomain.CurrentDomain.Load("OpenFTTH.UtilityGraphService.Business"),
+                AppDomain.CurrentDomain.Load("OpenFTTH.Schematic.Business"),
                 AppDomain.CurrentDomain.Load("OpenFTTH.Work.Business")
             };
 
@@ -149,6 +151,9 @@ namespace OpenFTTH.APIGateway
             // Work service mockup stuff
             RegisterWorkServiceTypes.Register(services);
             services.AddSingleton<InMemRepoImpl, InMemRepoImpl>();
+
+            // Schematic stuff
+            RegisterSchematicTypes.Register(services);
 
             // Utilty Network stuff
             RegisterUtilityNetworkTypes.Register(services);

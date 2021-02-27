@@ -1,9 +1,9 @@
 ﻿using GraphQL.Types;
-using OpenFTTH.Events.Geo;
+using NetTopologySuite.Geometries;
 
 namespace OpenFTTH.APIGateway.GraphQL.Core.Types
 {
-    public class EnvelopeType : ObjectGraphType<EnvelopeInfo>
+    public class EnvelopeType : ObjectGraphType<Envelope>
     {
         public EnvelopeType()
         {
