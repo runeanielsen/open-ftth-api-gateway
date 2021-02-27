@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using OpenFTTH.APIGateway.GraphQL.Schematic.Types;
 using OpenFTTH.CQRS;
 using OpenFTTH.Schematic.API.Queries;
+using OpenFTTH.Schematic.Business.IO;
 using System;
 using System.Linq;
 
@@ -18,7 +19,10 @@ namespace OpenFTTH.APIGateway.GraphQL.Schematic.Queries
 
             Field<DiagramType>(
                 "buildDiagram",
-                arguments: new QueryArguments(new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "routeNetworkElementId" }),
+                arguments: 
+                new QueryArguments(new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "routeNetworkElementId" },
+                new QueryArgument<StringGraphType> { Name = "exportToGeoJsonFilename" }
+                ),
                 resolve: context =>
                 {
                     if (!Guid.TryParse(context.GetArgument<string>("routeNetworkElementId"), out Guid routeNetworkElementId))
@@ -32,6 +36,15 @@ namespace OpenFTTH.APIGateway.GraphQL.Schematic.Queries
                     if (getDiagramQueryResult.IsFailed)
                     {
                         context.Errors.Add(new ExecutionError(getDiagramQueryResult.Errors.First().Message));
+                    }
+
+                    // Export to geojson file (for checking in QGIS etc.) if such filename is specified
+                    var jsonFilename = context.GetArgument<string>("exportToGeoJsonFilename");
+
+                    if (jsonFilename != null)
+                    {
+                        var export = new GeoJsonExporter(getDiagramQueryResult.Value.Diagram);
+                        export.Export(jsonFilename);
                     }
 
                     return getDiagramQueryResult.Value.Diagram;
