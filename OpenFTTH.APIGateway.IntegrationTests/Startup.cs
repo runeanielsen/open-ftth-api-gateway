@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using DAX.EventProcessing;
+using Microsoft.Extensions.DependencyInjection;
 using OpenFTTH.APIGateway.IntegrationTests.TestData;
 using OpenFTTH.CQRS;
 using OpenFTTH.EventSourcing;
@@ -13,6 +14,9 @@ namespace OpenFTTH.APIGateway.IntegrationTests
     {
         public void ConfigureServices(IServiceCollection services)
         {
+            // Fake event producer
+            services.AddSingleton<IExternalEventProducer, FakeExternalEventProducer>();
+
             // Route Network State and Repository
             services.AddSingleton<IRouteNetworkState, InMemRouteNetworkState>();
             services.AddSingleton<IRouteNetworkRepository, InMemRouteNetworkRepository>();
