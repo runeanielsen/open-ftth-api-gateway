@@ -1,4 +1,5 @@
-﻿using DAX.EventProcessing.Dispatcher;
+﻿using DAX.EventProcessing;
+using DAX.EventProcessing.Dispatcher;
 using DAX.EventProcessing.Dispatcher.Topos;
 using GraphQL.Server;
 using GraphQL.Server.Ui.GraphiQL;
@@ -11,6 +12,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
@@ -133,6 +135,15 @@ namespace OpenFTTH.APIGateway
                                   });
             });
 
+            // Use kafka as external event producer
+            services.AddSingleton<IExternalEventProducer>(x =>
+                new KafkaProducer(
+                    x.GetRequiredService<ILogger<KafkaProducer>>(),
+                    x.GetRequiredService<IOptions<KafkaSetting>>().Value.Server,
+                    x.GetRequiredService<IOptions<KafkaSetting>>().Value.CertificateFilename
+                )
+            );
+
             // Event Sourcing and CQRS Stuff
             var assembliesWithBusinessLogic = new Assembly[] {
                 AppDomain.CurrentDomain.Load("OpenFTTH.RouteNetwork.Business"),
@@ -171,6 +182,7 @@ namespace OpenFTTH.APIGateway
             services.AddHostedService<RouteNetworkEventConsumer>();
 
             // Utility network updated
+            services.AddHostedService<UtilityNetworkUpdatedEventConsumer>();
             services.AddSingleton<IToposTypedEventObservable<RouteNetworkElementContainedEquipmentUpdated>, ToposTypedEventObservable<RouteNetworkElementContainedEquipmentUpdated>>();
             services.AddSingleton<SchematicDiagramObserver>();
 
