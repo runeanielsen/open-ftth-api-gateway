@@ -20,6 +20,7 @@ using OpenFTTH.APIGateway.GraphQL.Notifications.GeographicalAreaUpdated.Types;
 using OpenFTTH.APIGateway.GraphQL.Root;
 using OpenFTTH.APIGateway.GraphQL.RouteNetwork;
 using OpenFTTH.APIGateway.GraphQL.Schematic;
+using OpenFTTH.APIGateway.GraphQL.Schematic.Subscriptions;
 using OpenFTTH.APIGateway.GraphQL.UtilityNetwork;
 using OpenFTTH.APIGateway.GraphQL.Work;
 using OpenFTTH.APIGateway.Logging;
@@ -30,6 +31,7 @@ using OpenFTTH.APIGateway.Workers;
 using OpenFTTH.CQRS;
 using OpenFTTH.Events.Geo;
 using OpenFTTH.Events.RouteNetwork;
+using OpenFTTH.Events.UtilityNetwork;
 using OpenFTTH.EventSourcing;
 using OpenFTTH.EventSourcing.InMem;
 using OpenFTTH.RouteNetwork.Business.RouteElements.EventHandling;
@@ -167,6 +169,10 @@ namespace OpenFTTH.APIGateway
             services.AddSingleton<IToposTypedEventObservable<RouteNetworkEditOperationOccuredEvent>, ToposTypedEventObservable<RouteNetworkEditOperationOccuredEvent>>();
 
             services.AddHostedService<RouteNetworkEventConsumer>();
+
+            // Utility network updated
+            services.AddSingleton<IToposTypedEventObservable<RouteNetworkElementContainedEquipmentUpdated>, ToposTypedEventObservable<RouteNetworkElementContainedEquipmentUpdated>>();
+            services.AddSingleton<SchematicDiagramObserver>();
 
             // Geographical area updated
             services.AddHostedService<GeographicalAreaUpdatedEventConsumer>();
