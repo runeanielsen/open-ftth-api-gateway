@@ -32,6 +32,9 @@ namespace OpenFTTH.APIGateway.Workers
 
             try
             {
+                if (String.IsNullOrEmpty(_kafkaSetting.UtilityNetworkNotificationsTopic))
+                    throw new ApplicationException("UtilityNetworkNotificationsTopic Kafka app setting must be set!");
+
                 _kafkaConsumer = _eventDispatcher.Config("utility_network_updated_event_" + Guid.NewGuid(), c => {
                     var kafkaConfig = c.UseKafka(_kafkaSetting.Server);
 
@@ -48,6 +51,7 @@ namespace OpenFTTH.APIGateway.Workers
             catch (Exception ex)
             {
                 _logger.LogError(ex, ex.Message);
+                throw;
             }
 
             await Task.CompletedTask;

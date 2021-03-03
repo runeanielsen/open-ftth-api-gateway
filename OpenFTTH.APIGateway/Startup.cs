@@ -18,7 +18,6 @@ using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 using OpenFTTH.APIGateway.CoreTypes;
 using OpenFTTH.APIGateway.GraphQL.Core.Types;
-using OpenFTTH.APIGateway.GraphQL.Notifications.GeographicalAreaUpdated.Types;
 using OpenFTTH.APIGateway.GraphQL.Root;
 using OpenFTTH.APIGateway.GraphQL.RouteNetwork;
 using OpenFTTH.APIGateway.GraphQL.Schematic;
@@ -26,7 +25,6 @@ using OpenFTTH.APIGateway.GraphQL.Schematic.Subscriptions;
 using OpenFTTH.APIGateway.GraphQL.UtilityNetwork;
 using OpenFTTH.APIGateway.GraphQL.Work;
 using OpenFTTH.APIGateway.Logging;
-using OpenFTTH.APIGateway.Notifications.GeographicalAreaUpdated.Subscriptions;
 using OpenFTTH.APIGateway.Settings;
 using OpenFTTH.APIGateway.Test;
 using OpenFTTH.APIGateway.Workers;
@@ -185,16 +183,6 @@ namespace OpenFTTH.APIGateway
             services.AddHostedService<UtilityNetworkUpdatedEventConsumer>();
             services.AddSingleton<IToposTypedEventObservable<RouteNetworkElementContainedEquipmentUpdated>, ToposTypedEventObservable<RouteNetworkElementContainedEquipmentUpdated>>();
             services.AddSingleton<SchematicDiagramObserver>();
-
-            // Geographical area updated
-            services.AddHostedService<GeographicalAreaUpdatedEventConsumer>();
-            services.AddSingleton<IToposTypedEventObservable<ObjectsWithinGeographicalAreaUpdated>, ToposTypedEventObservable<ObjectsWithinGeographicalAreaUpdated>>();
-            services.AddSingleton<GeographicalAreaUpdatedEventSubscription>();
-            services.AddSingleton<ObjectsWithinGeographicalAreaUpdatedType>();
-            services.AddSingleton<EnvelopeType>();
-            services.AddSingleton<IdChangeSetType>();
-            services.AddSingleton<ChangeTypeEnumType>();
-
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

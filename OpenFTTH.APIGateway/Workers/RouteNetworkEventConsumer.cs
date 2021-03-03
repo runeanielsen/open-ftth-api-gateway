@@ -39,6 +39,9 @@ namespace OpenFTTH.APIGateway.Workers
 
             try
             {
+                if (String.IsNullOrEmpty(_kafkaSetting.RouteNetworkEventTopic))
+                    throw new ApplicationException("RouteNetworkEventTopic Kafka app setting must be set!");
+
                 var toposConfig = _eventDispatcher.Config("route_network_event_" + Guid.NewGuid(), c => {
                     var kafkaConfig = c.UseKafka(_kafkaSetting.Server);
 
@@ -60,6 +63,7 @@ namespace OpenFTTH.APIGateway.Workers
             catch (Exception ex)
             {
                 _logger.LogError(ex, ex.Message);
+                throw;
             }
 
             await Task.CompletedTask;
