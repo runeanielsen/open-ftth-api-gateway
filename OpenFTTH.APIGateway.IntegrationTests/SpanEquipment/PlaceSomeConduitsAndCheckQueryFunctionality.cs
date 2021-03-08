@@ -5,6 +5,7 @@ using OpenFTTH.CQRS;
 using OpenFTTH.RouteNetwork.API.Commands;
 using OpenFTTH.RouteNetwork.API.Model;
 using OpenFTTH.RouteNetwork.API.Queries;
+using OpenFTTH.Schematic.API.Queries;
 using OpenFTTH.TestData;
 using OpenFTTH.UtilityGraphService.API.Commands;
 using OpenFTTH.UtilityGraphService.API.Queries;
@@ -41,7 +42,49 @@ namespace OpenFTTH.APIGateway.IntegrationTests.SpanEquipment
         }
 
 
-        [Fact, Order(2)]
+        [Fact, Order(10)]
+        public async void CreateRouteNodeContainerInCC_1()
+        {
+            var nodeOfInterestId = Guid.NewGuid();
+            var registerNodeOfInterestCommand = new RegisterNodeOfInterest(nodeOfInterestId, TestRouteNetwork.CC_1);
+            var registerNodeOfInterestCommandResult = _commandDispatcher.HandleAsync<RegisterNodeOfInterest, Result<RouteNetworkInterest>>(registerNodeOfInterestCommand).Result;
+
+            var placeNodeContainerCommand = new PlaceNodeContainerInRouteNetwork(Guid.NewGuid(), TestSpecifications.Conduit_Closure_Emtelle_Branch_Box, registerNodeOfInterestCommandResult.Value)
+            {
+                ManufacturerId = TestSpecifications.Manu_Emtelle
+            };
+
+            // Act
+            var placeNodeContainerResult = await _commandDispatcher.HandleAsync<PlaceNodeContainerInRouteNetwork, Result>(placeNodeContainerCommand);
+
+            var equipmentQueryResult = await _queryDispatcher.HandleAsync<GetEquipmentDetails, Result<GetEquipmentDetailsResult>>(
+                new GetEquipmentDetails(new InterestIdList() { nodeOfInterestId })
+            );
+
+            // Assert
+            placeNodeContainerResult.IsSuccess.Should().BeTrue();
+            equipmentQueryResult.IsSuccess.Should().BeTrue();
+            equipmentQueryResult.Value.NodeContainers.Count.Should().Be(1);
+        }
+
+        [Fact, Order(11)]
+        public async void CheckThatDiagramIncludesNodeContainerInCC_1()
+        {
+            var sutRouteNetworkElement = TestRouteNetwork.CC_1;
+
+            // Act
+            var getDiagramQueryResult = await _queryDispatcher.HandleAsync<GetDiagram, Result<GetDiagramResult>>(new GetDiagram(sutRouteNetworkElement));
+
+            // Assert
+            getDiagramQueryResult.IsSuccess.Should().BeTrue();
+            getDiagramQueryResult.Value.Diagram.DiagramObjects.Any(d => d.Style == "NodeContainer").Should().BeTrue();
+
+
+        }
+
+
+
+        [Fact, Order(20)]
         public async void Place5x10Conduit_from_HH_1_to_HH_10()
         {
             // Place a 5x10 multi conduit here:
@@ -62,7 +105,7 @@ namespace OpenFTTH.APIGateway.IntegrationTests.SpanEquipment
             placeSpanEquipmentResult.IsSuccess.Should().BeTrue();
         }
 
-        [Fact, Order(2)]
+        [Fact, Order(21)]
         public async void Place10x10Conduit_from_HH_1_to_HH_10()
         {
             // Place a 1x10 multi conduit here:
@@ -83,7 +126,7 @@ namespace OpenFTTH.APIGateway.IntegrationTests.SpanEquipment
             placeSpanEquipmentResult.IsSuccess.Should().BeTrue();
         }
 
-        [Fact, Order(3)]
+        [Fact, Order(22)]
         public async void PlaceØ40Flex_from_HH_2_to_FP_2()
         {
             // Place a Ø40 flex conduit here:
@@ -104,7 +147,7 @@ namespace OpenFTTH.APIGateway.IntegrationTests.SpanEquipment
             placeSpanEquipmentResult.IsSuccess.Should().BeTrue();
         }
 
-        [Fact, Order(4)]
+        [Fact, Order(23)]
         public async void PlaceØ40Flex_from_CC_1_to_SP_1()
         {
             // Place a Ø40 flex conduit here:
@@ -125,7 +168,7 @@ namespace OpenFTTH.APIGateway.IntegrationTests.SpanEquipment
             placeSpanEquipmentResult.IsSuccess.Should().BeTrue();
         }
 
-        [Fact, Order(10)]
+        [Fact, Order(50)]
         public async void QueryRouteNetworkDetailsOfCC_1()
         {
             var routeNetworkQuery = new GetRouteNetworkDetails(new RouteNetworkElementIdList() { TestRouteNetwork.CC_1 })
@@ -138,14 +181,14 @@ namespace OpenFTTH.APIGateway.IntegrationTests.SpanEquipment
             // Assert
             routeNetworkQueryResult.IsSuccess.Should().BeTrue();
             routeNetworkQueryResult.Value.RouteNetworkElements.Count.Should().Be(1);
-            routeNetworkQueryResult.Value.Interests.Count.Should().Be(3);
-            routeNetworkQueryResult.Value.RouteNetworkElements[TestRouteNetwork.CC_1].InterestRelations.Length.Should().Be(3);
+            routeNetworkQueryResult.Value.Interests.Count.Should().Be(4);
+            routeNetworkQueryResult.Value.RouteNetworkElements[TestRouteNetwork.CC_1].InterestRelations.Length.Should().Be(4);
             routeNetworkQueryResult.Value.RouteNetworkElements[TestRouteNetwork.CC_1].InterestRelations.Count(r => r.RelationKind == RouteNetworkInterestRelationKindEnum.PassThrough).Should().Be(2);
             routeNetworkQueryResult.Value.RouteNetworkElements[TestRouteNetwork.CC_1].InterestRelations.Count(r => r.RelationKind == RouteNetworkInterestRelationKindEnum.Start).Should().Be(1);
         }
 
 
-        [Fact, Order(11)]
+        [Fact, Order(100)]
         public async void QueryEquipmentDetailsOfCC_1()
         {
             var routeNetworkQuery = new GetRouteNetworkDetails(new RouteNetworkElementIdList() { TestRouteNetwork.CC_1 })

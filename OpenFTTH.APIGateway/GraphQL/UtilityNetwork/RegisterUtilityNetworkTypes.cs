@@ -11,6 +11,7 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork
         {
             // Mutations
             services.AddSingleton<SpanEquipmentMutations>();
+            services.AddSingleton<NodeContainerMutations>();
 
             // Queries
             services.AddSingleton<UtilityNetworkServiceQueries>();
@@ -19,6 +20,7 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork
             services.AddSingleton<ManufacturerType>();
             services.AddSingleton<SpanEquipmentSpecificationType>();
             services.AddSingleton<NodeContainerSpecificationType>();
+            services.AddSingleton<NodeContainerSideEnumType>();
         }
     }
 }

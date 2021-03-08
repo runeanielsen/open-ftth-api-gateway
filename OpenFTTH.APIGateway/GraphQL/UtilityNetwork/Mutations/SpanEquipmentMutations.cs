@@ -73,7 +73,31 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                   
               }
             );
-          
+
+
+            Field<CommandResultType>(
+              "affixSpanEquipmentToNodeContainer",
+              description: "Affix a span equipment to a node container - i.e. som condult closure, man hole etc.",
+              arguments: new QueryArguments(
+                  new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "spanSegmentId" },
+                  new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "nodeContainerId" },
+                  new QueryArgument<NonNullGraphType<NodeContainerSideEnumType>> { Name = "nodeContainerSide" }
+              ),
+              resolve: context =>
+              {
+                  var spanSegmentId = context.GetArgument<Guid>("spanSegmentId");
+                  var nodeContainerId = context.GetArgument<Guid>("nodeContainerId");
+                  var side = context.GetArgument<NodeContainerSideEnum>("nodeContainerSide");
+
+                  var affixCommand = new AffixSpanEquipmentToNodeContainer(spanSegmentId, nodeContainerId, side);
+
+                  var affixCommandResult = commandDispatcher.HandleAsync<AffixSpanEquipmentToNodeContainer, Result>(affixCommand).Result;
+
+                  return new CommandResult(affixCommandResult);
+
+              }
+            );
+
         }
     }
 }
