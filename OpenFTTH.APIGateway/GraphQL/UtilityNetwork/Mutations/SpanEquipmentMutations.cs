@@ -13,7 +13,6 @@ using OpenFTTH.RouteNetwork.API.Model;
 using OpenFTTH.UtilityGraphService.API.Commands;
 using OpenFTTH.UtilityGraphService.API.Model.UtilityNetwork;
 using OpenFTTH.UtilityGraphService.Business.Graph;
-using OpenFTTH.UtilityGraphService.Business.SpanEquipments.Projections;
 using System;
 using System.Collections.Generic;
 
@@ -26,7 +25,7 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
             Description = "Span equipment mutations";
 
             Field<CommandResultType>(
-              "placSpanEquipmentInRouteNetwork",
+              "placeSpanEquipmentInRouteNetwork",
               description: "Place a span equipment (i.e. conduit, cable whatwever) in the route network",
               arguments: new QueryArguments(
                   new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "spanEquipmentId" },
