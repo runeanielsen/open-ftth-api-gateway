@@ -12,6 +12,7 @@ using OpenFTTH.RouteNetwork.API.Commands;
 using OpenFTTH.RouteNetwork.API.Model;
 using OpenFTTH.UtilityGraphService.API.Commands;
 using OpenFTTH.UtilityGraphService.API.Model.UtilityNetwork;
+using OpenFTTH.UtilityGraphService.Business.Graph;
 using OpenFTTH.UtilityGraphService.Business.SpanEquipments.Projections;
 using System;
 using System.Collections.Generic;
@@ -45,7 +46,7 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                   var namingInfo = context.GetArgument<NamingInfo>("namingInfo");
 
 
-                  var spanEquipments = eventStore.Projections.Get<SpanEquipmentsProjection>().SpanEquipments;
+                  var spanEquipments = eventStore.Projections.Get<UtilityGraphProjection>().SpanEquipments;
 
                   // First register the walk in the route network where the client want to place the span equipment
                   var walkOfInterestId = Guid.NewGuid();
