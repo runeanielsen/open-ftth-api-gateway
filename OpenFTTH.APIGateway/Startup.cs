@@ -36,6 +36,7 @@ using OpenFTTH.EventSourcing;
 using OpenFTTH.EventSourcing.InMem;
 using OpenFTTH.RouteNetwork.Business.RouteElements.EventHandling;
 using OpenFTTH.RouteNetwork.Business.RouteElements.StateHandling;
+using OpenFTTH.TestData;
 using OpenFTTH.Work.Business.InMemTestImpl;
 using Serilog;
 using System;
@@ -222,7 +223,9 @@ namespace OpenFTTH.APIGateway
 
 
             var commandDispatcher = app.ApplicationServices.GetService<ICommandDispatcher>();
-            new ConduitTypesTestDataGenerator(commandDispatcher).Run();
+            var queryDispatcher = app.ApplicationServices.GetService<IQueryDispatcher>();
+
+            new TestSpecifications(commandDispatcher, queryDispatcher).Run();
 
         }
     }
