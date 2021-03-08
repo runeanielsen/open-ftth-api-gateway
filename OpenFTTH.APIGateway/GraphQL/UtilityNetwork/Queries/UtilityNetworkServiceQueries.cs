@@ -37,6 +37,17 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Queries
                     return queryResult.Value;
                 }
             );
+
+            Field<ListGraphType<NodeContainerSpecificationType>>(
+                name: "nodeContainerSpecifications",
+                description: "Retrieve all node container specifications.",
+                resolve: context =>
+                {
+                    var queryResult = queryDispatcher.HandleAsync<GetNodeContainerSpecifications, Result<LookupCollection<NodeContainerSpecification>>>(new GetNodeContainerSpecifications()).Result;
+
+                    return queryResult.Value;
+                }
+            );
         }
     }
 }
