@@ -98,6 +98,27 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
               }
             );
 
+
+            Field<CommandResultType>(
+              "cutSpanSegments",
+              description: "Cut the span segments belonging to som span equipment at the route node specified",
+              arguments: new QueryArguments(
+                  new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "routeNodeId" },
+                  new QueryArgument<NonNullGraphType<ListGraphType<IdGraphType>>> { Name = "spanSegmentstoCut" }
+              ),
+              resolve: context =>
+              {
+                  var routeNodeId = context.GetArgument<Guid>("routeNodeId");
+                  var spanSegmentToCut = context.GetArgument<Guid[]>("spanSegmentstoCut");
+
+                  var cutCmd = new CutSpanSegmentsAtRouteNode(routeNodeId, spanSegmentToCut);
+
+                  var cutResult = commandDispatcher.HandleAsync<CutSpanSegmentsAtRouteNode, Result>(cutCmd).Result;
+
+                  return new CommandResult(cutResult);
+              }
+            );
+
         }
     }
 }
