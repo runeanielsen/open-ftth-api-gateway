@@ -35,7 +35,8 @@ namespace OpenFTTH.APIGateway.GraphQL.Schematic.Queries
 
                     if (getDiagramQueryResult.IsFailed)
                     {
-                        context.Errors.Add(new ExecutionError(getDiagramQueryResult.Errors.First().Message));
+                        foreach (var error in getDiagramQueryResult.Errors)
+                            context.Errors.Add(new ExecutionError(error.Message));
                     }
 
                     // Export to geojson file (for checking in QGIS etc.) if such filename is specified
