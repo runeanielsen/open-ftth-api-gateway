@@ -69,6 +69,16 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
 
                   var placeSpanEquipmentResult = commandDispatcher.HandleAsync<PlaceSpanEquipmentInRouteNetwork, Result>(placeSpanEquipmentCommand).Result;
 
+                  // Unregister interest if place span equipment failed
+                  if (placeSpanEquipmentResult.IsFailed)
+                  {
+                      var unregisterCommandResult = commandDispatcher.HandleAsync<UnregisterInterest, Result>(new UnregisterInterest(walkOfInterestId)).Result;
+
+                      if (unregisterCommandResult.IsFailed)
+                          return new CommandResult(unregisterCommandResult);
+                  }
+
+
                   return new CommandResult(placeSpanEquipmentResult);
                   
               }

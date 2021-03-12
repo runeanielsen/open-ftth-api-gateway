@@ -54,6 +54,15 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
 
                   var placeNodeContainerResult = commandDispatcher.HandleAsync<PlaceNodeContainerInRouteNetwork, Result>(placeNodeContainerCommand).Result;
 
+                  // Unregister interest if place node container failed
+                  if (placeNodeContainerResult.IsFailed)
+                  {
+                      var unregisterCommandResult = commandDispatcher.HandleAsync<UnregisterInterest, Result>(new UnregisterInterest(nodeOfInterestId)).Result;
+
+                      if (unregisterCommandResult.IsFailed)
+                          return new CommandResult(unregisterCommandResult);
+                  }
+
                   return new CommandResult(placeNodeContainerResult);
               }
             );
