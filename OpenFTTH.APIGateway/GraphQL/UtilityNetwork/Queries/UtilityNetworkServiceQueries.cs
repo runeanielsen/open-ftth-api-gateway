@@ -1,12 +1,17 @@
 ﻿using CSharpFunctionalExtensions;
+using GraphQL;
 using GraphQL.Types;
 using Microsoft.Extensions.Logging;
 using OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Types;
 using OpenFTTH.CQRS;
+using OpenFTTH.RouteNetwork.API.Model;
+using OpenFTTH.RouteNetwork.API.Queries;
 using OpenFTTH.Util;
 using OpenFTTH.UtilityGraphService.API.Model.UtilityNetwork;
 using OpenFTTH.UtilityGraphService.API.Queries;
-
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Queries
 {
@@ -46,6 +51,57 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Queries
                     var queryResult = queryDispatcher.HandleAsync<GetNodeContainerSpecifications, Result<LookupCollection<NodeContainerSpecification>>>(new GetNodeContainerSpecifications()).Result;
 
                     return queryResult.Value;
+                }
+            );
+
+            Field<SpanSegmentTraceType>(
+                name: "spanSegmentTrace",
+                description: "Query information related to a specific span equipment",
+                arguments: new QueryArguments(
+                  new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "spanSegmentId" }
+                ),
+                resolve: context =>
+                {
+                    var spanSegmentId = context.GetArgument<Guid>("spanSegmentId");
+
+                    // Get equipment information
+                    var equipmentQueryResult = queryDispatcher.HandleAsync<GetEquipmentDetails, FluentResults.Result<GetEquipmentDetailsResult>>(
+                        new GetEquipmentDetails(new EquipmentIdList() { spanSegmentId })
+                    ).Result;
+
+                    if (equipmentQueryResult.IsFailed)
+                    {
+                        foreach (var error in equipmentQueryResult.Errors)
+                            context.Errors.Add(new ExecutionError(error.Message));
+                    }
+
+                    var spanEquipment = equipmentQueryResult.Value.SpanEquipment.First();
+
+                    // Get walk of interest of the span equipment
+                    var interestQueryResult = queryDispatcher.HandleAsync<GetRouteNetworkDetails, FluentResults.Result<GetRouteNetworkDetailsResult>>(
+                        new GetRouteNetworkDetails(new InterestIdList() { spanEquipment.WalkOfInterestId })
+                    ).Result;
+
+                    if (interestQueryResult.IsFailed)
+                    {
+                        foreach (var error in interestQueryResult.Errors)
+                            context.Errors.Add(new ExecutionError(error.Message));
+                    }
+
+                    var interest = interestQueryResult.Value.Interests.First();
+
+                    // Create trace object
+                    List<Guid> segmentIds = new List<Guid>();
+
+                    for (int i = 1; i < interest.RouteNetworkElementRefs.Count; i += 2)
+                    {
+                        segmentIds.Add(interest.RouteNetworkElementRefs[i]);
+                    }
+
+                    return new SpanSegmentTrace()
+                    {
+                        RouteNetworkSegmentIds = segmentIds.ToArray()
+                    };
                 }
             );
         }
