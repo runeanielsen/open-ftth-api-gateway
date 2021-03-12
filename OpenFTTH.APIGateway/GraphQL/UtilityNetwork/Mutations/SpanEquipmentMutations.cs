@@ -129,6 +129,26 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
               }
             );
 
+            Field<CommandResultType>(
+              "connectSpanSegments",
+              description: "Connect the span segments belonging to two different span equipment at the route node specified",
+              arguments: new QueryArguments(
+                  new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "routeNodeId" },
+                  new QueryArgument<NonNullGraphType<ListGraphType<IdGraphType>>> { Name = "spanSegmentstoConnect" }
+              ),
+              resolve: context =>
+              {
+                  var routeNodeId = context.GetArgument<Guid>("routeNodeId");
+                  var spanSegmentToConnect = context.GetArgument<Guid[]>("spanSegmentstoConnect");
+
+                  var connectCmd = new ConnectSpanSegmentsAtRouteNode(routeNodeId, spanSegmentToConnect);
+
+                  var connectResult = commandDispatcher.HandleAsync<ConnectSpanSegmentsAtRouteNode, Result>(connectCmd).Result;
+
+                  return new CommandResult(connectResult);
+              }
+            );
+
         }
     }
 }
