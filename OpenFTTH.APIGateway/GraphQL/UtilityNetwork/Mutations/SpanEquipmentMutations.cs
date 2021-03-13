@@ -87,7 +87,7 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
 
             Field<CommandResultType>(
               "affixSpanEquipmentToNodeContainer",
-              description: "Affix a span equipment to a node container - i.e. som condult closure, man hole etc.",
+              description: "Affix a span equipment to a node container - i.e. to some condult closure, man hole etc.",
               arguments: new QueryArguments(
                   new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "spanSegmentId" },
                   new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "nodeContainerId" },
@@ -104,6 +104,27 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                   var affixCommandResult = commandDispatcher.HandleAsync<AffixSpanEquipmentToNodeContainer, Result>(affixCommand).Result;
 
                   return new CommandResult(affixCommandResult);
+
+              }
+            );
+
+            Field<CommandResultType>(
+              "detachSpanEquipmentFromNodeContainer",
+              description: "Detach a span equipment from a node container - i.e. from some condult closure, man hole etc.",
+              arguments: new QueryArguments(
+                  new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "spanSegmentId" },
+                  new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "nodeContainerId" }
+              ),
+              resolve: context =>
+              {
+                  var spanSegmentId = context.GetArgument<Guid>("spanSegmentId");
+                  var nodeContainerId = context.GetArgument<Guid>("nodeContainerId");
+
+                  var detachCommand = new DetachSpanEquipmentFromNodeContainer(spanSegmentId, nodeContainerId);
+
+                  var detachCommandResult = commandDispatcher.HandleAsync<DetachSpanEquipmentFromNodeContainer, Result>(detachCommand).Result;
+
+                  return new CommandResult(detachCommandResult);
 
               }
             );
@@ -134,18 +155,38 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
               description: "Connect the span segments belonging to two different span equipment at the route node specified",
               arguments: new QueryArguments(
                   new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "routeNodeId" },
-                  new QueryArgument<NonNullGraphType<ListGraphType<IdGraphType>>> { Name = "spanSegmentstoConnect" }
+                  new QueryArgument<NonNullGraphType<ListGraphType<IdGraphType>>> { Name = "spanSegmentsToConnect" }
               ),
               resolve: context =>
               {
                   var routeNodeId = context.GetArgument<Guid>("routeNodeId");
-                  var spanSegmentToConnect = context.GetArgument<Guid[]>("spanSegmentstoConnect");
+                  var spanSegmentToConnect = context.GetArgument<Guid[]>("spanSegmentsToConnect");
 
                   var connectCmd = new ConnectSpanSegmentsAtRouteNode(routeNodeId, spanSegmentToConnect);
 
                   var connectResult = commandDispatcher.HandleAsync<ConnectSpanSegmentsAtRouteNode, Result>(connectCmd).Result;
 
                   return new CommandResult(connectResult);
+              }
+            );
+
+            Field<CommandResultType>(
+              "disconnectSpanSegments",
+              description: "Disconnect two span segments belonging to two different span equipment at the route node specified",
+              arguments: new QueryArguments(
+                  new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "routeNodeId" },
+                  new QueryArgument<NonNullGraphType<ListGraphType<IdGraphType>>> { Name = "spanSegmentsToDisconnect" }
+              ),
+              resolve: context =>
+              {
+                  var routeNodeId = context.GetArgument<Guid>("routeNodeId");
+                  var spanSegmentToDisconnect = context.GetArgument<Guid[]>("spanSegmentsToDisconnect");
+
+                  var disconnectCmd = new DisconnectSpanSegmentsAtRouteNode(routeNodeId, spanSegmentToDisconnect);
+
+                  var disconnectResult = commandDispatcher.HandleAsync<DisconnectSpanSegmentsAtRouteNode, Result>(disconnectCmd).Result;
+
+                  return new CommandResult(disconnectResult);
               }
             );
 
