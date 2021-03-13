@@ -7,6 +7,7 @@ using OpenFTTH.Events.RouteNetwork;
 using OpenFTTH.RouteNetwork.Business.RouteElements.EventHandling;
 using OpenFTTH.RouteNetwork.Business.RouteElements.StateHandling;
 using System;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Topos.Config;
@@ -59,13 +60,48 @@ namespace OpenFTTH.APIGateway.Workers
                 ((InMemRouteNetworkState)_routeNetworkState).FinishLoadMode();
 
                 _kafkaConsumer = toposConfig.Start();
+
+                var inMemRouteNetworkState = (InMemRouteNetworkState)_routeNetworkState;
+
+
+                // Wait for load mode to create an initial version/state
+                _logger.LogInformation("Starting route network events load mode...");
+
+                bool loadFinish = false;
+                while (!stoppingToken.IsCancellationRequested && !loadFinish)
+                {
+                    _logger.LogDebug("Waiting for load mode to finish creating initial state...");
+
+                    _logger.LogInformation($"{inMemRouteNetworkState.NumberOfObjectsLoaded} objects loaded.");
+
+                    DateTime waitStartTimestamp = DateTime.UtcNow;
+
+                    await Task.Delay(5000, stoppingToken);
+
+                    TimeSpan timespan = waitStartTimestamp - inMemRouteNetworkState.LastEventRecievedTimestamp;
+
+                    if (timespan.TotalSeconds > 10)
+                    {
+                        loadFinish = true;
+                    }
+                }
+
+                ((InMemRouteNetworkState)_routeNetworkState).FinishLoadMode();
+                _logger.LogInformation("Loading of initial route network state finished.");
+
+                // We are now ready to serve the public if the loaded objects are bigger than 0
+                if (inMemRouteNetworkState.NumberOfObjectsLoaded > 0)
+                    File.Create("/tmp/healthy");
+                else
+                    throw new ApplicationException("Recieved no route network elements from Kafka topic.");
+
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, ex.Message);
                 throw;
             }
-
+                        
             await Task.CompletedTask;
         }
 

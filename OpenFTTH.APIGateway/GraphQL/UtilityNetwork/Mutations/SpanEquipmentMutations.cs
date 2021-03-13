@@ -113,14 +113,14 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
               description: "Detach a span equipment from a node container - i.e. from some condult closure, man hole etc.",
               arguments: new QueryArguments(
                   new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "spanSegmentId" },
-                  new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "nodeContainerId" }
+                  new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "routeNodeId" }
               ),
               resolve: context =>
               {
                   var spanSegmentId = context.GetArgument<Guid>("spanSegmentId");
-                  var nodeContainerId = context.GetArgument<Guid>("nodeContainerId");
+                  var routeNodeId = context.GetArgument<Guid>("routeNodeId");
 
-                  var detachCommand = new DetachSpanEquipmentFromNodeContainer(spanSegmentId, nodeContainerId);
+                  var detachCommand = new DetachSpanEquipmentFromNodeContainer(spanSegmentId, routeNodeId);
 
                   var detachCommandResult = commandDispatcher.HandleAsync<DetachSpanEquipmentFromNodeContainer, Result>(detachCommand).Result;
 
