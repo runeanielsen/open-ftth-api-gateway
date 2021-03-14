@@ -3,6 +3,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using OpenFTTH.APIGateway.Settings;
+using OpenFTTH.APIGateway.TestData;
+using OpenFTTH.CQRS;
 using OpenFTTH.Events.RouteNetwork;
 using OpenFTTH.RouteNetwork.Business.RouteElements.EventHandling;
 using OpenFTTH.RouteNetwork.Business.RouteElements.StateHandling;
@@ -22,13 +24,19 @@ namespace OpenFTTH.APIGateway.Workers
         private readonly RouteNetworkEventHandler _routeNetworkEventHandler;
         private readonly IRouteNetworkState _routeNetworkState;
         private readonly KafkaSetting _kafkaSetting;
+        private readonly DatabaseSetting _databaseSetting;
+        private readonly ICommandDispatcher _commandDispatcher;
+
         private InMemPositionsStorage _positionsStorage = new InMemPositionsStorage();
         private IDisposable _kafkaConsumer;
 
-        public RouteNetworkEventConsumer(ILogger<RouteNetworkEventConsumer> logger, IOptions<KafkaSetting> kafkaSetting, IToposTypedEventObservable<RouteNetworkEditOperationOccuredEvent> eventDispatcher, RouteNetworkEventHandler routeNetworkEventHandler, IRouteNetworkState routeNetworkState)
+        public RouteNetworkEventConsumer(ILogger<RouteNetworkEventConsumer> logger, IOptions<KafkaSetting> kafkaSetting, IOptions<DatabaseSetting> databaseSetting, IToposTypedEventObservable<RouteNetworkEditOperationOccuredEvent> eventDispatcher, RouteNetworkEventHandler routeNetworkEventHandler, IRouteNetworkState routeNetworkState, ICommandDispatcher commandDispatcher)
         {
             _logger = logger;
             _kafkaSetting = kafkaSetting.Value;
+            _databaseSetting = databaseSetting.Value;
+            _commandDispatcher = commandDispatcher;
+
             _eventDispatcher = eventDispatcher;
             _routeNetworkEventHandler = routeNetworkEventHandler;
             _routeNetworkState = routeNetworkState;
@@ -72,7 +80,7 @@ namespace OpenFTTH.APIGateway.Workers
                 {
                     _logger.LogDebug("Waiting for load mode to finish creating initial state...");
 
-                    _logger.LogInformation($"{inMemRouteNetworkState.NumberOfObjectsLoaded} objects loaded.");
+                    _logger.LogInformation($"{inMemRouteNetworkState.NumberOfObjectsLoaded} route network Kafka events processed.");
 
                     DateTime waitStartTimestamp = DateTime.UtcNow;
 
@@ -88,6 +96,12 @@ namespace OpenFTTH.APIGateway.Workers
 
                 ((InMemRouteNetworkState)_routeNetworkState).FinishLoadMode();
                 _logger.LogInformation("Loading of initial route network state finished.");
+
+                // TODO: Must be removed
+                // Seed conversion conduits
+                if (_databaseSetting.Host != null)
+                    new ConduitSeeder(_databaseSetting, _commandDispatcher).Run();
+
 
                 // We are now ready to serve the public if the loaded objects are bigger than 0
                 if (inMemRouteNetworkState.NumberOfObjectsLoaded > 0)

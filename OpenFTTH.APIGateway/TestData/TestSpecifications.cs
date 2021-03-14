@@ -58,14 +58,13 @@ namespace OpenFTTH.TestData
         public static Guid Ø10_Brown = Guid.Parse("b4cde3bf-56ff-43f3-a62a-270cf9afa24d");
         public static Guid Ø10_Turquoise = Guid.Parse("9d05b556-2eb4-4a30-89d6-4b813c10dabe");
         public static Guid Ø10_Violet = Guid.Parse("c09ca8f5-cd37-4cd8-9d32-b6274f3c2c64");
-
-        // Span Equipment
         public static Guid Ø32_Orange = Guid.Parse("e7dea74e-df7f-4a0d-a752-98f9e02be1a8");
         public static Guid Ø40_Orange = Guid.Parse("ac417fea-b6f6-4a5a-9c9e-10ee05ecbf56");
         public static Guid Ø40_Red = Guid.Parse("be4deb0f-8d15-49ba-bbeb-fafb4ed66de5");
         public static Guid Ø50_Orange = Guid.Parse("7960355a-4dab-4d60-b3a5-e20ac4301176");
-        public static Guid Ø110_Orange = Guid.Parse("150fdd01-80d5-41fd-b0c5-97d2fbe91fa0");
+        public static Guid Ø110_Red = Guid.Parse("e078e830-f79d-4220-bd9a-87ed7cf81f1d");
 
+        // Span Equipment
         public static Guid Multi_Ø32_3x10 = Guid.Parse("b11a4fce-2116-4437-9108-3ca467124d99");
         public static Guid Multi_Ø40_5x10 = Guid.Parse("7ca9dcbb-524f-4d61-945c-16bf2679326e");
         public static Guid Multi_Ø40_6x10 = Guid.Parse("f8d15ef6-b07f-440b-8357-4c7a3f84f156");
@@ -75,6 +74,9 @@ namespace OpenFTTH.TestData
         public static Guid Multi_Ø50_5x10_12_7_GreenWhite = Guid.Parse("2fe1a566-6477-4f24-b7df-e242bd6c7d7d");
 
         public static Guid Flex_Ø40_Red = Guid.Parse("6df48525-ac10-4b02-b1cd-05283b549ab2");
+        public static Guid Tomrør_Ø110_Red = Guid.Parse("233e77b1-b580-4093-91c1-48ac636cb300");
+        public static Guid Tomrør_Ø40_Orange = Guid.Parse("9c933058-1ea6-475f-930a-b389c421023d");
+        public static Guid Tomrør_Ø50_Orange = Guid.Parse("5c805317-8216-4b00-88c3-6ec9d542f831");
 
         public TestSpecifications Run()
         {
@@ -255,11 +257,32 @@ namespace OpenFTTH.TestData
                 ManufacturerRefs = new Guid[] { Manu_GMPlast, Manu_Emtelle }
             });
 
+            // Tomrør
+
             AddSpecification(new SpanEquipmentSpecification(Flex_Ø40_Red, "Conduit", "Ø40 Flex", new SpanStructureTemplate(Ø40_Red, 1, 1, Array.Empty<SpanStructureTemplate>()))
             {
                 Description = "ø40 mm Flexrør",
                 ManufacturerRefs = new Guid[] { Manu_GMPlast, Manu_Emtelle }
             });
+
+            AddSpecification(new SpanEquipmentSpecification(Tomrør_Ø40_Orange, "Conduit", "Ø40", new SpanStructureTemplate(Ø40_Orange, 1, 1, Array.Empty<SpanStructureTemplate>()))
+            {
+                Description = "ø40 mm orange tomrør",
+                ManufacturerRefs = new Guid[] { Manu_GMPlast, Manu_Emtelle }
+            });
+
+            AddSpecification(new SpanEquipmentSpecification(Tomrør_Ø50_Orange, "Conduit", "Ø50", new SpanStructureTemplate(Ø50_Orange, 1, 1, Array.Empty<SpanStructureTemplate>()))
+            {
+                Description = "ø50 mm orange tomrør",
+                ManufacturerRefs = new Guid[] { Manu_GMPlast, Manu_Emtelle }
+            });
+
+            AddSpecification(new SpanEquipmentSpecification(Tomrør_Ø110_Red, "Conduit", "Ø110", new SpanStructureTemplate(Ø110_Red, 1, 1, Array.Empty<SpanStructureTemplate>()))
+            {
+                Description = "ø110 mm rød tomrør",
+                ManufacturerRefs = new Guid[] { Manu_GMPlast, Manu_Emtelle }
+            });
+
         }
 
         private void AddSpanStructureSpecifications()
@@ -280,8 +303,8 @@ namespace OpenFTTH.TestData
             AddSpecification(new SpanStructureSpecification(Ø32_Orange, "Conduit", "Ø32", "Orange") { OuterDiameter = 32 });
             AddSpecification(new SpanStructureSpecification(Ø40_Orange, "Conduit", "Ø40", "Orange") { OuterDiameter = 40 });
             AddSpecification(new SpanStructureSpecification(Ø40_Red, "Conduit", "Ø40", "Red") { OuterDiameter = 40 });
-            AddSpecification(new SpanStructureSpecification(Ø50_Orange, "Conduit", "Ø50", "Orange") { OuterDiameter = 40 });
-            AddSpecification(new SpanStructureSpecification(Ø110_Orange, "Conduit", "Ø110", "Orange") { OuterDiameter = 40 });
+            AddSpecification(new SpanStructureSpecification(Ø50_Orange, "Conduit", "Ø50", "Orange") { OuterDiameter = 50 });
+            AddSpecification(new SpanStructureSpecification(Ø110_Red, "Conduit", "Ø110", "Red") { OuterDiameter = 110 });
         }
 
         private void AddManufactures()

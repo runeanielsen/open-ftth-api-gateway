@@ -113,6 +113,9 @@ namespace OpenFTTH.APIGateway
             services.Configure<RemoteServicesSetting>(remoteServiceSettings =>
                             Configuration.GetSection("RemoteServices").Bind(remoteServiceSettings));
 
+            services.Configure<DatabaseSetting>(databaseSettings =>
+                            Configuration.GetSection("Database").Bind(databaseSettings));
+
             // Web stuff
             services.AddRazorPages();
 
