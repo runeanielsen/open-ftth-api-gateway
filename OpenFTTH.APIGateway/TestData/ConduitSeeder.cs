@@ -7,6 +7,7 @@ using OpenFTTH.RouteNetwork.API.Commands;
 using OpenFTTH.RouteNetwork.API.Model;
 using OpenFTTH.TestData;
 using OpenFTTH.UtilityGraphService.API.Commands;
+using OpenFTTH.UtilityGraphService.API.Model.UtilityNetwork;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -71,13 +72,18 @@ namespace OpenFTTH.APIGateway.TestData
             {
                 if (conduit.ConduitSpec != null)
                 {
-                    PlaceConduit(conduit.ExternalId, conduit.ConduitSpec.SpecId, conduit.SegmentIds, conduit.ConduitSpec.AditionalSpecs);
+                    PlaceConduit(conduit.ExternalId, conduit.ConduitSpec.SpecId, conduit.SegmentIds, conduit.ConduitSpec.AditionalSpecs, conduit.ConduitSpec.MarkingColor);
                 }
             }
         }
 
-        private void PlaceConduit(string externalId, Guid specificationId, List<Guid> segmentIds, List<Guid> additionalStructureSpecIds)
+        private void PlaceConduit(string externalId, Guid specificationId, List<Guid> segmentIds, List<Guid> additionalStructureSpecIds, string markingColor)
         {
+            if (markingColor != null)
+            {
+
+            }
+
             RouteNetworkElementIdList walkIds = new RouteNetworkElementIdList();
             walkIds.AddRange(segmentIds);
 
@@ -94,7 +100,11 @@ namespace OpenFTTH.APIGateway.TestData
 
 
             // Place conduit
-            var placeSpanEquipmentCommand = new PlaceSpanEquipmentInRouteNetwork(Guid.NewGuid(), specificationId, registerWalkOfInterestCommandResult.Value);
+            var placeSpanEquipmentCommand = new PlaceSpanEquipmentInRouteNetwork(Guid.NewGuid(), specificationId, registerWalkOfInterestCommandResult.Value)
+            {
+                MarkingInfo = markingColor != null ? new MarkingInfo() { MarkingColor = markingColor } : null
+            };
+
             var placeSpanEquipmentResult = _commandDispatcher.HandleAsync<PlaceSpanEquipmentInRouteNetwork, Result>(placeSpanEquipmentCommand).Result;
 
             if (placeSpanEquipmentResult.IsFailed)
