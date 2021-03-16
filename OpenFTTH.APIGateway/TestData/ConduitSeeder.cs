@@ -1,4 +1,5 @@
 ﻿using FluentResults;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Npgsql;
 using OpenFTTH.APIGateway.Settings;
@@ -19,23 +20,36 @@ namespace OpenFTTH.APIGateway.TestData
 {
     public class ConduitSeeder
     {
-        private DatabaseSetting _databaseSetting;
+        private static string _connectionString = Environment.GetEnvironmentVariable("conversion_database_connection_string");
+
         private ICommandDispatcher _commandDispatcher;
+        private ILogger<ConduitSeeder> _logger;
 
 
-        public ConduitSeeder(DatabaseSetting databaseSetting, ICommandDispatcher commandDispatcher)
+        public ConduitSeeder(ILogger<ConduitSeeder> logger, ICommandDispatcher commandDispatcher)
         {
-            _databaseSetting = databaseSetting;
+            _logger = logger;
             _commandDispatcher = commandDispatcher;
         }
 
         public void Run()
         {
-            Log.Information("Starting conduit seed...");
-            var conduits = LoadConduitsFromConversionDatabase();
-            AddConduitsToNetwork(conduits);
+            _logger.LogInformation("Starting conduit seed...");
 
-            Log.Information("Seeding of conduits finish!");
+            if (_connectionString != null)
+            {
+
+                var conduits = LoadConduitsFromConversionDatabase();
+                AddConduitsToNetwork(conduits);
+
+                _logger.LogInformation("Seeding of conduits finish!");
+            }
+            else
+            {
+                _logger.LogInformation("No conversion_database_connection_string env variable specified. Will not seed database with conversion data");
+            }
+
+            
         }
 
         private List<ConduitForConversion> LoadConduitsFromConversionDatabase()
@@ -94,7 +108,7 @@ namespace OpenFTTH.APIGateway.TestData
 
             if (registerWalkOfInterestCommandResult.IsFailed)
             {
-                Log.Information("Failed to add conduit: " + externalId + " Error: " + registerWalkOfInterestCommandResult.Errors.First().Message);
+                _logger.LogInformation("Failed to add conduit: " + externalId + " Error: " + registerWalkOfInterestCommandResult.Errors.First().Message);
                 return;
             }
 
@@ -109,7 +123,7 @@ namespace OpenFTTH.APIGateway.TestData
 
             if (placeSpanEquipmentResult.IsFailed)
             {
-                Log.Information("Failed to add conduit: " + externalId + " Error: " + placeSpanEquipmentResult.Errors.First().Message);
+                _logger.LogInformation("Failed to add conduit: " + externalId + " Error: " + placeSpanEquipmentResult.Errors.First().Message);
                 return;
             }
 
@@ -125,7 +139,7 @@ namespace OpenFTTH.APIGateway.TestData
 
                 if (addStructureResult.IsFailed)
                 {
-                    Log.Information("Failed to add additional structures to: " + externalId + " Error: " + placeSpanEquipmentResult.Errors.First().Message);
+                    _logger.LogInformation("Failed to add additional structures to: " + externalId + " Error: " + placeSpanEquipmentResult.Errors.First().Message);
                     return;
                 }
             }
@@ -133,7 +147,7 @@ namespace OpenFTTH.APIGateway.TestData
 
         private IDbConnection GetConnection()
         {
-            return new NpgsqlConnection($"Host={_databaseSetting.Host};Port={_databaseSetting.Port};Username={_databaseSetting.Username};Password={_databaseSetting.Password};Database={_databaseSetting.Database}");
+            return new NpgsqlConnection(_connectionString);
         }
 
         private class ConduitForConversion

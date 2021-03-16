@@ -34,6 +34,7 @@ using OpenFTTH.Events.RouteNetwork;
 using OpenFTTH.Events.UtilityNetwork;
 using OpenFTTH.EventSourcing;
 using OpenFTTH.EventSourcing.InMem;
+using OpenFTTH.EventSourcing.Postgres;
 using OpenFTTH.RouteNetwork.Business.RouteElements.EventHandling;
 using OpenFTTH.RouteNetwork.Business.RouteElements.StateHandling;
 using OpenFTTH.TestData;
@@ -47,7 +48,7 @@ namespace OpenFTTH.APIGateway
     public class Startup
     {
         readonly string AllowedOrigins = "_myAllowSpecificOrigins";
-
+        
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -113,8 +114,11 @@ namespace OpenFTTH.APIGateway
             services.Configure<RemoteServicesSetting>(remoteServiceSettings =>
                             Configuration.GetSection("RemoteServices").Bind(remoteServiceSettings));
 
-            services.Configure<DatabaseSetting>(databaseSettings =>
-                            Configuration.GetSection("Database").Bind(databaseSettings));
+            services.Configure<EventStoreDatabaseSetting>(databaseSettings =>
+                            Configuration.GetSection("EventStoreDatabase").Bind(databaseSettings));
+
+            services.Configure<GeoDatabaseSetting>(databaseSettings =>
+                            Configuration.GetSection("GeoDatabase").Bind(databaseSettings));
 
             // Web stuff
             services.AddRazorPages();
@@ -154,7 +158,15 @@ namespace OpenFTTH.APIGateway
                 AppDomain.CurrentDomain.Load("OpenFTTH.Work.Business")
             };
 
-            services.AddSingleton<IEventStore, InMemEventStore>();
+
+            // Setup the event store
+            services.AddSingleton<IEventStore>(e =>
+                    new PostgresEventStore(
+                        serviceProvider: e.GetRequiredService<IServiceProvider>(),
+                        connectionString: e.GetRequiredService<IOptions<EventStoreDatabaseSetting>>().Value.PostgresConnectionString, 
+                        databaseSchemaName: "events"
+                    ) as IEventStore
+                );
 
             services.AddProjections(assembliesWithBusinessLogic);
 
@@ -227,7 +239,11 @@ namespace OpenFTTH.APIGateway
 
             var commandDispatcher = app.ApplicationServices.GetService<ICommandDispatcher>();
             var queryDispatcher = app.ApplicationServices.GetService<IQueryDispatcher>();
+            var eventStore = app.ApplicationServices.GetService<IEventStore>();
 
+            eventStore.DehydrateProjections();
+
+            // TODO: Must be removed
             new TestSpecifications(commandDispatcher, queryDispatcher).Run();
 
         }

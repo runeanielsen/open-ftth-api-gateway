@@ -24,18 +24,20 @@ namespace OpenFTTH.APIGateway.Workers
         private readonly RouteNetworkEventHandler _routeNetworkEventHandler;
         private readonly IRouteNetworkState _routeNetworkState;
         private readonly KafkaSetting _kafkaSetting;
-        private readonly DatabaseSetting _databaseSetting;
+        private readonly EventStoreDatabaseSetting _databaseSetting;
         private readonly ICommandDispatcher _commandDispatcher;
+        private readonly ILogger<ConduitSeeder> _conduitSeederLogger;
 
         private InMemPositionsStorage _positionsStorage = new InMemPositionsStorage();
         private IDisposable _kafkaConsumer;
 
-        public RouteNetworkEventConsumer(ILogger<RouteNetworkEventConsumer> logger, IOptions<KafkaSetting> kafkaSetting, IOptions<DatabaseSetting> databaseSetting, IToposTypedEventObservable<RouteNetworkEditOperationOccuredEvent> eventDispatcher, RouteNetworkEventHandler routeNetworkEventHandler, IRouteNetworkState routeNetworkState, ICommandDispatcher commandDispatcher)
+        public RouteNetworkEventConsumer(ILogger<RouteNetworkEventConsumer> logger, IOptions<KafkaSetting> kafkaSetting, IOptions<EventStoreDatabaseSetting> databaseSetting, IToposTypedEventObservable<RouteNetworkEditOperationOccuredEvent> eventDispatcher, RouteNetworkEventHandler routeNetworkEventHandler, IRouteNetworkState routeNetworkState, ICommandDispatcher commandDispatcher, ILogger<ConduitSeeder> conduitSeederLogger)
         {
             _logger = logger;
             _kafkaSetting = kafkaSetting.Value;
             _databaseSetting = databaseSetting.Value;
             _commandDispatcher = commandDispatcher;
+            _conduitSeederLogger = conduitSeederLogger;
 
             _eventDispatcher = eventDispatcher;
             _routeNetworkEventHandler = routeNetworkEventHandler;
@@ -100,7 +102,7 @@ namespace OpenFTTH.APIGateway.Workers
                 // TODO: Must be removed
                 // Seed conversion conduits
                 if (_databaseSetting.Host != null)
-                    new ConduitSeeder(_databaseSetting, _commandDispatcher).Run();
+                    new ConduitSeeder(_conduitSeederLogger, _commandDispatcher).Run();
 
 
                 // We are now ready to serve the public if the loaded objects are bigger than 0
