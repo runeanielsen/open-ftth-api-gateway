@@ -73,7 +73,17 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Queries
                     {
                         foreach (var error in equipmentQueryResult.Errors)
                             context.Errors.Add(new ExecutionError(error.Message));
+
+                        return null;
                     }
+
+                    if (equipmentQueryResult.Value.SpanEquipment == null || equipmentQueryResult.Value.SpanEquipment.Count == 0)
+                    {
+                        context.Errors.Add(new ExecutionError($"Cannot find any span equipment containing a span segment with id: {spanSegmentId}"));
+
+                        return null;
+                    }
+
 
                     var spanEquipment = equipmentQueryResult.Value.SpanEquipment.First();
 
@@ -86,6 +96,8 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Queries
                     {
                         foreach (var error in interestQueryResult.Errors)
                             context.Errors.Add(new ExecutionError(error.Message));
+
+                        return null;
                     }
 
                     var interest = interestQueryResult.Value.Interests.First();

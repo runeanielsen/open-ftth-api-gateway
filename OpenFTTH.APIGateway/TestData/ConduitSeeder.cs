@@ -4,11 +4,13 @@ using Microsoft.Extensions.Options;
 using Npgsql;
 using OpenFTTH.APIGateway.Settings;
 using OpenFTTH.CQRS;
+using OpenFTTH.EventSourcing;
 using OpenFTTH.RouteNetwork.API.Commands;
 using OpenFTTH.RouteNetwork.API.Model;
 using OpenFTTH.TestData;
 using OpenFTTH.UtilityGraphService.API.Commands;
 using OpenFTTH.UtilityGraphService.API.Model.UtilityNetwork;
+using OpenFTTH.UtilityGraphService.Business.Graph;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -23,13 +25,17 @@ namespace OpenFTTH.APIGateway.TestData
         private static string _connectionString = Environment.GetEnvironmentVariable("conversion_database_connection_string");
 
         private ICommandDispatcher _commandDispatcher;
+        private IQueryDispatcher _queryDispatcher;
         private ILogger<ConduitSeeder> _logger;
+        private IEventStore _eventStore;
 
 
-        public ConduitSeeder(ILogger<ConduitSeeder> logger, ICommandDispatcher commandDispatcher)
+        public ConduitSeeder(ILogger<ConduitSeeder> logger, IEventStore eventSTore, ICommandDispatcher commandDispatcher, IQueryDispatcher queryDispatcher)
         {
             _logger = logger;
+            _eventStore = eventSTore;
             _commandDispatcher = commandDispatcher;
+            _queryDispatcher = queryDispatcher;
         }
 
         public void Run()
@@ -38,7 +44,18 @@ namespace OpenFTTH.APIGateway.TestData
 
             if (_connectionString != null)
             {
+                var utilityNetwork = _eventStore.Projections.Get<UtilityNetworkProjection>();
 
+                if (utilityNetwork.SpanEquipments.Count > 0)
+                {
+                    _logger.LogInformation("Database already contain contains. Will therefor not seed conversion data.");
+                    return;
+                }
+
+                _logger.LogInformation("Creating specifications...");
+                new TestSpecifications(_commandDispatcher, _queryDispatcher).Run();
+
+                _logger.LogInformation("Adding span equipments...");
                 var conduits = LoadConduitsFromConversionDatabase();
                 AddConduitsToNetwork(conduits);
 

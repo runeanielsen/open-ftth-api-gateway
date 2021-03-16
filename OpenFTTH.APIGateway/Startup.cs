@@ -235,17 +235,6 @@ namespace OpenFTTH.APIGateway
                 GraphQLEndPoint = "/graphql",
                 Path = "/ui/voyager"
             });
-
-
-            var commandDispatcher = app.ApplicationServices.GetService<ICommandDispatcher>();
-            var queryDispatcher = app.ApplicationServices.GetService<IQueryDispatcher>();
-            var eventStore = app.ApplicationServices.GetService<IEventStore>();
-
-            eventStore.DehydrateProjections();
-
-            // TODO: Must be removed
-            new TestSpecifications(commandDispatcher, queryDispatcher).Run();
-
         }
     }
 }

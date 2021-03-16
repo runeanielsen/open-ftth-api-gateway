@@ -36,6 +36,7 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Queries
                     if (queryResult.IsFailed)
                     {
                         context.Errors.Add(new ExecutionError(queryResult.Errors.First().Message));
+                        return null;
                     }
 
                     return queryResult.Value.RouteNetworkElements[routeNodeId];
