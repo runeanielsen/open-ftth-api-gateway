@@ -48,7 +48,7 @@ namespace OpenFTTH.APIGateway.TestData
 
                 if (utilityNetwork.SpanEquipments.Count > 0)
                 {
-                    _logger.LogInformation("Database already contain contains. Will therefor not seed conversion data.");
+                    _logger.LogInformation("Database already contain converted data. Will therefor not seed conversion data.");
                     return;
                 }
 

@@ -46,6 +46,19 @@ namespace OpenFTTH.TestData
         public static Guid Conduit_Connector_Fiberpowertech_Straight_50 = Guid.Parse("5eb03c1f-41f3-4cf2-81b0-13f91ad11432");
 
         // Span Structures
+        public static Guid Ø7_Blue = Guid.Parse("94d5bc20-31da-4191-b4dc-9a701bba83d6");
+        public static Guid Ø7_Yellow = Guid.Parse("6416641c-1c31-4e6f-9bc4-41a435915a69");
+        public static Guid Ø7_White = Guid.Parse("6c861c63-0134-45ac-9e1e-c982b543e74e");
+        public static Guid Ø7_Green = Guid.Parse("55af46cb-5c53-4046-a4d6-0069ad60bbf8");
+        public static Guid Ø7_Black = Guid.Parse("b96a1ecb-4665-4929-a016-82ee48cae57e");
+        public static Guid Ø7_Red = Guid.Parse("ef1c6787-eb76-4941-96e0-4ca2fac5b57b");
+        public static Guid Ø7_Orange = Guid.Parse("def493b9-71a1-43c5-9f09-02e8229bc785");
+        public static Guid Ø7_Pink = Guid.Parse("1bb0ee9b-3f41-44f0-8f5b-ccae8cb63a23");
+        public static Guid Ø7_Silver = Guid.Parse("16c77f06-3439-4843-8ff9-76bb3a7c8b20");
+        public static Guid Ø7_Brown = Guid.Parse("4e9373e8-c6bd-4a85-856d-6f2ef57f6833");
+        public static Guid Ø7_Turquoise = Guid.Parse("72d88e01-178a-4656-9fe5-8819544c94c9");
+        public static Guid Ø7_Violet = Guid.Parse("3672dd91-886a-444e-93a2-afc0d44d6541");
+
         public static Guid Ø10_Blue = Guid.Parse("980a2a21-cf40-4b70-91ae-69af79be9e80");
         public static Guid Ø10_Yellow = Guid.Parse("779a8d88-1c52-4fca-b2d5-0aabfa652393");
         public static Guid Ø10_White = Guid.Parse("ec75555f-33ea-432f-9235-d1f111cebd68");
@@ -58,6 +71,7 @@ namespace OpenFTTH.TestData
         public static Guid Ø10_Brown = Guid.Parse("b4cde3bf-56ff-43f3-a62a-270cf9afa24d");
         public static Guid Ø10_Turquoise = Guid.Parse("9d05b556-2eb4-4a30-89d6-4b813c10dabe");
         public static Guid Ø10_Violet = Guid.Parse("c09ca8f5-cd37-4cd8-9d32-b6274f3c2c64");
+
         public static Guid Ø32_Orange = Guid.Parse("e7dea74e-df7f-4a0d-a752-98f9e02be1a8");
         public static Guid Ø40_Orange = Guid.Parse("ac417fea-b6f6-4a5a-9c9e-10ee05ecbf56");
         public static Guid Ø40_Red = Guid.Parse("be4deb0f-8d15-49ba-bbeb-fafb4ed66de5");
@@ -68,6 +82,7 @@ namespace OpenFTTH.TestData
         public static Guid Multi_Ø32_3x10 = Guid.Parse("b11a4fce-2116-4437-9108-3ca467124d99");
         public static Guid Multi_Ø40_5x10 = Guid.Parse("7ca9dcbb-524f-4d61-945c-16bf2679326e");
         public static Guid Multi_Ø40_6x10 = Guid.Parse("f8d15ef6-b07f-440b-8357-4c7a3f84f156");
+        public static Guid Multi_Ø40_12x7 = Guid.Parse("eac5660c-446b-4404-b0af-01032ebf94da");
         public static Guid Multi_Ø50_10x10 = Guid.Parse("1c2a1e9e-03e6-4eb9-ae89-e723fea1e59c");
         public static Guid Multi_Ø50_5x10_12_7_MultiColor = Guid.Parse("36f0deaf-0d77-4cae-be06-1e6e0cf84ae2");
         public static Guid Multi_Ø50_5x10_12_7_BlueYellow = Guid.Parse("dc83bdd3-142b-49ff-8a80-d8d7e1d794b3");
@@ -183,8 +198,13 @@ namespace OpenFTTH.TestData
                 )
             {
                 Description = "ø32 mm Multirør 3x10",
-                ManufacturerRefs = new Guid[] { Manu_GMPlast, Manu_Emtelle }
+                ManufacturerRefs = new Guid[] { Manu_GMPlast, Manu_Emtelle },
+                IsFixed = true,
+                IsMultiLevel = true
             });
+
+
+
 
             AddSpecification(new SpanEquipmentSpecification(Multi_Ø40_5x10, "Conduit", "Ø40 5x10",
                 new SpanStructureTemplate(Ø40_Orange, 1, 1,
@@ -198,7 +218,9 @@ namespace OpenFTTH.TestData
                 )
             {
                 Description = "ø40 mm Multirør 5x10",
-                ManufacturerRefs = new Guid[] { Manu_GMPlast, Manu_Emtelle }
+                ManufacturerRefs = new Guid[] { Manu_GMPlast, Manu_Emtelle },
+                IsFixed = true,
+                IsMultiLevel = true
             });
 
             AddSpecification(new SpanEquipmentSpecification(Multi_Ø40_6x10, "Conduit", "Ø40 6x10",
@@ -214,7 +236,9 @@ namespace OpenFTTH.TestData
                 )
             {
                 Description = "ø40 mm Multirør 6x10",
-                ManufacturerRefs = new Guid[] { Manu_GMPlast, Manu_Emtelle }
+                ManufacturerRefs = new Guid[] { Manu_GMPlast, Manu_Emtelle },
+                IsFixed = true,
+                IsMultiLevel = true
             });
 
             AddSpecification(new SpanEquipmentSpecification(Multi_Ø50_10x10, "Conduit", "Ø50 10x10",
@@ -234,7 +258,9 @@ namespace OpenFTTH.TestData
                 )
             {
                 Description = "ø50 mm Multirør 10x10",
-                ManufacturerRefs = new Guid[] { Manu_GMPlast, Manu_Emtelle }
+                ManufacturerRefs = new Guid[] { Manu_GMPlast, Manu_Emtelle },
+                IsFixed = true,
+                IsMultiLevel = true
             });
 
             AddSpecification(new SpanEquipmentSpecification(Multi_Ø50_5x10_12_7_MultiColor, "Conduit", "Ø50 10x10",
@@ -254,7 +280,9 @@ namespace OpenFTTH.TestData
                 )
             {
                 Description = "ø50 mm Multirør 5x10 + 12x7 color",
-                ManufacturerRefs = new Guid[] { Manu_GMPlast, Manu_Emtelle }
+                ManufacturerRefs = new Guid[] { Manu_GMPlast, Manu_Emtelle },
+                IsFixed = true,
+                IsMultiLevel = true
             });
 
             // Tomrør
@@ -262,25 +290,33 @@ namespace OpenFTTH.TestData
             AddSpecification(new SpanEquipmentSpecification(Flex_Ø40_Red, "Conduit", "Ø40 Flex", new SpanStructureTemplate(Ø40_Red, 1, 1, Array.Empty<SpanStructureTemplate>()))
             {
                 Description = "ø40 mm Flexrør",
-                ManufacturerRefs = new Guid[] { Manu_GMPlast, Manu_Emtelle }
+                ManufacturerRefs = new Guid[] { Manu_GMPlast, Manu_Emtelle },
+                IsFixed = false,
+                IsMultiLevel = true
             });
 
             AddSpecification(new SpanEquipmentSpecification(Tomrør_Ø40_Orange, "Conduit", "Ø40", new SpanStructureTemplate(Ø40_Orange, 1, 1, Array.Empty<SpanStructureTemplate>()))
             {
                 Description = "ø40 mm orange tomrør",
-                ManufacturerRefs = new Guid[] { Manu_GMPlast, Manu_Emtelle }
+                ManufacturerRefs = new Guid[] { Manu_GMPlast, Manu_Emtelle },
+                IsFixed = false,
+                IsMultiLevel = true
             });
 
             AddSpecification(new SpanEquipmentSpecification(Tomrør_Ø50_Orange, "Conduit", "Ø50", new SpanStructureTemplate(Ø50_Orange, 1, 1, Array.Empty<SpanStructureTemplate>()))
             {
                 Description = "ø50 mm orange tomrør",
-                ManufacturerRefs = new Guid[] { Manu_GMPlast, Manu_Emtelle }
+                ManufacturerRefs = new Guid[] { Manu_GMPlast, Manu_Emtelle },
+                IsFixed = false,
+                IsMultiLevel = true
             });
 
             AddSpecification(new SpanEquipmentSpecification(Tomrør_Ø110_Red, "Conduit", "Ø110", new SpanStructureTemplate(Ø110_Red, 1, 1, Array.Empty<SpanStructureTemplate>()))
             {
                 Description = "ø110 mm rød tomrør",
-                ManufacturerRefs = new Guid[] { Manu_GMPlast, Manu_Emtelle }
+                ManufacturerRefs = new Guid[] { Manu_GMPlast, Manu_Emtelle },
+                IsFixed = false,
+                IsMultiLevel = true
             });
 
         }
