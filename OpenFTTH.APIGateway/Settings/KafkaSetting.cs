@@ -8,7 +8,6 @@ namespace OpenFTTH.APIGateway.Settings
     {
         public string Server { get; set; }
         public string CertificateFilename { get; set; }
-        public string PositionFilePath { get; set; }
         public string RouteNetworkEventTopic { get; set; }
         public string GeographicalAreaUpdatedTopic { get; set; }
         public string UtilityNetworkNotificationsTopic { get; set; }

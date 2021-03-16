@@ -44,7 +44,11 @@ namespace OpenFTTH.APIGateway.Workers
                     }
                 })
               .Logging(l => l.UseSerilog())
-              .Positions(p => p.StoreInFileSystem(_kafkaSetting.PositionFilePath))
+              .Positions(x =>
+              {
+                  x.SetInitialPosition(StartFromPosition.Now);
+                  x.StoreInMemory();
+              })
               .Topics(t => t.Subscribe(_kafkaSetting.UtilityNetworkNotificationsTopic))
               .Start();
             }
