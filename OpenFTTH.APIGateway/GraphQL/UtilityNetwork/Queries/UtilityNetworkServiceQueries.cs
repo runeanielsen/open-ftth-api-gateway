@@ -39,7 +39,7 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Queries
                 {
                     var queryResult = queryDispatcher.HandleAsync<GetSpanEquipmentSpecifications, Result<LookupCollection<SpanEquipmentSpecification>>>(new GetSpanEquipmentSpecifications()).Result;
 
-                    return queryResult.Value;
+                    return queryResult.Value.OrderBy(s => s.Description);
                 }
             );
 
@@ -50,7 +50,7 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Queries
                 {
                     var queryResult = queryDispatcher.HandleAsync<GetNodeContainerSpecifications, Result<LookupCollection<NodeContainerSpecification>>>(new GetNodeContainerSpecifications()).Result;
 
-                    return queryResult.Value;
+                    return queryResult.Value.OrderBy(s => s.Description);
                 }
             );
 
