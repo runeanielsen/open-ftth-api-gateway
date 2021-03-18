@@ -190,6 +190,28 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
               }
             );
 
+            Field<CommandResultType>(
+              "addAdditionalInnerSpanStructures",
+              description: "Add inner span structures to an existing span equipment",
+              arguments: new QueryArguments(
+                  new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "spanEquipmentOrSegmentId" },
+                  new QueryArgument<NonNullGraphType<ListGraphType<IdGraphType>>> { Name = "spanStructureSpecificationIds" }
+              ),
+              resolve: context =>
+              {
+                  var spanEquipmentOrSegmentId = context.GetArgument<Guid>("spanEquipmentOrSegmentId");
+                  var specificationsId = context.GetArgument<Guid[]>("spanStructureSpecificationIds");
+
+                  var addStructure = new PlaceAdditionalStructuresInSpanEquipment(
+                    spanEquipmentId: spanEquipmentOrSegmentId,
+                    structureSpecificationIds: specificationsId
+                    );
+
+                  var addStructureResult = commandDispatcher.HandleAsync<PlaceAdditionalStructuresInSpanEquipment, Result>(addStructure).Result;
+
+                  return new CommandResult(addStructureResult);
+              }
+            );
         }
     }
 }

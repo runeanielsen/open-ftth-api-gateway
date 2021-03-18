@@ -12,8 +12,14 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Types
             Field(x => x.Category, type: typeof(StringGraphType)).Description("Category - i.e. Conduit, Fiber Cable etc.");
             Field(x => x.Name, type: typeof(StringGraphType)).Description("Short name");
             Field(x => x.Description, type: typeof(StringGraphType)).Description("Long description");
-            Field(x => x.Deprecated, type: typeof(BooleanGraphType)).Description("Whereas the manufacturer is still used in new projects");
+            Field(x => x.Deprecated, type: typeof(BooleanGraphType)).Description("Whereas the type of span equipment is still in use");
             Field(x => x.ManufacturerRefs, type: typeof(ListGraphType<IdGraphType>)).Description("Manufacturer providing products of the the specification");
+            Field(x => x.IsFixed, type: typeof(BooleanGraphType)).Description("True is the span equipment has a fixed span structure - i.e. you cannot add or remove inner span stuctures.");
+            Field(x => x.IsMultiLevel, type: typeof(BooleanGraphType)).Description("True is the span equipment has and/or allows a multi level structure - i.e. it already has a fixed inner span structure or it allows inner spans to be added in case of a non-fixed structure.");
+
+            Field(x => x.RootTemplate.SpanStructureSpecificationId, type: typeof(IdGraphType))
+                .Name("OuterSpanStructureSpecificationId")
+                .Description("Root / outer span structure specification.");
         }
     }
 }

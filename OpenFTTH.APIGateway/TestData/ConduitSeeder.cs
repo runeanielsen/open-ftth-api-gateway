@@ -192,25 +192,80 @@ namespace OpenFTTH.APIGateway.TestData
 
             private ConduitSpecInfo MapToSpanEquipmentSpecification(string externalSpec)
             {
+                // Ø 32
+                if (externalSpec.StartsWith("32mm-3x10"))
+                    return new ConduitSpecInfo(TestSpecifications.Multi_Ø32_3x10, GetMarkingText(externalSpec));
 
-                if (externalSpec.StartsWith("40-5x10"))
-                {
-                    // TODO: handle special editing
+                // Ø40 tomrør med indhold
+                if (externalSpec == "40 mm 1x10")
+                    return new ConduitSpecInfo(TestSpecifications.Tomrør_Ø40_Orange, GetAdditionalStructures(externalSpec));
+
+                if (externalSpec == "40-4x10--sort")
+                    return new ConduitSpecInfo(TestSpecifications.Tomrør_Ø40_Orange, GetAdditionalStructures(externalSpec));
+
+                if (externalSpec == "40-2x10-grøn-blå")
+                    return new ConduitSpecInfo(TestSpecifications.Tomrør_Ø40_Orange, GetAdditionalStructures(externalSpec));
+
+                if (externalSpec == "40-3x10")
+                    return new ConduitSpecInfo(TestSpecifications.Tomrør_Ø40_Orange, GetMarkingText(externalSpec));
+
+                // Ø40 multi
+
+                if (externalSpec == "40-5x10")
                     return new ConduitSpecInfo(TestSpecifications.Multi_Ø40_5x10, GetMarkingText(externalSpec));
-                }
+
+                if (externalSpec == "corenet 40-5x10")
+                    return new ConduitSpecInfo(TestSpecifications.Multi_Ø40_5x10, GetMarkingText(externalSpec));
+
+                if (externalSpec == "40-5x10 blå tape")
+                    return new ConduitSpecInfo(TestSpecifications.Multi_Ø40_5x10, GetMarkingText(externalSpec));
+
+                if (externalSpec == "40-5x10 blå tape rd")
+                    return new ConduitSpecInfo(TestSpecifications.Multi_Ø40_5x10_Red, GetMarkingText(externalSpec));
+
+                if (externalSpec == "40-5x10 rød tape")
+                    return new ConduitSpecInfo(TestSpecifications.Multi_Ø40_5x10, GetMarkingText(externalSpec));
+
+                if (externalSpec == "40-5x10-2sort")
+                    return new ConduitSpecInfo(TestSpecifications.Multi_Ø40_5x10_BlackBlack, GetMarkingText(externalSpec));
+
+                if (externalSpec == "40-5x10-red")
+                    return new ConduitSpecInfo(TestSpecifications.Multi_Ø40_5x10_Red, GetMarkingText(externalSpec));
 
                 if (externalSpec.StartsWith("40-6x10"))
                     return new ConduitSpecInfo(TestSpecifications.Multi_Ø40_6x10, GetMarkingText(externalSpec));
 
+                if (externalSpec.StartsWith("corenet 40-6x10"))
+                    return new ConduitSpecInfo(TestSpecifications.Multi_Ø40_6x10, GetMarkingText(externalSpec));
+
+                if (externalSpec.StartsWith("40-12x7mm"))
+                    return new ConduitSpecInfo(TestSpecifications.Multi_Ø40_12x7, GetMarkingText(externalSpec));
+
+                // Ø50
                 if (externalSpec.StartsWith("50-5x10"))
                     return new ConduitSpecInfo(TestSpecifications.Multi_Ø40_5x10, GetMarkingText(externalSpec));
 
                 if (externalSpec.StartsWith("50-10x10"))
                     return new ConduitSpecInfo(TestSpecifications.Multi_Ø50_10x10, GetMarkingText(externalSpec));
 
+                if (externalSpec == "50-12x7+5x10color")
+                    return new ConduitSpecInfo(TestSpecifications.Multi_Ø50_12x7_5x10, GetMarkingText(externalSpec));
+
+                if (externalSpec == "50-12x7+5x10")
+                    return new ConduitSpecInfo(TestSpecifications.Multi_Ø50_12x7_5x10_BlueYellow, GetMarkingText(externalSpec));
+
+                if (externalSpec == "50-12x7+5x10 gr wh")
+                    return new ConduitSpecInfo(TestSpecifications.Multi_Ø50_12x7_5x10_GreenWhite, GetMarkingText(externalSpec));
+
+                if (externalSpec == "50-10x7+5x10color")
+                    return new ConduitSpecInfo(TestSpecifications.Multi_Ø50_10x7_5x10, GetMarkingText(externalSpec));
+
+
+                // Tomrør
                 if (externalSpec == "40 mm tomt rør")
                     return new ConduitSpecInfo(TestSpecifications.Tomrør_Ø40_Orange);
 
+                
 
                 // flexrør
                 if (externalSpec.StartsWith("flexrør") || externalSpec == "oe 40 mm tomt rør")
@@ -218,14 +273,14 @@ namespace OpenFTTH.APIGateway.TestData
                     return new ConduitSpecInfo(TestSpecifications.Flex_Ø40_Red, GetAdditionalStructures(externalSpec));
                 }
 
-                // Ø110 r'r
+                // Ø110
                 if (externalSpec.StartsWith("rør 110"))
                 {
                     return new ConduitSpecInfo(TestSpecifications.Tomrør_Ø110_Red, GetAdditionalStructures(externalSpec));
                 }
 
 
-                Log.Debug($"Don't know how to handle spec: {externalSpec}");
+                Log.Warning($"Don't know how to handle spec: '{externalSpec}'");
 
                 return null;
             }
@@ -313,6 +368,34 @@ namespace OpenFTTH.APIGateway.TestData
                     additionalStructureSpecs.Add(TestSpecifications.Ø10_White);
                 }
 
+                // Ø40 speciel
+                if (spec.Contains("40 mm 1x10"))
+                {
+                    additionalStructureSpecs.Add(TestSpecifications.Ø10_Yellow);
+                }
+
+                if (spec.Contains("40-2x10-gron-blå"))
+                {
+                    additionalStructureSpecs.Add(TestSpecifications.Ø10_Green);
+                    additionalStructureSpecs.Add(TestSpecifications.Ø10_Blue);
+                }
+
+                if (spec.Contains("40-4x10--sort"))
+                {
+                    additionalStructureSpecs.Add(TestSpecifications.Ø10_Blue);
+                    additionalStructureSpecs.Add(TestSpecifications.Ø10_Yellow);
+                    additionalStructureSpecs.Add(TestSpecifications.Ø10_White);
+                    additionalStructureSpecs.Add(TestSpecifications.Ø10_Green);
+                }
+
+                if (spec.Contains("40-3x10"))
+                {
+                    additionalStructureSpecs.Add(TestSpecifications.Ø10_Blue);
+                    additionalStructureSpecs.Add(TestSpecifications.Ø10_Yellow);
+                    additionalStructureSpecs.Add(TestSpecifications.Ø10_White);
+                }
+
+                
                 // Ø110
 
                 if (spec.Contains("110-4x10-red"))

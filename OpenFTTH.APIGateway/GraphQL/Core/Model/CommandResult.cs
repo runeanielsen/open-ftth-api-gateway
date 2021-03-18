@@ -14,7 +14,14 @@ namespace OpenFTTH.APIGateway.GraphQL.Core.Model
             if (result.IsFailed)
             {
                 IsSuccess = false;
-                ErrorCode = result.Errors.First().Metadata["ErrorCode"].ToString();
+
+                var error = result.Errors.First();
+
+                if (error.Metadata != null && error.HasMetadataKey("ErrorCode"))
+                    ErrorCode = result.Errors.First().Metadata["ErrorCode"].ToString();
+                else
+                    ErrorCode = "ERROR";
+
                 ErrorMessage = result.Errors.First().Message;
             }
             else
