@@ -72,8 +72,6 @@ namespace OpenFTTH.APIGateway.Workers
 
                 _eventDispatcher.OnEvent.Subscribe(_routeNetworkEventHandler);
 
-                ((InMemRouteNetworkState)_routeNetworkState).FinishLoadMode();
-
                 _kafkaConsumer = toposConfig.Start();
 
                 var inMemRouteNetworkState = (InMemRouteNetworkState)_routeNetworkState;
