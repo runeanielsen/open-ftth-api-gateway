@@ -212,6 +212,27 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                   return new CommandResult(addStructureResult);
               }
             );
+
+
+            Field<CommandResultType>(
+              "removeSpanStructure",
+              description: "Remove inner or outer span structure of a span equipment. When the outer span structure is removed the entire span equipment is removed from the network.",
+              arguments: new QueryArguments(
+                  new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "spanSegmentId" }
+              ),
+              resolve: context =>
+              {
+                  var spanSegmentId = context.GetArgument<Guid>("spanSegmentId");
+                  
+                  var removeStructure = new RemoveSpanStructureFromSpanEquipment(
+                    spanSegmentId: spanSegmentId
+                  );
+
+                  var removeStructureResult = commandDispatcher.HandleAsync<RemoveSpanStructureFromSpanEquipment, Result>(removeStructure).Result;
+
+                  return new CommandResult(removeStructureResult);
+              }
+            );
         }
     }
 }
