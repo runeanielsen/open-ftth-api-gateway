@@ -29,7 +29,10 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Queries
                         return null;
                     }
 
-                    var routeNodeQuery = new GetRouteNetworkDetails(new RouteNetworkElementIdList() { routeNodeId });
+                    var routeNodeQuery = new GetRouteNetworkDetails(new RouteNetworkElementIdList() { routeNodeId })
+                    {
+                        RelatedInterestFilter = RelatedInterestFilterOptions.ReferencesFromRouteElementOnly
+                    };
 
                     var queryResult = queryDispatcher.HandleAsync<GetRouteNetworkDetails, Result<GetRouteNetworkDetailsResult>>(routeNodeQuery).Result;
 
