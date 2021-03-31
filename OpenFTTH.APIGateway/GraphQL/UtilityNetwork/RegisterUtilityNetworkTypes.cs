@@ -18,6 +18,7 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork
             services.AddSingleton<UtilityNetworkServiceQueries>();
 
             // Types
+            services.AddSingleton<SpanEquipmentType>();
             services.AddSingleton<ManufacturerType>();
             services.AddSingleton<SpanEquipmentSpecificationType>();
             services.AddSingleton<NodeContainerSpecificationType>();

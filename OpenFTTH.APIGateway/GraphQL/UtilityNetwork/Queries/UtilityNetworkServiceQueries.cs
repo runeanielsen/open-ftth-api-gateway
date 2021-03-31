@@ -56,7 +56,7 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Queries
 
             Field<SpanSegmentTraceType>(
                 name: "spanSegmentTrace",
-                description: "Query information related to a specific span equipment",
+                description: "Trace a specific span segment",
                 arguments: new QueryArguments(
                   new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "spanSegmentId" }
                 ),
@@ -116,6 +116,44 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Queries
                     };
                 }
             );
+
+
+            Field<SpanEquipmentType>(
+               name: "spanEquipment",
+               description: "Query information related to a specific span equipment",
+               arguments: new QueryArguments(
+                 new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "spanEquipmentOrSegmentId" }
+               ),
+               resolve: context =>
+               {
+                   var spanEquipmentOrSegmentId = context.GetArgument<Guid>("spanEquipmentOrSegmentId");
+
+                    // Get equipment information
+                    var equipmentQueryResult = queryDispatcher.HandleAsync<GetEquipmentDetails, FluentResults.Result<GetEquipmentDetailsResult>>(
+                       new GetEquipmentDetails(new EquipmentIdList() { spanEquipmentOrSegmentId })
+                   ).Result;
+
+                   if (equipmentQueryResult.IsFailed)
+                   {
+                       foreach (var error in equipmentQueryResult.Errors)
+                           context.Errors.Add(new ExecutionError(error.Message));
+
+                       return null;
+                   }
+
+                   if (equipmentQueryResult.Value.SpanEquipment == null || equipmentQueryResult.Value.SpanEquipment.Count == 0)
+                   {
+                       context.Errors.Add(new ExecutionError($"Cannot find any span equipment containing a span segment with id: {spanEquipmentOrSegmentId}"));
+
+                       return null;
+                   }
+
+
+                   var spanEquipment = equipmentQueryResult.Value.SpanEquipment.First();
+
+                   return spanEquipment;
+               }
+           );
         }
     }
 }
