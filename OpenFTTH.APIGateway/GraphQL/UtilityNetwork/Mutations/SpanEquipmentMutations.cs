@@ -236,40 +236,46 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
 
 
             Field<CommandResultType>(
-              "updateSpanEquipment",
-              description: "Update route network walk, specification and/or marking information of a span equipment",
+              "move",
+              description: "Move a span equipment / change its walk in the route network",
               arguments: new QueryArguments(
                   new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "spanEquipmentOrSegmentId" },
-                  new QueryArgument<IdGraphType> { Name = "spanEquipmentSpecificationId" },
-                  new QueryArgument<ListGraphType<IdGraphType>> { Name = "routeSegmentIds" },
-                  new QueryArgument<IdGraphType> { Name = "manufacturerId" },
-                  new QueryArgument<MarkingInfoInputType> { Name = "markingInfo" }
+                  new QueryArgument<NonNullGraphType<ListGraphType<IdGraphType>>> { Name = "routeSegmentIds" }
               ),
               resolve: context =>
               {
                   var spanEquipmentOrSegmentId = context.GetArgument<Guid>("spanEquipmentOrSegmentId");
 
-                  if (context.HasArgument("routeSegmentIds"))
-                  {
-                      Guid[] routeSegmentIds = context.GetArgument<Guid[]>("routeSegmentIds");
+                  Guid[] routeSegmentIds = context.GetArgument<Guid[]>("routeSegmentIds");
 
-                      RouteNetworkElementIdList newWalkIds = new();
-                      newWalkIds.AddRange(routeSegmentIds);
+                  RouteNetworkElementIdList newWalkIds = new();
+                  newWalkIds.AddRange(routeSegmentIds);
 
-                      var moveCmd = new MoveSpanEquipment(
-                        spanEquipmentId : spanEquipmentOrSegmentId,
-                        newWalkIds: newWalkIds
-                      );
+                  var moveCmd = new MoveSpanEquipment(
+                    spanEquipmentId: spanEquipmentOrSegmentId,
+                    newWalkIds: newWalkIds
+                  );
 
-                      var moveCmdResult = commandDispatcher.HandleAsync<MoveSpanEquipment, Result>(moveCmd).Result;
+                  var moveCmdResult = commandDispatcher.HandleAsync<MoveSpanEquipment, Result>(moveCmd).Result;
 
-                      if (moveCmdResult.IsFailed)
-                          return new CommandResult(moveCmdResult);
-                  }
-
-                  return new CommandResult(Result.Ok());
+                  return new CommandResult(moveCmdResult);
               }
             );
+
+            Field<CommandResultType>(
+             "updateProperties",
+             description: "Mutation that can be used to change the span equipment specification, manufacturer and/or marking information",
+             arguments: new QueryArguments(
+                 new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "spanEquipmentOrSegmentId" },
+                 new QueryArgument<IdGraphType> { Name = "spanEquipmentSpecificationId" },
+                 new QueryArgument<IdGraphType> { Name = "manufacturerId" },
+                 new QueryArgument<MarkingInfoInputType> { Name = "markingInfo" }
+             ),
+             resolve: context =>
+             {
+                 return new CommandResult(Result.Ok());
+             }
+           );
         }
     }
 }
