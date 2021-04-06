@@ -128,8 +128,8 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Queries
                {
                    var spanEquipmentOrSegmentId = context.GetArgument<Guid>("spanEquipmentOrSegmentId");
 
-                    // Get equipment information
-                    var equipmentQueryResult = queryDispatcher.HandleAsync<GetEquipmentDetails, FluentResults.Result<GetEquipmentDetailsResult>>(
+                   // Get equipment information
+                   var equipmentQueryResult = queryDispatcher.HandleAsync<GetEquipmentDetails, FluentResults.Result<GetEquipmentDetailsResult>>(
                        new GetEquipmentDetails(new EquipmentIdList() { spanEquipmentOrSegmentId })
                    ).Result;
 

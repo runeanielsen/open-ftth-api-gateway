@@ -233,6 +233,43 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                   return new CommandResult(removeStructureResult);
               }
             );
+
+
+            Field<CommandResultType>(
+              "updateSpanEquipment",
+              description: "Update route network walk, specification and/or marking information of a span equipment",
+              arguments: new QueryArguments(
+                  new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "spanEquipmentOrSegmentId" },
+                  new QueryArgument<IdGraphType> { Name = "spanEquipmentSpecificationId" },
+                  new QueryArgument<ListGraphType<IdGraphType>> { Name = "routeSegmentIds" },
+                  new QueryArgument<IdGraphType> { Name = "manufacturerId" },
+                  new QueryArgument<MarkingInfoInputType> { Name = "markingInfo" }
+              ),
+              resolve: context =>
+              {
+                  var spanEquipmentOrSegmentId = context.GetArgument<Guid>("spanEquipmentOrSegmentId");
+
+                  if (context.HasArgument("routeSegmentIds"))
+                  {
+                      Guid[] routeSegmentIds = context.GetArgument<Guid[]>("routeSegmentIds");
+
+                      RouteNetworkElementIdList newWalkIds = new();
+                      newWalkIds.AddRange(routeSegmentIds);
+
+                      var moveCmd = new MoveSpanEquipment(
+                        spanEquipmentId : spanEquipmentOrSegmentId,
+                        newWalkIds: newWalkIds
+                      );
+
+                      var moveCmdResult = commandDispatcher.HandleAsync<MoveSpanEquipment, Result>(moveCmd).Result;
+
+                      if (moveCmdResult.IsFailed)
+                          return new CommandResult(moveCmdResult);
+                  }
+
+                  return new CommandResult(Result.Ok());
+              }
+            );
         }
     }
 }
