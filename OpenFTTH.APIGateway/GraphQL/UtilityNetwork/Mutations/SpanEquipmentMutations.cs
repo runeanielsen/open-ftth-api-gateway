@@ -62,7 +62,7 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                   // Now place the conduit in the walk
                   var placeSpanEquipmentCommand = new PlaceSpanEquipmentInRouteNetwork(spanEquipmentId, spanEquipmentSpecificationId, registerWalkOfInterestCommandResult.Value)
                   {
-                      ManufacturerId = manufacturerId == Guid.Empty ? null : manufacturerId,
+                      ManufacturerId = manufacturerId,
                       NamingInfo = namingInfo,
                       MarkingInfo = markingInfo
                   };
@@ -273,7 +273,18 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
              ),
              resolve: context =>
              {
-                 return new CommandResult(Result.Ok());
+                 var spanEquipmentOrSegmentId = context.GetArgument<Guid>("spanEquipmentOrSegmentId");
+
+                 var updateCmd = new UpdateSpanEquipmentProperties(spanEquipmentId: spanEquipmentOrSegmentId)
+                 {
+                     SpecificationId = context.HasArgument("spanEquipmentSpecificationId") ? context.GetArgument<Guid>("spanEquipmentSpecificationId") : null,
+                     ManufacturerId = context.HasArgument("manufacturerId") ? context.GetArgument<Guid>("manufacturerId") : null,
+                     MarkingInfo = context.HasArgument("markingInfo") ? context.GetArgument<MarkingInfo>("markingInfo") : null
+                 };
+
+                 var updateResult = commandDispatcher.HandleAsync<UpdateSpanEquipmentProperties, Result>(updateCmd).Result;
+
+                 return new CommandResult(updateResult);
              }
            );
         }

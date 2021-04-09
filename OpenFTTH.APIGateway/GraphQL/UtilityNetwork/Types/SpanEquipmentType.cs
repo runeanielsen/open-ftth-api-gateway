@@ -36,7 +36,7 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Types
                }
             );
 
-            Field<ListGraphType<ManufacturerType>>(
+            Field<ManufacturerType>(
                 name: "manufacturer",
                 description: "The manufacturer of the span equipment",
                 resolve: context =>
