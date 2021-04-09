@@ -275,7 +275,7 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
              {
                  var spanEquipmentOrSegmentId = context.GetArgument<Guid>("spanEquipmentOrSegmentId");
 
-                 var updateCmd = new UpdateSpanEquipmentProperties(spanEquipmentId: spanEquipmentOrSegmentId)
+                 var updateCmd = new UpdateSpanEquipmentProperties(spanEquipmentOrSegmentId: spanEquipmentOrSegmentId)
                  {
                      SpecificationId = context.HasArgument("spanEquipmentSpecificationId") ? context.GetArgument<Guid>("spanEquipmentSpecificationId") : null,
                      ManufacturerId = context.HasArgument("manufacturerId") ? context.GetArgument<Guid>("manufacturerId") : null,
