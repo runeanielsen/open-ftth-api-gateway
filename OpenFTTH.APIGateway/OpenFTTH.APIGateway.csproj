@@ -20,8 +20,8 @@
     <PackageReference Include="OpenFTTH.CQRS" Version="1.0.2" />
     <PackageReference Include="OpenFTTH.Events" Version="2.3.0" />
     <PackageReference Include="OpenFTTH.EventSourcing" Version="1.2.0" />
-    <PackageReference Include="OpenFTTH.RouteNetwork.API" Version="1.1.9" />
-    <PackageReference Include="OpenFTTH.RouteNetwork.Business" Version="1.1.9" />
+    <PackageReference Include="OpenFTTH.RouteNetwork.API" Version="1.2.0" />
+    <PackageReference Include="OpenFTTH.RouteNetwork.Business" Version="1.2.0" />
     <PackageReference Include="OpenFTTH.RouteNetworkService.Queries" Version="1.0.5" />
     <PackageReference Include="OpenFTTH.Schematic.API" Version="0.0.29" />
     <PackageReference Include="OpenFTTH.Schematic.Business" Version="0.0.29" />
