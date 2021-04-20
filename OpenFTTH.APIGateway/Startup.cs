@@ -2,6 +2,7 @@
 using DAX.EventProcessing.Dispatcher;
 using DAX.EventProcessing.Dispatcher.Topos;
 using GraphQL.Server;
+using GraphQL.Server.Transports.Subscriptions.Abstractions;
 using GraphQL.Server.Ui.GraphiQL;
 using GraphQL.Server.Ui.Playground;
 using GraphQL.Server.Ui.Voyager;
@@ -14,6 +15,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
@@ -45,13 +47,11 @@ namespace OpenFTTH.APIGateway
     public class Startup
     {
         private readonly string AllowedOrigins = "_myAllowSpecificOrigins";
-        private readonly IWebHostEnvironment _env;
         public IConfiguration Configuration { get; }
 
-        public Startup(IConfiguration configuration, IWebHostEnvironment env)
+        public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
-            _env = env;
         }
 
         public void ConfigureServices(IServiceCollection services)
@@ -90,7 +90,7 @@ namespace OpenFTTH.APIGateway
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, _ =>
                 {
-                    _.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters()
+                    _.TokenValidationParameters = new TokenValidationParameters()
                     {
                         ValidateAudience = true,
                         ValidAudience = "account",
@@ -105,7 +105,11 @@ namespace OpenFTTH.APIGateway
                     _.RequireHttpsMetadata = configuration.GetSection("Auth").GetValue<bool>("RequireHttps");
                 });
 
-            if (_env.IsProduction())
+            services.AddHttpContextAccessor();
+            services.AddTransient<IOperationMessageListener, AuthenticationListener>();
+            services.AddHttpClient<IOperationMessageListener, AuthenticationListener>();
+
+            if (configuration.GetSection("Auth").GetValue<bool>("Enable"))
             {
                 services.AddGraphQLAuth((settings, provider) => settings.AddPolicy("Authenticated", p => p.RequireAuthenticatedUser()));
             }
@@ -140,6 +144,9 @@ namespace OpenFTTH.APIGateway
 
             services.Configure<GeoDatabaseSetting>(databaseSettings =>
                             Configuration.GetSection("GeoDatabase").Bind(databaseSettings));
+
+            services.Configure<AuthSetting>(authSettings =>
+                            Configuration.GetSection("Auth").Bind(authSettings));
 
             // Web stuff
             services.AddRazorPages();
