@@ -66,6 +66,23 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                   return new CommandResult(placeNodeContainerResult);
               }
             );
+
+            Field<CommandResultType>(
+                 "reverseVerticalContentAlignment",
+                 description: "Toggle whether the content in the node container should be drawed from bottom up or top down",
+                 arguments: new QueryArguments(
+                     new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "nodeContainerId" }
+                 ),
+                 resolve: context =>
+                 {
+                     var nodeContainerId = context.GetArgument<Guid>("nodeContainerId");
+
+                     var reverseAlignmentCmd = new ReverseNodeContainerVerticalContentAlignment(nodeContainerId);
+                     var reverseAlignmentCmdResult = commandDispatcher.HandleAsync<ReverseNodeContainerVerticalContentAlignment, Result>(reverseAlignmentCmd).Result;
+
+                     return new CommandResult(reverseAlignmentCmdResult);
+                 }
+           );
         }
     }
 }
