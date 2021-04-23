@@ -8,6 +8,7 @@ using OpenFTTH.RouteNetwork.API.Model;
 using OpenFTTH.RouteNetwork.API.Queries;
 using OpenFTTH.Util;
 using OpenFTTH.UtilityGraphService.API.Model.UtilityNetwork;
+using OpenFTTH.UtilityGraphService.API.Model.UtilityNetwork.Tracing;
 using OpenFTTH.UtilityGraphService.API.Queries;
 using System;
 using System.Collections.Generic;
@@ -68,6 +69,9 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Queries
                     // Get equipment information
                     var equipmentQueryResult = queryDispatcher.HandleAsync<GetEquipmentDetails, FluentResults.Result<GetEquipmentDetailsResult>>(
                         new GetEquipmentDetails(new EquipmentIdList() { spanSegmentId })
+                        {
+                            EquipmentDetailsFilter = new EquipmentDetailsFilterOptions { IncludeRouteNetworkTrace = true }
+                        }
                     ).Result;
 
                     if (equipmentQueryResult.IsFailed)
@@ -87,6 +91,34 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Queries
 
 
                     var spanEquipment = equipmentQueryResult.Value.SpanEquipment.First();
+
+                    Dictionary<Guid, RouteNetworkTrace> traceByBySpanId = new();
+
+                    foreach (var traceRef in spanEquipment.RouteNetworkTraceRefs)
+                    {
+                        var trace = equipmentQueryResult.Value.RouteNetworkTraces[traceRef.TraceId];
+                        traceByBySpanId.Add(traceRef.SpanEquipmentOrSegmentId, trace);
+                    }
+
+                    if (traceByBySpanId.TryGetValue(spanSegmentId, out var routeNetworkTraceBySpanSegmentId))
+                    {
+                        return new SpanSegmentTrace()
+                        {
+                            RouteNetworkSegmentIds = routeNetworkTraceBySpanSegmentId.RouteSegmentIds
+                        };
+                    }
+                    else if (traceByBySpanId.TryGetValue(spanEquipment.Id, out var routeNetworkTraceBySpanEquipmentId))
+                    {
+                        return new SpanSegmentTrace()
+                        {
+                            RouteNetworkSegmentIds = routeNetworkTraceBySpanEquipmentId.RouteSegmentIds
+                        };
+                    }
+                    else
+                        return new ExecutionError("Can't get trace for span segment.");
+
+
+                    /*
 
                     // Get walk of interest of the span equipment
                     var interestQueryResult = queryDispatcher.HandleAsync<GetRouteNetworkDetails, FluentResults.Result<GetRouteNetworkDetailsResult>>(
@@ -115,6 +147,7 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Queries
                     {
                         RouteNetworkSegmentIds = segmentIds.ToArray()
                     };
+                    */
                 }
             );
 
