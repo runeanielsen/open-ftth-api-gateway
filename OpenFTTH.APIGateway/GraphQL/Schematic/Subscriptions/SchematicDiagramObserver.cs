@@ -1,5 +1,6 @@
 ﻿using DAX.EventProcessing.Dispatcher;
 using FluentResults;
+using Microsoft.Extensions.Logging;
 using OpenFTTH.CQRS;
 using OpenFTTH.Events.UtilityNetwork;
 using OpenFTTH.Schematic.API.Model.DiagramLayout;
@@ -14,13 +15,15 @@ namespace OpenFTTH.APIGateway.GraphQL.Schematic.Subscriptions
 {
     public class SchematicDiagramObserver : IObserver<RouteNetworkElementContainedEquipmentUpdated>
     {
+        private readonly ILogger<SchematicDiagramObserver> _logger;
         private readonly IToposTypedEventObservable<RouteNetworkElementContainedEquipmentUpdated> _toposTypedEventObserable;
         private readonly IQueryDispatcher _queryDispatcher;
 
         private ConcurrentDictionary<Guid, Subject<Diagram>> _observableByRouteNetworkElementId = new ConcurrentDictionary<Guid, Subject<Diagram>>();
 
-        public SchematicDiagramObserver(IToposTypedEventObservable<RouteNetworkElementContainedEquipmentUpdated> toposTypedEventObserable, IQueryDispatcher queryDispatcher)
+        public SchematicDiagramObserver(ILogger<SchematicDiagramObserver> logger, IToposTypedEventObservable<RouteNetworkElementContainedEquipmentUpdated> toposTypedEventObserable, IQueryDispatcher queryDispatcher)
         {
+            _logger = logger;
             _toposTypedEventObserable = toposTypedEventObserable;
             _queryDispatcher = queryDispatcher;
             _toposTypedEventObserable.OnEvent.Subscribe(this);
@@ -65,14 +68,25 @@ namespace OpenFTTH.APIGateway.GraphQL.Schematic.Subscriptions
         
         private Diagram GetDiagram(Guid routeNetworkElementId)
         {
-            var getDiagramQueryResult = _queryDispatcher.HandleAsync<GetDiagram, Result<GetDiagramResult>>(new GetDiagram(routeNetworkElementId)).Result;
-
-            if (getDiagramQueryResult.IsFailed)
+            // We catch all execeptions to avoid Topos retrying (calling the message handler again and again)
+            // It does not matter that the failed event is never processed again, because it's just a notification topic
+            try
             {
-                throw new ApplicationException($"Schematic diagram creation for route node element with id: {routeNetworkElementId} failed with message: {getDiagramQueryResult.Errors.First().Message}");
-            }
+                var getDiagramQueryResult = _queryDispatcher.HandleAsync<GetDiagram, Result<GetDiagramResult>>(new GetDiagram(routeNetworkElementId)).Result;
 
-            return getDiagramQueryResult.Value.Diagram;
+                if (getDiagramQueryResult.IsFailed)
+                {
+                    _logger.LogError($"Schematic diagram creation for route node element with id: {routeNetworkElementId} failed with message: {getDiagramQueryResult.Errors.First().Message}");
+                    return new Diagram();
+                }
+
+                return getDiagramQueryResult.Value.Diagram;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Schematic diagram creation for route node element with id: {routeNetworkElementId} failed with message: {ex.Message}", ex);
+                return new Diagram();
+            }
         }
     }
 }
