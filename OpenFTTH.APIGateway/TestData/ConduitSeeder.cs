@@ -245,6 +245,9 @@ namespace OpenFTTH.APIGateway.TestData
                 if (externalSpec.StartsWith("50-5x10"))
                     return new ConduitSpecInfo(TestSpecifications.Multi_Ø40_5x10, GetMarkingText(externalSpec));
 
+                if (externalSpec == "core-acces 50-10x10")
+                    return new ConduitSpecInfo(TestSpecifications.Multi_Ø50_10x10, GetMarkingText(externalSpec));
+
                 if (externalSpec.StartsWith("50-10x10"))
                     return new ConduitSpecInfo(TestSpecifications.Multi_Ø50_10x10, GetMarkingText(externalSpec));
 
