@@ -1,8 +1,9 @@
-﻿using CSharpFunctionalExtensions;
+﻿using FluentResults;
 using OpenFTTH.CQRS;
 using OpenFTTH.UtilityGraphService.API.Commands;
 using OpenFTTH.UtilityGraphService.API.Model.UtilityNetwork;
 using System;
+using System.Linq;
 
 namespace OpenFTTH.APIGateway.Test
 {
@@ -163,8 +164,8 @@ namespace OpenFTTH.APIGateway.Test
             var cmd = new AddSpanEquipmentSpecification(spec);
             var cmdResult = await _commandDispatcher.HandleAsync<AddSpanEquipmentSpecification, Result>(cmd);
 
-            if (cmdResult.IsFailure)
-                throw new ApplicationException(cmdResult.Error);
+            if (cmdResult.IsFailed)
+                throw new ApplicationException(cmdResult.Errors.First().Message);
         }
 
         private async void AddSpecification(SpanStructureSpecification spec)
@@ -172,8 +173,8 @@ namespace OpenFTTH.APIGateway.Test
             var cmd = new AddSpanStructureSpecification(spec);
             var cmdResult = await _commandDispatcher.HandleAsync<AddSpanStructureSpecification, Result>(cmd);
 
-            if (cmdResult.IsFailure)
-                throw new ApplicationException(cmdResult.Error);
+            if (cmdResult.IsFailed)
+                throw new ApplicationException(cmdResult.Errors.First().Message);
         }
 
         private async void AddManufacturer(Manufacturer manufacturer)
@@ -181,8 +182,9 @@ namespace OpenFTTH.APIGateway.Test
             var cmd = new AddManufacturer(manufacturer);
             var cmdResult = await _commandDispatcher.HandleAsync<AddManufacturer, Result>(cmd);
 
-            if (cmdResult.IsFailure)
-                throw new ApplicationException(cmdResult.Error);
+            if (cmdResult.IsFailed)
+                throw new ApplicationException(cmdResult.Errors.First().Message);
+
         }
     }
 }

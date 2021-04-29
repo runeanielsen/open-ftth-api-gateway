@@ -29,16 +29,25 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
               ),
               resolve: context =>
               {
+                  var userContext = context.UserContext as GraphQLUserContext;
+                  var userName = userContext.Username;
+
+                  // TODO: Get from work manager
+                  var workTaskId = Guid.Parse("54800ae5-13a5-4b03-8626-a63b66a25568");
+
                   var routeNodeId = context.GetArgument<Guid>("routeNodeId");
                   var nodeContainerId = context.GetArgument<Guid>("nodeContainerId");
                   var nodeContainerSpecificationId = context.GetArgument<Guid>("nodeContainerSpecificationId");
                   var manufacturerId = context.GetArgument<Guid>("manufacturerId");
 
-
                   // First register the walk in the route network where the client want to place the node container
                   var nodeOfInterestId = Guid.NewGuid();
                   var walk = new RouteNetworkElementIdList();
-                  var registerNodeOfInterestCommand = new RegisterNodeOfInterest(nodeOfInterestId, routeNodeId);
+                  var registerNodeOfInterestCommand = new RegisterNodeOfInterest(nodeOfInterestId, routeNodeId)
+                  {
+                      UserContext = new UserContext(userName, workTaskId)
+                  };
+
                   var registerNodeOfInterestCommandResult = commandDispatcher.HandleAsync<RegisterNodeOfInterest, Result<RouteNetworkInterest>>(registerNodeOfInterestCommand).Result;
 
                   if (registerNodeOfInterestCommandResult.IsFailed)
@@ -75,9 +84,20 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                  ),
                  resolve: context =>
                  {
+                     var userContext = context.UserContext as GraphQLUserContext;
+                     var userName = userContext.Username;
+
+                     // TODO: Get from work manager
+                     var workTaskId = Guid.Parse("54800ae5-13a5-4b03-8626-a63b66a25568");
+
+
                      var nodeContainerId = context.GetArgument<Guid>("nodeContainerId");
 
-                     var reverseAlignmentCmd = new ReverseNodeContainerVerticalContentAlignment(nodeContainerId);
+                     var reverseAlignmentCmd = new ReverseNodeContainerVerticalContentAlignment(nodeContainerId)
+                     {
+                         UserContext = new UserContext(userName, workTaskId)
+                     };
+
                      var reverseAlignmentCmdResult = commandDispatcher.HandleAsync<ReverseNodeContainerVerticalContentAlignment, Result>(reverseAlignmentCmd).Result;
 
                      return new CommandResult(reverseAlignmentCmdResult);

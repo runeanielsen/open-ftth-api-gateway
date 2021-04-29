@@ -1,4 +1,4 @@
-﻿using CSharpFunctionalExtensions;
+﻿using FluentResults;
 using GraphQL.Types;
 using Microsoft.Extensions.Logging;
 using OpenFTTH.CQRS;

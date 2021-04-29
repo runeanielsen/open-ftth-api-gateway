@@ -44,6 +44,11 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                   var markingInfo = context.GetArgument<MarkingInfo>("markingInfo");
                   var namingInfo = context.GetArgument<NamingInfo>("namingInfo");
 
+                  var userContext = context.UserContext as GraphQLUserContext;
+                  var userName = userContext.Username;
+
+                  // TODO: Get from work manager
+                  var workTaskId = Guid.Parse("54800ae5-13a5-4b03-8626-a63b66a25568");
 
                   var spanEquipments = eventStore.Projections.Get<UtilityNetworkProjection>().SpanEquipments;
 
@@ -51,7 +56,12 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                   var walkOfInterestId = Guid.NewGuid();
                   var walk = new RouteNetworkElementIdList();
                   walk.AddRange(routeSegmentIds);
-                  var registerWalkOfInterestCommand = new RegisterWalkOfInterest(walkOfInterestId, walk);
+
+                  var registerWalkOfInterestCommand = new RegisterWalkOfInterest(walkOfInterestId, walk)
+                  {
+                      UserContext = new UserContext(userName, workTaskId)
+                  };
+
                   var registerWalkOfInterestCommandResult = commandDispatcher.HandleAsync<RegisterWalkOfInterest, Result<RouteNetworkInterest>>(registerWalkOfInterestCommand).Result;
 
                   if (registerWalkOfInterestCommandResult.IsFailed)
@@ -62,9 +72,11 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                   // Now place the conduit in the walk
                   var placeSpanEquipmentCommand = new PlaceSpanEquipmentInRouteNetwork(spanEquipmentId, spanEquipmentSpecificationId, registerWalkOfInterestCommandResult.Value)
                   {
+                      CmdId = registerWalkOfInterestCommand.CmdId,
+                      UserContext = new UserContext(userName, workTaskId),
                       ManufacturerId = manufacturerId,
                       NamingInfo = namingInfo,
-                      MarkingInfo = markingInfo
+                      MarkingInfo = markingInfo,
                   };
 
                   var placeSpanEquipmentResult = commandDispatcher.HandleAsync<PlaceSpanEquipmentInRouteNetwork, Result>(placeSpanEquipmentCommand).Result;
@@ -99,7 +111,17 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                   var nodeContainerId = context.GetArgument<Guid>("nodeContainerId");
                   var side = context.GetArgument<NodeContainerSideEnum>("nodeContainerSide");
 
-                  var affixCommand = new AffixSpanEquipmentToNodeContainer(spanSegmentId, nodeContainerId, side);
+                  var userContext = context.UserContext as GraphQLUserContext;
+                  var userName = userContext.Username;
+
+                  // TODO: Get from work manager
+                  var workTaskId = Guid.Parse("54800ae5-13a5-4b03-8626-a63b66a25568");
+
+
+                  var affixCommand = new AffixSpanEquipmentToNodeContainer(spanSegmentId, nodeContainerId, side)
+                  {
+                      UserContext = new UserContext(userName, workTaskId)
+                  };
 
                   var affixCommandResult = commandDispatcher.HandleAsync<AffixSpanEquipmentToNodeContainer, Result>(affixCommand).Result;
 
@@ -120,7 +142,17 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                   var spanSegmentId = context.GetArgument<Guid>("spanSegmentId");
                   var routeNodeId = context.GetArgument<Guid>("routeNodeId");
 
-                  var detachCommand = new DetachSpanEquipmentFromNodeContainer(spanSegmentId, routeNodeId);
+                  var userContext = context.UserContext as GraphQLUserContext;
+                  var userName = userContext.Username;
+
+                  // TODO: Get from work manager
+                  var workTaskId = Guid.Parse("54800ae5-13a5-4b03-8626-a63b66a25568");
+
+
+                  var detachCommand = new DetachSpanEquipmentFromNodeContainer(spanSegmentId, routeNodeId)
+                  {
+                      UserContext = new UserContext(userName, workTaskId)
+                  };
 
                   var detachCommandResult = commandDispatcher.HandleAsync<DetachSpanEquipmentFromNodeContainer, Result>(detachCommand).Result;
 
@@ -142,7 +174,17 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                   var routeNodeId = context.GetArgument<Guid>("routeNodeId");
                   var spanSegmentToCut = context.GetArgument<Guid[]>("spanSegmentstoCut");
 
-                  var cutCmd = new CutSpanSegmentsAtRouteNode(routeNodeId, spanSegmentToCut);
+                  var userContext = context.UserContext as GraphQLUserContext;
+                  var userName = userContext.Username;
+
+                  // TODO: Get from work manager
+                  var workTaskId = Guid.Parse("54800ae5-13a5-4b03-8626-a63b66a25568");
+
+
+                  var cutCmd = new CutSpanSegmentsAtRouteNode(routeNodeId, spanSegmentToCut)
+                  {
+                      UserContext = new UserContext(userName, workTaskId)
+                  };
 
                   var cutResult = commandDispatcher.HandleAsync<CutSpanSegmentsAtRouteNode, Result>(cutCmd).Result;
 
@@ -162,7 +204,17 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                   var routeNodeId = context.GetArgument<Guid>("routeNodeId");
                   var spanSegmentToConnect = context.GetArgument<Guid[]>("spanSegmentsToConnect");
 
-                  var connectCmd = new ConnectSpanSegmentsAtRouteNode(routeNodeId, spanSegmentToConnect);
+                  var userContext = context.UserContext as GraphQLUserContext;
+                  var userName = userContext.Username;
+
+                  // TODO: Get from work manager
+                  var workTaskId = Guid.Parse("54800ae5-13a5-4b03-8626-a63b66a25568");
+
+
+                  var connectCmd = new ConnectSpanSegmentsAtRouteNode(routeNodeId, spanSegmentToConnect)
+                  {
+                      UserContext = new UserContext(userName, workTaskId)
+                  };
 
                   var connectResult = commandDispatcher.HandleAsync<ConnectSpanSegmentsAtRouteNode, Result>(connectCmd).Result;
 
@@ -182,7 +234,17 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                   var routeNodeId = context.GetArgument<Guid>("routeNodeId");
                   var spanSegmentToDisconnect = context.GetArgument<Guid[]>("spanSegmentsToDisconnect");
 
-                  var disconnectCmd = new DisconnectSpanSegmentsAtRouteNode(routeNodeId, spanSegmentToDisconnect);
+                  var userContext = context.UserContext as GraphQLUserContext;
+                  var userName = userContext.Username;
+
+                  // TODO: Get from work manager
+                  var workTaskId = Guid.Parse("54800ae5-13a5-4b03-8626-a63b66a25568");
+
+
+                  var disconnectCmd = new DisconnectSpanSegmentsAtRouteNode(routeNodeId, spanSegmentToDisconnect)
+                  {
+                      UserContext = new UserContext(userName, workTaskId)
+                  };
 
                   var disconnectResult = commandDispatcher.HandleAsync<DisconnectSpanSegmentsAtRouteNode, Result>(disconnectCmd).Result;
 
@@ -202,10 +264,20 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                   var spanEquipmentOrSegmentId = context.GetArgument<Guid>("spanEquipmentOrSegmentId");
                   var specificationsId = context.GetArgument<Guid[]>("spanStructureSpecificationIds");
 
+                  var userContext = context.UserContext as GraphQLUserContext;
+                  var userName = userContext.Username;
+
+                  // TODO: Get from work manager
+                  var workTaskId = Guid.Parse("54800ae5-13a5-4b03-8626-a63b66a25568");
+
+
                   var addStructure = new PlaceAdditionalStructuresInSpanEquipment(
                     spanEquipmentId: spanEquipmentOrSegmentId,
                     structureSpecificationIds: specificationsId
-                    );
+                  )
+                  {
+                      UserContext = new UserContext(userName, workTaskId)
+                  };
 
                   var addStructureResult = commandDispatcher.HandleAsync<PlaceAdditionalStructuresInSpanEquipment, Result>(addStructure).Result;
 
@@ -223,10 +295,20 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
               resolve: context =>
               {
                   var spanSegmentId = context.GetArgument<Guid>("spanSegmentId");
-                  
+
+                  var userContext = context.UserContext as GraphQLUserContext;
+                  var userName = userContext.Username;
+
+                  // TODO: Get from work manager
+                  var workTaskId = Guid.Parse("54800ae5-13a5-4b03-8626-a63b66a25568");
+
+
                   var removeStructure = new RemoveSpanStructureFromSpanEquipment(
                     spanSegmentId: spanSegmentId
-                  );
+                  )
+                  {
+                      UserContext = new UserContext(userName, workTaskId)
+                  };
 
                   var removeStructureResult = commandDispatcher.HandleAsync<RemoveSpanStructureFromSpanEquipment, Result>(removeStructure).Result;
 
@@ -246,6 +328,13 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
               {
                   var spanEquipmentOrSegmentId = context.GetArgument<Guid>("spanEquipmentOrSegmentId");
 
+                  var userContext = context.UserContext as GraphQLUserContext;
+                  var userName = userContext.Username;
+
+                  // TODO: Get from work manager
+                  var workTaskId = Guid.Parse("54800ae5-13a5-4b03-8626-a63b66a25568");
+
+
                   Guid[] routeSegmentIds = context.GetArgument<Guid[]>("routeSegmentIds");
 
                   RouteNetworkElementIdList newWalkIds = new();
@@ -254,7 +343,10 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                   var moveCmd = new MoveSpanEquipment(
                     spanEquipmentId: spanEquipmentOrSegmentId,
                     newWalkIds: newWalkIds
-                  );
+                  )
+                  {
+                      UserContext = new UserContext(userName, workTaskId)
+                  };
 
                   var moveCmdResult = commandDispatcher.HandleAsync<MoveSpanEquipment, Result>(moveCmd).Result;
 
@@ -275,11 +367,19 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
              {
                  var spanEquipmentOrSegmentId = context.GetArgument<Guid>("spanEquipmentOrSegmentId");
 
+                 var userContext = context.UserContext as GraphQLUserContext;
+                 var userName = userContext.Username;
+
+                 // TODO: Get from work manager
+                 var workTaskId = Guid.Parse("54800ae5-13a5-4b03-8626-a63b66a25568");
+
+
                  var updateCmd = new UpdateSpanEquipmentProperties(spanEquipmentOrSegmentId: spanEquipmentOrSegmentId)
                  {
                      SpecificationId = context.HasArgument("spanEquipmentSpecificationId") ? context.GetArgument<Guid>("spanEquipmentSpecificationId") : null,
                      ManufacturerId = context.HasArgument("manufacturerId") ? context.GetArgument<Guid>("manufacturerId") : null,
-                     MarkingInfo = context.HasArgument("markingInfo") ? context.GetArgument<MarkingInfo>("markingInfo") : null
+                     MarkingInfo = context.HasArgument("markingInfo") ? context.GetArgument<MarkingInfo>("markingInfo") : null,
+                     UserContext = new UserContext(userName, workTaskId)
                  };
 
                  var updateResult = commandDispatcher.HandleAsync<UpdateSpanEquipmentProperties, Result>(updateCmd).Result;

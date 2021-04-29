@@ -1,4 +1,4 @@
-﻿using CSharpFunctionalExtensions;
+﻿using FluentResults;
 using GraphQL;
 using GraphQL.Types;
 using Microsoft.Extensions.Logging;
