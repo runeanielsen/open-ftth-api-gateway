@@ -13,6 +13,8 @@ using OpenFTTH.RouteNetwork.API.Model;
 using OpenFTTH.UtilityGraphService.API.Commands;
 using OpenFTTH.UtilityGraphService.API.Model.UtilityNetwork;
 using OpenFTTH.UtilityGraphService.Business.Graph;
+using OpenFTTH.UtilityGraphService.Business.SpanEquipments;
+using OpenFTTH.UtilityGraphService.Business.SpanEquipments.Projections;
 using System;
 using System.Collections.Generic;
 
@@ -43,6 +45,17 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                   var manufacturerId = context.GetArgument<Guid>("manufacturerId");
                   var markingInfo = context.GetArgument<MarkingInfo>("markingInfo");
                   var namingInfo = context.GetArgument<NamingInfo>("namingInfo");
+
+                  // Name conduit span equipment
+                  // TODO: Refactor into som class responsible for span equipment naming
+                  var spec = eventStore.Projections.Get<SpanEquipmentSpecificationsProjection>().Specifications[spanEquipmentSpecificationId];
+                  if (spec.Category != null && spec.Category.ToLower().Contains("conduit"))
+                  {
+                      var nextConduitSeqStr = eventStore.Sequences.GetNextVal("conduit").ToString();
+
+                      var conduitName = "R" + nextConduitSeqStr.PadLeft(6 - nextConduitSeqStr.Length, '0');
+                      namingInfo = new NamingInfo(conduitName, null);
+                  }
 
                   var correlationId = Guid.NewGuid();
 
