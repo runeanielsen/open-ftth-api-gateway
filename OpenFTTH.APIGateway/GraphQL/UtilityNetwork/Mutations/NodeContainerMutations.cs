@@ -4,6 +4,7 @@ using GraphQL.Types;
 using OpenFTTH.APIGateway.CoreTypes;
 using OpenFTTH.APIGateway.GraphQL.Core.Model;
 using OpenFTTH.CQRS;
+using OpenFTTH.Events.Core.Infos;
 using OpenFTTH.EventSourcing;
 using OpenFTTH.RouteNetwork.API.Commands;
 using OpenFTTH.RouteNetwork.API.Model;
@@ -63,7 +64,8 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                   {
                       CorrelationId = correlationId,
                       UserContext = new UserContext(userName, workTaskId),
-                      ManufacturerId = manufacturerId
+                      ManufacturerId = manufacturerId,
+                      LifecycleInfo = new LifecycleInfo(DeploymentStateEnum.InService, null, null)
                   };
 
                   var placeNodeContainerResult = commandDispatcher.HandleAsync<PlaceNodeContainerInRouteNetwork, Result>(placeNodeContainerCommand).Result;

@@ -81,6 +81,7 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                       ManufacturerId = manufacturerId,
                       NamingInfo = namingInfo,
                       MarkingInfo = markingInfo,
+                      LifecycleInfo = new LifecycleInfo(DeploymentStateEnum.InService, null, null)
                   };
 
                   var placeSpanEquipmentResult = commandDispatcher.HandleAsync<PlaceSpanEquipmentInRouteNetwork, Result>(placeSpanEquipmentCommand).Result;
