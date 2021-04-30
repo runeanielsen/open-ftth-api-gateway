@@ -24,6 +24,8 @@ namespace OpenFTTH.APIGateway.TestData
     {
         private static string _connectionString = Environment.GetEnvironmentVariable("conversion_database_connection_string");
 
+        private static Guid _bentleyMultiConduitConversion = Guid.Parse("9501d6d6-2322-44a5-bdfe-c55c371d02e4");
+
         private ICommandDispatcher _commandDispatcher;
         private IQueryDispatcher _queryDispatcher;
         private ILogger<ConduitSeeder> _logger;
@@ -110,6 +112,8 @@ namespace OpenFTTH.APIGateway.TestData
 
         private void PlaceConduit(string externalId, Guid specificationId, List<Guid> segmentIds, List<Guid> additionalStructureSpecIds, string markingColor)
         {
+            Guid correlationId = Guid.NewGuid();
+
             if (markingColor != null)
             {
 
@@ -120,7 +124,12 @@ namespace OpenFTTH.APIGateway.TestData
 
             // Register walk of interest
             var walkOfInterestId = Guid.NewGuid();
-            var registerWalkOfInterestCommand = new RegisterWalkOfInterest(walkOfInterestId, walkIds);
+            var registerWalkOfInterestCommand = new RegisterWalkOfInterest(walkOfInterestId, walkIds)
+            {
+                CorrelationId = correlationId,
+                UserContext = new UserContext("conversion", _bentleyMultiConduitConversion),
+            };
+
             var registerWalkOfInterestCommandResult = _commandDispatcher.HandleAsync<RegisterWalkOfInterest, Result<RouteNetworkInterest>>(registerWalkOfInterestCommand).Result;
 
             if (registerWalkOfInterestCommandResult.IsFailed)
@@ -133,6 +142,8 @@ namespace OpenFTTH.APIGateway.TestData
             // Place conduit
             var placeSpanEquipmentCommand = new PlaceSpanEquipmentInRouteNetwork(Guid.NewGuid(), specificationId, registerWalkOfInterestCommandResult.Value)
             {
+                CorrelationId = correlationId,
+                UserContext = new UserContext("conversion", _bentleyMultiConduitConversion),
                 MarkingInfo = markingColor != null ? new MarkingInfo() { MarkingColor = markingColor } : null
             };
 
@@ -150,7 +161,11 @@ namespace OpenFTTH.APIGateway.TestData
                 var addStructure = new PlaceAdditionalStructuresInSpanEquipment(
                  spanEquipmentId: placeSpanEquipmentCommand.SpanEquipmentId,
                  structureSpecificationIds: additionalStructureSpecIds.ToArray()
-                );
+                )
+                {
+                    CorrelationId = correlationId,
+                    UserContext = new UserContext("conversion", _bentleyMultiConduitConversion),
+                };
 
                 var addStructureResult = _commandDispatcher.HandleAsync<PlaceAdditionalStructuresInSpanEquipment, Result>(addStructure).Result;
 

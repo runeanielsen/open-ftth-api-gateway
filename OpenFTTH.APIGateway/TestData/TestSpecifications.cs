@@ -12,6 +12,7 @@ namespace OpenFTTH.TestData
 {
     public class TestSpecifications
     {
+        private static Guid _specSeederId = Guid.Parse("ac478ae4-9851-4c25-8b1a-d45d69e250d7");
         private static bool _specificationsCreated = false;
         private static readonly object _myLock = new object();
 
@@ -776,7 +777,12 @@ namespace OpenFTTH.TestData
 
         private void AddSpecification(SpanEquipmentSpecification spec)
         {
-            var cmd = new AddSpanEquipmentSpecification(spec);
+            var cmd = new AddSpanEquipmentSpecification(spec)
+            {
+                CorrelationId = Guid.NewGuid(),
+                UserContext = new UserContext("specification seeder", _specSeederId)
+            };
+
             var cmdResult = _commandDispatcher.HandleAsync<AddSpanEquipmentSpecification, Result>(cmd).Result;
 
             if (cmdResult.IsFailed)
@@ -785,7 +791,12 @@ namespace OpenFTTH.TestData
 
         private void AddSpecification(SpanStructureSpecification spec)
         {
-            var cmd = new AddSpanStructureSpecification(spec);
+            var cmd = new AddSpanStructureSpecification(spec)
+            {
+                CorrelationId = Guid.NewGuid(),
+                UserContext = new UserContext("specification seeder", _specSeederId)
+            };
+
             var cmdResult = _commandDispatcher.HandleAsync<AddSpanStructureSpecification, Result>(cmd).Result;
 
             if (cmdResult.IsFailed)
@@ -795,7 +806,12 @@ namespace OpenFTTH.TestData
 
         private void AddSpecification(NodeContainerSpecification spec)
         {
-            var cmd = new AddNodeContainerSpecification(spec);
+            var cmd = new AddNodeContainerSpecification(spec)
+            {
+                CorrelationId = Guid.NewGuid(),
+                UserContext = new UserContext("specification seeder", _specSeederId)
+            };
+
             var cmdResult = _commandDispatcher.HandleAsync<AddNodeContainerSpecification, Result>(cmd).Result;
 
             if (cmdResult.IsFailed)
@@ -804,7 +820,12 @@ namespace OpenFTTH.TestData
 
         private void AddManufacturer(Manufacturer manufacturer)
         {
-            var cmd = new AddManufacturer(manufacturer);
+            var cmd = new AddManufacturer(manufacturer)
+            {
+                CorrelationId = Guid.NewGuid(),
+                UserContext = new UserContext("specification seeder", _specSeederId)
+            };
+
             var cmdResult = _commandDispatcher.HandleAsync<AddManufacturer, Result>(cmd).Result;
 
             if (cmdResult.IsFailed)

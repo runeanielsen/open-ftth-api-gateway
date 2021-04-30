@@ -32,6 +32,8 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                   var userContext = context.UserContext as GraphQLUserContext;
                   var userName = userContext.Username;
 
+                  Guid correlationId = Guid.NewGuid();
+
                   // TODO: Get from work manager
                   var workTaskId = Guid.Parse("54800ae5-13a5-4b03-8626-a63b66a25568");
 
@@ -45,6 +47,7 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                   var walk = new RouteNetworkElementIdList();
                   var registerNodeOfInterestCommand = new RegisterNodeOfInterest(nodeOfInterestId, routeNodeId)
                   {
+                      CorrelationId = correlationId,
                       UserContext = new UserContext(userName, workTaskId)
                   };
 
@@ -58,6 +61,8 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                   // Now place the conduit in the walk
                   var placeNodeContainerCommand = new PlaceNodeContainerInRouteNetwork(nodeContainerId, nodeContainerSpecificationId, registerNodeOfInterestCommandResult.Value)
                   {
+                      CorrelationId = correlationId,
+                      UserContext = new UserContext(userName, workTaskId),
                       ManufacturerId = manufacturerId
                   };
 
@@ -87,6 +92,8 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                      var userContext = context.UserContext as GraphQLUserContext;
                      var userName = userContext.Username;
 
+                     Guid correlationId = Guid.NewGuid();
+
                      // TODO: Get from work manager
                      var workTaskId = Guid.Parse("54800ae5-13a5-4b03-8626-a63b66a25568");
 
@@ -95,6 +102,7 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
 
                      var reverseAlignmentCmd = new ReverseNodeContainerVerticalContentAlignment(nodeContainerId)
                      {
+                         CorrelationId = correlationId,
                          UserContext = new UserContext(userName, workTaskId)
                      };
 
