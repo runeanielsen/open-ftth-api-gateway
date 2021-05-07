@@ -53,7 +53,7 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                   {
                       var nextConduitSeqStr = eventStore.Sequences.GetNextVal("conduit").ToString();
 
-                      var conduitName = "R" + nextConduitSeqStr.PadLeft(6 - nextConduitSeqStr.Length, '0');
+                      var conduitName = "R" + nextConduitSeqStr.PadLeft(6, '0');
                       namingInfo = new NamingInfo(conduitName, null);
                   }
 

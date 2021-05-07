@@ -4,6 +4,7 @@ using Microsoft.Extensions.Options;
 using Npgsql;
 using OpenFTTH.APIGateway.Settings;
 using OpenFTTH.CQRS;
+using OpenFTTH.Events.Core.Infos;
 using OpenFTTH.EventSourcing;
 using OpenFTTH.RouteNetwork.API.Commands;
 using OpenFTTH.RouteNetwork.API.Model;
@@ -138,13 +139,19 @@ namespace OpenFTTH.APIGateway.TestData
                 return;
             }
 
+            // conduit name
+            var nextConduitSeqStr = _eventStore.Sequences.GetNextVal("conduit").ToString();
+
+            var conduitName = "R" + nextConduitSeqStr.PadLeft(6, '0');
+            var namingInfo = new NamingInfo(conduitName, null);
 
             // Place conduit
             var placeSpanEquipmentCommand = new PlaceSpanEquipmentInRouteNetwork(Guid.NewGuid(), specificationId, registerWalkOfInterestCommandResult.Value)
             {
                 CorrelationId = correlationId,
                 UserContext = new UserContext("conversion", _bentleyMultiConduitConversion),
-                MarkingInfo = markingColor != null ? new MarkingInfo() { MarkingColor = markingColor } : null
+                MarkingInfo = markingColor != null ? new MarkingInfo() { MarkingColor = markingColor } : null,
+                NamingInfo = namingInfo
             };
 
             var placeSpanEquipmentResult = _commandDispatcher.HandleAsync<PlaceSpanEquipmentInRouteNetwork, Result>(placeSpanEquipmentCommand).Result;

@@ -36,7 +36,7 @@ namespace OpenFTTH.APIGateway.Logging
                     _logger.LogError("GraphQL execution completed in {Elapsed} with error(s): {Errors}", requestExecutionResult.Elapsed, requestExecutionResult.Result.Errors);
             }
             else
-                _logger.LogInformation("GraphQL execution successfully completed in {Elapsed}", requestExecutionResult.Elapsed);
+                _logger.LogDebug("GraphQL execution successfully completed in {Elapsed}", requestExecutionResult.Elapsed);
 
             return base.RequestExecutedAsync(requestExecutionResult);
         }

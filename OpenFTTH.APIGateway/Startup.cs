@@ -39,6 +39,7 @@ using OpenFTTH.RouteNetwork.Business.RouteElements.EventHandling;
 using OpenFTTH.RouteNetwork.Business.RouteElements.StateHandling;
 using OpenFTTH.Work.Business.InMemTestImpl;
 using Serilog;
+using Serilog.Formatting.Compact;
 using System;
 using System.Reflection;
 
@@ -56,35 +57,15 @@ namespace OpenFTTH.APIGateway
 
         public void ConfigureServices(IServiceCollection services)
         {
-            // To support event deserialization we need setup newtonsoft to this
-            JsonConvert.DefaultSettings = (() =>
-            {
-                var settings = new JsonSerializerSettings();
-                settings.ContractResolver = new CamelCasePropertyNamesContractResolver();
-                settings.Converters.Add(new StringEnumConverter());
-                settings.TypeNameHandling = TypeNameHandling.Auto;
-                return settings;
-            });
-
             services.AddOptions();
 
-            // Logging
             var configuration = new ConfigurationBuilder()
-               .AddJsonFile("appsettings.json", true, false)
-               .AddEnvironmentVariables().Build();
+                .AddJsonFile("appsettings.json", true, false)
+                .AddEnvironmentVariables().Build();
 
-            Log.Logger = new LoggerConfiguration()
-                .ReadFrom.Configuration(configuration)
-                .CreateLogger();
+            ConfigureLogging(configuration, services);
 
-            services.AddLogging(loggingBuilder =>
-            {
-                var logger = new LoggerConfiguration()
-                    .ReadFrom.Configuration(configuration)
-                    .CreateLogger();
-
-                loggingBuilder.AddSerilog(dispose: true);
-            });
+            ConfigureSerialization();
 
             // Auth
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -274,6 +255,33 @@ namespace OpenFTTH.APIGateway
             {
                 GraphQLEndPoint = "/graphql",
                 Path = "/ui/voyager"
+            });
+        }
+
+        private static void ConfigureLogging(IConfigurationRoot configuration, IServiceCollection services)
+        {
+            services.AddLogging(loggingBuilder =>
+            {
+                var logger = new LoggerConfiguration()
+                    .ReadFrom.Configuration(configuration)
+                    .Enrich.FromLogContext()
+                    .WriteTo.Console(new CompactJsonFormatter())
+                    .CreateLogger();
+
+                loggingBuilder.AddSerilog(logger, true);
+            });
+        }
+
+        private static void ConfigureSerialization()
+        {
+            // To support event deserialization we need setup newtonsoft to this
+            JsonConvert.DefaultSettings = (() =>
+            {
+                var settings = new JsonSerializerSettings();
+                settings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+                settings.Converters.Add(new StringEnumConverter());
+                settings.TypeNameHandling = TypeNameHandling.Auto;
+                return settings;
             });
         }
     }
