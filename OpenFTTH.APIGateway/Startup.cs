@@ -98,6 +98,7 @@ namespace OpenFTTH.APIGateway
             // GraphQL stuff
             services.Configure<KestrelServerOptions>(options => options.AllowSynchronousIO = true);
 
+
             services.AddGraphQL((options, provider) =>
             {
                 options.EnableMetrics = false;
@@ -268,7 +269,7 @@ namespace OpenFTTH.APIGateway
                     .WriteTo.Console(new CompactJsonFormatter())
                     .CreateLogger();
 
-                loggingBuilder.AddSerilog(logger, true);
+                loggingBuilder.ClearProviders().AddSerilog(logger, true);
             });
         }
 
