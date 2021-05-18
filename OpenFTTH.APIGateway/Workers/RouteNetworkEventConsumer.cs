@@ -109,8 +109,8 @@ namespace OpenFTTH.APIGateway.Workers
 
                 // TODO: Must be removed
                 // Seed conversion conduits
-                if (_databaseSetting.Host != null)
-                    new ConduitSeeder(_conduitSeederLogger, _eventStore, _commandDispatcher, _queryDispatcher).Run();
+                // if (_databaseSetting.Host != null)
+                //     new ConduitSeeder(_conduitSeederLogger, _eventStore, _commandDispatcher, _queryDispatcher).Run();
 
 
 
