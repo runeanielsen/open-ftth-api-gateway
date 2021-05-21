@@ -85,69 +85,28 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Queries
                     if (equipmentQueryResult.Value.SpanEquipment == null || equipmentQueryResult.Value.SpanEquipment.Count == 0)
                     {
                         context.Errors.Add(new ExecutionError($"Cannot find any span equipment containing a span segment with id: {spanSegmentId}"));
-
                         return null;
                     }
 
-
-                    var spanEquipment = equipmentQueryResult.Value.SpanEquipment.First();
-
-                    Dictionary<Guid, RouteNetworkTrace> traceByBySpanId = new();
-
-                    foreach (var traceRef in spanEquipment.RouteNetworkTraceRefs)
+                    if (equipmentQueryResult.Value.RouteNetworkTraces == null)
                     {
-                        var trace = equipmentQueryResult.Value.RouteNetworkTraces[traceRef.TraceId];
-                        traceByBySpanId.Add(traceRef.SpanEquipmentOrSegmentId, trace);
-                    }
-
-                    if (traceByBySpanId.TryGetValue(spanSegmentId, out var routeNetworkTraceBySpanSegmentId))
-                    {
-                        return new SpanSegmentTrace()
-                        {
-                            RouteNetworkSegmentIds = routeNetworkTraceBySpanSegmentId.RouteSegmentIds
-                        };
-                    }
-                    else if (traceByBySpanId.TryGetValue(spanEquipment.Id, out var routeNetworkTraceBySpanEquipmentId))
-                    {
-                        return new SpanSegmentTrace()
-                        {
-                            RouteNetworkSegmentIds = routeNetworkTraceBySpanEquipmentId.RouteSegmentIds
-                        };
-                    }
-                    else
-                        return new ExecutionError("Can't get trace for span segment.");
-
-
-                    /*
-
-                    // Get walk of interest of the span equipment
-                    var interestQueryResult = queryDispatcher.HandleAsync<GetRouteNetworkDetails, FluentResults.Result<GetRouteNetworkDetailsResult>>(
-                        new GetRouteNetworkDetails(new InterestIdList() { spanEquipment.WalkOfInterestId })
-                    ).Result;
-
-                    if (interestQueryResult.IsFailed)
-                    {
-                        foreach (var error in interestQueryResult.Errors)
-                            context.Errors.Add(new ExecutionError(error.Message));
-
+                        context.Errors.Add(new ExecutionError($"No trace information returned for span segment with id: {spanSegmentId}"));
                         return null;
                     }
 
-                    var interest = interestQueryResult.Value.Interests.First();
-
-                    // Create trace object
-                    List<Guid> segmentIds = new List<Guid>();
-
-                    for (int i = 1; i < interest.RouteNetworkElementRefs.Count; i += 2)
+                    if (equipmentQueryResult.Value.RouteNetworkTraces.Count != 1)
                     {
-                        segmentIds.Add(interest.RouteNetworkElementRefs[i]);
+                        context.Errors.Add(new ExecutionError($"Expected only one trace returned for span segment with id: {spanSegmentId}. Are you sure you did a query on a span segment id and not a span equipment id?"));
+                        return null;
                     }
+
+                    var theTrace = equipmentQueryResult.Value.RouteNetworkTraces.First();
 
                     return new SpanSegmentTrace()
                     {
-                        RouteNetworkSegmentIds = segmentIds.ToArray()
+                        RouteNetworkSegmentIds = theTrace.RouteSegmentIds,
+                        RouteNetworkSegmentGeometries = theTrace.RouteSegmentGeometries
                     };
-                    */
                 }
             );
 

@@ -8,7 +8,9 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Types
     {
         public SpanSegmentTraceType(ILogger<SpanSegmentTraceType> logger)
         {
-            Field(x => x.RouteNetworkSegmentIds, type: typeof(ListGraphType<IdGraphType>)).Description("Route network segments that this span segment is connected to");
+            Field(x => x.RouteNetworkSegmentIds, type: typeof(ListGraphType<IdGraphType>)).Description("Route network segment ids of the span segment traversal");
+
+            Field(x => x.RouteNetworkSegmentGeometries, type: typeof(ListGraphType<StringGraphType>)).Description("Route network segment geometries of the span segment traversal");
         }
     }
 }
