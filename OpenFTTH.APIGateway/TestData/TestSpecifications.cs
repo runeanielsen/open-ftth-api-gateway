@@ -411,7 +411,7 @@ namespace OpenFTTH.TestData
                   })
               )
             {
-                Description = "ø50 mm Multirør 5x10 + 10x7 standard farver",
+                Description = "ø50 mm Multirør 5x10 + 12x7 standard farver",
                 ManufacturerRefs = new Guid[] { Manu_GMPlast, Manu_Emtelle },
                 IsFixed = true,
                 IsMultiLevel = true
