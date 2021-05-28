@@ -2,7 +2,10 @@
 using GraphQL;
 using GraphQL.Types;
 using Microsoft.Extensions.Logging;
+using NetTopologySuite.Geometries;
+using NetTopologySuite.IO;
 using OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Types;
+using OpenFTTH.APIGateway.Util;
 using OpenFTTH.CQRS;
 using OpenFTTH.RouteNetwork.API.Model;
 using OpenFTTH.RouteNetwork.API.Queries;
@@ -105,7 +108,7 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Queries
                     return new SpanSegmentTrace()
                     {
                         RouteNetworkSegmentIds = theTrace.RouteSegmentIds,
-                        RouteNetworkSegmentGeometries = theTrace.RouteSegmentGeometries
+                        RouteNetworkSegmentGeometries = UTM32WGS84Converter.ConvertGeoJsonLineStringsToWgs84(theTrace.RouteSegmentGeometries)
                     };
                 }
             );
@@ -148,5 +151,7 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Queries
                }
            );
         }
+
+        
     }
 }
