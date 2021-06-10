@@ -107,14 +107,6 @@ namespace OpenFTTH.APIGateway.Workers
                 _eventStore.DehydrateProjections();
                 _logger.LogInformation("Finish dehydrating in-memory projections.");
 
-                // TODO: Must be removed
-                // Seed conversion conduits
-                // if (_databaseSetting.Host != null)
-                //     new ConduitSeeder(_conduitSeederLogger, _eventStore, _commandDispatcher, _queryDispatcher).Run();
-
-
-
-
                 // We are now ready to serve the public if the loaded objects are bigger than 0
                 if (inMemRouteNetworkState.NumberOfObjectsLoaded > 0)
                 {
@@ -128,7 +120,6 @@ namespace OpenFTTH.APIGateway.Workers
             catch (Exception ex)
             {
                 _logger.LogError(ex, ex.Message);
-                throw;
             }
                         
             await Task.CompletedTask;
