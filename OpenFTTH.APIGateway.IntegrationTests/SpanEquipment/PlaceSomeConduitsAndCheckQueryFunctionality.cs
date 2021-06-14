@@ -46,10 +46,10 @@ namespace OpenFTTH.APIGateway.IntegrationTests.SpanEquipment
         public async void CreateRouteNodeContainerInCC_1()
         {
             var nodeOfInterestId = Guid.NewGuid();
-            var registerNodeOfInterestCommand = new RegisterNodeOfInterest(nodeOfInterestId, TestRouteNetwork.CC_1);
+            var registerNodeOfInterestCommand = new RegisterNodeOfInterest(Guid.NewGuid(), new UserContext("test", Guid.Empty), nodeOfInterestId, TestRouteNetwork.CC_1);
             var registerNodeOfInterestCommandResult = _commandDispatcher.HandleAsync<RegisterNodeOfInterest, Result<RouteNetworkInterest>>(registerNodeOfInterestCommand).Result;
 
-            var placeNodeContainerCommand = new PlaceNodeContainerInRouteNetwork(Guid.NewGuid(), TestSpecifications.Conduit_Closure_Emtelle_Branch_Box, registerNodeOfInterestCommandResult.Value)
+            var placeNodeContainerCommand = new PlaceNodeContainerInRouteNetwork(Guid.NewGuid(), new UserContext("test", Guid.Empty), Guid.NewGuid(), TestSpecifications.Conduit_Closure_Emtelle_Branch_Box, registerNodeOfInterestCommandResult.Value)
             {
                 ManufacturerId = TestSpecifications.Manu_Emtelle
             };
@@ -93,11 +93,11 @@ namespace OpenFTTH.APIGateway.IntegrationTests.SpanEquipment
             // First register the walk in the route network where we want to place the conduit
             var walkOfInterestId = Guid.NewGuid();
             var walk = new RouteNetworkElementIdList() { TestRouteNetwork.S2, TestRouteNetwork.S4, TestRouteNetwork.S13 };
-            var registerWalkOfInterestCommand = new RegisterWalkOfInterest(walkOfInterestId, walk);
+            var registerWalkOfInterestCommand = new RegisterWalkOfInterest(Guid.NewGuid(), new UserContext("test", Guid.Empty), walkOfInterestId, walk);
             var registerWalkOfInterestCommandResult = await _commandDispatcher.HandleAsync<RegisterWalkOfInterest, Result<RouteNetworkInterest>>(registerWalkOfInterestCommand);
 
             // Now place the conduit in walk
-            var placeSpanEquipmentCommand = new PlaceSpanEquipmentInRouteNetwork(Guid.NewGuid(), TestSpecifications.Multi_Ø40_5x10, registerWalkOfInterestCommandResult.Value);
+            var placeSpanEquipmentCommand = new PlaceSpanEquipmentInRouteNetwork(Guid.NewGuid(), new UserContext("test", Guid.Empty), Guid.NewGuid(), TestSpecifications.Multi_Ø40_5x10, registerWalkOfInterestCommandResult.Value);
             var placeSpanEquipmentResult = await _commandDispatcher.HandleAsync<PlaceSpanEquipmentInRouteNetwork, Result>(placeSpanEquipmentCommand);
 
             // Assert
@@ -114,11 +114,11 @@ namespace OpenFTTH.APIGateway.IntegrationTests.SpanEquipment
             // First register the walk in the route network where we want to place the conduit
             var walkOfInterestId = Guid.NewGuid();
             var walk = new RouteNetworkElementIdList() { TestRouteNetwork.S2, TestRouteNetwork.S4, TestRouteNetwork.S13 };
-            var registerWalkOfInterestCommand = new RegisterWalkOfInterest(walkOfInterestId, walk);
+            var registerWalkOfInterestCommand = new RegisterWalkOfInterest(Guid.NewGuid(), new UserContext("test", Guid.Empty), walkOfInterestId, walk);
             var registerWalkOfInterestCommandResult = await _commandDispatcher.HandleAsync<RegisterWalkOfInterest, Result<RouteNetworkInterest>>(registerWalkOfInterestCommand);
 
             // Now place the conduit in walk
-            var placeSpanEquipmentCommand = new PlaceSpanEquipmentInRouteNetwork(Guid.NewGuid(), TestSpecifications.Multi_Ø50_10x10, registerWalkOfInterestCommandResult.Value);
+            var placeSpanEquipmentCommand = new PlaceSpanEquipmentInRouteNetwork(Guid.NewGuid(), new UserContext("test", Guid.Empty), Guid.NewGuid(), TestSpecifications.Multi_Ø50_10x10, registerWalkOfInterestCommandResult.Value);
             var placeSpanEquipmentResult = await _commandDispatcher.HandleAsync<PlaceSpanEquipmentInRouteNetwork, Result>(placeSpanEquipmentCommand);
 
             // Assert
@@ -135,11 +135,11 @@ namespace OpenFTTH.APIGateway.IntegrationTests.SpanEquipment
             // First register the walk in the route network where we want to place the conduit
             var walkOfInterestId = Guid.NewGuid();
             var walk = new RouteNetworkElementIdList() { TestRouteNetwork.S3 };
-            var registerWalkOfInterestCommand = new RegisterWalkOfInterest(walkOfInterestId, walk);
+            var registerWalkOfInterestCommand = new RegisterWalkOfInterest(Guid.NewGuid(), new UserContext("test", Guid.Empty), walkOfInterestId, walk);
             var registerWalkOfInterestCommandResult = await _commandDispatcher.HandleAsync<RegisterWalkOfInterest, Result<RouteNetworkInterest>>(registerWalkOfInterestCommand);
 
             // Now place the conduit in walk
-            var placeSpanEquipmentCommand = new PlaceSpanEquipmentInRouteNetwork(Guid.NewGuid(), TestSpecifications.Flex_Ø40_Red, registerWalkOfInterestCommandResult.Value);
+            var placeSpanEquipmentCommand = new PlaceSpanEquipmentInRouteNetwork(Guid.NewGuid(), new UserContext("test", Guid.Empty), Guid.NewGuid(), TestSpecifications.Flex_Ø40_Red, registerWalkOfInterestCommandResult.Value);
             var placeSpanEquipmentResult = await _commandDispatcher.HandleAsync<PlaceSpanEquipmentInRouteNetwork, Result>(placeSpanEquipmentCommand);
 
             // Assert
@@ -156,11 +156,11 @@ namespace OpenFTTH.APIGateway.IntegrationTests.SpanEquipment
             // First register the walk in the route network where we want to place the conduit
             var walkOfInterestId = Guid.NewGuid();
             var walk = new RouteNetworkElementIdList() { TestRouteNetwork.S5 };
-            var registerWalkOfInterestCommand = new RegisterWalkOfInterest(walkOfInterestId, walk);
+            var registerWalkOfInterestCommand = new RegisterWalkOfInterest(Guid.NewGuid(), new UserContext("test", Guid.Empty), walkOfInterestId, walk);
             var registerWalkOfInterestCommandResult = await _commandDispatcher.HandleAsync<RegisterWalkOfInterest, Result<RouteNetworkInterest>>(registerWalkOfInterestCommand);
 
             // Now place the conduit in walk
-            var placeSpanEquipmentCommand = new PlaceSpanEquipmentInRouteNetwork(Guid.NewGuid(), TestSpecifications.Flex_Ø40_Red, registerWalkOfInterestCommandResult.Value);
+            var placeSpanEquipmentCommand = new PlaceSpanEquipmentInRouteNetwork(Guid.NewGuid(), new UserContext("test", Guid.Empty), Guid.NewGuid(), TestSpecifications.Flex_Ø40_Red, registerWalkOfInterestCommandResult.Value);
             var placeSpanEquipmentResult = await _commandDispatcher.HandleAsync<PlaceSpanEquipmentInRouteNetwork, Result>(placeSpanEquipmentCommand);
 
             // Assert

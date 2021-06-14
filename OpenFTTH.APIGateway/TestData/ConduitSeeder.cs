@@ -115,21 +115,12 @@ namespace OpenFTTH.APIGateway.TestData
         {
             Guid correlationId = Guid.NewGuid();
 
-            if (markingColor != null)
-            {
-
-            }
-
             RouteNetworkElementIdList walkIds = new RouteNetworkElementIdList();
             walkIds.AddRange(segmentIds);
 
             // Register walk of interest
             var walkOfInterestId = Guid.NewGuid();
-            var registerWalkOfInterestCommand = new RegisterWalkOfInterest(walkOfInterestId, walkIds)
-            {
-                CorrelationId = correlationId,
-                UserContext = new UserContext("conversion", _bentleyMultiConduitConversion),
-            };
+            var registerWalkOfInterestCommand = new RegisterWalkOfInterest(correlationId, new UserContext("conversion", _bentleyMultiConduitConversion), walkOfInterestId, walkIds);
 
             var registerWalkOfInterestCommandResult = _commandDispatcher.HandleAsync<RegisterWalkOfInterest, Result<RouteNetworkInterest>>(registerWalkOfInterestCommand).Result;
 
@@ -146,10 +137,8 @@ namespace OpenFTTH.APIGateway.TestData
             var namingInfo = new NamingInfo(conduitName, null);
 
             // Place conduit
-            var placeSpanEquipmentCommand = new PlaceSpanEquipmentInRouteNetwork(Guid.NewGuid(), specificationId, registerWalkOfInterestCommandResult.Value)
+            var placeSpanEquipmentCommand = new PlaceSpanEquipmentInRouteNetwork(correlationId, new UserContext("conversion", _bentleyMultiConduitConversion), Guid.NewGuid(), specificationId, registerWalkOfInterestCommandResult.Value)
             {
-                CorrelationId = correlationId,
-                UserContext = new UserContext("conversion", _bentleyMultiConduitConversion),
                 MarkingInfo = markingColor != null ? new MarkingInfo() { MarkingColor = markingColor } : null,
                 NamingInfo = namingInfo
             };
@@ -165,14 +154,10 @@ namespace OpenFTTH.APIGateway.TestData
             // Place additional structures
             if (additionalStructureSpecIds.Count > 0)
             {
-                var addStructure = new PlaceAdditionalStructuresInSpanEquipment(
+                var addStructure = new PlaceAdditionalStructuresInSpanEquipment(correlationId, new UserContext("conversion", _bentleyMultiConduitConversion),
                  spanEquipmentId: placeSpanEquipmentCommand.SpanEquipmentId,
                  structureSpecificationIds: additionalStructureSpecIds.ToArray()
-                )
-                {
-                    CorrelationId = correlationId,
-                    UserContext = new UserContext("conversion", _bentleyMultiConduitConversion),
-                };
+                );
 
                 var addStructureResult = _commandDispatcher.HandleAsync<PlaceAdditionalStructuresInSpanEquipment, Result>(addStructure).Result;
 

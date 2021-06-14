@@ -777,11 +777,7 @@ namespace OpenFTTH.TestData
 
         private void AddSpecification(SpanEquipmentSpecification spec)
         {
-            var cmd = new AddSpanEquipmentSpecification(spec)
-            {
-                CorrelationId = Guid.NewGuid(),
-                UserContext = new UserContext("specification seeder", _specSeederId)
-            };
+            var cmd = new AddSpanEquipmentSpecification(Guid.NewGuid(), new UserContext("specification seeder", _specSeederId), spec);
 
             var cmdResult = _commandDispatcher.HandleAsync<AddSpanEquipmentSpecification, Result>(cmd).Result;
 
@@ -791,11 +787,7 @@ namespace OpenFTTH.TestData
 
         private void AddSpecification(SpanStructureSpecification spec)
         {
-            var cmd = new AddSpanStructureSpecification(spec)
-            {
-                CorrelationId = Guid.NewGuid(),
-                UserContext = new UserContext("specification seeder", _specSeederId)
-            };
+            var cmd = new AddSpanStructureSpecification(Guid.NewGuid(), new UserContext("specification seeder", _specSeederId), spec);
 
             var cmdResult = _commandDispatcher.HandleAsync<AddSpanStructureSpecification, Result>(cmd).Result;
 
@@ -806,11 +798,7 @@ namespace OpenFTTH.TestData
 
         private void AddSpecification(NodeContainerSpecification spec)
         {
-            var cmd = new AddNodeContainerSpecification(spec)
-            {
-                CorrelationId = Guid.NewGuid(),
-                UserContext = new UserContext("specification seeder", _specSeederId)
-            };
+            var cmd = new AddNodeContainerSpecification(Guid.NewGuid(), new UserContext("specification seeder",_specSeederId), spec);
 
             var cmdResult = _commandDispatcher.HandleAsync<AddNodeContainerSpecification, Result>(cmd).Result;
 
@@ -820,11 +808,7 @@ namespace OpenFTTH.TestData
 
         private void AddManufacturer(Manufacturer manufacturer)
         {
-            var cmd = new AddManufacturer(manufacturer)
-            {
-                CorrelationId = Guid.NewGuid(),
-                UserContext = new UserContext("specification seeder", _specSeederId)
-            };
+            var cmd = new AddManufacturer(Guid.NewGuid(), new UserContext("specification seeder", _specSeederId), manufacturer);
 
             var cmdResult = _commandDispatcher.HandleAsync<AddManufacturer, Result>(cmd).Result;
 

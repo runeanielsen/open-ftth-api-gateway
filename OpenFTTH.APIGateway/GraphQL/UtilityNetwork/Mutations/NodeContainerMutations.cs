@@ -30,6 +30,11 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
               ),
               resolve: context =>
               {
+                  var routeNodeId = context.GetArgument<Guid>("routeNodeId");
+                  var nodeContainerId = context.GetArgument<Guid>("nodeContainerId");
+                  var nodeContainerSpecificationId = context.GetArgument<Guid>("nodeContainerSpecificationId");
+                  var manufacturerId = context.GetArgument<Guid>("manufacturerId");
+
                   var userContext = context.UserContext as GraphQLUserContext;
                   var userName = userContext.Username;
 
@@ -38,19 +43,16 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                   // TODO: Get from work manager
                   var workTaskId = Guid.Parse("54800ae5-13a5-4b03-8626-a63b66a25568");
 
-                  var routeNodeId = context.GetArgument<Guid>("routeNodeId");
-                  var nodeContainerId = context.GetArgument<Guid>("nodeContainerId");
-                  var nodeContainerSpecificationId = context.GetArgument<Guid>("nodeContainerSpecificationId");
-                  var manufacturerId = context.GetArgument<Guid>("manufacturerId");
+                  var commandUserContext = new UserContext(userName, workTaskId)
+                  {
+                      EditingRouteNodeId = routeNodeId
+                  };
+
 
                   // First register the walk in the route network where the client want to place the node container
                   var nodeOfInterestId = Guid.NewGuid();
                   var walk = new RouteNetworkElementIdList();
-                  var registerNodeOfInterestCommand = new RegisterNodeOfInterest(nodeOfInterestId, routeNodeId)
-                  {
-                      CorrelationId = correlationId,
-                      UserContext = new UserContext(userName, workTaskId)
-                  };
+                  var registerNodeOfInterestCommand = new RegisterNodeOfInterest(correlationId, commandUserContext, nodeOfInterestId, routeNodeId);
 
                   var registerNodeOfInterestCommandResult = commandDispatcher.HandleAsync<RegisterNodeOfInterest, Result<RouteNetworkInterest>>(registerNodeOfInterestCommand).Result;
 
@@ -60,10 +62,8 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                   }
 
                   // Now place the conduit in the walk
-                  var placeNodeContainerCommand = new PlaceNodeContainerInRouteNetwork(nodeContainerId, nodeContainerSpecificationId, registerNodeOfInterestCommandResult.Value)
+                  var placeNodeContainerCommand = new PlaceNodeContainerInRouteNetwork(correlationId, commandUserContext, nodeContainerId, nodeContainerSpecificationId, registerNodeOfInterestCommandResult.Value)
                   {
-                      CorrelationId = correlationId,
-                      UserContext = new UserContext(userName, workTaskId),
                       ManufacturerId = manufacturerId,
                       LifecycleInfo = new LifecycleInfo(DeploymentStateEnum.InService, null, null)
                   };
@@ -73,7 +73,7 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                   // Unregister interest if place node container failed
                   if (placeNodeContainerResult.IsFailed)
                   {
-                      var unregisterCommandResult = commandDispatcher.HandleAsync<UnregisterInterest, Result>(new UnregisterInterest(nodeOfInterestId)).Result;
+                      var unregisterCommandResult = commandDispatcher.HandleAsync<UnregisterInterest, Result>(new UnregisterInterest(correlationId, commandUserContext, nodeOfInterestId)).Result;
 
                       if (unregisterCommandResult.IsFailed)
                           return new CommandResult(unregisterCommandResult);
@@ -99,14 +99,11 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                      // TODO: Get from work manager
                      var workTaskId = Guid.Parse("54800ae5-13a5-4b03-8626-a63b66a25568");
 
+                     var commandUserContext = new UserContext(userName, workTaskId);
 
                      var nodeContainerId = context.GetArgument<Guid>("nodeContainerId");
 
-                     var reverseAlignmentCmd = new ReverseNodeContainerVerticalContentAlignment(nodeContainerId)
-                     {
-                         CorrelationId = correlationId,
-                         UserContext = new UserContext(userName, workTaskId)
-                     };
+                     var reverseAlignmentCmd = new ReverseNodeContainerVerticalContentAlignment(correlationId, commandUserContext, nodeContainerId);
 
                      var reverseAlignmentCmdResult = commandDispatcher.HandleAsync<ReverseNodeContainerVerticalContentAlignment, Result>(reverseAlignmentCmd).Result;
 
