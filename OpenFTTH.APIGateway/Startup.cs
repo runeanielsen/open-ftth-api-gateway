@@ -25,6 +25,7 @@ using OpenFTTH.APIGateway.GraphQL.Root;
 using OpenFTTH.APIGateway.GraphQL.RouteNetwork;
 using OpenFTTH.APIGateway.GraphQL.Schematic;
 using OpenFTTH.APIGateway.GraphQL.Schematic.Subscriptions;
+using OpenFTTH.APIGateway.GraphQL.Search;
 using OpenFTTH.APIGateway.GraphQL.UtilityNetwork;
 using OpenFTTH.APIGateway.GraphQL.Work;
 using OpenFTTH.APIGateway.Logging;
@@ -42,7 +43,10 @@ using Serilog;
 using Serilog.Events;
 using Serilog.Formatting.Compact;
 using System;
+using System.Collections.Generic;
 using System.Reflection;
+using Typesense;
+using Typesense.Setup;
 
 namespace OpenFTTH.APIGateway
 {
@@ -201,6 +205,9 @@ namespace OpenFTTH.APIGateway
             // Route Network stuff
             RegisterRouteNetworkServiceTypes.Register(services);
 
+            // Search stuff
+            RegisterSearchServiceTypes.Register(services);
+
             services.AddSingleton<RouteNetworkEventHandler, RouteNetworkEventHandler>();
             services.AddSingleton<IRouteNetworkState, InMemRouteNetworkState>();
             services.AddSingleton<IRouteNetworkRepository, InMemRouteNetworkRepository>();
@@ -212,6 +219,21 @@ namespace OpenFTTH.APIGateway
             services.AddHostedService<UtilityNetworkUpdatedEventConsumer>();
             services.AddSingleton<IToposTypedEventObservable<RouteNetworkElementContainedEquipmentUpdated>, ToposTypedEventObservable<RouteNetworkElementContainedEquipmentUpdated>>();
             services.AddSingleton<SchematicDiagramObserver>();
+
+            // Typesense
+            services.AddTypesenseClient(config =>
+            {
+                 config.ApiKey = "bla";
+                 config.Nodes = new List<Node>
+                   {
+                        new Node
+                        {
+                            Host = "bla",
+                            Port = "bla",
+                            Protocol = "http"
+                        }
+                    };
+             });
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
