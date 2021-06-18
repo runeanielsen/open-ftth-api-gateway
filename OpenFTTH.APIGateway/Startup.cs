@@ -132,6 +132,9 @@ namespace OpenFTTH.APIGateway
             services.Configure<GeoDatabaseSetting>(databaseSettings =>
                             Configuration.GetSection("GeoDatabase").Bind(databaseSettings));
 
+            services.Configure<TypesenseSetting>(typesenseSettings =>
+                     Configuration.GetSection("Typesense").Bind(typesenseSettings));
+
             services.Configure<AuthSetting>(authSettings =>
                             Configuration.GetSection("Auth").Bind(authSettings));
 
@@ -223,13 +226,15 @@ namespace OpenFTTH.APIGateway
             // Typesense
             services.AddTypesenseClient(config =>
             {
-                 config.ApiKey = "bla";
-                 config.Nodes = new List<Node>
+                var typesenseSetting = Configuration.GetSection("Typesense").Get<TypesenseSetting>();
+
+                config.ApiKey = typesenseSetting.ApiKey;
+                config.Nodes = new List<Node>
                    {
                         new Node
                         {
-                            Host = "bla",
-                            Port = "bla",
+                            Host = typesenseSetting.Host,
+                            Port = typesenseSetting.Port,
                             Protocol = "http"
                         }
                     };

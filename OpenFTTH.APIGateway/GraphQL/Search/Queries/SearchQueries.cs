@@ -24,15 +24,17 @@ namespace OpenFTTH.APIGateway.GraphQL.Search.Queries
                 name: "globalSearch",
                 description: "Search for route network node, adresses etc.",
                 arguments: new QueryArguments(
-                    new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "searchString" }
+                    new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "searchString" },
+                    new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "pageSize" }
                 ),
                 resolve: context =>
                 {
                     var searchString = context.GetArgument<string>("searchString");
+                    var pageSize = context.GetArgument<int>("pageSize");
 
                     var searchClient = new GlobalSearchClient(typesenseClient);
 
-                    return searchClient.Search(searchString, 20);
+                    return searchClient.Search(searchString, pageSize);
                 }
             );
         }

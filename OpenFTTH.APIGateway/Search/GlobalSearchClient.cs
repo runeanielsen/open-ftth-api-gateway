@@ -28,11 +28,10 @@ namespace OpenFTTH.APIGateway.Search
             var query = new SearchParameters
             {
                 Text = searchString,
-                QueryBy = "roadName,houseNumber,postDistrictCode,postDistrictName,townName",
-                Page = "0",
+                QueryBy = "roadNameHouseNumber,postDistrictCode,postDistrictName,townName",
                 PerPage = maxHits.ToString(),
                 LimitHits = maxHits.ToString(),
-                QueryByWeights = "5,4,3,3,2"
+                QueryByWeights = "5,3,3,2"
             };
 
             var searchResult = await _typesenseClient.Search<OfficialAccessAddress>("Addresses", query);
@@ -56,7 +55,7 @@ namespace OpenFTTH.APIGateway.Search
 
         private static string GetAddressLabel(OfficialAccessAddress address)
         {
-            string result = address.RoadName + ' ' + address.HouseNumber + ", ";
+            string result = address.RoadNameHouseNumber + ", ";
 
             if (address.TownName != null)
                 result += address.TownName + ", ";
@@ -71,12 +70,11 @@ namespace OpenFTTH.APIGateway.Search
     {
         public Guid Id { get; init; }
         public string Status { get; init; }
-        public string HouseNumber { get; init; }
+        public string RoadNameHouseNumber { get; init; }
         public string PostDistrictCode { get; init; }
         public string PostDistrictName { get; init; }
         public string EastCoordinate { get; init; }
         public string NorthCoordinate { get; init; }
         public string TownName { get; init; }
-        public string RoadName { get; init; }
     }
 }
