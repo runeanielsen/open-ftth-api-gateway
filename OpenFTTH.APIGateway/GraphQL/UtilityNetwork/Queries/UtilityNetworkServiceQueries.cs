@@ -150,6 +150,45 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Queries
                    return spanEquipment;
                }
            );
+
+
+
+            Field<NodeContainerType>(
+              name: "nodeContainer",
+              description: "Query information related to a specific node container",
+              arguments: new QueryArguments(
+                new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "nodeContainerId" }
+              ),
+              resolve: context =>
+              {
+                  var nodeContainerId = context.GetArgument<Guid>("nodeContainerId");
+
+                   // Get equipment information
+                   var equipmentQueryResult = queryDispatcher.HandleAsync<GetEquipmentDetails, FluentResults.Result<GetEquipmentDetailsResult>>(
+                      new GetEquipmentDetails(new InterestIdList() { nodeContainerId })
+                  ).Result;
+
+                  if (equipmentQueryResult.IsFailed)
+                  {
+                      foreach (var error in equipmentQueryResult.Errors)
+                          context.Errors.Add(new ExecutionError(error.Message));
+
+                      return null;
+                  }
+
+                  if (equipmentQueryResult.Value.NodeContainers == null || equipmentQueryResult.Value.NodeContainers.Count == 0)
+                  {
+                      context.Errors.Add(new ExecutionError($"Cannot find any node container with id: {nodeContainerId}"));
+
+                      return null;
+                  }
+
+
+                  var nodeContainer = equipmentQueryResult.Value.NodeContainers.First();
+
+                  return nodeContainer;
+              }
+          );
         }
 
         
