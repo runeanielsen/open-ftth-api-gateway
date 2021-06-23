@@ -1,4 +1,5 @@
 using DAX.EventProcessing.Dispatcher;
+using FluentResults;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -9,6 +10,11 @@ using OpenFTTH.Events.RouteNetwork;
 using OpenFTTH.EventSourcing;
 using OpenFTTH.RouteNetwork.Business.RouteElements.EventHandling;
 using OpenFTTH.RouteNetwork.Business.RouteElements.StateHandling;
+using OpenFTTH.TestData;
+using OpenFTTH.Util;
+using OpenFTTH.UtilityGraphService.API.Model.UtilityNetwork;
+using OpenFTTH.UtilityGraphService.API.Queries;
+using OpenFTTH.UtilityGraphService.Business.SpanEquipments;
 using System;
 using System.IO;
 using System.Threading;
@@ -106,6 +112,17 @@ namespace OpenFTTH.APIGateway.Workers
                 _logger.LogInformation("Start dehydrate in-memory projections...");
                 _eventStore.DehydrateProjections();
                 _logger.LogInformation("Finish dehydrating in-memory projections.");
+
+
+                // Check if database contain any manufacturer. If not the database must be blank, and we seed it with som test specifications
+                var manufacturerQueryResult = _queryDispatcher.HandleAsync<GetManufacturer, Result<LookupCollection<Manufacturer>>>(new GetManufacturer()).Result;
+
+                if (manufacturerQueryResult.IsSuccess && manufacturerQueryResult.Value.Count == 0)
+                {
+                    _logger.LogInformation("Start seeding database with test specifications...");
+                    var result = new TestSpecifications(_commandDispatcher, _queryDispatcher).Run();
+                    _logger.LogInformation("Finish seeding database with test specifications.");
+                }
 
                 // We are now ready to serve the public if the loaded objects are bigger than 0
                 if (inMemRouteNetworkState.NumberOfObjectsLoaded > 0)
