@@ -110,6 +110,40 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                      return new CommandResult(reverseAlignmentCmdResult);
                  }
            );
+
+           Field<CommandResultType>(
+                "updateProperties",
+                description: "Mutation that can be used to change the node container specification and/or manufacturer",
+                arguments: new QueryArguments(
+                    new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "nodeContainerId" },
+                    new QueryArgument<IdGraphType> { Name = "specificationId" },
+                    new QueryArgument<IdGraphType> { Name = "manufacturerId" }
+                ),
+                resolve: context =>
+                {
+                    var nodeContainerId = context.GetArgument<Guid>("nodeContainerId");
+
+                    var correlationId = Guid.NewGuid();
+
+                    var userContext = context.UserContext as GraphQLUserContext;
+                    var userName = userContext.Username;
+
+                    // TODO: Get from work manager
+                    var workTaskId = Guid.Parse("54800ae5-13a5-4b03-8626-a63b66a25568");
+
+                    var commandUserContext = new UserContext(userName, workTaskId);
+
+                    var updateCmd = new UpdateNodeContainerProperties(correlationId, commandUserContext, nodeContainerId)
+                    {
+                        SpecificationId = context.HasArgument("specificationId") ? context.GetArgument<Guid>("specificationId") : null,
+                        ManufacturerId = context.HasArgument("manufacturerId") ? context.GetArgument<Guid>("manufacturerId") : null,
+                    };
+
+                    var updateResult = commandDispatcher.HandleAsync<UpdateNodeContainerProperties, Result>(updateCmd).Result;
+
+                    return new CommandResult(updateResult);
+                }
+            );
         }
     }
 }
