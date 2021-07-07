@@ -83,7 +83,7 @@ namespace OpenFTTH.APIGateway.Conversion
             using var dbConn = GetConnection();
 
             using var dbCmd = dbConn.CreateCommand();
-            dbCmd.CommandText = "SELECT * FROM " + tableName + " limit 100";
+            dbCmd.CommandText = "SELECT * FROM " + tableName;
 
             using var dbReader = dbCmd.ExecuteReader();
 
