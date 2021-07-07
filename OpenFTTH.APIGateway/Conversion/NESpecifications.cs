@@ -81,9 +81,9 @@ namespace OpenFTTH.APIGateway.Conversion
         {
             lock (_myLock)
             {
-                var spanStructureSpecifications = _queryDispatcher.HandleAsync<GetSpanStructureSpecifications, Result<LookupCollection<SpanStructureSpecification>>>(new GetSpanStructureSpecifications()).Result;
+                var spanEquipmentSpecifications = _queryDispatcher.HandleAsync<GetSpanEquipmentSpecifications, Result<LookupCollection<SpanEquipmentSpecification>>>(new GetSpanEquipmentSpecifications()).Result;
 
-                if (spanStructureSpecifications.Value.ContainsKey(CustomerConduit_Ø7_Orange))
+                if (spanEquipmentSpecifications.Value.ContainsKey(CustomerConduit_Ø7_Orange))
                     return FluentResults.Result.Fail("Additional specification already present in system");
             
                 AddNodeContainerSpecifications();
