@@ -107,10 +107,10 @@ namespace OpenFTTH.APIGateway.Conversion
         {
             using var conn = GetConnection();
 
-            var logCmd = conn.CreateCommand();
+            using var logCmd = conn.CreateCommand();
 
-            var trans = conn.BeginTransaction();
-            logCmd.Transaction = trans;
+            //var trans = conn.BeginTransaction();
+            //logCmd.Transaction = trans;
 
             foreach (var conduit in conduits)
             {
@@ -129,7 +129,7 @@ namespace OpenFTTH.APIGateway.Conversion
                 }
             }
 
-            trans.Commit();
+            //trans.Commit();
         }
 
         private Result PlaceConduit(string externalId, Guid specificationId, List<Guid> segmentIds, List<Guid> additionalStructureSpecIds, string markingColor)
