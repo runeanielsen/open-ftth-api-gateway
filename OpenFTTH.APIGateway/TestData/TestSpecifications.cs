@@ -61,6 +61,9 @@ namespace OpenFTTH.TestData
         public static Guid Ø7_Turquoise = Guid.Parse("72d88e01-178a-4656-9fe5-8819544c94c9");
         public static Guid Ø7_Violet = Guid.Parse("3672dd91-886a-444e-93a2-afc0d44d6541");
 
+        public static Guid Ø7_3_5_Orange = Guid.Parse("00b2786c-e6b9-4f88-b4ea-584337a4d38a");
+        
+
         public static Guid Ø10_Blue = Guid.Parse("980a2a21-cf40-4b70-91ae-69af79be9e80");
         public static Guid Ø10_Yellow = Guid.Parse("779a8d88-1c52-4fca-b2d5-0aabfa652393");
         public static Guid Ø10_White = Guid.Parse("ec75555f-33ea-432f-9235-d1f111cebd68");
@@ -133,6 +136,11 @@ namespace OpenFTTH.TestData
 
         public static Guid SingleConduit_Ø12_Red = Guid.Parse("0b6be410-a6e3-4696-9964-3aff3e827dc8");
         public static Guid SingleConduit_Ø12_Orange = Guid.Parse("12c5e369-9fcc-49c7-81f5-208769501b7d");
+
+        // Span equipments
+        public static Guid CustomerConduit_Ø7_Orange = Guid.Parse("671529f8-65f7-4670-9b02-8bae53747f1c");
+        public static Guid CustomerConduit_Ø12_Orange = Guid.Parse("ddd86873-9d6c-4741-a406-084c628314db");
+
 
 
         public FluentResults.Result<TestSpecifications> Run()
@@ -511,7 +519,8 @@ namespace OpenFTTH.TestData
                 IsMultiLevel = true
             });
 
-            // Ø7 Enkelt rør
+
+            // Ø7/5 Enkelt rør
             AddSpecification(new SpanEquipmentSpecification(SingleConduit_Ø7_Blue, "SingleConduit", "Ø7", new SpanStructureTemplate(Ø7_Blue, 1, 1, Array.Empty<SpanStructureTemplate>()))
             {
                 Description = "ø7/5 blå",
@@ -725,6 +734,23 @@ namespace OpenFTTH.TestData
             });
 
 
+            // Ø7 customer conduit
+            AddSpecification(new SpanEquipmentSpecification(CustomerConduit_Ø7_Orange, "CustomerConduit", "Ø7", new SpanStructureTemplate(Ø7_3_5_Orange, 1, 1, Array.Empty<SpanStructureTemplate>()))
+            {
+                Description = "ø7/3,5 orange",
+                ManufacturerRefs = new Guid[] { Manu_GMPlast, Manu_Emtelle },
+                IsFixed = true,
+                IsMultiLevel = false
+            });
+
+            // Ø12 customer conduit
+            AddSpecification(new SpanEquipmentSpecification(CustomerConduit_Ø12_Orange, "CustomerConduit", "Ø12", new SpanStructureTemplate(Ø12_Orange, 1, 1, Array.Empty<SpanStructureTemplate>()))
+            {
+                Description = "ø12/8 orange",
+                ManufacturerRefs = new Guid[] { Manu_GMPlast, Manu_Emtelle },
+                IsFixed = true,
+                IsMultiLevel = false
+            });
         }
 
         private void AddSpanStructureSpecifications()
@@ -741,6 +767,8 @@ namespace OpenFTTH.TestData
             AddSpecification(new SpanStructureSpecification(Ø7_Brown, "Conduit", "Ø7/5", "Brown") { OuterDiameter = 7, InnerDiameter = 5 });
             AddSpecification(new SpanStructureSpecification(Ø7_Turquoise, "Conduit", "Ø7/5", "Turquoise") { OuterDiameter = 7, InnerDiameter = 5 });
             AddSpecification(new SpanStructureSpecification(Ø7_Violet, "Conduit", "Ø7/5", "Violet") { OuterDiameter = 7, InnerDiameter = 5 });
+
+            AddSpecification(new SpanStructureSpecification(Ø7_3_5_Orange, "Conduit", "Ø7/3.5", "Orange") { OuterDiameter = 7, InnerDiameter = 4 });
 
 
             AddSpecification(new SpanStructureSpecification(Ø10_Blue, "Conduit", "Ø10/8", "Blue") { OuterDiameter = 10, InnerDiameter = 8 });

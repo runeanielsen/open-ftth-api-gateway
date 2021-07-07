@@ -3,6 +3,7 @@ using FluentResults;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using OpenFTTH.APIGateway.Conversion;
 using OpenFTTH.APIGateway.Settings;
 using OpenFTTH.APIGateway.TestData;
 using OpenFTTH.CQRS;
@@ -16,6 +17,7 @@ using OpenFTTH.UtilityGraphService.API.Model.UtilityNetwork;
 using OpenFTTH.UtilityGraphService.API.Queries;
 using OpenFTTH.UtilityGraphService.Business.SpanEquipments;
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -32,20 +34,23 @@ namespace OpenFTTH.APIGateway.Workers
         private readonly RouteNetworkEventHandler _routeNetworkEventHandler;
         private readonly IRouteNetworkState _routeNetworkState;
         private readonly KafkaSetting _kafkaSetting;
-        private readonly EventStoreDatabaseSetting _databaseSetting;
+        private readonly EventStoreDatabaseSetting _eventStoreDatabaseSetting;
+        private readonly GeoDatabaseSetting _geoDatabaseSetting;
         private readonly ICommandDispatcher _commandDispatcher;
         private readonly IQueryDispatcher _queryDispatcher;
-        private readonly ILogger<ConduitSeeder> _conduitSeederLogger;
+        private readonly ILogger<NEConduitImporter> _conduitSeederLogger;
 
         private InMemPositionsStorage _positionsStorage = new InMemPositionsStorage();
         private IDisposable _kafkaConsumer;
 
-        public RouteNetworkEventConsumer(ILogger<RouteNetworkEventConsumer> logger, IEventStore eventStore, IOptions<KafkaSetting> kafkaSetting, IOptions<EventStoreDatabaseSetting> databaseSetting, IToposTypedEventObservable<RouteNetworkEditOperationOccuredEvent> eventDispatcher, RouteNetworkEventHandler routeNetworkEventHandler, IRouteNetworkState routeNetworkState, ICommandDispatcher commandDispatcher, IQueryDispatcher queryDispatcher, ILogger<ConduitSeeder> conduitSeederLogger)
+        public RouteNetworkEventConsumer(ILogger<RouteNetworkEventConsumer> logger, IEventStore eventStore, IOptions<KafkaSetting> kafkaSetting, IOptions<EventStoreDatabaseSetting> eventStoreDatabaseSetting, IOptions<GeoDatabaseSetting> geoDatabaseSetting, IToposTypedEventObservable<RouteNetworkEditOperationOccuredEvent> eventDispatcher, RouteNetworkEventHandler routeNetworkEventHandler, IRouteNetworkState routeNetworkState, ICommandDispatcher commandDispatcher, IQueryDispatcher queryDispatcher, ILogger<NEConduitImporter> conduitSeederLogger)
         {
             _logger = logger;
             _eventStore = eventStore;
             _kafkaSetting = kafkaSetting.Value;
-            _databaseSetting = databaseSetting.Value;
+            _eventStoreDatabaseSetting = eventStoreDatabaseSetting.Value;
+            _geoDatabaseSetting = geoDatabaseSetting.Value;
+
             _commandDispatcher = commandDispatcher;
             _queryDispatcher = queryDispatcher;
             _conduitSeederLogger = conduitSeederLogger;
@@ -87,6 +92,7 @@ namespace OpenFTTH.APIGateway.Workers
                 _logger.LogInformation("Starting route network events load mode...");
 
                 bool loadFinish = false;
+
                 while (!stoppingToken.IsCancellationRequested && !loadFinish)
                 {
                     _logger.LogDebug("Waiting for load mode to finish creating initial state...");
@@ -110,9 +116,10 @@ namespace OpenFTTH.APIGateway.Workers
 
                 // Dehydrate projections
                 _logger.LogInformation("Start dehydrate in-memory projections...");
+                LogMenUsage();
                 _eventStore.DehydrateProjections();
                 _logger.LogInformation("Finish dehydrating in-memory projections.");
-
+                LogMenUsage();
 
                 // Check if database contain any manufacturer. If not the database must be blank, and we seed it with som test specifications
                 var manufacturerQueryResult = _queryDispatcher.HandleAsync<GetManufacturer, Result<LookupCollection<Manufacturer>>>(new GetManufacturer()).Result;
@@ -123,6 +130,9 @@ namespace OpenFTTH.APIGateway.Workers
                     var result = new TestSpecifications(_commandDispatcher, _queryDispatcher).Run();
                     _logger.LogInformation("Finish seeding database with test specifications.");
                 }
+
+                // Conversion
+                new NEConduitImporter(_conduitSeederLogger, _eventStore, _geoDatabaseSetting, _commandDispatcher, _queryDispatcher).Run();
 
                 // We are now ready to serve the public if the loaded objects are bigger than 0
                 if (inMemRouteNetworkState.NumberOfObjectsLoaded > 0)
@@ -148,6 +158,15 @@ namespace OpenFTTH.APIGateway.Workers
             _kafkaConsumer.Dispose();
 
             await Task.CompletedTask;
+        }
+
+        private double LogMenUsage()
+        {
+            var me = Process.GetCurrentProcess();
+
+            _logger.LogInformation($"Memory usage current process id: {me.Id} {me.WorkingSet64 / 1024.0 / 1024.0 / 1024.0} GB");
+
+            return me.WorkingSet64;
         }
 
     }
