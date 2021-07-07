@@ -83,7 +83,7 @@ namespace OpenFTTH.APIGateway.Conversion
             using var dbConn = GetConnection();
 
             using var dbCmd = dbConn.CreateCommand();
-            dbCmd.CommandText = "SELECT * FROM " + tableName;
+            dbCmd.CommandText = "SELECT * FROM " + tableName + " WHERE status is null";
 
             using var dbReader = dbCmd.ExecuteReader();
 
@@ -121,6 +121,10 @@ namespace OpenFTTH.APIGateway.Conversion
                     if (result.IsFailed)
                     {
                         LogStatus((NpgsqlCommand)logCmd, _tableName, result.Reasons.First().Message, conduit.ExternalId);
+                    }
+                    else
+                    {
+                        LogStatus((NpgsqlCommand)logCmd, _tableName, "OK", conduit.ExternalId);
                     }
                 }
             }
