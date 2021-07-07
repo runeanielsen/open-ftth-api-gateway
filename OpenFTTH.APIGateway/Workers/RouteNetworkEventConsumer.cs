@@ -130,10 +130,7 @@ namespace OpenFTTH.APIGateway.Workers
                     var result = new TestSpecifications(_commandDispatcher, _queryDispatcher).Run();
                     _logger.LogInformation("Finish seeding database with test specifications.");
                 }
-
-                // Conversion
-                new NEConduitImporter(_conduitSeederLogger, _eventStore, _geoDatabaseSetting, _commandDispatcher, _queryDispatcher).Run();
-
+         
                 // We are now ready to serve the public if the loaded objects are bigger than 0
                 if (inMemRouteNetworkState.NumberOfObjectsLoaded > 0)
                 {
@@ -142,6 +139,10 @@ namespace OpenFTTH.APIGateway.Workers
                 }
                 else
                     throw new ApplicationException("Recieved no route network elements from Kafka topic.");
+
+                // Start conversion
+                new NEConduitImporter(_conduitSeederLogger, _eventStore, _geoDatabaseSetting, _commandDispatcher, _queryDispatcher).Run();
+
 
             }
             catch (Exception ex)
