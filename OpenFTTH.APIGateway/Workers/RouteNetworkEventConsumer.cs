@@ -91,7 +91,7 @@ namespace OpenFTTH.APIGateway.Workers
                 // Wait for load mode to create an initial version/state
                 _logger.LogInformation("Starting route network events load mode...");
 
-                bool loadFinish = true;
+                bool loadFinish = false;
 
                 while (!stoppingToken.IsCancellationRequested && !loadFinish)
                 {
