@@ -10,7 +10,7 @@ using System.Threading;
 
 namespace OpenFTTH.APIGateway.Conversion
 {
-    public class NESpecifications
+    public class CreateSpecifications
     {
         private static Guid _specSeederId = Guid.Parse("2897abbb-f504-4957-ac6e-fe47f5294239");
         private static bool _specificationsCreated = false;
@@ -19,7 +19,7 @@ namespace OpenFTTH.APIGateway.Conversion
         private ICommandDispatcher _commandDispatcher;
         private IQueryDispatcher _queryDispatcher;
 
-        public NESpecifications(ICommandDispatcher commandDispatcher, IQueryDispatcher queryDispatcher)
+        public CreateSpecifications(ICommandDispatcher commandDispatcher, IQueryDispatcher queryDispatcher)
         {
             _commandDispatcher = commandDispatcher;
             _queryDispatcher = queryDispatcher;
@@ -77,7 +77,7 @@ namespace OpenFTTH.APIGateway.Conversion
       
 
 
-        public FluentResults.Result<NESpecifications> Run()
+        public FluentResults.Result<CreateSpecifications> Run()
         {
             lock (_myLock)
             {

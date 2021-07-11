@@ -28,6 +28,7 @@ namespace OpenFTTH.APIGateway.Workers
 {
     public class RouteNetworkEventConsumer : BackgroundService
     {
+        private readonly ILoggerFactory _loggerFactory;
         private readonly ILogger<RouteNetworkEventConsumer> _logger;
         private readonly IEventStore _eventStore;
         private readonly IToposTypedEventObservable<RouteNetworkEditOperationOccuredEvent> _eventDispatcher;
@@ -38,14 +39,14 @@ namespace OpenFTTH.APIGateway.Workers
         private readonly GeoDatabaseSetting _geoDatabaseSetting;
         private readonly ICommandDispatcher _commandDispatcher;
         private readonly IQueryDispatcher _queryDispatcher;
-        private readonly ILogger<NEConduitImporter> _conduitSeederLogger;
 
         private InMemPositionsStorage _positionsStorage = new InMemPositionsStorage();
         private IDisposable _kafkaConsumer;
 
-        public RouteNetworkEventConsumer(ILogger<RouteNetworkEventConsumer> logger, IEventStore eventStore, IOptions<KafkaSetting> kafkaSetting, IOptions<EventStoreDatabaseSetting> eventStoreDatabaseSetting, IOptions<GeoDatabaseSetting> geoDatabaseSetting, IToposTypedEventObservable<RouteNetworkEditOperationOccuredEvent> eventDispatcher, RouteNetworkEventHandler routeNetworkEventHandler, IRouteNetworkState routeNetworkState, ICommandDispatcher commandDispatcher, IQueryDispatcher queryDispatcher, ILogger<NEConduitImporter> conduitSeederLogger)
+        public RouteNetworkEventConsumer(ILoggerFactory loggerFactory, IEventStore eventStore, IOptions<KafkaSetting> kafkaSetting, IOptions<EventStoreDatabaseSetting> eventStoreDatabaseSetting, IOptions<GeoDatabaseSetting> geoDatabaseSetting, IToposTypedEventObservable<RouteNetworkEditOperationOccuredEvent> eventDispatcher, RouteNetworkEventHandler routeNetworkEventHandler, IRouteNetworkState routeNetworkState, ICommandDispatcher commandDispatcher, IQueryDispatcher queryDispatcher)
         {
-            _logger = logger;
+            _loggerFactory = loggerFactory;
+            _logger = _loggerFactory.CreateLogger<RouteNetworkEventConsumer>();
             _eventStore = eventStore;
             _kafkaSetting = kafkaSetting.Value;
             _eventStoreDatabaseSetting = eventStoreDatabaseSetting.Value;
@@ -53,7 +54,6 @@ namespace OpenFTTH.APIGateway.Workers
 
             _commandDispatcher = commandDispatcher;
             _queryDispatcher = queryDispatcher;
-            _conduitSeederLogger = conduitSeederLogger;
 
             _eventDispatcher = eventDispatcher;
             _routeNetworkEventHandler = routeNetworkEventHandler;
@@ -91,7 +91,7 @@ namespace OpenFTTH.APIGateway.Workers
                 // Wait for load mode to create an initial version/state
                 _logger.LogInformation("Starting route network events load mode...");
 
-                bool loadFinish = false;
+                bool loadFinish = true;
 
                 while (!stoppingToken.IsCancellationRequested && !loadFinish)
                 {
@@ -141,7 +141,7 @@ namespace OpenFTTH.APIGateway.Workers
                     throw new ApplicationException("Recieved no route network elements from Kafka topic.");
 
                 // Start conversion
-                new NEConduitImporter(_conduitSeederLogger, _eventStore, _geoDatabaseSetting, _commandDispatcher, _queryDispatcher).Run();
+                new ConversionRunner(_loggerFactory, _eventStore, _geoDatabaseSetting, _commandDispatcher, _queryDispatcher).Run();
 
 
             }

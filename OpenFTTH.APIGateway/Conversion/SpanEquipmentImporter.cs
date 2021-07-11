@@ -1,6 +1,5 @@
 ﻿using FluentResults;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Npgsql;
 using OpenFTTH.APIGateway.Settings;
 using OpenFTTH.CQRS;
@@ -11,89 +10,67 @@ using OpenFTTH.RouteNetwork.API.Model;
 using OpenFTTH.TestData;
 using OpenFTTH.UtilityGraphService.API.Commands;
 using OpenFTTH.UtilityGraphService.API.Model.UtilityNetwork;
-using OpenFTTH.UtilityGraphService.Business.Graph;
 using Serilog;
 using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Data.Common;
 using System.Linq;
 
 namespace OpenFTTH.APIGateway.Conversion
 {
-    public class NEConduitImporter
+    public class SpanEquipmentImporter : ImporterBase
     {
         private static Guid _neMultiConduitConversion = Guid.Parse("299c3e6f-c764-4566-81ab-3e9413aa4fca");
 
         private ICommandDispatcher _commandDispatcher;
         private IQueryDispatcher _queryDispatcher;
-        private ILogger<NEConduitImporter> _logger;
+        private ILogger<SpanEquipmentImporter> _logger;
         private IEventStore _eventStore;
-        private GeoDatabaseSetting _geoDatabaseSetting;
+     
 
         private string _tableName = "conversion.ne_multiconduit_conversion_result";
 
-        public NEConduitImporter(ILogger<NEConduitImporter> logger, IEventStore eventSTore, GeoDatabaseSetting geoDatabaseSettings, ICommandDispatcher commandDispatcher, IQueryDispatcher queryDispatcher)
+        public SpanEquipmentImporter(ILogger<SpanEquipmentImporter> logger, IEventStore eventSTore, GeoDatabaseSetting geoDatabaseSettings, ICommandDispatcher commandDispatcher, IQueryDispatcher queryDispatcher) : base(geoDatabaseSettings)
         {
             _logger = logger;
             _eventStore = eventSTore;
-            _geoDatabaseSetting = geoDatabaseSettings;
             _commandDispatcher = commandDispatcher;
             _queryDispatcher = queryDispatcher;
         }
 
         public void Run()
         {
-            if (_geoDatabaseSetting != null)
-            {
-                _logger.LogInformation("Checking conversion database...");
 
-                var specResult = new NESpecifications(_commandDispatcher, _queryDispatcher).Run();
+            _logger.LogInformation("Starting span equipment conversion...");
 
-                if (specResult.IsFailed)
-                {
-                    _logger.LogInformation("Database already contain converted data. Will therefore not seed conversion data.");
-                    return;
-                }
+            CreateTableLogColumn(_tableName);
 
-                _logger.LogInformation("Starting conversion...");
+            var conduits = LoadSpanEquipmentsFromConversionDatabase(_tableName);
 
 
-                CreateTableLogColumn(_tableName);
+            AddConduitsToNetwork(conduits);
 
-                var conduits = LoadConduitsFromConversionDatabase(_tableName);
-                
-
-                AddConduitsToNetwork(conduits);
-
-                _logger.LogInformation("Seeding of conduits finish!");
-            }
-            else
-            {
-                _logger.LogInformation("No conversion_database_connection_string env variable specified. Will not seed database with conversion data");
-            }
-
-            
+            _logger.LogInformation("Conversion of span equipment finish!");
         }
 
-        private List<ConduitForConversion> LoadConduitsFromConversionDatabase(string tableName)
+        private List<SpanEquipmentForConversion> LoadSpanEquipmentsFromConversionDatabase(string tableName)
         {
-            List<ConduitForConversion> conduitForConversions = new List<ConduitForConversion>();
+            List<SpanEquipmentForConversion> conduitForConversions = new List<SpanEquipmentForConversion>();
 
             using var dbConn = GetConnection();
 
             using var dbCmd = dbConn.CreateCommand();
-            dbCmd.CommandText = "SELECT * FROM " + tableName + " WHERE status is null";
+            dbCmd.CommandText = "SELECT * FROM " + tableName + " WHERE status is null ORDER BY external_id";
 
             using var dbReader = dbCmd.ExecuteReader();
 
             while (dbReader.Read())
             {
-                var external_id = dbReader.GetString(1).Trim();
-                var external_spec = dbReader.GetString(2).Trim().ToLower();
-                var segments_ids = dbReader.GetString(3);
+                var externalId = dbReader.GetString(1).Trim();
+                var externalSpec = dbReader.GetString(2).Trim().ToLower();
+                var spanSegmentId = Guid.Parse(dbReader.GetString(3));
+                var routeSegmentsIds = dbReader.GetString(4);
 
-                var conduit = new ConduitForConversion(external_id, external_spec, segments_ids);
+                var conduit = new SpanEquipmentForConversion(spanSegmentId, externalId, externalSpec, routeSegmentsIds);
 
                 conduitForConversions.Add(conduit);
             }
@@ -103,36 +80,31 @@ namespace OpenFTTH.APIGateway.Conversion
             return conduitForConversions;
         }
 
-        private void AddConduitsToNetwork(List<ConduitForConversion> conduits)
+        private void AddConduitsToNetwork(List<SpanEquipmentForConversion> spanEquipments)
         {
             using var conn = GetConnection();
 
             using var logCmd = conn.CreateCommand();
-
-            //var trans = conn.BeginTransaction();
-            //logCmd.Transaction = trans;
-
-            foreach (var conduit in conduits)
+        
+            foreach (var spanEquipment in spanEquipments)
             {
-                if (conduit.ConduitSpec != null)
+                if (spanEquipment.ConduitSpec != null)
                 {
-                    var result = PlaceConduit(conduit.ExternalId, conduit.ConduitSpec.SpecId, conduit.SegmentIds, conduit.ConduitSpec.AditionalSpecs, conduit.ConduitSpec.MarkingColor);
+                    var result = PlaceSpanEquipment(spanEquipment.Id, spanEquipment.ExternalId, spanEquipment.ConduitSpec.SpecId, spanEquipment.SegmentIds, spanEquipment.ConduitSpec.AditionalSpecs, spanEquipment.ConduitSpec.MarkingColor);
 
                     if (result.IsFailed)
                     {
-                        LogStatus((NpgsqlCommand)logCmd, _tableName, result.Reasons.First().Message, conduit.ExternalId);
+                        LogStatus((NpgsqlCommand)logCmd, _tableName, result.Reasons.First().Message, spanEquipment.ExternalId);
                     }
                     else
                     {
-                        LogStatus((NpgsqlCommand)logCmd, _tableName, "OK", conduit.ExternalId);
+                        LogStatus((NpgsqlCommand)logCmd, _tableName, "OK", spanEquipment.ExternalId);
                     }
                 }
             }
-
-            //trans.Commit();
         }
 
-        private Result PlaceConduit(string externalId, Guid specificationId, List<Guid> segmentIds, List<Guid> additionalStructureSpecIds, string markingColor)
+        private Result PlaceSpanEquipment(Guid spanEquipmentId, string externalId, Guid specificationId, List<Guid> segmentIds, List<Guid> additionalStructureSpecIds, string markingColor)
         {
             Guid correlationId = Guid.NewGuid();
 
@@ -158,7 +130,7 @@ namespace OpenFTTH.APIGateway.Conversion
             var namingInfo = new NamingInfo(conduitName, null);
 
             // Place conduit
-            var placeSpanEquipmentCommand = new PlaceSpanEquipmentInRouteNetwork(correlationId, new UserContext("conversion", _neMultiConduitConversion), Guid.NewGuid(), specificationId, registerWalkOfInterestCommandResult.Value)
+            var placeSpanEquipmentCommand = new PlaceSpanEquipmentInRouteNetwork(correlationId, new UserContext("conversion", _neMultiConduitConversion), spanEquipmentId, specificationId, registerWalkOfInterestCommandResult.Value)
             {
                 MarkingInfo = markingColor != null ? new MarkingInfo() { MarkingColor = markingColor } : null,
                 NamingInfo = namingInfo
@@ -192,60 +164,21 @@ namespace OpenFTTH.APIGateway.Conversion
             return Result.Ok();
         }
 
-
-        private void CreateTableLogColumn(string tableName)
+        private class SpanEquipmentForConversion
         {
-            var conn = GetConnection();
-
-            var logCmd = conn.CreateCommand();
-
-            // Add status column
-            try
-            {
-                logCmd.CommandText = "ALTER TABLE " + tableName + " ADD COLUMN IF NOT EXISTS status varchar";
-                logCmd.ExecuteNonQuery();
-            }
-            catch (Exception ex) { }
-
-            logCmd.Dispose();
-
-
-            var cmd = conn.CreateCommand();
-
-            // make sure it is null
-            cmd.CommandText = "update " + tableName + " set status = null";
-            cmd.ExecuteNonQuery();
-
-            cmd.Dispose();
-        }
-
-        private void LogStatus(NpgsqlCommand cmd, string tableName, string statusText, string externalId)
-        {
-            cmd.CommandText = @"UPDATE " + tableName + " set status = @statusText where external_id ='" + externalId + "'";
-            cmd.Parameters.AddWithValue("statusText", statusText);
-            cmd.ExecuteNonQuery();
-        }
-
-        private IDbConnection GetConnection()
-        {
-            var conn = new NpgsqlConnection(_geoDatabaseSetting.PostgresConnectionString);
-            conn.Open();
-            return conn;
-        }
-
-        private class ConduitForConversion
-        {
+            public Guid Id { get; set; }
             public string ExternalId { get; set; }
             public string ExternalSpec { get; set; }
 
             public List<Guid> SegmentIds = new List<Guid>();
             
-            public ConduitSpecInfo ConduitSpec { get; set;}
+            public SpanEquipmentSpecInfo ConduitSpec { get; set;}
 
             public bool MissingSegments = false;
 
-            public ConduitForConversion(string externalId, string externalSpec, string segmentIds)
+            public SpanEquipmentForConversion(Guid id, string externalId, string externalSpec, string segmentIds)
             {
+                Id = id;
                 ExternalId = externalId;
                 ExternalSpec = externalSpec;
 
@@ -266,80 +199,80 @@ namespace OpenFTTH.APIGateway.Conversion
                 ConduitSpec = MapToSpanEquipmentSpecification(externalSpec);
             }
 
-            private ConduitSpecInfo MapToSpanEquipmentSpecification(string externalSpec)
+            private SpanEquipmentSpecInfo MapToSpanEquipmentSpecification(string externalSpec)
             {
                 // Ø 12
                 if (externalSpec.StartsWith("12mm"))
-                    return new ConduitSpecInfo(TestSpecifications.CustomerConduit_Ø12_Orange, GetMarkingText(externalSpec));
+                    return new SpanEquipmentSpecInfo(TestSpecifications.CustomerConduit_Ø12_Orange, GetMarkingText(externalSpec));
 
                 if (externalSpec.StartsWith("ø12"))
-                    return new ConduitSpecInfo(TestSpecifications.CustomerConduit_Ø12_Orange, GetMarkingText(externalSpec));
+                    return new SpanEquipmentSpecInfo(TestSpecifications.CustomerConduit_Ø12_Orange, GetMarkingText(externalSpec));
 
                 // Ø 32
                 if (externalSpec.StartsWith("ø32"))
-                    return new ConduitSpecInfo(TestSpecifications.Multi_Ø32_3x10, GetMarkingText(externalSpec));
+                    return new SpanEquipmentSpecInfo(TestSpecifications.Multi_Ø32_3x10, GetMarkingText(externalSpec));
 
                 // Ø40 flexrør
                 if (externalSpec.StartsWith("flx"))
-                    return new ConduitSpecInfo(TestSpecifications.Flex_Ø40_Red, GetAdditionalStructures(externalSpec));
+                    return new SpanEquipmentSpecInfo(TestSpecifications.Flex_Ø40_Red, GetAdditionalStructures(externalSpec));
 
                 if (externalSpec.StartsWith("flexrør"))
-                    return new ConduitSpecInfo(TestSpecifications.Flex_Ø40_Red, GetAdditionalStructures(externalSpec));
+                    return new SpanEquipmentSpecInfo(TestSpecifications.Flex_Ø40_Red, GetAdditionalStructures(externalSpec));
 
                 if (externalSpec == "40-2x10-grøn-blå")
-                    return new ConduitSpecInfo(TestSpecifications.Flex_Ø40_Red, GetAdditionalStructures(externalSpec));
+                    return new SpanEquipmentSpecInfo(TestSpecifications.Flex_Ø40_Red, GetAdditionalStructures(externalSpec));
 
                 if (externalSpec == "40-3x10")
-                    return new ConduitSpecInfo(TestSpecifications.Flex_Ø40_Red, GetMarkingText(externalSpec));
+                    return new SpanEquipmentSpecInfo(TestSpecifications.Flex_Ø40_Red, GetMarkingText(externalSpec));
 
                 // Ø40 tomrør
                 if (externalSpec == "ø40 tomrør")
-                    return new ConduitSpecInfo(TestSpecifications.Tomrør_Ø40_Orange, GetMarkingText(externalSpec));
+                    return new SpanEquipmentSpecInfo(TestSpecifications.Tomrør_Ø40_Orange, GetMarkingText(externalSpec));
 
                 if (externalSpec == "ø40 dantex")
-                    return new ConduitSpecInfo(TestSpecifications.Tomrør_Ø40_Orange, GetMarkingText(externalSpec));
+                    return new SpanEquipmentSpecInfo(TestSpecifications.Tomrør_Ø40_Orange, GetMarkingText(externalSpec));
 
                 if (externalSpec == "ø40 4x10")
-                    return new ConduitSpecInfo(TestSpecifications.Tomrør_Ø40_Orange, GetMarkingText(externalSpec));
+                    return new SpanEquipmentSpecInfo(TestSpecifications.Tomrør_Ø40_Orange, GetMarkingText(externalSpec));
 
                 // Ø40 multi
                 if (externalSpec == "ø40 5x10" || externalSpec == "ø40 5x10 dantex")
-                    return new ConduitSpecInfo(TestSpecifications.Multi_Ø40_5x10, GetMarkingText(externalSpec));
+                    return new SpanEquipmentSpecInfo(TestSpecifications.Multi_Ø40_5x10, GetMarkingText(externalSpec));
 
                 if (externalSpec == "ø40 5x10 rød")
-                    return new ConduitSpecInfo(TestSpecifications.Multi_Ø40_5x10_Red, GetMarkingText(externalSpec));
+                    return new SpanEquipmentSpecInfo(TestSpecifications.Multi_Ø40_5x10_Red, GetMarkingText(externalSpec));
 
                 if (externalSpec.StartsWith("ø40+6x10"))
-                    return new ConduitSpecInfo(TestSpecifications.Multi_Ø40_6x10, GetMarkingText(externalSpec));
+                    return new SpanEquipmentSpecInfo(TestSpecifications.Multi_Ø40_6x10, GetMarkingText(externalSpec));
 
                 if (externalSpec.StartsWith("ø40 12x7"))
-                    return new ConduitSpecInfo(TestSpecifications.Multi_Ø40_12x7, GetMarkingText(externalSpec));
+                    return new SpanEquipmentSpecInfo(TestSpecifications.Multi_Ø40_12x7, GetMarkingText(externalSpec));
 
                 if (externalSpec.StartsWith("ø40+12x7"))
-                    return new ConduitSpecInfo(TestSpecifications.Multi_Ø40_12x7, GetMarkingText(externalSpec));
+                    return new SpanEquipmentSpecInfo(TestSpecifications.Multi_Ø40_12x7, GetMarkingText(externalSpec));
 
                 // Ø50 tomrør
                 if (externalSpec == "ø50 dantex")
-                    return new ConduitSpecInfo(TestSpecifications.Tomrør_Ø50_Orange);
+                    return new SpanEquipmentSpecInfo(TestSpecifications.Tomrør_Ø50_Orange);
 
                 // Ø50
                 if (externalSpec ==  "ø50 5x10")
-                    return new ConduitSpecInfo(TestSpecifications.Multi_Ø40_5x10, GetMarkingText(externalSpec));
+                    return new SpanEquipmentSpecInfo(TestSpecifications.Multi_Ø40_5x10, GetMarkingText(externalSpec));
 
                 if (externalSpec == "ø50 5x10+12x7 color")
-                    return new ConduitSpecInfo(TestSpecifications.Multi_Ø50_12x7_5x10, GetMarkingText(externalSpec));
+                    return new SpanEquipmentSpecInfo(TestSpecifications.Multi_Ø50_12x7_5x10, GetMarkingText(externalSpec));
 
                 if (externalSpec == "ø50+5x10+12x7dantex")
-                    return new ConduitSpecInfo(TestSpecifications.Multi_Ø50_12x7_5x10, GetMarkingText(externalSpec));
+                    return new SpanEquipmentSpecInfo(TestSpecifications.Multi_Ø50_12x7_5x10, GetMarkingText(externalSpec));
 
                 if (externalSpec == "ø50 5x10+12x7")
-                    return new ConduitSpecInfo(TestSpecifications.Multi_Ø50_12x7_5x10_BlueYellow, GetMarkingText(externalSpec));
+                    return new SpanEquipmentSpecInfo(TestSpecifications.Multi_Ø50_12x7_5x10_BlueYellow, GetMarkingText(externalSpec));
 
                 if (externalSpec == "ø50 5x10+12x7 hvigrø")
-                    return new ConduitSpecInfo(TestSpecifications.Multi_Ø50_12x7_5x10_GreenWhite, GetMarkingText(externalSpec));
+                    return new SpanEquipmentSpecInfo(TestSpecifications.Multi_Ø50_12x7_5x10_GreenWhite, GetMarkingText(externalSpec));
 
                 if (externalSpec.StartsWith("ø50+10x10") || externalSpec.StartsWith("ø50 10x10"))
-                    return new ConduitSpecInfo(TestSpecifications.Multi_Ø50_10x10, GetMarkingText(externalSpec));
+                    return new SpanEquipmentSpecInfo(TestSpecifications.Multi_Ø50_10x10, GetMarkingText(externalSpec));
 
 
                 Log.Warning($"Don't know how to handle spec: '{externalSpec}'");
@@ -422,20 +355,20 @@ namespace OpenFTTH.APIGateway.Conversion
 
         }
 
-        private class ConduitSpecInfo
+        private class SpanEquipmentSpecInfo
         {
             public Guid SpecId { get; set; }
             public string MarkingColor { get; set; }
 
             public List<Guid> AditionalSpecs = new List<Guid>();
 
-            public ConduitSpecInfo(Guid specId, string markingColor = null)
+            public SpanEquipmentSpecInfo(Guid specId, string markingColor = null)
             {
                 SpecId = specId;
                 MarkingColor = markingColor;
             }
 
-            public ConduitSpecInfo(Guid specId, List<Guid> aditionalSpecs)
+            public SpanEquipmentSpecInfo(Guid specId, List<Guid> aditionalSpecs)
             {
                 SpecId = specId;
                 AditionalSpecs = aditionalSpecs;
