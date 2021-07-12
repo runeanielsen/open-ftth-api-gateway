@@ -93,6 +93,9 @@ namespace OpenFTTH.APIGateway.Workers
 
                 bool loadFinish = false;
 
+                if (loadFinish)
+                    _logger.LogError("NOTICE THAT WAITING FOR ROUTE EVENTS LOADING IS DISABLED!!!");
+
                 while (!stoppingToken.IsCancellationRequested && !loadFinish)
                 {
                     _logger.LogDebug("Waiting for load mode to finish creating initial state...");

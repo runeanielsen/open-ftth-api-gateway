@@ -13,11 +13,9 @@ namespace OpenFTTH.APIGateway.Conversion
     public class CreateSpecifications
     {
         private static Guid _specSeederId = Guid.Parse("2897abbb-f504-4957-ac6e-fe47f5294239");
-        private static bool _specificationsCreated = false;
-        private static readonly object _myLock = new object();
 
-        private ICommandDispatcher _commandDispatcher;
-        private IQueryDispatcher _queryDispatcher;
+        private readonly ICommandDispatcher _commandDispatcher;
+        private readonly IQueryDispatcher _queryDispatcher;
 
         public CreateSpecifications(ICommandDispatcher commandDispatcher, IQueryDispatcher queryDispatcher)
         {
@@ -34,6 +32,9 @@ namespace OpenFTTH.APIGateway.Conversion
         public static Guid CustomerConduit_Ø7_Orange = Guid.Parse("671529f8-65f7-4670-9b02-8bae53747f1c");
         public static Guid CustomerConduit_Ø12_Orange = Guid.Parse("ddd86873-9d6c-4741-a406-084c628314db");
 
+        // Uknown types
+        public static Guid Well_Unknown = Guid.Parse("7388baca-4710-4756-a3df-caaf1fc246b8");
+        public static Guid ConduitClosure_Unknown = Guid.Parse("c288e797-a65c-4cf6-b63d-5eda4b4a8a8c");
 
         // Span Structures
         public static Guid Ø7_Blue = Guid.Parse("94d5bc20-31da-4191-b4dc-9a701bba83d6");
@@ -74,40 +75,38 @@ namespace OpenFTTH.APIGateway.Conversion
         public static Guid Ø50_Orange = Guid.Parse("7960355a-4dab-4d60-b3a5-e20ac4301176");
         public static Guid Ø110_Red = Guid.Parse("e078e830-f79d-4220-bd9a-87ed7cf81f1d");
 
-      
-
-
         public FluentResults.Result<CreateSpecifications> Run()
         {
-            lock (_myLock)
-            {
-                var spanEquipmentSpecifications = _queryDispatcher.HandleAsync<GetSpanEquipmentSpecifications, Result<LookupCollection<SpanEquipmentSpecification>>>(new GetSpanEquipmentSpecifications()).Result;
+            var nodeContainerSpecification = _queryDispatcher.HandleAsync<GetNodeContainerSpecifications, Result<LookupCollection<NodeContainerSpecification>>>(new GetNodeContainerSpecifications()).Result;
 
-                if (spanEquipmentSpecifications.Value.ContainsKey(CustomerConduit_Ø7_Orange))
-                    return FluentResults.Result.Fail("Additional specification already present in system");
-            
-                AddNodeContainerSpecifications();
-       
-                AddSpanEquipmentSpecifications();
+            if (nodeContainerSpecification.Value.ContainsKey(Well_Unknown))
+                return FluentResults.Result.Fail("Additional specification already present in system");
 
-                Thread.Sleep(100);
+            AddNodeContainerSpecifications();
 
-                _specificationsCreated = true;
+            //AddSpanEquipmentSpecifications();
 
-                return FluentResults.Result.Ok(this);
-            }
+            Thread.Sleep(100);
+
+            return FluentResults.Result.Ok(this);
         }
 
         private void AddNodeContainerSpecifications()
         {
-            /*
-            // Man Holes
-            AddSpecification(new NodeContainerSpecification(Well_Cubis_STAKKAbox_MODULA_600x450, "ManHole", "STAKKAbox 600x450")
+            // Uknown manhole
+            AddSpecification(new NodeContainerSpecification(Well_Unknown, "ManHole", "Brønd Ukendt Type")
             {
-                Description = "STAKKAbox MODULA 600x450mm",
-                ManufacturerRefs = new Guid[] { Manu_Cubis }
+                Description = "Brønd Ukendt Type",
+                ManufacturerRefs = new Guid[] { }
             });
-            */
+
+            // Uknown conduit closure
+            AddSpecification(new NodeContainerSpecification(ConduitClosure_Unknown, "ConduitClosure", "Rørmuffe Ukendt Type")
+            {
+                Description = "Rørmuffe Ukendt Type",
+                ManufacturerRefs = new Guid[] { }
+            });
+
         }
 
         private void AddSpanEquipmentSpecifications()

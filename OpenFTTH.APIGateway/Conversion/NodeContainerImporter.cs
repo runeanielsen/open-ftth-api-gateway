@@ -19,17 +19,17 @@ namespace OpenFTTH.APIGateway.Conversion
 {
     public class NodeContainerImporter : ImporterBase
     {
-        private ILogger<SpanEquipmentImporter> _logger;
+        private ILogger<NodeContainerImporter> _logger;
         private Guid _workTaskId;
         private IEventStore _eventStore;
         private ICommandDispatcher _commandDispatcher;
         private IQueryDispatcher _queryDispatcher;
 
-        private string _tableName = "conversion.node_containers";
+        private string _tableName = "conversion.ne_node_containers_result";
 
         private Dictionary<string, NodeContainerSpecification> _nodeContainerSpecByName = null;
 
-        public NodeContainerImporter(ILogger<SpanEquipmentImporter> logger, Guid workTaskId, IEventStore eventSTore, GeoDatabaseSetting geoDatabaseSettings, ICommandDispatcher commandDispatcher, IQueryDispatcher queryDispatcher) : base(geoDatabaseSettings)
+        public NodeContainerImporter(ILogger<NodeContainerImporter> logger, Guid workTaskId, IEventStore eventSTore, GeoDatabaseSetting geoDatabaseSettings, ICommandDispatcher commandDispatcher, IQueryDispatcher queryDispatcher) : base(geoDatabaseSettings)
         {
             _logger = logger;
             _workTaskId = workTaskId;
@@ -85,20 +85,17 @@ namespace OpenFTTH.APIGateway.Conversion
 
         private Result PlaceNodeContainer(NodeContainerForConversion nodeContainer, Guid specId)
         {
-            var routeNodeId = Guid.NewGuid();
-            var nodeContainerId = Guid.NewGuid();
-
             Guid correlationId = Guid.NewGuid();
 
             var commandUserContext = new UserContext("conversion", _workTaskId)
             {
-                EditingRouteNodeId = routeNodeId
+                EditingRouteNodeId = nodeContainer.NodeId
             };
 
             // First register the node of interest where to place the node container
             var nodeOfInterestId = Guid.NewGuid();
 
-            var registerNodeOfInterestCommand = new RegisterNodeOfInterest(correlationId, commandUserContext, nodeOfInterestId, routeNodeId);
+            var registerNodeOfInterestCommand = new RegisterNodeOfInterest(correlationId, commandUserContext, nodeOfInterestId, nodeContainer.NodeId);
 
             var registerNodeOfInterestCommandResult = _commandDispatcher.HandleAsync<RegisterNodeOfInterest, Result<RouteNetworkInterest>>(registerNodeOfInterestCommand).Result;
 
@@ -108,7 +105,7 @@ namespace OpenFTTH.APIGateway.Conversion
             }
 
             // Now place the node container in the walk
-            var placeNodeContainerCommand = new PlaceNodeContainerInRouteNetwork(correlationId, commandUserContext, nodeContainerId, specId, registerNodeOfInterestCommandResult.Value)
+            var placeNodeContainerCommand = new PlaceNodeContainerInRouteNetwork(correlationId, commandUserContext, nodeContainer.NodeContainerId, specId, registerNodeOfInterestCommandResult.Value)
             {
                 ManufacturerId = null,
                 LifecycleInfo = new LifecycleInfo(DeploymentStateEnum.InService, null, null)
@@ -132,7 +129,13 @@ namespace OpenFTTH.APIGateway.Conversion
         {
             if (_nodeContainerSpecByName == null)
             {
-                _nodeContainerSpecByName = _eventStore.Projections.Get<NodeContainerSpecificationsProjection>().Specifications.ToDictionary(s => s.Name.ToLower());
+                _nodeContainerSpecByName = new Dictionary<string, NodeContainerSpecification>();
+
+                foreach (var nodeSpec in _eventStore.Projections.Get<NodeContainerSpecificationsProjection>().Specifications)
+                {
+                    if (!_nodeContainerSpecByName.ContainsKey(nodeSpec.Name.ToLower()))
+                        _nodeContainerSpecByName[nodeSpec.Name.ToLower()] = nodeSpec;
+                }
             }
 
             var key = specificationName.Trim().ToLower();
@@ -162,9 +165,9 @@ namespace OpenFTTH.APIGateway.Conversion
                 var nodeContainerId = Guid.Parse(dbReader.GetString(4));
                 var specification = dbReader.GetString(5).Trim();
 
-                var conduit = new NodeContainerForConversion(externalId, specification, routeNodeId, nodeContainerId);
+                var nodeCondtainerForConversion = new NodeContainerForConversion(externalId, specification, routeNodeId, nodeContainerId);
 
-                nodeContainersForConversions.Add(conduit);
+                nodeContainersForConversions.Add(nodeCondtainerForConversion);
             }
 
             dbConn.Close();
