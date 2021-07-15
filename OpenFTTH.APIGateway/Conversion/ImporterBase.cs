@@ -2,6 +2,7 @@
 using OpenFTTH.APIGateway.Settings;
 using System;
 using System.Data;
+using System.Linq;
 
 namespace OpenFTTH.APIGateway.Conversion
 {
@@ -35,6 +36,25 @@ namespace OpenFTTH.APIGateway.Conversion
         {
             cmd.CommandText = @"UPDATE " + tableName + " set status = @statusText where external_id ='" + externalId + "'";
             cmd.Parameters.AddWithValue("statusText", statusText);
+            cmd.ExecuteNonQuery();
+        }
+
+        protected void LogStatus(NpgsqlCommand cmd, string tableName, string keyColumnName, string key, FluentResults.Result result)
+        {
+            cmd.CommandText = @"UPDATE " + tableName + " set status = @statusText where " + keyColumnName + "='" + key + "'";
+            
+            if (result.IsSuccess)
+                cmd.Parameters.AddWithValue("statusText", "OK");
+            else
+                cmd.Parameters.AddWithValue("statusText", result.Errors.First().Message);
+
+            cmd.ExecuteNonQuery();
+        }
+
+        protected void LogStatus(NpgsqlCommand cmd, string tableName, string keyColumnName, string key, string message)
+        {
+            cmd.CommandText = @"UPDATE " + tableName + " set status = @statusText where " + keyColumnName + "='" + key + "'";
+            cmd.Parameters.AddWithValue("statusText", message);
             cmd.ExecuteNonQuery();
         }
 

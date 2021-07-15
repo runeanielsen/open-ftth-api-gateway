@@ -8,8 +8,10 @@ using OpenFTTH.Events.Core.Infos;
 using OpenFTTH.EventSourcing;
 using OpenFTTH.RouteNetwork.API.Commands;
 using OpenFTTH.RouteNetwork.API.Model;
+using OpenFTTH.RouteNetwork.API.Queries;
 using OpenFTTH.UtilityGraphService.API.Commands;
 using OpenFTTH.UtilityGraphService.API.Model.UtilityNetwork;
+using OpenFTTH.UtilityGraphService.API.Queries;
 using OpenFTTH.UtilityGraphService.Business.NodeContainers.Projections;
 using System;
 using System.Collections.Generic;
@@ -25,7 +27,8 @@ namespace OpenFTTH.APIGateway.Conversion
         private ICommandDispatcher _commandDispatcher;
         private IQueryDispatcher _queryDispatcher;
 
-        private string _tableName = "conversion.ne_node_containers_result";
+        private string _nodeContainerTableName = "conversion.ne_node_containers_result";
+        private string _connectivityTableName = "conversion.ne_connectivity_result";
 
         private Dictionary<string, NodeContainerSpecification> _nodeContainerSpecByName = null;
 
@@ -43,11 +46,12 @@ namespace OpenFTTH.APIGateway.Conversion
         {
             _logger.LogInformation("Conversion of node containers started...");
 
-            CreateTableLogColumn(_tableName);
+            CreateTableLogColumn(_nodeContainerTableName);
+            CreateTableLogColumn(_connectivityTableName);
 
-            var nodeContainers = LoadDataFromConversionDatabase(_tableName);
+            var nodeContainers = LoadDataFromConversionDatabase();
 
-            AddContainersToNetwork(nodeContainers);
+            AddContainersToNetwork(nodeContainers.Values.ToList());
 
             _logger.LogInformation("Conversion of node containers finish!");
         }
@@ -56,34 +60,97 @@ namespace OpenFTTH.APIGateway.Conversion
         {
             using var conn = GetConnection();
 
-            using var logCmd = conn.CreateCommand();
+            using var logCmd = conn.CreateCommand() as NpgsqlCommand;
 
             foreach (var nodeContainer in nodeContainers)
             {
-
+                // Place the container
                 var specId = GetNodeContainerSpecificationIdFromName(nodeContainer.Specification);
 
                 if (specId != null)
                 {
-                    var result = PlaceNodeContainer(nodeContainer, specId.Value);
+                    var placeNodeContainerResult = PlaceNodeContainer(logCmd, nodeContainer, specId.Value);
 
-                    if (result.IsFailed)
-                    {
-                        LogStatus((NpgsqlCommand)logCmd, _tableName, result.Reasons.First().Message, nodeContainer.ExternalId);
-                    }
-                    else
-                    {
-                        LogStatus((NpgsqlCommand)logCmd, _tableName, "OK", nodeContainer.ExternalId);
+                    if (placeNodeContainerResult.IsSuccess)
+                    { 
+                        var relatedInfo = GetRelatedInformation(nodeContainer);
+
+                        AffixSpanEquipmentsToNodeContainer(logCmd, nodeContainer, relatedInfo);
+                        ConnectSpanEquipmentsInNodeContainer(logCmd, nodeContainer, relatedInfo);
                     }
                 }
                 else
                 {
-                    LogStatus((NpgsqlCommand)logCmd, _tableName, $"Cannot find any node container specification with description: '{nodeContainer.Specification}'", nodeContainer.ExternalId);
+                    LogStatus((NpgsqlCommand)logCmd, _nodeContainerTableName, $"Cannot find any node container specification with name: '{nodeContainer.Specification}'", nodeContainer.ExternalId);
                 }
             }
         }
 
-        private Result PlaceNodeContainer(NodeContainerForConversion nodeContainer, Guid specId)
+        private void AffixSpanEquipmentsToNodeContainer(NpgsqlCommand logCmd, NodeContainerForConversion nodeContainer, RelatedEquipmentInfo relatedInfo)
+        {
+            if (!relatedInfo.SingleConduitsOnly)
+            {
+                foreach (var ingoingSpanEquipment in relatedInfo.IngoingSpanEquipments)
+                {
+                    if (ingoingSpanEquipment.SpanStructures.Length == 1)
+                        AffixSpanEquipmentToContainer(nodeContainer.NodeId, ingoingSpanEquipment.Id, nodeContainer.NodeContainerId, NodeContainerSideEnum.North);
+                    else
+                        AffixSpanEquipmentToContainer(nodeContainer.NodeId, ingoingSpanEquipment.Id, nodeContainer.NodeContainerId, NodeContainerSideEnum.West);
+                }
+
+                foreach (var outgoingSpanEquipment in relatedInfo.OutgoingSpanEquipments)
+                {
+                    if (outgoingSpanEquipment.SpanStructures.Length == 1)
+                        AffixSpanEquipmentToContainer(nodeContainer.NodeId, outgoingSpanEquipment.Id, nodeContainer.NodeContainerId, NodeContainerSideEnum.North);
+                    else
+                        AffixSpanEquipmentToContainer(nodeContainer.NodeId, outgoingSpanEquipment.Id, nodeContainer.NodeContainerId, NodeContainerSideEnum.East);
+                }
+            }
+            else
+            {
+                foreach (var ingoingSpanEquipment in relatedInfo.IngoingSpanEquipments)
+                {
+                    AffixSpanEquipmentToContainer(nodeContainer.NodeId, ingoingSpanEquipment.Id, nodeContainer.NodeContainerId, NodeContainerSideEnum.West);
+                }
+
+                foreach (var outgoingSpanEquipment in relatedInfo.OutgoingSpanEquipments)
+                {
+                    AffixSpanEquipmentToContainer(nodeContainer.NodeId, outgoingSpanEquipment.Id, nodeContainer.NodeContainerId, NodeContainerSideEnum.East);
+                }
+            }
+        }
+
+        private void ConnectSpanEquipmentsInNodeContainer(NpgsqlCommand logCmd, NodeContainerForConversion nodeContainer, RelatedEquipmentInfo relatedInfo)
+        {
+            foreach (var connectivity in nodeContainer.Connectivity)
+            {
+                if (!relatedInfo.SpanEquipmentById.ContainsKey(connectivity.FromSpanEquipmentId))
+                {
+                    LogStatus(logCmd, _nodeContainerTableName, "ogc_fid", connectivity.Key, $"Span equipment with id: {connectivity.FromSpanEquipmentId} not found in route node with id: {nodeContainer.NodeId}");
+                    continue;
+                }
+
+                if (!relatedInfo.SpanEquipmentById.ContainsKey(connectivity.ToSpanEquipmentId))
+                {
+                    LogStatus(logCmd, _nodeContainerTableName, "ogc_fid", connectivity.Key, $"Span equipment with id: {connectivity.ToSpanEquipmentId} not found in route node with id: {nodeContainer.NodeId}");
+                    continue;
+                }
+
+                // We need adjust index 1 to index 0 on single conduits
+                var fromSpanEquipment = relatedInfo.SpanEquipmentById[connectivity.FromSpanEquipmentId];
+                var toSpanEquipment = relatedInfo.SpanEquipmentById[connectivity.ToSpanEquipmentId];
+
+                int fromStructureIndex = fromSpanEquipment.SpanStructures.Length == 1 ? connectivity.FromStructureIndex - 1 : connectivity.FromStructureIndex;
+                int toStructureIndex = toSpanEquipment.SpanStructures.Length == 1 ? connectivity.ToStructureIndex - 1 : connectivity.ToStructureIndex;
+
+                var connectResult = ConnectSpanEquipments(nodeContainer.NodeId, connectivity.FromSpanEquipmentId, connectivity.ToSpanEquipmentId, (ushort)fromStructureIndex, (ushort)toStructureIndex, connectivity.NumberOfUnits);
+
+                LogStatus(logCmd, _nodeContainerTableName, "ogc_fid", connectivity.Key, connectResult);
+            }
+        }
+
+
+        private Result PlaceNodeContainer(NpgsqlCommand logCmd, NodeContainerForConversion nodeContainer, Guid specId)
         {
             Guid correlationId = Guid.NewGuid();
 
@@ -122,8 +189,54 @@ namespace OpenFTTH.APIGateway.Conversion
                     return unregisterCommandResult;
             }
 
+            LogStatus((NpgsqlCommand)logCmd, _nodeContainerTableName, "external_id", nodeContainer.ExternalId, placeNodeContainerResult);
+
             return placeNodeContainerResult;
         }
+
+        private Result AffixSpanEquipmentToContainer(Guid routeNodeId, Guid spanEquipmentId, Guid nodeContainerId, NodeContainerSideEnum side)
+        {
+            Guid correlationId = Guid.NewGuid();
+
+            var commandUserContext = new UserContext("conversion", _workTaskId)
+            {
+                EditingRouteNodeId = routeNodeId
+            };
+
+            var affixConduitToContainerCommand = new AffixSpanEquipmentToNodeContainer(correlationId, commandUserContext,
+               spanEquipmentOrSegmentId: spanEquipmentId,
+               nodeContainerId: nodeContainerId,
+               nodeContainerIngoingSide: side
+           );
+
+            var affixResult = _commandDispatcher.HandleAsync<AffixSpanEquipmentToNodeContainer, Result>(affixConduitToContainerCommand).Result;
+
+            return affixResult;
+        }
+
+        private Result ConnectSpanEquipments(Guid routeNodeId, Guid fromSpanEquipmentId, Guid toSpanEquipmentId, ushort fromStructureIndex, ushort toStructureIndex, int numberOfUnits)
+        {
+            Guid correlationId = Guid.NewGuid();
+
+            var commandUserContext = new UserContext("conversion", _workTaskId)
+            {
+                EditingRouteNodeId = routeNodeId
+            };
+
+            var connectCmd = new ConnectSpanSegmentsByIndexAtRouteNode(correlationId, commandUserContext,
+                routeNodeId: routeNodeId,
+                fromSpanEquipmentId: fromSpanEquipmentId,
+                toSpanEquipmentId: toSpanEquipmentId,
+                fromStructureIndex: fromStructureIndex,
+                toStructureIndex: toStructureIndex,
+                numberOfUnits: numberOfUnits
+            );
+
+            var connectResult = _commandDispatcher.HandleAsync<ConnectSpanSegmentsByIndexAtRouteNode, Result>(connectCmd).Result;
+
+            return connectResult;
+        }
+
 
         private Guid? GetNodeContainerSpecificationIdFromName(string specificationName)
         {
@@ -146,28 +259,127 @@ namespace OpenFTTH.APIGateway.Conversion
             return null;
         }
 
-        private List<NodeContainerForConversion> LoadDataFromConversionDatabase(string tableName)
+
+        private RelatedEquipmentInfo GetRelatedInformation(NodeContainerForConversion nodeContainer)
         {
-            List<NodeContainerForConversion> nodeContainersForConversions = new();
+
+            RelatedEquipmentInfo result = new();
+
+            // Get interest information from existing span equipment
+            var interestQueryResult = _queryDispatcher.HandleAsync<GetRouteNetworkDetails, Result<GetRouteNetworkDetailsResult>>(new GetRouteNetworkDetails(new RouteNetworkElementIdList() { nodeContainer.NodeId }) { RelatedInterestFilter = RelatedInterestFilterOptions.ReferencesFromRouteElementOnly }).Result;
+
+            if (interestQueryResult.IsSuccess)
+            {
+                InterestIdList interestIdsToFetch = new InterestIdList();
+
+                foreach (var interestRel in interestQueryResult.Value.RouteNetworkElements.First().InterestRelations)
+                {
+                    interestIdsToFetch.Add(interestRel.RefId);
+                }
+
+                if (interestIdsToFetch.Count == 0)
+                    return result;
+
+                var spanEquipmentQueryResult = _queryDispatcher.HandleAsync<GetEquipmentDetails, Result<GetEquipmentDetailsResult>>(new GetEquipmentDetails(interestIdsToFetch)).Result;
+
+                if (spanEquipmentQueryResult.IsSuccess)
+                {
+                    Dictionary<Guid, SpanEquipmentWithRelatedInfo> spanEquipmentByInterestId = spanEquipmentQueryResult.Value.SpanEquipment.ToDictionary(s => s.WalkOfInterestId);
+
+                    foreach (var interestRel in interestQueryResult.Value.RouteNetworkElements.First().InterestRelations)
+                    {
+                        if (interestRel.RelationKind == RouteNetworkInterestRelationKindEnum.Start)
+                        {
+                            var spanEq = spanEquipmentByInterestId[interestRel.RefId];
+                            result.OutgoingSpanEquipments.Add(spanEq);
+                            result.SpanEquipmentById.Add(spanEq.Id, spanEq);
+                        }
+                        else if (interestRel.RelationKind == RouteNetworkInterestRelationKindEnum.End)
+                        {
+                            var spanEq = spanEquipmentByInterestId[interestRel.RefId];
+                            result.IngoingSpanEquipments.Add(spanEq);
+                            result.SpanEquipmentById.Add(spanEq.Id, spanEq);
+                        }
+                    }
+                }
+                else
+                    _logger.LogError($"Error querying equipment details in route node with id: {nodeContainer.NodeId} " + spanEquipmentQueryResult.Errors.First().Message);
+
+            }
+            else
+                _logger.LogError($"Error querying interests related to route node with id: {nodeContainer.NodeId} " + interestQueryResult.Errors.First().Message);
+
+            return result;
+        }
+
+
+        private Dictionary<Guid, NodeContainerForConversion> LoadDataFromConversionDatabase()
+        {
+            var nodeContainersForConversions = LoadNodeContainersFromDatabase();
+
+            var nodeContainersWitConnectivity = LoadConnectivityFromConversionDatabase(nodeContainersForConversions);
+
+            return nodeContainersWitConnectivity;
+        }
+
+        private Dictionary<Guid, NodeContainerForConversion> LoadNodeContainersFromDatabase()
+        {
+            Dictionary<Guid, NodeContainerForConversion> nodeContainersForConversions = new();
 
             using var dbConn = GetConnection();
 
-            using var dbCmd = dbConn.CreateCommand();
-            dbCmd.CommandText = "SELECT * FROM " + tableName + " WHERE status is null ORDER BY external_id";
+            // Load node containers
+            using var nodeContainerSelectCmd = dbConn.CreateCommand();
+            nodeContainerSelectCmd.CommandText = "SELECT * FROM " + _nodeContainerTableName + " WHERE status is null ORDER BY external_id";
+            //nodeContainerSelectCmd.CommandText = "SELECT * FROM " + _nodeContainerTableName + " ORDER BY external_id";
 
-            using var dbReader = dbCmd.ExecuteReader();
+            using var nodeContainerReader = nodeContainerSelectCmd.ExecuteReader();
 
-            while (dbReader.Read())
+            while (nodeContainerReader.Read())
             {
-                var externalId = dbReader.GetString(1).Trim();
-                var externalSpec = dbReader.GetString(2).Trim();
-                var routeNodeId = Guid.Parse(dbReader.GetString(3));
-                var nodeContainerId = Guid.Parse(dbReader.GetString(4));
-                var specification = dbReader.GetString(5).Trim();
+                var externalId = nodeContainerReader.GetString(1).Trim();
+                var externalSpec = nodeContainerReader.GetString(2).Trim();
+                var routeNodeId = Guid.Parse(nodeContainerReader.GetString(3));
+                var nodeContainerId = Guid.Parse(nodeContainerReader.GetString(4));
+                var specification = nodeContainerReader.GetString(5).Trim();
 
                 var nodeCondtainerForConversion = new NodeContainerForConversion(externalId, specification, routeNodeId, nodeContainerId);
 
-                nodeContainersForConversions.Add(nodeCondtainerForConversion);
+                nodeContainersForConversions.Add(nodeContainerId, nodeCondtainerForConversion);
+            }
+
+            dbConn.Close();
+
+            return nodeContainersForConversions;
+        }
+
+        private Dictionary<Guid, NodeContainerForConversion> LoadConnectivityFromConversionDatabase(Dictionary<Guid, NodeContainerForConversion> nodeContainersForConversions)
+        {
+            using var dbConn = GetConnection();
+         
+            // Load connectivity
+            var connectivitySelectCmd = dbConn.CreateCommand();
+            connectivitySelectCmd.CommandText = "SELECT * FROM " + _connectivityTableName + " WHERE status is null ORDER BY node_container_id";
+
+            using var connectivityReader = connectivitySelectCmd.ExecuteReader();
+
+            while (connectivityReader.Read())
+            {
+                var connectivity = new ConnectivityForConversion();
+
+                connectivity.Key = connectivityReader.GetInt32(0).ToString();
+                connectivity.RouteNodeId = Guid.Parse(connectivityReader.GetString(1));
+                connectivity.NodeContainerId = Guid.Parse(connectivityReader.GetString(2));
+                connectivity.FromSpanEquipmentId = Guid.Parse(connectivityReader.GetString(3));
+                connectivity.ToSpanEquipmentId = Guid.Parse(connectivityReader.GetString(4));
+                connectivity.FromStructureIndex = (ushort)connectivityReader.GetInt32(5);
+                connectivity.ToStructureIndex = (ushort)connectivityReader.GetInt32(6);
+                connectivity.NumberOfUnits = connectivityReader.GetInt32(7);
+
+                if (nodeContainersForConversions.ContainsKey(connectivity.NodeContainerId))
+                {
+                    nodeContainersForConversions[connectivity.NodeContainerId].Connectivity.Add(connectivity);
+                }
             }
 
             dbConn.Close();
@@ -182,6 +394,8 @@ namespace OpenFTTH.APIGateway.Conversion
             public Guid NodeId { get; set; }
             public Guid NodeContainerId { get; set; }
 
+            public List<ConnectivityForConversion> Connectivity = new List<ConnectivityForConversion>();
+
             public NodeContainerForConversion(string externalId, string specification, Guid nodeId, Guid nodeContainerId)
             {
                 ExternalId = externalId;
@@ -190,5 +404,45 @@ namespace OpenFTTH.APIGateway.Conversion
                 NodeContainerId = nodeContainerId;
             }
         }
+
+        private class ConnectivityForConversion
+        {
+            public string Key { get; set; }
+            public Guid RouteNodeId { get; set; }
+            public Guid NodeContainerId { get; set; }
+            public Guid FromSpanEquipmentId { get; set; }
+            public Guid ToSpanEquipmentId { get; set; }
+            public ushort FromStructureIndex { get; set; }
+            public ushort ToStructureIndex { get; set; }
+            public int NumberOfUnits { get; set; }
+        }
+
+        private class RelatedEquipmentInfo
+        {
+            public List<SpanEquipment> IngoingSpanEquipments = new();
+            public List<SpanEquipment> OutgoingSpanEquipments = new();
+            public Dictionary<Guid, SpanEquipment> SpanEquipmentById = new();
+
+            public bool SingleConduitsOnly
+            {
+                get
+                {
+                    foreach (var spanEquipment in IngoingSpanEquipments)
+                    {
+                        if (spanEquipment.SpanStructures.Length > 1)
+                            return false;
+                    }
+
+                    foreach (var spanEquipment in OutgoingSpanEquipments)
+                    {
+                        if (spanEquipment.SpanStructures.Length > 1)
+                            return false;
+                    }
+
+                    return true;
+                }
+            }
+        }
     }
 }
+
