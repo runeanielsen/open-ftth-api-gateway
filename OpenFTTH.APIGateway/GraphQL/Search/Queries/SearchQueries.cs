@@ -32,7 +32,7 @@ namespace OpenFTTH.APIGateway.GraphQL.Search.Queries
                     var searchString = context.GetArgument<string>("searchString");
                     var pageSize = context.GetArgument<int>("pageSize");
 
-                    var searchClient = new GlobalSearchClient(typesenseClient);
+                    var searchClient = new GlobalSearchClient(typesenseClient, queryDispatcher);
 
                     return searchClient.Search(searchString, pageSize);
                 }
