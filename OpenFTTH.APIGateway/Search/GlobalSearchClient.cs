@@ -99,7 +99,8 @@ namespace OpenFTTH.APIGateway.Search
                 Text = searchString,
                 QueryBy = "name",
                 PerPage = maxHits.ToString(),
-                LimitHits = maxHits.ToString()
+                LimitHits = maxHits.ToString(),
+                NumberOfTypos = "0"
             };
 
             var searchResult = await _typesenseClient.Search<RouteNodeSearchHit>("RouteNodes", query);
