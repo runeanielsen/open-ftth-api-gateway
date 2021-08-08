@@ -69,8 +69,8 @@ namespace OpenFTTH.APIGateway.Conversion
                 var externalSpec = dbReader.GetString(2).Trim().ToLower();
                 var spanSegmentId = Guid.Parse(dbReader.GetString(3));
                 var routeSegmentsIds = dbReader.GetString(4);
-                Guid? accessAddressId = dbReader.IsDBNull(5) ? null : Guid.Parse(dbReader.GetString(5));
-                Guid? unitAddressId = dbReader.IsDBNull(6) ? null : Guid.Parse(dbReader.GetString(6));
+                Guid? accessAddressId = dbReader.IsDBNull(5) || dbReader.GetString(5).Trim() == "" ? null : Guid.Parse(dbReader.GetString(5));
+                Guid? unitAddressId = dbReader.IsDBNull(6) || dbReader.GetString(6).Trim() == "" ? null : Guid.Parse(dbReader.GetString(6));
 
                 var conduit = new SpanEquipmentForConversion(spanSegmentId, externalId, externalSpec, routeSegmentsIds, accessAddressId, unitAddressId);
 
