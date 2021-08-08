@@ -84,7 +84,7 @@ namespace OpenFTTH.APIGateway.Conversion
 
             AddNodeContainerSpecifications();
 
-            //AddSpanEquipmentSpecifications();
+            AddSpanEquipmentSpecifications();
 
             Thread.Sleep(100);
 
