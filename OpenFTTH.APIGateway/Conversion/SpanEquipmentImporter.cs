@@ -69,8 +69,10 @@ namespace OpenFTTH.APIGateway.Conversion
                 var externalSpec = dbReader.GetString(2).Trim().ToLower();
                 var spanSegmentId = Guid.Parse(dbReader.GetString(3));
                 var routeSegmentsIds = dbReader.GetString(4);
+                Guid? accessAddressId = dbReader.IsDBNull(5) ? null : Guid.Parse(dbReader.GetString(5));
+                Guid? unitAddressId = dbReader.IsDBNull(6) ? null : Guid.Parse(dbReader.GetString(6));
 
-                var conduit = new SpanEquipmentForConversion(spanSegmentId, externalId, externalSpec, routeSegmentsIds);
+                var conduit = new SpanEquipmentForConversion(spanSegmentId, externalId, externalSpec, routeSegmentsIds, accessAddressId, unitAddressId);
 
                 conduitForConversions.Add(conduit);
             }
@@ -90,7 +92,7 @@ namespace OpenFTTH.APIGateway.Conversion
             {
                 if (spanEquipment.ConduitSpec != null)
                 {
-                    var result = PlaceSpanEquipment(spanEquipment.Id, spanEquipment.ExternalId, spanEquipment.ConduitSpec.SpecId, spanEquipment.SegmentIds, spanEquipment.ConduitSpec.AditionalSpecs, spanEquipment.ConduitSpec.MarkingColor);
+                    var result = PlaceSpanEquipment(spanEquipment.Id, spanEquipment.ExternalId, spanEquipment.ConduitSpec.SpecId, spanEquipment.SegmentIds, spanEquipment.ConduitSpec.AditionalSpecs, spanEquipment.ConduitSpec.MarkingColor, spanEquipment.AccessAddressId, spanEquipment.UnitAddressId);
 
                     if (result.IsFailed)
                     {
@@ -104,7 +106,7 @@ namespace OpenFTTH.APIGateway.Conversion
             }
         }
 
-        private Result PlaceSpanEquipment(Guid spanEquipmentId, string externalId, Guid specificationId, List<Guid> segmentIds, List<Guid> additionalStructureSpecIds, string markingColor)
+        private Result PlaceSpanEquipment(Guid spanEquipmentId, string externalId, Guid specificationId, List<Guid> segmentIds, List<Guid> additionalStructureSpecIds, string markingColor, Guid? accessAddressId, Guid? unitAddressId)
         {
             Guid correlationId = Guid.NewGuid();
 
@@ -129,11 +131,19 @@ namespace OpenFTTH.APIGateway.Conversion
             var conduitName = "R" + nextConduitSeqStr.PadLeft(6, '0');
             var namingInfo = new NamingInfo(conduitName, null);
 
+            AddressInfo? addressInfo = null;
+
+            if (accessAddressId != null)
+            {
+                addressInfo = new AddressInfo() { AccessAddressId = accessAddressId, UnitAddressId = unitAddressId };
+            }
+
             // Place conduit
             var placeSpanEquipmentCommand = new PlaceSpanEquipmentInRouteNetwork(correlationId, new UserContext("conversion", _neMultiConduitConversion), spanEquipmentId, specificationId, registerWalkOfInterestCommandResult.Value)
             {
                 MarkingInfo = markingColor != null ? new MarkingInfo() { MarkingColor = markingColor } : null,
-                NamingInfo = namingInfo
+                NamingInfo = namingInfo,
+                AddressInfo = addressInfo
             };
 
             var placeSpanEquipmentResult = _commandDispatcher.HandleAsync<PlaceSpanEquipmentInRouteNetwork, Result>(placeSpanEquipmentCommand).Result;
@@ -169,18 +179,23 @@ namespace OpenFTTH.APIGateway.Conversion
             public Guid Id { get; set; }
             public string ExternalId { get; set; }
             public string ExternalSpec { get; set; }
-
-            public List<Guid> SegmentIds = new List<Guid>();
             
+            public List<Guid> SegmentIds = new List<Guid>();
             public SpanEquipmentSpecInfo ConduitSpec { get; set;}
+
+            public Guid? AccessAddressId;
+            public Guid? UnitAddressId;
 
             public bool MissingSegments = false;
 
-            public SpanEquipmentForConversion(Guid id, string externalId, string externalSpec, string segmentIds)
+
+            public SpanEquipmentForConversion(Guid id, string externalId, string externalSpec, string segmentIds, Guid? accessAddressId, Guid? unitAddressId)
             {
                 Id = id;
                 ExternalId = externalId;
                 ExternalSpec = externalSpec;
+                AccessAddressId = accessAddressId;
+                UnitAddressId = unitAddressId;
 
                 var segmentSplit = segmentIds.Split(',');
 

@@ -37,7 +37,6 @@ namespace OpenFTTH.APIGateway.Conversion
 
             if (CheckIfConversionSchemaExists())
             {
-                /*
                 var specResult = new CreateSpecifications(_commandDispatcher, _queryDispatcher).Run();
 
                 if (specResult.IsFailed)
@@ -45,11 +44,10 @@ namespace OpenFTTH.APIGateway.Conversion
                     _logger.LogInformation("Database already contain converted data. Will therefore not seed conversion data.");
                     return;
                 }
-                */
 
-                //new SpanEquipmentImporter(_loggerFactory.CreateLogger<SpanEquipmentImporter>(), _eventStore, _geoDatabaseSetting, _commandDispatcher, _queryDispatcher).Run();
+                new SpanEquipmentImporter(_loggerFactory.CreateLogger<SpanEquipmentImporter>(), _eventStore, _geoDatabaseSetting, _commandDispatcher, _queryDispatcher).Run();
 
-                new NodeContainerImporter(_loggerFactory.CreateLogger<NodeContainerImporter>(), _workTaskId, _eventStore, _geoDatabaseSetting, _commandDispatcher, _queryDispatcher).Run();
+                //new NodeContainerImporter(_loggerFactory.CreateLogger<NodeContainerImporter>(), _workTaskId, _eventStore, _geoDatabaseSetting, _commandDispatcher, _queryDispatcher).Run();
             }
             else
             {
