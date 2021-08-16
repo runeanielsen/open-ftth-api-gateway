@@ -25,9 +25,10 @@ namespace OpenFTTH.APIGateway.Conversion
         private IQueryDispatcher _queryDispatcher;
         private ILogger<SpanEquipmentImporter> _logger;
         private IEventStore _eventStore;
-     
 
-        private string _tableName = "conversion.ne_multiconduit_conversion_result";
+
+        //private string _tableName = "conversion.ne_multiconduit_conversion_result";
+        private string _tableName = "conversion.conduit_conversion_result";
 
         public SpanEquipmentImporter(ILogger<SpanEquipmentImporter> logger, IEventStore eventSTore, GeoDatabaseSetting geoDatabaseSettings, ICommandDispatcher commandDispatcher, IQueryDispatcher queryDispatcher) : base(geoDatabaseSettings)
         {
