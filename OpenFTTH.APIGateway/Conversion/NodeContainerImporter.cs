@@ -145,7 +145,7 @@ namespace OpenFTTH.APIGateway.Conversion
 
                 var connectResult = ConnectSpanEquipments(nodeContainer.NodeId, connectivity.FromSpanEquipmentId, connectivity.ToSpanEquipmentId, (ushort)fromStructureIndex, (ushort)toStructureIndex, connectivity.NumberOfUnits);
 
-                LogStatus(logCmd, _nodeContainerTableName, "ogc_fid", connectivity.Key, connectResult);
+                LogStatus(logCmd, _connectivityTableName, "ogc_fid", connectivity.Key, connectResult);
             }
         }
 
