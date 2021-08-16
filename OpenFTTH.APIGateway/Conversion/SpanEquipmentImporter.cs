@@ -72,8 +72,9 @@ namespace OpenFTTH.APIGateway.Conversion
                 var routeSegmentsIds = dbReader.GetString(4);
                 Guid? accessAddressId = dbReader.IsDBNull(5) || dbReader.GetString(5).Trim() == "" ? null : Guid.Parse(dbReader.GetString(5));
                 Guid? unitAddressId = dbReader.IsDBNull(6) || dbReader.GetString(6).Trim() == "" ? null : Guid.Parse(dbReader.GetString(6));
+                var addressInfo = dbReader.IsDBNull(7) || dbReader.GetString(7).Trim() == "" ? null : dbReader.GetString(7).Trim();
 
-                var conduit = new SpanEquipmentForConversion(spanSegmentId, externalId, externalSpec, routeSegmentsIds, accessAddressId, unitAddressId);
+                var conduit = new SpanEquipmentForConversion(spanSegmentId, externalId, externalSpec, routeSegmentsIds, accessAddressId, unitAddressId, addressInfo);
 
                 conduitForConversions.Add(conduit);
             }
@@ -93,7 +94,7 @@ namespace OpenFTTH.APIGateway.Conversion
             {
                 if (spanEquipment.ConduitSpec != null)
                 {
-                    var result = PlaceSpanEquipment(spanEquipment.Id, spanEquipment.ExternalId, spanEquipment.ConduitSpec.SpecId, spanEquipment.SegmentIds, spanEquipment.ConduitSpec.AditionalSpecs, spanEquipment.ConduitSpec.MarkingColor, spanEquipment.AccessAddressId, spanEquipment.UnitAddressId);
+                    var result = PlaceSpanEquipment(spanEquipment.Id, spanEquipment.ExternalId, spanEquipment.ConduitSpec.SpecId, spanEquipment.SegmentIds, spanEquipment.ConduitSpec.AditionalSpecs, spanEquipment.ConduitSpec.MarkingColor, spanEquipment.AccessAddressId, spanEquipment.UnitAddressId, spanEquipment.AddressRemark);
 
                     if (result.IsFailed)
                     {
@@ -107,7 +108,7 @@ namespace OpenFTTH.APIGateway.Conversion
             }
         }
 
-        private Result PlaceSpanEquipment(Guid spanEquipmentId, string externalId, Guid specificationId, List<Guid> segmentIds, List<Guid> additionalStructureSpecIds, string markingColor, Guid? accessAddressId, Guid? unitAddressId)
+        private Result PlaceSpanEquipment(Guid spanEquipmentId, string externalId, Guid specificationId, List<Guid> segmentIds, List<Guid> additionalStructureSpecIds, string markingColor, Guid? accessAddressId, Guid? unitAddressId, string? addressRemark)
         {
             Guid correlationId = Guid.NewGuid();
 
@@ -136,7 +137,7 @@ namespace OpenFTTH.APIGateway.Conversion
 
             if (accessAddressId != null)
             {
-                addressInfo = new AddressInfo() { AccessAddressId = accessAddressId, UnitAddressId = unitAddressId };
+                addressInfo = new AddressInfo() { AccessAddressId = accessAddressId, UnitAddressId = unitAddressId, Remark = addressRemark };
             }
 
             // Place conduit
@@ -186,17 +187,19 @@ namespace OpenFTTH.APIGateway.Conversion
 
             public Guid? AccessAddressId;
             public Guid? UnitAddressId;
+            public string? AddressRemark;
 
             public bool MissingSegments = false;
 
 
-            public SpanEquipmentForConversion(Guid id, string externalId, string externalSpec, string segmentIds, Guid? accessAddressId, Guid? unitAddressId)
+            public SpanEquipmentForConversion(Guid id, string externalId, string externalSpec, string segmentIds, Guid? accessAddressId, Guid? unitAddressId, string? addressInfo)
             {
                 Id = id;
                 ExternalId = externalId;
                 ExternalSpec = externalSpec;
                 AccessAddressId = accessAddressId;
                 UnitAddressId = unitAddressId;
+                AddressRemark = addressInfo;
 
                 var segmentSplit = segmentIds.Split(',');
 
