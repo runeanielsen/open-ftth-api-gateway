@@ -117,7 +117,6 @@ namespace OpenFTTH.APIGateway.Workers
                 
                 ((InMemRouteNetworkState)_routeNetworkState).FinishLoadMode();
                 _logger.LogInformation("Loading of initial route network state finished.");
-                ForceGC();
 
                 // Dehydrate projections
                 LogMenUsage();
@@ -125,7 +124,6 @@ namespace OpenFTTH.APIGateway.Workers
                 _logger.LogInformation("Start dehydrate in-memory projections...");
                 _eventStore.DehydrateProjections();
                 _logger.LogInformation("Finish dehydrating in-memory projections.");
-                ForceGC();
 
                 LogMenUsage();
 
@@ -177,12 +175,5 @@ namespace OpenFTTH.APIGateway.Workers
 
             return me.WorkingSet64;
         }
-
-        private void ForceGC()
-        {
-            System.GC.Collect();
-            _logger.LogInformation("Force Garbage Collection...");
-        }
-
     }
 }

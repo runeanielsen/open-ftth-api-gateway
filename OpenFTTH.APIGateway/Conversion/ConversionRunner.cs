@@ -48,10 +48,8 @@ namespace OpenFTTH.APIGateway.Conversion
                 */
                 
                 new SpanEquipmentImporter(_loggerFactory.CreateLogger<SpanEquipmentImporter>(), _eventStore, _geoDatabaseSetting, _commandDispatcher, _queryDispatcher).Run();
-                ForceGC();
 
                 new NodeContainerImporter(_loggerFactory.CreateLogger<NodeContainerImporter>(), _workTaskId, _eventStore, _geoDatabaseSetting, _commandDispatcher, _queryDispatcher).Run();
-                ForceGC();
             }
             else
             {
@@ -79,12 +77,6 @@ namespace OpenFTTH.APIGateway.Conversion
             var conn = new NpgsqlConnection(_geoDatabaseSetting.PostgresConnectionString);
             conn.Open();
             return conn;
-        }
-
-        private void ForceGC()
-        {
-            System.GC.Collect();
-            _logger.LogInformation("Force Garbage Collection...");
         }
     }
 }
