@@ -114,14 +114,19 @@ namespace OpenFTTH.APIGateway.Workers
                     }
                 }
 
+                
                 ((InMemRouteNetworkState)_routeNetworkState).FinishLoadMode();
                 _logger.LogInformation("Loading of initial route network state finished.");
+                ForceGC();
 
                 // Dehydrate projections
-                _logger.LogInformation("Start dehydrate in-memory projections...");
                 LogMenUsage();
+
+                _logger.LogInformation("Start dehydrate in-memory projections...");
                 _eventStore.DehydrateProjections();
                 _logger.LogInformation("Finish dehydrating in-memory projections.");
+                ForceGC();
+
                 LogMenUsage();
 
                 // Check if database contain any manufacturer. If not the database must be blank, and we seed it with som test specifications
@@ -171,6 +176,12 @@ namespace OpenFTTH.APIGateway.Workers
             _logger.LogInformation($"Memory usage current process id: {me.Id} {me.WorkingSet64 / 1024.0 / 1024.0 / 1024.0} GB");
 
             return me.WorkingSet64;
+        }
+
+        private void ForceGC()
+        {
+            System.GC.Collect();
+            _logger.LogInformation("Force Garbage Collection...");
         }
 
     }
