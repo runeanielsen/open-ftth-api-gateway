@@ -135,7 +135,7 @@ namespace OpenFTTH.APIGateway.Conversion
 
             AddressInfo? addressInfo = null;
 
-            if (accessAddressId != null)
+            if (accessAddressId != null || unitAddressId != null && addressRemark != null)
             {
                 addressInfo = new AddressInfo() { AccessAddressId = accessAddressId, UnitAddressId = unitAddressId, Remark = addressRemark };
             }
