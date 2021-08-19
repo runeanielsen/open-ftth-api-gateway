@@ -69,7 +69,7 @@ namespace OpenFTTH.APIGateway.Conversion
 
                     if (result.IsFailed)
                     {
-                        LogStatus((NpgsqlCommand)logCmd, _tableName, result.Reasons.First().Message, nodeContainer.ExternalId);
+                        LogStatus((NpgsqlCommand)logCmd, _tableName, result.Errors.First().Message, nodeContainer.ExternalId);
                     }
                     else
                     {

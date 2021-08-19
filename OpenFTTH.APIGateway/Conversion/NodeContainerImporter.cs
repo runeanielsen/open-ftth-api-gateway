@@ -126,13 +126,13 @@ namespace OpenFTTH.APIGateway.Conversion
             {
                 if (!relatedInfo.SpanEquipmentById.ContainsKey(connectivity.FromSpanEquipmentId))
                 {
-                    LogStatus(logCmd, _nodeContainerTableName, "ogc_fid", connectivity.Key, $"Span equipment with id: {connectivity.FromSpanEquipmentId} not found in route node with id: {nodeContainer.NodeId}");
+                    LogStatus(logCmd, _connectivityTableName, "ogc_fid", connectivity.Key, $"Span equipment with id: {connectivity.FromSpanEquipmentId} not found in route node with id: {nodeContainer.NodeId}");
                     continue;
                 }
 
                 if (!relatedInfo.SpanEquipmentById.ContainsKey(connectivity.ToSpanEquipmentId))
                 {
-                    LogStatus(logCmd, _nodeContainerTableName, "ogc_fid", connectivity.Key, $"Span equipment with id: {connectivity.ToSpanEquipmentId} not found in route node with id: {nodeContainer.NodeId}");
+                    LogStatus(logCmd, _connectivityTableName, "ogc_fid", connectivity.Key, $"Span equipment with id: {connectivity.ToSpanEquipmentId} not found in route node with id: {nodeContainer.NodeId}");
                     continue;
                 }
 
