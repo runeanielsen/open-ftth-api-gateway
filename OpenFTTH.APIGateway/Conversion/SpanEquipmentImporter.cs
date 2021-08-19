@@ -88,13 +88,13 @@ namespace OpenFTTH.APIGateway.Conversion
         {
             using var conn = GetConnection();
 
-            using var logCmd = conn.CreateCommand();
-        
+            using var logCmd = conn.CreateCommand() as NpgsqlCommand;
+
             foreach (var spanEquipment in spanEquipments)
             {
                 if (spanEquipment.ConduitSpec != null)
                 {
-                    var result = PlaceSpanEquipment(spanEquipment.Id, spanEquipment.ExternalId, spanEquipment.ConduitSpec.SpecId, spanEquipment.SegmentIds, spanEquipment.ConduitSpec.AditionalSpecs, spanEquipment.ConduitSpec.MarkingColor, spanEquipment.AccessAddressId, spanEquipment.UnitAddressId, spanEquipment.AddressRemark);
+                    var result = PlaceSpanEquipment(logCmd, spanEquipment.Id, spanEquipment.ExternalId, spanEquipment.ConduitSpec.SpecId, spanEquipment.SegmentIds, spanEquipment.ConduitSpec.AditionalSpecs, spanEquipment.ConduitSpec.MarkingColor, spanEquipment.AccessAddressId, spanEquipment.UnitAddressId, spanEquipment.AddressRemark);
 
                     if (result.IsFailed)
                     {
@@ -108,7 +108,7 @@ namespace OpenFTTH.APIGateway.Conversion
             }
         }
 
-        private Result PlaceSpanEquipment(Guid spanEquipmentId, string externalId, Guid specificationId, List<Guid> segmentIds, List<Guid> additionalStructureSpecIds, string markingColor, Guid? accessAddressId, Guid? unitAddressId, string? addressRemark)
+        private Result PlaceSpanEquipment(NpgsqlCommand logCmd, Guid spanEquipmentId, string externalId, Guid specificationId, List<Guid> segmentIds, List<Guid> additionalStructureSpecIds, string markingColor, Guid? accessAddressId, Guid? unitAddressId, string? addressRemark)
         {
             Guid correlationId = Guid.NewGuid();
 
@@ -124,6 +124,7 @@ namespace OpenFTTH.APIGateway.Conversion
             if (registerWalkOfInterestCommandResult.IsFailed)
             {
                 _logger.LogInformation("Failed to add conduit: " + externalId + " Error: " + registerWalkOfInterestCommandResult.Errors.First().Message);
+                LogStatus((NpgsqlCommand)logCmd, _tableName, registerWalkOfInterestCommandResult.Errors.First().Message, externalId);
                 return registerWalkOfInterestCommandResult;
             }
 
@@ -153,6 +154,7 @@ namespace OpenFTTH.APIGateway.Conversion
             if (placeSpanEquipmentResult.IsFailed)
             {
                 _logger.LogInformation("Failed to add conduit: " + externalId + " Error: " + placeSpanEquipmentResult.Errors.First().Message);
+                LogStatus((NpgsqlCommand)logCmd, _tableName, placeSpanEquipmentResult.Errors.First().Message, externalId);
                 return placeSpanEquipmentResult;
             }
 
@@ -169,6 +171,7 @@ namespace OpenFTTH.APIGateway.Conversion
                 if (addStructureResult.IsFailed)
                 {
                     _logger.LogInformation("Failed to add additional structures to: " + externalId + " Error: " + placeSpanEquipmentResult.Errors.First().Message);
+                    LogStatus((NpgsqlCommand)logCmd, _tableName, addStructureResult.Errors.First().Message, externalId);
                     return addStructureResult;
                 }
             }
