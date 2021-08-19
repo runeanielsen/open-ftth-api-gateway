@@ -34,14 +34,14 @@ namespace OpenFTTH.APIGateway.Conversion
 
         protected void LogStatus(NpgsqlCommand cmd, string tableName, string statusText, string externalId)
         {
-            cmd.CommandText = @"UPDATE " + tableName + " set status = @statusText where external_id ='" + externalId + "'";
+            cmd.CommandText = @"UPDATE " + tableName + " set status = @statusText where external_id ='" + externalId + "' and status is null";
             cmd.Parameters.AddWithValue("statusText", statusText);
             cmd.ExecuteNonQuery();
         }
 
         protected void LogStatus(NpgsqlCommand cmd, string tableName, string keyColumnName, string key, FluentResults.Result result)
         {
-            cmd.CommandText = @"UPDATE " + tableName + " set status = @statusText where " + keyColumnName + "='" + key + "'";
+            cmd.CommandText = @"UPDATE " + tableName + " set status = @statusText where " + keyColumnName + "='" + key + "' and status is null";
             
             if (result.IsSuccess)
                 cmd.Parameters.AddWithValue("statusText", "OK");
@@ -53,7 +53,7 @@ namespace OpenFTTH.APIGateway.Conversion
 
         protected void LogStatus(NpgsqlCommand cmd, string tableName, string keyColumnName, string key, string message)
         {
-            cmd.CommandText = @"UPDATE " + tableName + " set status = @statusText where " + keyColumnName + "='" + key + "'";
+            cmd.CommandText = @"UPDATE " + tableName + " set status = @statusText where " + keyColumnName + "='" + key + "' and status is null";
             cmd.Parameters.AddWithValue("statusText", message);
             cmd.ExecuteNonQuery();
         }
