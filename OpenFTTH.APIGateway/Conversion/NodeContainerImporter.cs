@@ -73,10 +73,17 @@ namespace OpenFTTH.APIGateway.Conversion
 
                     if (placeNodeContainerResult.IsSuccess)
                     { 
-                        var relatedInfo = GetRelatedInformation(nodeContainer);
+                        var relatedInfo = GetRelatedInformation(nodeContainer.NodeId);
 
                         AffixSpanEquipmentsToNodeContainer(logCmd, nodeContainer, relatedInfo);
                         ConnectSpanEquipmentsInNodeContainer(logCmd, nodeContainer, relatedInfo);
+                    }
+                    else
+                    {
+                        var relatedInfo = GetRelatedInformation(nodeContainer.NodeId);
+
+                        if (placeNodeContainerResult.Errors.First().Message.Contains("NODE_CONTAINER_ALREADY_EXISTS"))
+                            ConnectSpanEquipmentsInNodeContainer(logCmd, nodeContainer, relatedInfo);
                     }
                 }
                 else
@@ -145,6 +152,11 @@ namespace OpenFTTH.APIGateway.Conversion
 
                 var connectResult = ConnectSpanEquipments(nodeContainer.NodeId, connectivity.FromSpanEquipmentId, connectivity.ToSpanEquipmentId, (ushort)fromStructureIndex, (ushort)toStructureIndex, connectivity.NumberOfUnits);
 
+                if (connectResult.IsFailed)
+                {
+                    LogStatus((NpgsqlCommand)logCmd, _connectivityTableName, "ogc_fid", nodeContainer.ExternalId, connectResult.Errors.First().Message);
+                }
+
                 LogStatus(logCmd, _connectivityTableName, "ogc_fid", connectivity.Key, connectResult);
             }
         }
@@ -168,6 +180,7 @@ namespace OpenFTTH.APIGateway.Conversion
 
             if (registerNodeOfInterestCommandResult.IsFailed)
             {
+                LogStatus((NpgsqlCommand)logCmd, _nodeContainerTableName, registerNodeOfInterestCommandResult.Errors.First().Message, nodeContainer.ExternalId);
                 return registerNodeOfInterestCommandResult;
             }
 
@@ -183,6 +196,8 @@ namespace OpenFTTH.APIGateway.Conversion
             // Unregister interest if place node container failed
             if (placeNodeContainerResult.IsFailed)
             {
+                LogStatus((NpgsqlCommand)logCmd, _nodeContainerTableName, placeNodeContainerResult.Errors.First().Message, nodeContainer.ExternalId);
+
                 var unregisterCommandResult = _commandDispatcher.HandleAsync<UnregisterInterest, Result>(new UnregisterInterest(correlationId, commandUserContext, nodeOfInterestId)).Result;
 
                 if (unregisterCommandResult.IsFailed)
@@ -260,13 +275,13 @@ namespace OpenFTTH.APIGateway.Conversion
         }
 
 
-        private RelatedEquipmentInfo GetRelatedInformation(NodeContainerForConversion nodeContainer)
+        private RelatedEquipmentInfo GetRelatedInformation(Guid routeNodeId)
         {
 
             RelatedEquipmentInfo result = new();
 
             // Get interest information from existing span equipment
-            var interestQueryResult = _queryDispatcher.HandleAsync<GetRouteNetworkDetails, Result<GetRouteNetworkDetailsResult>>(new GetRouteNetworkDetails(new RouteNetworkElementIdList() { nodeContainer.NodeId }) { RelatedInterestFilter = RelatedInterestFilterOptions.ReferencesFromRouteElementOnly }).Result;
+            var interestQueryResult = _queryDispatcher.HandleAsync<GetRouteNetworkDetails, Result<GetRouteNetworkDetailsResult>>(new GetRouteNetworkDetails(new RouteNetworkElementIdList() { routeNodeId }) { RelatedInterestFilter = RelatedInterestFilterOptions.ReferencesFromRouteElementOnly }).Result;
 
             if (interestQueryResult.IsSuccess)
             {
@@ -303,11 +318,11 @@ namespace OpenFTTH.APIGateway.Conversion
                     }
                 }
                 else
-                    _logger.LogError($"Error querying equipment details in route node with id: {nodeContainer.NodeId} " + spanEquipmentQueryResult.Errors.First().Message);
+                    _logger.LogError($"Error querying equipment details in route node with id: {routeNodeId} " + spanEquipmentQueryResult.Errors.First().Message);
 
             }
             else
-                _logger.LogError($"Error querying interests related to route node with id: {nodeContainer.NodeId} " + interestQueryResult.Errors.First().Message);
+                _logger.LogError($"Error querying interests related to route node with id: {routeNodeId} " + interestQueryResult.Errors.First().Message);
 
             return result;
         }
