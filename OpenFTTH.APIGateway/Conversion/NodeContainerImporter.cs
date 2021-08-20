@@ -154,7 +154,7 @@ namespace OpenFTTH.APIGateway.Conversion
 
                 if (connectResult.IsFailed)
                 {
-                    LogStatus((NpgsqlCommand)logCmd, _connectivityTableName, "ogc_fid", nodeContainer.ExternalId, connectResult.Errors.First().Message);
+                    LogStatus((NpgsqlCommand)logCmd, _connectivityTableName, "ogc_fid", connectivity.Key, connectResult.Errors.First().Message);
                 }
 
                 LogStatus(logCmd, _connectivityTableName, "ogc_fid", connectivity.Key, connectResult);
