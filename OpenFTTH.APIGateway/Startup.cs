@@ -19,6 +19,8 @@ using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
+using OpenFTTH.Address.Business;
+using OpenFTTH.Address.Business.Repository;
 using OpenFTTH.APIGateway.Auth;
 using OpenFTTH.APIGateway.CoreTypes;
 using OpenFTTH.APIGateway.GraphQL.Root;
@@ -173,7 +175,8 @@ namespace OpenFTTH.APIGateway
                 AppDomain.CurrentDomain.Load("OpenFTTH.RouteNetwork.Business"),
                 AppDomain.CurrentDomain.Load("OpenFTTH.UtilityGraphService.Business"),
                 AppDomain.CurrentDomain.Load("OpenFTTH.Schematic.Business"),
-                AppDomain.CurrentDomain.Load("OpenFTTH.Work.Business")
+                AppDomain.CurrentDomain.Load("OpenFTTH.Work.Business"),
+                AppDomain.CurrentDomain.Load("OpenFTTH.Address.Business")
             };
 
             // Adds controllers
@@ -239,6 +242,11 @@ namespace OpenFTTH.APIGateway
                         }
                     };
              });
+
+            // Address service
+            services.AddSingleton<IAddressRepository>(x =>
+                    new PostgresAddressRepository(x.GetRequiredService<IOptions<GeoDatabaseSetting>>().Value.PostgresConnectionString)
+            );
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
