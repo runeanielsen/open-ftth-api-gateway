@@ -1,6 +1,7 @@
 ﻿using GraphQL.Authorization;
 using GraphQL.Types;
 using Microsoft.Extensions.Logging;
+using OpenFTTH.APIGateway.GraphQL.Addresses.Queries;
 using OpenFTTH.APIGateway.GraphQL.RouteNetwork.Queries;
 using OpenFTTH.APIGateway.GraphQL.Schematic.Queries;
 using OpenFTTH.APIGateway.GraphQL.Search.Queries;
@@ -28,6 +29,8 @@ namespace OpenFTTH.APIGateway.GraphQL.Root
             Field<SchematicQueries>("schematic", resolve: context => new { });
 
             Field<SearchQueries>("search", resolve: context => new { });
+
+            Field<AddressServiceQueries>("addressService", resolve: context => new { });
         }
 
     }

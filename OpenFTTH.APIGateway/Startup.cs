@@ -23,6 +23,7 @@ using OpenFTTH.Address.Business;
 using OpenFTTH.Address.Business.Repository;
 using OpenFTTH.APIGateway.Auth;
 using OpenFTTH.APIGateway.CoreTypes;
+using OpenFTTH.APIGateway.GraphQL.Addresses;
 using OpenFTTH.APIGateway.GraphQL.Root;
 using OpenFTTH.APIGateway.GraphQL.RouteNetwork;
 using OpenFTTH.APIGateway.GraphQL.Schematic;
@@ -210,6 +211,9 @@ namespace OpenFTTH.APIGateway
 
             // Route Network stuff
             RegisterRouteNetworkServiceTypes.Register(services);
+
+            // Address stuff
+            RegisterAddressTypes.Register(services);
 
             // Search stuff
             RegisterSearchServiceTypes.Register(services);
