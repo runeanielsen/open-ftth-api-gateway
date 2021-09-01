@@ -5,9 +5,11 @@ using Microsoft.Extensions.Logging;
 using OpenFTTH.APIGateway.GraphQL.Core.Model;
 using OpenFTTH.APIGateway.GraphQL.RouteNetwork.Types;
 using OpenFTTH.CQRS;
+using OpenFTTH.Events.RouteNetwork.Infos;
 using OpenFTTH.RouteNetwork.API.Model;
 using OpenFTTH.RouteNetwork.API.Queries;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Queries
@@ -43,6 +45,39 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Queries
                     }
 
                     return queryResult.Value.RouteNetworkElements[routeNodeId];
+                }
+           );
+
+
+           Field<ListGraphType<RouteNetworkTraceType>>(
+                "nearestNeighborNodes",
+                arguments: new QueryArguments(
+                    new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "sourceRouteNodeId" },
+                    new QueryArgument<NonNullGraphType<ListGraphType<RouteNodeKindEnumType>>> { Name = "stops" },
+                    new QueryArgument<NonNullGraphType<ListGraphType<RouteNodeKindEnumType>>> { Name = "interests" },
+                    new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "maxHits" },
+                    new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "maxBirdFlyDistanceMeters" }
+                ),
+                resolve: context =>
+                {
+                    Guid routeNodeId = context.GetArgument<Guid>("sourceRouteNodeId");
+                    List<RouteNodeKindEnum> stops = context.GetArgument<List<RouteNodeKindEnum>>("stops");
+                    List<RouteNodeKindEnum> interests = context.GetArgument<List<RouteNodeKindEnum>>("interests");
+                    int maxHits = context.GetArgument<int>("maxHits");
+                    int maxBirdFlyDistanceMeters = context.GetArgument<int>("maxBirdFlyDistanceMeters");
+
+
+                    var nearestNodeQuery = new FindNearestRouteNodes(routeNodeId, maxHits, maxBirdFlyDistanceMeters, stops.ToArray(), interests.ToArray());
+
+                    var nearestNodeQueryResult = queryDispatcher.HandleAsync<FindNearestRouteNodes, Result<FindNearestRouteNodesResult>>(nearestNodeQuery).Result;
+            
+                    if (nearestNodeQueryResult.IsFailed)
+                    {
+                        context.Errors.Add(new ExecutionError(nearestNodeQueryResult.Errors.First().Message));
+                        return null;
+                    }
+
+                    return nearestNodeQueryResult.Value.RouteNetworkTraces;
                 }
            );
 
