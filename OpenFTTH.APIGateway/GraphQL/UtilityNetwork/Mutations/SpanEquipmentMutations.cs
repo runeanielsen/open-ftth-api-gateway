@@ -2,6 +2,7 @@
 using GraphQL;
 using GraphQL.Types;
 using OpenFTTH.APIGateway.CoreTypes;
+using OpenFTTH.APIGateway.GraphQL.Addresses.Types;
 using OpenFTTH.APIGateway.GraphQL.Core.Model;
 using OpenFTTH.APIGateway.GraphQL.RouteNetwork.Types;
 using OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Types;
@@ -35,7 +36,8 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                   new QueryArgument<NonNullGraphType<ListGraphType<IdGraphType>>> { Name = "routeSegmentIds" },
                   new QueryArgument<IdGraphType> { Name = "manufacturerId" },
                   new QueryArgument<MarkingInfoInputType> { Name = "markingInfo" },
-                  new QueryArgument<NamingInfoInputType> { Name = "namingInfo" }
+                  new QueryArgument<NamingInfoInputType> { Name = "namingInfo" },
+                  new QueryArgument<AddressInfoInputType> { Name = "addressInfo" }
               ),
               resolve: context =>
               {
@@ -45,6 +47,7 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                   var manufacturerId = context.GetArgument<Guid>("manufacturerId");
                   var markingInfo = context.GetArgument<MarkingInfo>("markingInfo");
                   var namingInfo = context.GetArgument<NamingInfo>("namingInfo");
+                  var addressInfo = context.GetArgument<AddressInfo>("addressInfo");
 
                   // Name conduit span equipment
                   // TODO: Refactor into som class responsible for span equipment naming
@@ -88,7 +91,8 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                       ManufacturerId = manufacturerId,
                       NamingInfo = namingInfo,
                       MarkingInfo = markingInfo,
-                      LifecycleInfo = new LifecycleInfo(DeploymentStateEnum.InService, null, null)
+                      LifecycleInfo = new LifecycleInfo(DeploymentStateEnum.InService, null, null),
+                      AddressInfo = addressInfo
                   };
 
                   var placeSpanEquipmentResult = commandDispatcher.HandleAsync<PlaceSpanEquipmentInRouteNetwork, Result>(placeSpanEquipmentCommand).Result;
@@ -391,7 +395,8 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                  new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "spanEquipmentOrSegmentId" },
                  new QueryArgument<IdGraphType> { Name = "spanEquipmentSpecificationId" },
                  new QueryArgument<IdGraphType> { Name = "manufacturerId" },
-                 new QueryArgument<MarkingInfoInputType> { Name = "markingInfo" }
+                 new QueryArgument<MarkingInfoInputType> { Name = "markingInfo" },
+                 new QueryArgument<AddressInfoInputType> { Name = "addressInfo" }
              ),
              resolve: context =>
              {
@@ -412,7 +417,8 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                  {
                      SpecificationId = context.HasArgument("spanEquipmentSpecificationId") ? context.GetArgument<Guid>("spanEquipmentSpecificationId") : null,
                      ManufacturerId = context.HasArgument("manufacturerId") ? context.GetArgument<Guid>("manufacturerId") : null,
-                     MarkingInfo = context.HasArgument("markingInfo") ? context.GetArgument<MarkingInfo>("markingInfo") : null
+                     MarkingInfo = context.HasArgument("markingInfo") ? context.GetArgument<MarkingInfo>("markingInfo") : null,
+                     AddressInfo = context.HasArgument("addressInfo") ? context.GetArgument<AddressInfo>("addressInfo") : null
                  };
 
                  var updateResult = commandDispatcher.HandleAsync<UpdateSpanEquipmentProperties, Result>(updateCmd).Result;

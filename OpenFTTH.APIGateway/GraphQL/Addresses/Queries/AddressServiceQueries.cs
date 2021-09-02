@@ -141,7 +141,7 @@ namespace OpenFTTH.APIGateway.GraphQL.Addresses.Queries
             return result;
         }
 
-        private AccessAddressData MapAccessAddress(Guid accessAddressId, GetAddressInfoResult addressQueryResult)
+        public static AccessAddressData MapAccessAddress(Guid accessAddressId, GetAddressInfoResult addressQueryResult)
         {
             var searchAccessAddress = addressQueryResult.AccessAddresses[accessAddressId];
 

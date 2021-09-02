@@ -1,6 +1,7 @@
 ﻿using FluentResults;
 using GraphQL.Types;
 using Microsoft.Extensions.Logging;
+using OpenFTTH.APIGateway.GraphQL.Addresses.Types;
 using OpenFTTH.CQRS;
 using OpenFTTH.RouteNetwork.API.Model;
 using OpenFTTH.RouteNetwork.API.Queries;
@@ -21,6 +22,7 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Types
             Field(x => x.Name, type: typeof(StringGraphType)).Description("Short name");
             Field(x => x.Description, type: typeof(StringGraphType)).Description("Long description");
             Field(x => x.MarkingInfo, type: typeof(MarkingInfoType)).Description("Text and color marking information");
+            Field(x => x.AddressInfo, type: typeof(SpanEquipmentAddressInfoType)).Description("Address information such as access and unit address id");
 
             Field(x => x.SpecificationId, type: typeof(IdGraphType)).Description("Span equipment specification id");
             Field(x => x.ManufacturerId, type: typeof(IdGraphType)).Description("Span equipment manufacturer id");
