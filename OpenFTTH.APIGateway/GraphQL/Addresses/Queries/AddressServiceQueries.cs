@@ -34,7 +34,7 @@ namespace OpenFTTH.APIGateway.GraphQL.Addresses.Queries
                 arguments:
                 new QueryArguments(
                     new QueryArgument<IdGraphType> { Name = "routeNodeId" },
-                    new QueryArgument<IdGraphType> { Name = "spanSegmentId" },
+                    new QueryArgument<IdGraphType> { Name = "spanEquipmentOrSegmentId" },
                     new QueryArgument<FloatGraphType> { Name = "x" },
                     new QueryArgument<FloatGraphType> { Name = "y" },
                     new QueryArgument<IntGraphType> { Name = "srid" },
@@ -47,7 +47,7 @@ namespace OpenFTTH.APIGateway.GraphQL.Addresses.Queries
                     int srid = context.GetArgument<int>("srid");
                     int maxHits = context.GetArgument<int>("maxHits");
                     Guid routeNodeId = context.GetArgument<Guid>("routeNodeId");
-                    Guid spanSegmentId = context.GetArgument<Guid>("spanSegmentId");
+                    Guid spanEquipmentOrSegmentId = context.GetArgument<Guid>("spanEquipmentOrSegmentId");
 
                     if (routeNodeId != Guid.Empty)
                     {
@@ -71,9 +71,9 @@ namespace OpenFTTH.APIGateway.GraphQL.Addresses.Queries
 
                         return MapToGraphQLAddressHits(result.Value);
                     }
-                    else if (spanSegmentId != Guid.Empty)
+                    else if (spanEquipmentOrSegmentId != Guid.Empty)
                     {
-                        var segmentEnds = GetSpanSegmentEndCoordinates(spanSegmentId, queryDispatcher);
+                        var segmentEnds = GetSpanSegmentEndCoordinates(spanEquipmentOrSegmentId, queryDispatcher);
 
 
                         // Find address near the from span equipment end
