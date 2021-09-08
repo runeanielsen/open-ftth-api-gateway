@@ -73,35 +73,20 @@ namespace OpenFTTH.APIGateway.GraphQL.Addresses.Queries
                     }
                     else if (spanEquipmentOrSegmentId != Guid.Empty)
                     {
-                        var segmentEnds = GetSpanSegmentEndCoordinates(spanEquipmentOrSegmentId, queryDispatcher);
-
+                        var segmentEnd = GetSpanSegmentEndCoordinate(spanEquipmentOrSegmentId, queryDispatcher);
 
                         // Find address near the from span equipment end
-                        var getAddressInfoQueryFromEnd = new GetAddressInfo(segmentEnds[0].Item1, segmentEnds[0].Item2, 25832, maxHits / 2);
+                        var getAddressInfoQuery = new GetAddressInfo(segmentEnd.Item1, segmentEnd.Item2, 25832, maxHits);
 
-                        var fromEndResult = queryDispatcher.HandleAsync<GetAddressInfo, Result<GetAddressInfoResult>>(getAddressInfoQueryFromEnd).Result;
+                        var getAddressInfoQueryResult = queryDispatcher.HandleAsync<GetAddressInfo, Result<GetAddressInfoResult>>(getAddressInfoQuery).Result;
 
-                        if (fromEndResult.IsFailed)
+                        if (getAddressInfoQueryResult.IsFailed)
                         {
-                            context.Errors.Add(new ExecutionError(fromEndResult.Errors.First().Message));
+                            context.Errors.Add(new ExecutionError(getAddressInfoQueryResult.Errors.First().Message));
                             return null;
                         }
 
-                        // Find address near the to span equipment end
-                        var getAddressInfoQueryToEnd = new GetAddressInfo(segmentEnds[1].Item1, segmentEnds[1].Item2, 25832, maxHits / 2);
-
-                        var toEndResult = queryDispatcher.HandleAsync<GetAddressInfo, Result<GetAddressInfoResult>>(getAddressInfoQueryToEnd).Result;
-
-                        if (toEndResult.IsFailed)
-                        {
-                            context.Errors.Add(new ExecutionError(fromEndResult.Errors.First().Message));
-                            return null;
-                        }
-
-                        var hits = MapToGraphQLAddressHits(fromEndResult.Value);
-                        hits.AddRange(MapToGraphQLAddressHits(toEndResult.Value));
-
-                        return hits;
+                        return MapToGraphQLAddressHits(getAddressInfoQueryResult.Value);
                     }
                     else
                     {
@@ -143,7 +128,7 @@ namespace OpenFTTH.APIGateway.GraphQL.Addresses.Queries
                 return (0, 0);
         }
 
-        private List<(double, double)> GetSpanSegmentEndCoordinates(Guid spanSegmentId, IQueryDispatcher queryDispatcher)
+        private (double, double) GetSpanSegmentEndCoordinate(Guid spanSegmentId, IQueryDispatcher queryDispatcher)
         {
             // Query span equipment
             var equipmentQueryResult = queryDispatcher.HandleAsync<GetEquipmentDetails, FluentResults.Result<GetEquipmentDetailsResult>>(
@@ -187,12 +172,7 @@ namespace OpenFTTH.APIGateway.GraphQL.Addresses.Queries
 
             var routeNetworkElementIds = routeNetworkQueryResult.Value.Interests[spanEquipmentInterestId].RouteNetworkElementRefs;
 
-            var result = new List<(double, double)>();
-
-            result.Add(GetNodeCoordinates(routeNetworkElementIds.First(), queryDispatcher));
-            result.Add(GetNodeCoordinates(routeNetworkElementIds.Last(), queryDispatcher));
-
-            return result;
+            return GetNodeCoordinates(routeNetworkElementIds.Last(), queryDispatcher);
         }
 
         private double[] ConvertPointGeojsonToCoordArray(string geojson)
