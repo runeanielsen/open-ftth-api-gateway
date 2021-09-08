@@ -7,7 +7,10 @@ using OpenFTTH.Address.API.Queries;
 using OpenFTTH.APIGateway.GraphQL.Addresses.Types;
 using OpenFTTH.APIGateway.Util;
 using OpenFTTH.CQRS;
+using OpenFTTH.RouteNetwork.API.Model;
 using OpenFTTH.RouteNetwork.API.Queries;
+using OpenFTTH.UtilityGraphService.API.Model.UtilityNetwork;
+using OpenFTTH.UtilityGraphService.API.Queries;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -31,6 +34,7 @@ namespace OpenFTTH.APIGateway.GraphQL.Addresses.Queries
                 arguments:
                 new QueryArguments(
                     new QueryArgument<IdGraphType> { Name = "routeNodeId" },
+                    new QueryArgument<IdGraphType> { Name = "spanSegmentId" },
                     new QueryArgument<FloatGraphType> { Name = "x" },
                     new QueryArgument<FloatGraphType> { Name = "y" },
                     new QueryArgument<IntGraphType> { Name = "srid" },
@@ -43,6 +47,7 @@ namespace OpenFTTH.APIGateway.GraphQL.Addresses.Queries
                     int srid = context.GetArgument<int>("srid");
                     int maxHits = context.GetArgument<int>("maxHits");
                     Guid routeNodeId = context.GetArgument<Guid>("routeNodeId");
+                    Guid spanSegmentId = context.GetArgument<Guid>("spanSegmentId");
 
                     if (routeNodeId != Guid.Empty)
                     {
@@ -65,6 +70,38 @@ namespace OpenFTTH.APIGateway.GraphQL.Addresses.Queries
                         }
 
                         return MapToGraphQLAddressHits(result.Value);
+                    }
+                    else if (spanSegmentId != Guid.Empty)
+                    {
+                        var segmentEnds = GetSpanSegmentEndCoordinates(spanSegmentId, queryDispatcher);
+
+
+                        // Find address near the from span equipment end
+                        var getAddressInfoQueryFromEnd = new GetAddressInfo(segmentEnds[0].Item1, segmentEnds[0].Item2, 25832, maxHits / 2);
+
+                        var fromEndResult = queryDispatcher.HandleAsync<GetAddressInfo, Result<GetAddressInfoResult>>(getAddressInfoQueryFromEnd).Result;
+
+                        if (fromEndResult.IsFailed)
+                        {
+                            context.Errors.Add(new ExecutionError(fromEndResult.Errors.First().Message));
+                            return null;
+                        }
+
+                        // Find address near the to span equipment end
+                        var getAddressInfoQueryToEnd = new GetAddressInfo(segmentEnds[1].Item1, segmentEnds[1].Item2, 25832, maxHits / 2);
+
+                        var toEndResult = queryDispatcher.HandleAsync<GetAddressInfo, Result<GetAddressInfoResult>>(getAddressInfoQueryToEnd).Result;
+
+                        if (toEndResult.IsFailed)
+                        {
+                            context.Errors.Add(new ExecutionError(fromEndResult.Errors.First().Message));
+                            return null;
+                        }
+
+                        var hits = MapToGraphQLAddressHits(fromEndResult.Value);
+                        hits.AddRange(MapToGraphQLAddressHits(toEndResult.Value));
+
+                        return hits;
                     }
                     else
                     {
@@ -104,6 +141,58 @@ namespace OpenFTTH.APIGateway.GraphQL.Addresses.Queries
             }
             else
                 return (0, 0);
+        }
+
+        private List<(double, double)> GetSpanSegmentEndCoordinates(Guid spanSegmentId, IQueryDispatcher queryDispatcher)
+        {
+            // Query span equipment
+            var equipmentQueryResult = queryDispatcher.HandleAsync<GetEquipmentDetails, FluentResults.Result<GetEquipmentDetailsResult>>(
+                new GetEquipmentDetails(new EquipmentIdList() { spanSegmentId })
+                {
+                    EquipmentDetailsFilter = new EquipmentDetailsFilterOptions { IncludeRouteNetworkTrace = true }
+                }
+            ).Result;
+
+            if (equipmentQueryResult.IsFailed)
+            {
+                throw new ApplicationException($"Error querying span equipment by id: {spanSegmentId} " + equipmentQueryResult.Errors.First().Message);
+            }
+
+            if (equipmentQueryResult.Value.SpanEquipment == null || equipmentQueryResult.Value.SpanEquipment.Count == 0)
+            {
+                throw new ApplicationException($"Cannot find any span equipment containing a span segment with id: {spanSegmentId}");
+            }
+
+            Guid spanEquipmentInterestId = equipmentQueryResult.Value.SpanEquipment.First().WalkOfInterestId;
+
+            // Query route network
+            var routeNetworkQueryResult = queryDispatcher.HandleAsync<GetRouteNetworkDetails, FluentResults.Result<GetRouteNetworkDetailsResult>>(
+                      new GetRouteNetworkDetails(new InterestIdList() { spanEquipmentInterestId })
+                      {
+                          RouteNetworkElementFilter = new RouteNetworkElementFilterOptions()
+                          { 
+                              IncludeCoordinates = true,
+                          },
+                          RelatedInterestFilter = RelatedInterestFilterOptions.None
+                      }
+                  ).Result;
+
+            if (routeNetworkQueryResult.IsFailed)
+            {
+                throw new ApplicationException($"Got error querying interest information for span equipment: {spanSegmentId} ERROR: " + routeNetworkQueryResult.Errors.First().Message);
+            }
+
+            if (routeNetworkQueryResult.Value.Interests == null || !routeNetworkQueryResult.Value.Interests.ContainsKey(spanEquipmentInterestId))
+                throw new ApplicationException($"Got no info querying interest information for span equipment: {spanSegmentId}");
+
+            var routeNetworkElementIds = routeNetworkQueryResult.Value.Interests[spanEquipmentInterestId].RouteNetworkElementRefs;
+
+            var result = new List<(double, double)>();
+
+            result.Add(GetNodeCoordinates(routeNetworkElementIds.First(), queryDispatcher));
+            result.Add(GetNodeCoordinates(routeNetworkElementIds.Last(), queryDispatcher));
+
+            return result;
         }
 
         private double[] ConvertPointGeojsonToCoordArray(string geojson)
