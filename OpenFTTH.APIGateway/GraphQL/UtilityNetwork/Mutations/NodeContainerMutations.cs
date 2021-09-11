@@ -144,6 +144,39 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                     return new CommandResult(updateResult);
                 }
             );
+
+
+            Field<CommandResultType>(
+              "remove",
+              description: "Remove node container from the route network node",
+              arguments: new QueryArguments(
+                  new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "nodeContainerId" }
+              ),
+              resolve: context =>
+              {
+                  var nodeContainerId = context.GetArgument<Guid>("nodeContainerId");
+
+                  var correlationId = Guid.NewGuid();
+
+                  var userContext = context.UserContext as GraphQLUserContext;
+                  var userName = userContext.Username;
+
+                  // TODO: Get from work manager
+                  var workTaskId = Guid.Parse("54800ae5-13a5-4b03-8626-a63b66a25568");
+
+                  var commandUserContext = new UserContext(userName, workTaskId);
+
+                  var removeNodeContainer = new RemoveNodeContainerFromRouteNetwork(
+                    correlationId: correlationId,
+                    userContext: commandUserContext,
+                    nodeContainerId: nodeContainerId
+                  );
+
+                  var removeResult = commandDispatcher.HandleAsync<RemoveNodeContainerFromRouteNetwork, Result>(removeNodeContainer).Result;
+
+                  return new CommandResult(removeResult);
+              }
+            );
         }
     }
 }
