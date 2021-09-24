@@ -117,13 +117,13 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
               "affixSpanEquipmentToNodeContainer",
               description: "Affix a span equipment to a node container - i.e. to some condult closure, man hole etc.",
               arguments: new QueryArguments(
-                  new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "spanSegmentId" },
+                  new QueryArgument<NonNullGraphType<ListGraphType<IdGraphType>>> { Name = "spanSegmentIds" },
                   new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "nodeContainerId" },
                   new QueryArgument<NonNullGraphType<NodeContainerSideEnumType>> { Name = "nodeContainerSide" }
               ),
               resolve: context =>
               {
-                  var spanSegmentId = context.GetArgument<Guid>("spanSegmentId");
+                  var spanSegmentIds = context.GetArgument<List<Guid>>("spanSegmentIds");
                   var nodeContainerId = context.GetArgument<Guid>("nodeContainerId");
                   var side = context.GetArgument<NodeContainerSideEnum>("nodeContainerSide");
 
@@ -137,12 +137,17 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
 
                   var commandUserContext = new UserContext(userName, workTaskId);
 
-                  var affixCommand = new AffixSpanEquipmentToNodeContainer(correlationId, commandUserContext, spanSegmentId, nodeContainerId, side);
+                  foreach (var spanSegmentId in spanSegmentIds)
+                  {
+                      var affixCommand = new AffixSpanEquipmentToNodeContainer(correlationId, commandUserContext, spanSegmentId, nodeContainerId, side);
 
-                  var affixCommandResult = commandDispatcher.HandleAsync<AffixSpanEquipmentToNodeContainer, Result>(affixCommand).Result;
+                      var affixCommandResult = commandDispatcher.HandleAsync<AffixSpanEquipmentToNodeContainer, Result>(affixCommand).Result;
 
-                  return new CommandResult(affixCommandResult);
+                      if (affixCommandResult.IsFailed)
+                        return new CommandResult(affixCommandResult);
+                  }
 
+                  return new CommandResult(Result.Ok());
               }
             );
 
@@ -150,12 +155,12 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
               "detachSpanEquipmentFromNodeContainer",
               description: "Detach a span equipment from a node container - i.e. from some condult closure, man hole etc.",
               arguments: new QueryArguments(
-                  new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "spanSegmentId" },
+                  new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "spanSegmentIds" },
                   new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "routeNodeId" }
               ),
               resolve: context =>
               {
-                  var spanSegmentId = context.GetArgument<Guid>("spanSegmentId");
+                  var spanSegmentIds = context.GetArgument<List<Guid>>("spanSegmentIds");
                   var routeNodeId = context.GetArgument<Guid>("routeNodeId");
 
                   var correlationId = Guid.NewGuid();
@@ -171,12 +176,18 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                       EditingRouteNodeId = routeNodeId
                   };
 
-                  var detachCommand = new DetachSpanEquipmentFromNodeContainer(correlationId, commandUserContext, spanSegmentId, routeNodeId);
+                  foreach (var spanSegmentId in spanSegmentIds)
+                  {
 
-                  var detachCommandResult = commandDispatcher.HandleAsync<DetachSpanEquipmentFromNodeContainer, Result>(detachCommand).Result;
+                      var detachCommand = new DetachSpanEquipmentFromNodeContainer(correlationId, commandUserContext, spanSegmentId, routeNodeId);
 
-                  return new CommandResult(detachCommandResult);
+                      var detachCommandResult = commandDispatcher.HandleAsync<DetachSpanEquipmentFromNodeContainer, Result>(detachCommand).Result;
 
+                      if (detachCommandResult.IsFailed)
+                        return new CommandResult(detachCommandResult);
+                  }
+
+                  return new CommandResult(Result.Ok());
               }
             );
 
