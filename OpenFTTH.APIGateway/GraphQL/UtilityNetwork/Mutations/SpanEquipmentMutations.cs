@@ -155,7 +155,7 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
               "detachSpanEquipmentFromNodeContainer",
               description: "Detach a span equipment from a node container - i.e. from some condult closure, man hole etc.",
               arguments: new QueryArguments(
-                  new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "spanSegmentIds" },
+                  new QueryArgument<ListGraphType<IdGraphType>> { Name = "spanSegmentIds" },
                   new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "routeNodeId" }
               ),
               resolve: context =>
