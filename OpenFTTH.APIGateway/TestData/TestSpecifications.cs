@@ -141,6 +141,11 @@ namespace OpenFTTH.TestData
         public static Guid CustomerConduit_Ø7_Orange = Guid.Parse("671529f8-65f7-4670-9b02-8bae53747f1c");
         public static Guid CustomerConduit_Ø12_Orange = Guid.Parse("ddd86873-9d6c-4741-a406-084c628314db");
 
+        // Racks
+        public static Guid Rack_ESTI = Guid.Parse("b72523d7-4a55-489e-8901-a9fdf9a7d471");
+        public static Guid Rack_19Inch = Guid.Parse("a34f58a1-d214-49a1-85b9-b3a6c1a03ba5");
+        public static Guid Rack_HuberSuber = Guid.Parse("f4889d4a-0224-49e1-a1fe-61158f3bd764");
+
 
 
         public FluentResults.Result<TestSpecifications> Run()
@@ -159,6 +164,8 @@ namespace OpenFTTH.TestData
                 AddSpanStructureSpecifications();
 
                 AddSpanEquipmentSpecifications();
+
+                AddRackSpecifications();
 
                 Thread.Sleep(100);
 
@@ -803,6 +810,13 @@ namespace OpenFTTH.TestData
             AddManufacturer(new Manufacturer(Manu_Cubis, "Wavin"));
         }
 
+        private void AddRackSpecifications()
+        {
+            AddSpecification(new RackSpecification(Rack_ESTI, "CommScope ETSI Rack", "ETSI"));
+            AddSpecification(new RackSpecification(Rack_19Inch, "19\" Rack", "19\""));
+            AddSpecification(new RackSpecification(Rack_HuberSuber, "HUBER+SUHNER Rack", "HUBER+SUHNER"));
+        }
+
         private void AddSpecification(SpanEquipmentSpecification spec)
         {
             var cmd = new AddSpanEquipmentSpecification(Guid.NewGuid(), new UserContext("specification seeder", _specSeederId), spec);
@@ -829,6 +843,15 @@ namespace OpenFTTH.TestData
             var cmd = new AddNodeContainerSpecification(Guid.NewGuid(), new UserContext("specification seeder",_specSeederId), spec);
 
             var cmdResult = _commandDispatcher.HandleAsync<AddNodeContainerSpecification, Result>(cmd).Result;
+
+            if (cmdResult.IsFailed)
+                throw new ApplicationException(cmdResult.Errors.First().Message);
+        }
+
+        private void AddSpecification(RackSpecification spec)
+        {
+            var cmd = new AddRackSpecification(Guid.NewGuid(), new UserContext("test", Guid.Empty), spec);
+            var cmdResult = _commandDispatcher.HandleAsync<AddRackSpecification, Result>(cmd).Result;
 
             if (cmdResult.IsFailed)
                 throw new ApplicationException(cmdResult.Errors.First().Message);

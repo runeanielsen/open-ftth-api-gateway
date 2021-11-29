@@ -177,6 +177,50 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                   return new CommandResult(removeResult);
               }
             );
+
+
+            Field<CommandResultType>(
+              "placeRackInNodeContainer",
+              description: "Place a rack in the node container",
+              arguments: new QueryArguments(
+                  new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "nodeContainerId" },
+                  new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "rackId" },
+                  new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "rackSpecificationId" },
+                  new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "rackName" },
+                  new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "rackHeightInUnits" }
+              ),
+              resolve: context =>
+              {
+                  var nodeContainerId = context.GetArgument<Guid>("nodeContainerId");
+                  var rackId = context.GetArgument<Guid>("rackId");
+                  var rackSpecificationId = context.GetArgument<Guid>("rackSpecificationId");
+                  var rackName = context.GetArgument<string>("rackName");
+                  var rackHeightInUnits = context.GetArgument<int>("rackHeightInUnits");
+
+                  var correlationId = Guid.NewGuid();
+
+                  var userContext = context.UserContext as GraphQLUserContext;
+                  var userName = userContext.Username;
+
+                  // TODO: Get from work manager
+                  var workTaskId = Guid.Parse("54800ae5-13a5-4b03-8626-a63b66a25568");
+
+                  var commandUserContext = new UserContext(userName, workTaskId);
+
+                  var placeRackInNodeContainer = new PlaceRackInNodeContainer(
+                    correlationId: correlationId,
+                    userContext: commandUserContext,
+                    nodeContainerId: nodeContainerId,
+                    rackSpecificationId: rackSpecificationId,
+                    rackName: rackName,
+                    rackHeightInUnits: rackHeightInUnits
+                  );
+
+                  var removeResult = commandDispatcher.HandleAsync<PlaceRackInNodeContainer, Result>(placeRackInNodeContainer).Result;
+
+                  return new CommandResult(removeResult);
+              }
+            );
         }
     }
 }

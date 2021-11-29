@@ -59,6 +59,19 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Queries
                 }
             );
 
+            Field<ListGraphType<RackSpecificationType>>(
+               name: "rackSpecifications",
+               description: "Retrieve all rack specifications.",
+               resolve: context =>
+               {
+                   var queryResult = queryDispatcher.HandleAsync<GetRackSpecifications, Result<LookupCollection<RackSpecification>>>(new GetRackSpecifications()).Result;
+
+                   return queryResult.Value.OrderBy(s => s.Description);
+               }
+           );
+
+
+
             Field<SpanSegmentTraceType>(
                 name: "spanSegmentTrace",
                 description: "Trace a specific span segment",
@@ -189,8 +202,52 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Queries
                   return nodeContainer;
               }
           );
-        }
 
+
+          Field<RackType>(
+            name: "rack",
+            description: "Query information related to a specific rack residing within a node container",
+            arguments: new QueryArguments(
+              new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "nodeContainerId" },
+              new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "rackId" }
+            ),
+            resolve: context =>
+            {
+                var nodeContainerId = context.GetArgument<Guid>("nodeContainerId");
+                var rackId = context.GetArgument<Guid>("rackId");
+
+                // Get equipment information
+                var equipmentQueryResult = queryDispatcher.HandleAsync<GetEquipmentDetails, FluentResults.Result<GetEquipmentDetailsResult>>(
+                     new GetEquipmentDetails(new InterestIdList() { nodeContainerId })
+                 ).Result;
+
+                if (equipmentQueryResult.IsFailed)
+                {
+                    foreach (var error in equipmentQueryResult.Errors)
+                        context.Errors.Add(new ExecutionError(error.Message));
+
+                    return null;
+                }
+
+                if (equipmentQueryResult.Value.NodeContainers == null || equipmentQueryResult.Value.NodeContainers.Count == 0)
+                {
+                    context.Errors.Add(new ExecutionError($"Cannot find any node container with id: {nodeContainerId}"));
+                    return null;
+                }
+
+                var nodeContainer = equipmentQueryResult.Value.NodeContainers.First();
+
+
+                if (nodeContainer.Racks == null || !nodeContainer.Racks.Any(r => r.Id == rackId))
+                {
+                    context.Errors.Add(new ExecutionError($"Cannot find any rack with id: {rackId} within node container with id: {nodeContainerId}"));
+                    return null;
+                }
+
+                return nodeContainer.Racks.First(r => r.Id == rackId);
+            }
+        );
         
+        }
     }
 }
