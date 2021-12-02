@@ -3,12 +3,15 @@ using GraphQL;
 using GraphQL.Types;
 using OpenFTTH.APIGateway.CoreTypes;
 using OpenFTTH.APIGateway.GraphQL.Core.Model;
+using OpenFTTH.APIGateway.GraphQL.RouteNetwork.Types;
+using OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Types;
 using OpenFTTH.CQRS;
 using OpenFTTH.Events.Core.Infos;
 using OpenFTTH.EventSourcing;
 using OpenFTTH.RouteNetwork.API.Commands;
 using OpenFTTH.RouteNetwork.API.Model;
 using OpenFTTH.UtilityGraphService.API.Commands;
+using OpenFTTH.UtilityGraphService.API.Model.UtilityNetwork;
 using System;
 
 namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
@@ -221,6 +224,59 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                   return new CommandResult(removeResult);
               }
             );
+
+
+            Field<CommandResultType>(
+             "placeTerminalEquipmentInNodeContainer",
+             description: "Place a terminal directly in a node container or in a node container rack",
+             arguments: new QueryArguments(
+                 new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "nodeContainerId" },
+                 new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "terminalEquipmentSpecificationId" },
+                 new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "numberOfEquipments" },
+                 new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "startSequenceNumber" },
+                 new QueryArgument<NonNullGraphType<TerminalEquipmentNamingMethodEnumType>> { Name = "terminalEquipmentNamingMethod" },
+                 new QueryArgument<NamingInfoInputType> { Name = "namingInfo" },
+                 new QueryArgument<SubrackPlacementInfoInputType> { Name = "subrackPlacementInfo" }
+             ),
+             resolve: context =>
+             {
+                 var nodeContainerId = context.GetArgument<Guid>("nodeContainerId");
+                 var terminalEquipmentSpecificationId = context.GetArgument<Guid>("terminalEquipmentSpecificationId");
+                 var numberOfEquipments = context.GetArgument<int>("numberOfEquipments");
+                 var startSequenceNumber = context.GetArgument<int>("startSequenceNumber");
+                 var terminalEquipmentNamingMethod = context.GetArgument<TerminalEquipmentNamingMethodEnum>("terminalEquipmentNamingMethod");
+                 var namingInfo = context.GetArgument<NamingInfo>("namingInfo");
+                 var subrackPlacementInfo = context.GetArgument<SubrackPlacementInfo>("subrackPlacementInfo");
+
+                 var correlationId = Guid.NewGuid();
+
+                 var userContext = context.UserContext as GraphQLUserContext;
+                 var userName = userContext.Username;
+
+                  // TODO: Get from work manager
+                  var workTaskId = Guid.Parse("54800ae5-13a5-4b03-8626-a63b66a25568");
+
+                 var commandUserContext = new UserContext(userName, workTaskId);
+
+                 var placeEquipmentInNodeContainer = new PlaceTerminalEquipmentInNodeContainer(
+                   correlationId: correlationId,
+                   userContext: commandUserContext,
+                   nodeContainerId: nodeContainerId,
+                   terminalEquipmentSpecificationId: terminalEquipmentSpecificationId,
+                   numberOfEquipments: numberOfEquipments,
+                   startSequenceNumber: startSequenceNumber,
+                   namingMethod: terminalEquipmentNamingMethod,
+                   namingInfo: namingInfo
+                 )
+                 {
+                     SubrackPlacementInfo = subrackPlacementInfo
+                 };
+
+                 var removeResult = commandDispatcher.HandleAsync<PlaceTerminalEquipmentInNodeContainer, Result>(placeEquipmentInNodeContainer).Result;
+
+                 return new CommandResult(removeResult);
+             }
+           );
         }
     }
 }

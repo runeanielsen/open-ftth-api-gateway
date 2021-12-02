@@ -48,6 +48,18 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Queries
                 }
             );
 
+            Field<ListGraphType<TerminalEquipmentSpecificationType>>(
+                name: "terminalEquipmentSpecifications",
+                description: "Retrieve all terminal equipment specifications.",
+                resolve: context =>
+                {
+                    var queryResult = queryDispatcher.HandleAsync<GetTerminalEquipmentSpecifications,
+                        Result<LookupCollection<TerminalEquipmentSpecification>>>(new GetTerminalEquipmentSpecifications()).Result;
+
+                    return queryResult.Value.OrderBy(s => s.Description);
+                }
+            );
+
             Field<ListGraphType<NodeContainerSpecificationType>>(
                 name: "nodeContainerSpecifications",
                 description: "Retrieve all node container specifications.",
