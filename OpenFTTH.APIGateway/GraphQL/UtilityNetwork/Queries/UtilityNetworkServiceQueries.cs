@@ -218,41 +218,31 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Queries
 
           Field<RackType>(
             name: "rack",
-            description: "Query information related to a specific rack residing within a node container",
+            description: "Query information related to a specific rack residing within a node",
             arguments: new QueryArguments(
-              new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "nodeContainerId" },
+              new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "routeNodeId" },
               new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "rackId" }
             ),
             resolve: context =>
             {
-                var nodeContainerId = context.GetArgument<Guid>("nodeContainerId");
+                var routeNodeId = context.GetArgument<Guid>("routeNodeId");
                 var rackId = context.GetArgument<Guid>("rackId");
 
-                // Get equipment information
-                var equipmentQueryResult = queryDispatcher.HandleAsync<GetEquipmentDetails, FluentResults.Result<GetEquipmentDetailsResult>>(
-                     new GetEquipmentDetails(new InterestIdList() { nodeContainerId })
-                 ).Result;
+                var getNodeContainerResult = GetNodeContainerFromRouteNodeId(queryDispatcher, routeNodeId);
 
-                if (equipmentQueryResult.IsFailed)
+                if (getNodeContainerResult.IsFailed)
                 {
-                    foreach (var error in equipmentQueryResult.Errors)
+                    foreach (var error in getNodeContainerResult.Errors)
                         context.Errors.Add(new ExecutionError(error.Message));
 
                     return null;
                 }
-
-                if (equipmentQueryResult.Value.NodeContainers == null || equipmentQueryResult.Value.NodeContainers.Count == 0)
-                {
-                    context.Errors.Add(new ExecutionError($"Cannot find any node container with id: {nodeContainerId}"));
-                    return null;
-                }
-
-                var nodeContainer = equipmentQueryResult.Value.NodeContainers.First();
-
+    
+                var nodeContainer = getNodeContainerResult.Value;
 
                 if (nodeContainer.Racks == null || !nodeContainer.Racks.Any(r => r.Id == rackId))
                 {
-                    context.Errors.Add(new ExecutionError($"Cannot find any rack with id: {rackId} within node container with id: {nodeContainerId}"));
+                    context.Errors.Add(new ExecutionError($"Cannot find any rack with id: {rackId} within node container with id: {nodeContainer.Id}"));
                     return null;
                 }
 
@@ -261,5 +251,46 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Queries
         );
         
         }
+
+
+        private Result<NodeContainer> GetNodeContainerFromRouteNodeId(IQueryDispatcher queryDispatcher, Guid routeNodeId)
+        {
+            // Query all route node interests
+            var routeNetworkInterestQuery = new GetRouteNetworkDetails(new RouteNetworkElementIdList() { routeNodeId })
+            {
+                RelatedInterestFilter = RelatedInterestFilterOptions.ReferencesFromRouteElementOnly
+            };
+
+            Result<GetRouteNetworkDetailsResult> interestsQueryResult = queryDispatcher.HandleAsync<GetRouteNetworkDetails, Result<GetRouteNetworkDetailsResult>>(routeNetworkInterestQuery).Result;
+
+            if (interestsQueryResult.IsFailed)
+                return Result.Fail(interestsQueryResult.Errors.First());
+       
+            var interestIdList = new InterestIdList();
+            interestIdList.AddRange(interestsQueryResult.Value.RouteNetworkElements[routeNodeId].InterestRelations.Select(r => r.RefId));
+
+            // Only query for equipments if interests are returned from the route network query
+            if (interestIdList.Count > 0)
+            {
+                // Query all the equipments related to the route network element
+                var equipmentQueryResult = queryDispatcher.HandleAsync<GetEquipmentDetails, Result<GetEquipmentDetailsResult>>(
+                    new GetEquipmentDetails(interestIdList)
+                    { 
+                        EquipmentDetailsFilter = new EquipmentDetailsFilterOptions() { IncludeRouteNetworkTrace = false }
+                    }
+                ).Result;
+
+                if (equipmentQueryResult.IsFailed)
+                    return Result.Fail(equipmentQueryResult.Errors.First());
+
+                if (equipmentQueryResult.Value.NodeContainers != null && equipmentQueryResult.Value.NodeContainers.Count > 0)
+                {
+                    return Result.Ok(equipmentQueryResult.Value.NodeContainers.First());
+                }
+            }
+
+            return Result.Fail(new Error($"Failed to find node container in route node with id: {routeNodeId}"));
+        }
+
     }
 }
