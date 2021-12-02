@@ -198,6 +198,10 @@ namespace OpenFTTH.TestData
 
                 AddRackSpecifications();
 
+                AddTerminalStructureSpecifications();
+
+                AddTerminalEquipmentSpecifications();
+
                 Thread.Sleep(100);
 
                 _specificationsCreated = true;
