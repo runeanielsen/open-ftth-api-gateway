@@ -11,11 +11,8 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Types
         {
             Field(x => x.RackId, type: typeof(IdGraphType)).Description("Rack id");
             Field(x => x.StartUnitPosition, type: typeof(IntGraphType)).Description("Subrack start position (rack unit)");
-            Field(x => x.PlacmentMethod, type: typeof(SubrackPlacmentMethodType)).Description("Subrack placement method");
+            Field(x => x.PlacementMethod, type: typeof(SubrackPlacmentMethodType)).Description("Subrack placement method");
         }
-
-
-
     }
 
     public class SubrackPlacementInfoInputType : InputObjectGraphType<SubrackPlacementInfo>
@@ -24,7 +21,7 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Types
         {
             Field(x => x.RackId, type: typeof(IdGraphType)).Description("Rack id");
             Field(x => x.StartUnitPosition, type: typeof(IntGraphType)).Description("Subrack start position (rack unit)");
-            Field(x => x.PlacmentMethod, type: typeof(SubrackPlacmentMethodType)).Description("Subrack placement method");
+            Field(x => x.PlacementMethod, type: typeof(SubrackPlacmentMethodType)).Description("Subrack placement method");
         }
     }
 }

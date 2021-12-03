@@ -9,6 +9,7 @@ using OpenFTTH.RouteNetwork.API.Model;
 using OpenFTTH.RouteNetwork.API.Queries;
 using OpenFTTH.Util;
 using OpenFTTH.UtilityGraphService.API.Model.UtilityNetwork;
+using OpenFTTH.UtilityGraphService.API.Model.UtilityNetwork.Views;
 using OpenFTTH.UtilityGraphService.API.Queries;
 using System;
 using System.Linq;
@@ -244,7 +245,39 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Queries
                 return nodeContainer.Racks.First(r => r.Id == rackId);
             }
         );
-        
+
+
+         Field<TerminalEquipmentAZConnectivityViewModelType>(
+            name: "terminalEquipmentConnectivityView",
+            description: "Query connectivity information related to ",
+            arguments: new QueryArguments(
+              new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "routeNodeId" },
+              new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "terminalEquipmentOrRackId" }
+            ),
+            resolve: context =>
+            {
+                var routeNodeId = context.GetArgument<Guid>("routeNodeId");
+                var terminalEquipmentOrRackId = context.GetArgument<Guid>("terminalEquipmentOrRackId");
+
+                var connectivityQuery = new GetTerminalEquipmentConnectivityView(routeNodeId, terminalEquipmentOrRackId);
+
+                var connectivityQueryResult = queryDispatcher.HandleAsync<GetTerminalEquipmentConnectivityView, Result<TerminalEquipmentAZConnectivityViewModel>>(
+                    connectivityQuery
+                ).Result;
+
+                if (connectivityQueryResult.IsFailed)
+                {
+                    foreach (var error in connectivityQueryResult.Errors)
+                        context.Errors.Add(new ExecutionError(error.Message));
+
+                    return null;
+                }
+
+                return connectivityQueryResult.Value;
+            }
+        );
+
+
         }
 
     }
