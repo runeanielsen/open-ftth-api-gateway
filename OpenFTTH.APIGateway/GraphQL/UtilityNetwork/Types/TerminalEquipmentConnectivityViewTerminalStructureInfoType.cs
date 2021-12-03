@@ -13,7 +13,7 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Types
             Field(x => x.Category, type: typeof(StringGraphType)).Description("Category");
             Field(x => x.Info, type: typeof(StringGraphType)).Description("Additional information (remark)");
             Field(x => x.SpecName, type: typeof(StringGraphType)).Description("Specification name");
-            Field(x => x.Lines, type: typeof(ListGraphType<TerminalEquipmentConnectivityViewTerminalStructureInfoType>)).Description("The terminal structures(s) - i.e. cards, trays etc.");
+            Field(x => x.Lines, type: typeof(ListGraphType<TerminalEquipmentAZConnectivityViewLineInfoType>)).Description("Connectivity lines");
         }
     }
 }
