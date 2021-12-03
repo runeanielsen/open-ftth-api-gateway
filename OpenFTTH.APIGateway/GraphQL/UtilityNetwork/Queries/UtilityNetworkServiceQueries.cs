@@ -2,8 +2,6 @@
 using GraphQL;
 using GraphQL.Types;
 using Microsoft.Extensions.Logging;
-using NetTopologySuite.Geometries;
-using NetTopologySuite.IO;
 using OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Types;
 using OpenFTTH.APIGateway.Util;
 using OpenFTTH.CQRS;
@@ -11,10 +9,8 @@ using OpenFTTH.RouteNetwork.API.Model;
 using OpenFTTH.RouteNetwork.API.Queries;
 using OpenFTTH.Util;
 using OpenFTTH.UtilityGraphService.API.Model.UtilityNetwork;
-using OpenFTTH.UtilityGraphService.API.Model.UtilityNetwork.Tracing;
 using OpenFTTH.UtilityGraphService.API.Queries;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Queries
@@ -80,8 +76,7 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Queries
 
                    return queryResult.Value.OrderBy(s => s.Description);
                }
-           );
-
+            );
 
 
             Field<SpanSegmentTraceType>(
@@ -228,7 +223,7 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Queries
                 var routeNodeId = context.GetArgument<Guid>("routeNodeId");
                 var rackId = context.GetArgument<Guid>("rackId");
 
-                var getNodeContainerResult = GetNodeContainerFromRouteNodeId(queryDispatcher, routeNodeId);
+                var getNodeContainerResult = QueryHelper.GetNodeContainerFromRouteNodeId(queryDispatcher, routeNodeId);
 
                 if (getNodeContainerResult.IsFailed)
                 {
@@ -250,46 +245,6 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Queries
             }
         );
         
-        }
-
-
-        private Result<NodeContainer> GetNodeContainerFromRouteNodeId(IQueryDispatcher queryDispatcher, Guid routeNodeId)
-        {
-            // Query all route node interests
-            var routeNetworkInterestQuery = new GetRouteNetworkDetails(new RouteNetworkElementIdList() { routeNodeId })
-            {
-                RelatedInterestFilter = RelatedInterestFilterOptions.ReferencesFromRouteElementOnly
-            };
-
-            Result<GetRouteNetworkDetailsResult> interestsQueryResult = queryDispatcher.HandleAsync<GetRouteNetworkDetails, Result<GetRouteNetworkDetailsResult>>(routeNetworkInterestQuery).Result;
-
-            if (interestsQueryResult.IsFailed)
-                return Result.Fail(interestsQueryResult.Errors.First());
-       
-            var interestIdList = new InterestIdList();
-            interestIdList.AddRange(interestsQueryResult.Value.RouteNetworkElements[routeNodeId].InterestRelations.Select(r => r.RefId));
-
-            // Only query for equipments if interests are returned from the route network query
-            if (interestIdList.Count > 0)
-            {
-                // Query all the equipments related to the route network element
-                var equipmentQueryResult = queryDispatcher.HandleAsync<GetEquipmentDetails, Result<GetEquipmentDetailsResult>>(
-                    new GetEquipmentDetails(interestIdList)
-                    { 
-                        EquipmentDetailsFilter = new EquipmentDetailsFilterOptions() { IncludeRouteNetworkTrace = false }
-                    }
-                ).Result;
-
-                if (equipmentQueryResult.IsFailed)
-                    return Result.Fail(equipmentQueryResult.Errors.First());
-
-                if (equipmentQueryResult.Value.NodeContainers != null && equipmentQueryResult.Value.NodeContainers.Count > 0)
-                {
-                    return Result.Ok(equipmentQueryResult.Value.NodeContainers.First());
-                }
-            }
-
-            return Result.Fail(new Error($"Failed to find node container in route node with id: {routeNodeId}"));
         }
 
     }

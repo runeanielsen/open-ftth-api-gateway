@@ -5,6 +5,7 @@ using OpenFTTH.APIGateway.CoreTypes;
 using OpenFTTH.APIGateway.GraphQL.Core.Model;
 using OpenFTTH.APIGateway.GraphQL.RouteNetwork.Types;
 using OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Types;
+using OpenFTTH.APIGateway.Util;
 using OpenFTTH.CQRS;
 using OpenFTTH.Events.Core.Infos;
 using OpenFTTH.EventSourcing;
@@ -18,7 +19,7 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
 {
     public class NodeContainerMutations : ObjectGraphType
     {
-        public NodeContainerMutations(ICommandDispatcher commandDispatcher, IEventStore eventStore)
+        public NodeContainerMutations(ICommandDispatcher commandDispatcher, IQueryDispatcher queryDispatcher, IEventStore eventStore)
         {
             Description = "Node container mutations";
 
@@ -230,7 +231,7 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
              "placeTerminalEquipmentInNodeContainer",
              description: "Place a terminal directly in a node container or in a node container rack",
              arguments: new QueryArguments(
-                 new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "nodeContainerId" },
+                 new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "routeNodeId" },
                  new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "terminalEquipmentSpecificationId" },
                  new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "numberOfEquipments" },
                  new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "startSequenceNumber" },
@@ -240,13 +241,25 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
              ),
              resolve: context =>
              {
-                 var nodeContainerId = context.GetArgument<Guid>("nodeContainerId");
+                 var routeNodeId = context.GetArgument<Guid>("routeNodeId");
                  var terminalEquipmentSpecificationId = context.GetArgument<Guid>("terminalEquipmentSpecificationId");
                  var numberOfEquipments = context.GetArgument<int>("numberOfEquipments");
                  var startSequenceNumber = context.GetArgument<int>("startSequenceNumber");
                  var terminalEquipmentNamingMethod = context.GetArgument<TerminalEquipmentNamingMethodEnum>("terminalEquipmentNamingMethod");
                  var namingInfo = context.GetArgument<NamingInfo>("namingInfo");
                  var subrackPlacementInfo = context.GetArgument<SubrackPlacementInfo>("subrackPlacementInfo");
+
+                 var getNodeContainerResult = QueryHelper.GetNodeContainerFromRouteNodeId(queryDispatcher, routeNodeId);
+
+                 if (getNodeContainerResult.IsFailed)
+                 {
+                     foreach (var error in getNodeContainerResult.Errors)
+                         context.Errors.Add(new ExecutionError(error.Message));
+
+                     return null;
+                 }
+
+                 var nodeContainer = getNodeContainerResult.Value;
 
                  var correlationId = Guid.NewGuid();
 
@@ -261,7 +274,7 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                  var placeEquipmentInNodeContainer = new PlaceTerminalEquipmentInNodeContainer(
                    correlationId: correlationId,
                    userContext: commandUserContext,
-                   nodeContainerId: nodeContainerId,
+                   nodeContainerId: nodeContainer.Id,
                    terminalEquipmentSpecificationId: terminalEquipmentSpecificationId,
                    numberOfEquipments: numberOfEquipments,
                    startSequenceNumber: startSequenceNumber,

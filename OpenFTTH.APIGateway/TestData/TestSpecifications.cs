@@ -1151,6 +1151,7 @@ namespace OpenFTTH.TestData
                     new TerminalStructureTemplate(SpliceTray_SC12Pin, 8),
                     new TerminalStructureTemplate(SpliceTray_SC12Pin, 9),
                     new TerminalStructureTemplate(SpliceTray_SC12Pin, 10),
+                    new TerminalStructureTemplate(SpliceTray_SC12Pin, 11),
                     new TerminalStructureTemplate(SpliceTray_SC12Pin, 12),
                     new TerminalStructureTemplate(SpliceTray_SC12Pin, 13),
                     new TerminalStructureTemplate(SpliceTray_SC12Pin, 14),
