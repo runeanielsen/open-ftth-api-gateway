@@ -437,6 +437,42 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                  return new CommandResult(updateResult);
              }
            );
+
+
+            Field<CommandResultType>(
+             "affixSpanEquipmentToParent",
+             description: "Affix a span equipment to a parent span equipment - i.e. put a cable inside a conduit",
+             arguments: new QueryArguments(
+                 new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "routeNodeId" },
+                 new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "spanSegmentId1" },
+                 new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "spanSegmentId2" }
+             ),
+             resolve: context =>
+             {
+                 var routeNodeId = context.GetArgument<Guid>("routeNodeId");
+                 var spanSegmentId1 = context.GetArgument<Guid>("spanSegmentId1");
+                 var spanSegmentId2 = context.GetArgument<Guid>("spanSegmentId2");
+
+                 var correlationId = Guid.NewGuid();
+
+                 var userContext = context.UserContext as GraphQLUserContext;
+                 var userName = userContext.Username;
+
+                  // TODO: Get from work manager
+                  var workTaskId = Guid.Parse("54800ae5-13a5-4b03-8626-a63b66a25568");
+
+                 var commandUserContext = new UserContext(userName, workTaskId);
+
+                    var affixCommand = new AffixSpanEquipmentToParent(correlationId, commandUserContext, routeNodeId, spanSegmentId1, spanSegmentId2);
+
+                     var affixCommandResult = commandDispatcher.HandleAsync<AffixSpanEquipmentToParent, Result>(affixCommand).Result;
+
+                     if (affixCommandResult.IsFailed)
+                         return new CommandResult(affixCommandResult);
+
+                 return new CommandResult(Result.Ok());
+             }
+           );
         }
     }
 }
