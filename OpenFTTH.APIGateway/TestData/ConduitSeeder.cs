@@ -30,11 +30,13 @@ namespace OpenFTTH.APIGateway.TestData
         private ICommandDispatcher _commandDispatcher;
         private IQueryDispatcher _queryDispatcher;
         private ILogger<ConduitSeeder> _logger;
+        private ILoggerFactory _loggerFactory;
         private IEventStore _eventStore;
 
 
-        public ConduitSeeder(ILogger<ConduitSeeder> logger, IEventStore eventSTore, ICommandDispatcher commandDispatcher, IQueryDispatcher queryDispatcher)
+        public ConduitSeeder(ILoggerFactory loggerFactory, ILogger<ConduitSeeder> logger, IEventStore eventSTore, ICommandDispatcher commandDispatcher, IQueryDispatcher queryDispatcher)
         {
+            _loggerFactory = loggerFactory;
             _logger = logger;
             _eventStore = eventSTore;
             _commandDispatcher = commandDispatcher;
@@ -56,7 +58,7 @@ namespace OpenFTTH.APIGateway.TestData
                 }
 
                 _logger.LogInformation("Creating specifications...");
-                new TestSpecifications(_commandDispatcher, _queryDispatcher).Run();
+                new TestSpecifications(_loggerFactory, _commandDispatcher, _queryDispatcher).Run();
 
                 _logger.LogInformation("Adding span equipments...");
                 var conduits = LoadConduitsFromConversionDatabase();

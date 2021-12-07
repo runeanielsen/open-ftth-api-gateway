@@ -1,5 +1,6 @@
 using FluentAssertions;
 using FluentResults;
+using Microsoft.Extensions.Logging;
 using OpenFTTH.APIGateway.IntegrationTests.TestData;
 using OpenFTTH.CQRS;
 using OpenFTTH.RouteNetwork.API.Commands;
@@ -23,13 +24,15 @@ namespace OpenFTTH.APIGateway.IntegrationTests.SpanEquipment
     /// </summary>
     public class PlaceSomeConduitsAndCheckQueryFunctionality
     {
+        private ILoggerFactory _loggerFactory;
         private ICommandDispatcher _commandDispatcher;
         private IQueryDispatcher _queryDispatcher;
 
         private static TestSpecifications _specs;
 
-        public PlaceSomeConduitsAndCheckQueryFunctionality(ICommandDispatcher commandDispatcher, IQueryDispatcher queryDispatcher)
+        public PlaceSomeConduitsAndCheckQueryFunctionality(ILoggerFactory loggerFactory, ICommandDispatcher commandDispatcher, IQueryDispatcher queryDispatcher)
         {
+            _loggerFactory = loggerFactory;
             _commandDispatcher = commandDispatcher;
             _queryDispatcher = queryDispatcher;
         }
@@ -38,7 +41,7 @@ namespace OpenFTTH.APIGateway.IntegrationTests.SpanEquipment
         public void CreateSpanEquipmentSpecifications()
         {
             // Add conduit specifications
-            _specs = new TestSpecifications(_commandDispatcher, _queryDispatcher).Run().Value;
+            _specs = new TestSpecifications(_loggerFactory, _commandDispatcher, _queryDispatcher).Run().Value;
         }
 
 

@@ -1,6 +1,7 @@
 ﻿using FluentResults;
 using GraphQL;
 using GraphQL.Types;
+using Microsoft.Extensions.Logging;
 using OpenFTTH.APIGateway.CoreTypes;
 using OpenFTTH.APIGateway.GraphQL.Core.Model;
 using OpenFTTH.APIGateway.GraphQL.RouteNetwork.Types;
@@ -15,7 +16,7 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
 {
     public class TestDataMutations : ObjectGraphType
     {
-        public TestDataMutations(ICommandDispatcher commandDispatcher, IQueryDispatcher queryDispatcher)
+        public TestDataMutations(ILoggerFactory loggerFactory, ICommandDispatcher commandDispatcher, IQueryDispatcher queryDispatcher)
         {
             Description = "Test network mutations.";
 
@@ -24,7 +25,7 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
               description: "Create a set of specifications for testing",
               resolve: context =>
               {
-                  var result = new TestSpecifications(commandDispatcher, queryDispatcher).Run();
+                  var result = new TestSpecifications(loggerFactory, commandDispatcher, queryDispatcher).Run();
 
                   return new CommandResult(result);
               }

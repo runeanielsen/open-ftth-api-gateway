@@ -133,7 +133,7 @@ namespace OpenFTTH.APIGateway.Workers
                 if (manufacturerQueryResult.IsSuccess && manufacturerQueryResult.Value.Count == 0)
                 {
                     _logger.LogInformation("Start seeding database with test specifications...");
-                    var result = new TestSpecifications(_commandDispatcher, _queryDispatcher).Run();
+                    var result = new TestSpecifications(_loggerFactory, _commandDispatcher, _queryDispatcher).Run();
                     _logger.LogInformation("Finish seeding database with test specifications.");
                 }
          

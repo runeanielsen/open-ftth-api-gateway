@@ -1,4 +1,5 @@
 ﻿using FluentResults;
+using Microsoft.Extensions.Logging;
 using OpenFTTH.CQRS;
 using OpenFTTH.Util;
 using OpenFTTH.UtilityGraphService.API.Commands;
@@ -20,10 +21,13 @@ namespace OpenFTTH.TestData
         private ICommandDispatcher _commandDispatcher;
         private IQueryDispatcher _queryDispatcher;
 
-        public TestSpecifications(ICommandDispatcher commandDispatcher, IQueryDispatcher queryDispatcher)
+        private ILogger<TestSpecifications> _logger;
+
+        public TestSpecifications(ILoggerFactory loggerFactory, ICommandDispatcher commandDispatcher, IQueryDispatcher queryDispatcher)
         {
             _commandDispatcher = commandDispatcher;
             _queryDispatcher = queryDispatcher;
+            _logger = loggerFactory.CreateLogger<TestSpecifications>();
         }
 
         public static Guid Manu_GMPlast = Guid.Parse("47e87d16-a1f0-488a-8c3e-cb3a4f3e8926");
@@ -32,6 +36,7 @@ namespace OpenFTTH.TestData
         public static Guid Manu_Cubis = Guid.Parse("6b02e4aa-19f1-46a5-85e8-c1faab236ef0");
         public static Guid Manu_CommScope = Guid.Parse("6f729864-ea2a-4ddf-b370-3271ef81879c");
         public static Guid Manu_HuberSuhner = Guid.Parse("52d8191b-8cad-4584-a133-99dc252e5193");
+        public static Guid Manu_ABB = Guid.Parse("6bc0053b-a041-4a32-a4f8-0f1bbc92d5f5");
 
         public static Guid Well_Cubis_STAKKAbox_MODULA_600x450 = Guid.Parse("0fb389b5-4bbd-4ebf-b506-bfc636001171");
         public static Guid Well_Cubis_STAKKAbox_MODULA_900x450 = Guid.Parse("8251e1d3-c586-4632-952a-41332aa61a47");
@@ -39,6 +44,17 @@ namespace OpenFTTH.TestData
         public static Guid Well_Fiberpowertech_37_EK_378_400x800 = Guid.Parse("7fd8266e-44e1-46ee-a183-bc3068deadf3");
         public static Guid Well_Fiberpowertech_37_EK_338_550x1165 = Guid.Parse("b93c3bcf-3013-4b6c-814d-06ff14d9139f");
         public static Guid Well_Fiberpowertech_37_EK_328_800x800 = Guid.Parse("6c1c9ab8-b1f2-4021-bece-d9b4f65c6723");
+
+
+        public static Guid Building_Corehus = Guid.Parse("47acefcf-ff8e-40d6-880f-aa1f497a282e");
+        public static Guid Building_Teknikhus = Guid.Parse("0e2aac87-909b-47b4-8021-6fd1345dada9");
+        public static Guid Building_Flexhus = Guid.Parse("f9a5d838-a9c4-409a-9b4b-a01f7042f830");
+
+        public static Guid Cabinet_PK20 = Guid.Parse("bff6d247-5888-4657-952a-b66de67757a9");
+        public static Guid Cabinet_PK35 = Guid.Parse("a5200c4c-6359-417d-9b57-1f406dfab2a5");
+        public static Guid Cabinet_PK48 = Guid.Parse("844cdea2-ea2c-45da-8acd-353610b82cdb");
+        public static Guid Cabinet_BB800 = Guid.Parse("4086c494-b607-4f27-9ba4-0d62a91cad7d");
+
 
         // 50mm Straight In-line Elongated Enclosure (gammel model)
         public static Guid Conduit_Closure_Emtelle_Straight_In_line = Guid.Parse("a7bf7613-6ed3-4b38-a509-ea1c34e62660");
@@ -205,8 +221,8 @@ namespace OpenFTTH.TestData
             {
                 var manufacturerQueryResult = _queryDispatcher.HandleAsync<GetManufacturer, Result<LookupCollection<Manufacturer>>>(new GetManufacturer()).Result;
 
-                if (manufacturerQueryResult.Value.ContainsKey(Manu_GMPlast))
-                    return FluentResults.Result.Fail("Test specification already present in system");
+                //if (manufacturerQueryResult.Value.ContainsKey(Manu_GMPlast))
+                //   return FluentResults.Result.Fail("Test specification already present in system");
 
                 AddManufactures();
 
@@ -291,6 +307,48 @@ namespace OpenFTTH.TestData
                 ManufacturerRefs = new Guid[] { Manu_Fiberpowertech }
             });
 
+            // Skabe
+            AddSpecification(new NodeContainerSpecification(Cabinet_PK20, "Cabinets", "PK20 Skab")
+            {
+                Description = "PK20 Skab",
+                ManufacturerRefs = new Guid[] { Manu_ABB }
+            });
+
+            AddSpecification(new NodeContainerSpecification(Cabinet_PK35, "Cabinets", "PK35 Skab")
+            {
+                Description = "PK35 Skab",
+                ManufacturerRefs = new Guid[] { Manu_ABB }
+            });
+
+            AddSpecification(new NodeContainerSpecification(Cabinet_PK48, "Cabinets", "PK35 Skab")
+            {
+                Description = "PK48 Skab",
+                ManufacturerRefs = new Guid[] { Manu_ABB }
+            });
+
+            AddSpecification(new NodeContainerSpecification(Cabinet_BB800, "Cabinets", "BB800 Skab")
+            {
+                Description = "BB800 Skab",
+                ManufacturerRefs = new Guid[] { Manu_ABB }
+            });
+
+            // Bygninger
+            AddSpecification(new NodeContainerSpecification(Building_Corehus, "Buildings", "Corehus")
+            {
+                Description = "Corehus"
+            });
+
+            // Bygninger
+            AddSpecification(new NodeContainerSpecification(Building_Teknikhus, "Buildings", "Teknikhus")
+            {
+                Description = "Teknikhus"
+            });
+
+            // Bygninger
+            AddSpecification(new NodeContainerSpecification(Building_Flexhus, "Buildings", "Flexhus")
+            {
+                Description = "Flexhus"
+            });
         }
 
         private void AddConduitSpanEquipmentSpecifications()
@@ -984,6 +1042,7 @@ namespace OpenFTTH.TestData
             AddManufacturer(new Manufacturer(Manu_Cubis, "Wavin"));
             AddManufacturer(new Manufacturer(Manu_CommScope, "CommScope"));
             AddManufacturer(new Manufacturer(Manu_HuberSuhner, "Huber+Suhner"));
+            AddManufacturer(new Manufacturer(Manu_ABB, "ABB"));
         }
 
         private void AddRackSpecifications()
@@ -1384,7 +1443,7 @@ namespace OpenFTTH.TestData
             var cmdResult = _commandDispatcher.HandleAsync<AddSpanEquipmentSpecification, Result>(cmd).Result;
 
             if (cmdResult.IsFailed)
-                throw new ApplicationException(cmdResult.Errors.First().Message);
+                _logger.LogWarning(cmdResult.Errors.First().Message);
         }
 
         private void AddSpecification(SpanStructureSpecification spec)
@@ -1394,7 +1453,7 @@ namespace OpenFTTH.TestData
             var cmdResult = _commandDispatcher.HandleAsync<AddSpanStructureSpecification, Result>(cmd).Result;
 
             if (cmdResult.IsFailed)
-                throw new ApplicationException(cmdResult.Errors.First().Message);
+                _logger.LogWarning(cmdResult.Errors.First().Message);
 
         }
 
@@ -1405,7 +1464,7 @@ namespace OpenFTTH.TestData
             var cmdResult = _commandDispatcher.HandleAsync<AddNodeContainerSpecification, Result>(cmd).Result;
 
             if (cmdResult.IsFailed)
-                throw new ApplicationException(cmdResult.Errors.First().Message);
+                _logger.LogWarning(cmdResult.Errors.First().Message);
         }
 
         private void AddSpecification(RackSpecification spec)
@@ -1414,7 +1473,7 @@ namespace OpenFTTH.TestData
             var cmdResult = _commandDispatcher.HandleAsync<AddRackSpecification, Result>(cmd).Result;
 
             if (cmdResult.IsFailed)
-                throw new ApplicationException(cmdResult.Errors.First().Message);
+                _logger.LogWarning(cmdResult.Errors.First().Message);
         }
 
         private void AddManufacturer(Manufacturer manufacturer)
@@ -1424,7 +1483,7 @@ namespace OpenFTTH.TestData
             var cmdResult = _commandDispatcher.HandleAsync<AddManufacturer, Result>(cmd).Result;
 
             if (cmdResult.IsFailed)
-                throw new ApplicationException(cmdResult.Errors.First().Message);
+                _logger.LogWarning(cmdResult.Errors.First().Message);
         }
 
         private void AddSpecification(TerminalEquipmentSpecification spec)
@@ -1433,7 +1492,7 @@ namespace OpenFTTH.TestData
             var cmdResult = _commandDispatcher.HandleAsync<AddTerminalEquipmentSpecification, Result>(cmd).Result;
 
             if (cmdResult.IsFailed)
-                throw new ApplicationException(cmdResult.Errors.First().Message);
+                _logger.LogWarning(cmdResult.Errors.First().Message);
         }
 
         private void AddSpecification(TerminalStructureSpecification spec)
@@ -1442,7 +1501,7 @@ namespace OpenFTTH.TestData
             var cmdResult = _commandDispatcher.HandleAsync<AddTerminalStructureSpecification, Result>(cmd).Result;
 
             if (cmdResult.IsFailed)
-                throw new ApplicationException(cmdResult.Errors.First().Message);
+                _logger.LogWarning(cmdResult.Errors.First().Message);
         }
     }
 }
