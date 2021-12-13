@@ -110,7 +110,7 @@ namespace OpenFTTH.APIGateway.GraphQL.Addresses.Queries
 
         private (double, double) GetNodeCoordinates(Guid nodeId, IQueryDispatcher queryDispatcher)
         {
-
+            
             var routeNodeQueryResult = queryDispatcher.HandleAsync<GetRouteNetworkDetails, Result<GetRouteNetworkDetailsResult>>(
                   new GetRouteNetworkDetails(new OpenFTTH.RouteNetwork.API.Model.RouteNetworkElementIdList() { nodeId })
                   {
@@ -172,7 +172,14 @@ namespace OpenFTTH.APIGateway.GraphQL.Addresses.Queries
 
             var routeNetworkElementIds = routeNetworkQueryResult.Value.Interests[spanEquipmentInterestId].RouteNetworkElementRefs;
 
-            return GetNodeCoordinates(routeNetworkElementIds.Last(), queryDispatcher);
+            var lastNodeInSpanSegment = routeNetworkElementIds.Last();
+
+            var coord = GetNodeCoordinates(lastNodeInSpanSegment, queryDispatcher);
+
+            _logger.LogInformation($"Address search info: Get coordinate of span segment: {spanSegmentId} in span equipment: {equipmentQueryResult.Value.SpanEquipment.First().Name} {equipmentQueryResult.Value.SpanEquipment.First().Id} Route node id: {lastNodeInSpanSegment} successfully returned: x={coord.Item1} y={coord.Item2}");
+
+
+            return coord;
         }
 
         private double[] ConvertPointGeojsonToCoordArray(string geojson)
