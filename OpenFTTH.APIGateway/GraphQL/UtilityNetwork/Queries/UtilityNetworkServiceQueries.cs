@@ -278,6 +278,38 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Queries
         );
 
 
+
+        Field<ConnectivityTraceViewType>(
+          name: "connectivityTraceView",
+          description: "Trace connectivity",
+          arguments: new QueryArguments(
+            new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "routeNodeId" },
+            new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "terminalOrSpanEquipmentId" }
+          ),
+          resolve: context =>
+          {
+              var routeNodeId = context.GetArgument<Guid>("routeNodeId");
+              var terminalOrSpanEquipmentId = context.GetArgument<Guid>("terminalOrSpanEquipmentId");
+
+              var connectivityQuery = new GetConnectivityTraceView(routeNodeId, terminalOrSpanEquipmentId);
+
+              var connectivityQueryResult = queryDispatcher.HandleAsync<GetConnectivityTraceView, Result<ConnectivityTraceView>>(
+                  connectivityQuery
+              ).Result;
+
+              if (connectivityQueryResult.IsFailed)
+              {
+                  foreach (var error in connectivityQueryResult.Errors)
+                      context.Errors.Add(new ExecutionError(error.Message));
+
+                  return null;
+              }
+
+              return connectivityQueryResult.Value;
+          }
+      );
+
+
         }
 
     }
