@@ -13,6 +13,7 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Types
             Field(x => x.IsTraceSource, type: typeof(BooleanGraphType)).Description("Whether the hop is where the source of the upstream/downstream trace");
             Field(x => x.Node, type: typeof(StringGraphType)).Description("The name of route node in the trace hop");
             Field(x => x.Equipment, type: typeof(StringGraphType)).Description("Equipment info");
+            Field(x => x.TerminalStructure, type: typeof(StringGraphType)).Description("Equipment card/slot/tray info");
             Field(x => x.Terminal, type: typeof(StringGraphType)).Description("Terminal info");
             Field(x => x.ConnectionInfo, type: typeof(StringGraphType)).Description("Connection info");
             Field(x => x.TotalLength, type: typeof(FloatGraphType)).Description("Length in meters");
