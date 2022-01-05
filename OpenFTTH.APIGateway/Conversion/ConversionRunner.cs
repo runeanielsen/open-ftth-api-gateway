@@ -36,7 +36,6 @@ namespace OpenFTTH.APIGateway.Conversion
         {
             _logger.LogInformation("Checking conversion database...");
 
-            return;
 
             if (CheckIfConversionSchemaExists())
             {
