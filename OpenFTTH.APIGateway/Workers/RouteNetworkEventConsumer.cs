@@ -127,16 +127,6 @@ namespace OpenFTTH.APIGateway.Workers
 
                 LogMenUsage();
 
-                // Check if database contain any manufacturer. If not the database must be blank, and we seed it with som test specifications
-                var manufacturerQueryResult = _queryDispatcher.HandleAsync<GetManufacturer, Result<LookupCollection<Manufacturer>>>(new GetManufacturer()).Result;
-
-                if (manufacturerQueryResult.IsSuccess && manufacturerQueryResult.Value.Count == 0)
-                {
-                    _logger.LogInformation("Start seeding database with test specifications...");
-                    var result = new TestSpecifications(_loggerFactory, _commandDispatcher, _queryDispatcher).Run();
-                    _logger.LogInformation("Finish seeding database with test specifications.");
-                }
-         
                 // We are now ready to serve the public if the loaded objects are bigger than 0
                 if (inMemRouteNetworkState.NumberOfObjectsLoaded > 0)
                 {

@@ -1,14 +1,10 @@
 ﻿using GraphQL.Types;
 using Microsoft.Extensions.Logging;
-using OpenFTTH.Events.Core.Infos;
 using OpenFTTH.RouteNetwork.API.Model;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Types
 {
-    public class RouteNetworkTraceType : ObjectGraphType<RouteNetworkTrace>
+    public class RouteNetworkTraceType : ObjectGraphType<NearestRouteNodeTraceResult>
     {
         public RouteNetworkTraceType(ILogger<RouteNetworkTraceType> logger)
         {

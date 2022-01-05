@@ -3,6 +3,7 @@ using Npgsql;
 using OpenFTTH.APIGateway.Settings;
 using OpenFTTH.CQRS;
 using OpenFTTH.EventSourcing;
+using OpenFTTH.TestData;
 using System;
 using System.Data;
 
@@ -35,21 +36,29 @@ namespace OpenFTTH.APIGateway.Conversion
         {
             _logger.LogInformation("Checking conversion database...");
 
+            return;
+
             if (CheckIfConversionSchemaExists())
             {
-                var specResult = new CreateSpecifications(_commandDispatcher, _queryDispatcher).Run();
+                _logger.LogInformation("Start seeding database with test specifications...");
+                var result = new TestSpecifications(_loggerFactory, _commandDispatcher, _queryDispatcher).Run();
+                _logger.LogInformation("Finish seeding database with test specifications.");
+                           
 
-                /*
-                if (specResult.IsFailed)
+                var dbSettings = new Settings.GeoDatabaseSetting()
                 {
-                    _logger.LogInformation("Database already contain converted data. Will therefore not seed conversion data.");
-                    return;
-                }
-                */
-                
-                new SpanEquipmentImporter(_loggerFactory.CreateLogger<SpanEquipmentImporter>(), _eventStore, _geoDatabaseSetting, _commandDispatcher, _queryDispatcher).Run();
+                    Host = "localhost",
+                    Database = "open-ftth",
+                    Username = "postgres",
+                    Password = "postgres",
+                    Port = "5432"
+                };
 
-                new NodeContainerImporter(_loggerFactory.CreateLogger<NodeContainerImporter>(), _workTaskId, _eventStore, _geoDatabaseSetting, _commandDispatcher, _queryDispatcher).Run();
+                new CableSpanEquipmentImporter(_loggerFactory.CreateLogger<ConduitSpanEquipmentImporter>(), _eventStore, dbSettings, _commandDispatcher, _queryDispatcher).Run();
+
+                //new ConduitSpanEquipmentImporter(_loggerFactory.CreateLogger<ConduitSpanEquipmentImporter>(), _eventStore, _geoDatabaseSetting, _commandDispatcher, _queryDispatcher).Run();
+
+                //new NodeContainerImporter(_loggerFactory.CreateLogger<NodeContainerImporter>(), _workTaskId, _eventStore, _geoDatabaseSetting, _commandDispatcher, _queryDispatcher).Run();
             }
             else
             {

@@ -34,12 +34,15 @@ namespace OpenFTTH.APIGateway.Conversion
 
         protected void LogStatus(NpgsqlCommand cmd, string tableName, string statusText, string externalId)
         {
-            cmd.CommandText = @"UPDATE " + tableName + " set status = @statusText where external_id ='" + externalId + "' and status is null";
-            cmd.Parameters.Clear();
+            if (cmd != null)
+            {
+                cmd.CommandText = @"UPDATE " + tableName + " set status = @statusText where external_id ='" + externalId + "' and status is null";
+                cmd.Parameters.Clear();
 
-            cmd.Parameters.AddWithValue("statusText", statusText);
-            
-            cmd.ExecuteNonQuery();
+                cmd.Parameters.AddWithValue("statusText", statusText);
+
+                cmd.ExecuteNonQuery();
+            }
         }
 
         protected void LogStatus(NpgsqlCommand cmd, string tableName, string keyColumnName, string key, FluentResults.Result result)

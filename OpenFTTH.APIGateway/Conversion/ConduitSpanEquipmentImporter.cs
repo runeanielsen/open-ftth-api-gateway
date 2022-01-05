@@ -17,20 +17,20 @@ using System.Linq;
 
 namespace OpenFTTH.APIGateway.Conversion
 {
-    public class SpanEquipmentImporter : ImporterBase
+    public class ConduitSpanEquipmentImporter : ImporterBase
     {
         private static Guid _neMultiConduitConversion = Guid.Parse("299c3e6f-c764-4566-81ab-3e9413aa4fca");
 
         private ICommandDispatcher _commandDispatcher;
         private IQueryDispatcher _queryDispatcher;
-        private ILogger<SpanEquipmentImporter> _logger;
+        private ILogger<ConduitSpanEquipmentImporter> _logger;
         private IEventStore _eventStore;
 
 
         //private string _tableName = "conversion.ne_multiconduit_conversion_result";
         private string _tableName = "conversion.conduit_conversion_result";
 
-        public SpanEquipmentImporter(ILogger<SpanEquipmentImporter> logger, IEventStore eventSTore, GeoDatabaseSetting geoDatabaseSettings, ICommandDispatcher commandDispatcher, IQueryDispatcher queryDispatcher) : base(geoDatabaseSettings)
+        public ConduitSpanEquipmentImporter(ILogger<ConduitSpanEquipmentImporter> logger, IEventStore eventSTore, GeoDatabaseSetting geoDatabaseSettings, ICommandDispatcher commandDispatcher, IQueryDispatcher queryDispatcher) : base(geoDatabaseSettings)
         {
             _logger = logger;
             _eventStore = eventSTore;
@@ -94,7 +94,7 @@ namespace OpenFTTH.APIGateway.Conversion
             {
                 if (spanEquipment.ConduitSpec != null)
                 {
-                    var result = PlaceSpanEquipment(logCmd, spanEquipment.Id, spanEquipment.ExternalId, spanEquipment.ConduitSpec.SpecId, spanEquipment.SegmentIds, spanEquipment.ConduitSpec.AditionalSpecs, spanEquipment.ConduitSpec.MarkingColor, spanEquipment.AccessAddressId, spanEquipment.UnitAddressId, spanEquipment.AddressRemark);
+                    var result = PlaceConduitSpanEquipment(logCmd, spanEquipment.Id, spanEquipment.ExternalId, spanEquipment.ConduitSpec.SpecId, spanEquipment.SegmentIds, spanEquipment.ConduitSpec.AditionalSpecs, spanEquipment.ConduitSpec.MarkingColor, spanEquipment.AccessAddressId, spanEquipment.UnitAddressId, spanEquipment.AddressRemark);
 
                     if (result.IsFailed)
                     {
@@ -108,7 +108,7 @@ namespace OpenFTTH.APIGateway.Conversion
             }
         }
 
-        private Result PlaceSpanEquipment(NpgsqlCommand logCmd, Guid spanEquipmentId, string externalId, Guid specificationId, List<Guid> segmentIds, List<Guid> additionalStructureSpecIds, string markingColor, Guid? accessAddressId, Guid? unitAddressId, string? addressRemark)
+        private Result PlaceConduitSpanEquipment(NpgsqlCommand logCmd, Guid spanEquipmentId, string externalId, Guid specificationId, List<Guid> segmentIds, List<Guid> additionalStructureSpecIds, string markingColor, Guid? accessAddressId, Guid? unitAddressId, string? addressRemark)
         {
             Guid correlationId = Guid.NewGuid();
 
