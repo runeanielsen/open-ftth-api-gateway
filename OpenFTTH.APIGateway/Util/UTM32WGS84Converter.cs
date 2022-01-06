@@ -36,6 +36,9 @@ namespace OpenFTTH.APIGateway.Util
 
             foreach (var inputGeoJson in geoJsonLineStrings)
             {
+                if (inputGeoJson.)
+
+
                 var line = geoJsonReader.Read<LineString>("{ \"type\": \"LineString\",\"coordinates\":" + inputGeoJson + " }");
 
                 foreach (var coord in line.Coordinates)
