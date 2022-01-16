@@ -10,17 +10,15 @@ using OpenFTTH.RouteNetwork.API.Model;
 using OpenFTTH.TestData;
 using OpenFTTH.Util;
 using OpenFTTH.UtilityGraphService.API.Commands;
+using OpenFTTH.UtilityGraphService.API.Model.Trace;
 using OpenFTTH.UtilityGraphService.API.Model.UtilityNetwork;
-using OpenFTTH.UtilityGraphService.API.Model.UtilityNetwork.Tracing;
 using OpenFTTH.UtilityGraphService.Business.Graph;
-using OpenFTTH.UtilityGraphService.Business.NodeContainers.Projections;
 using OpenFTTH.UtilityGraphService.Business.SpanEquipments.Projections;
-using OpenFTTH.UtilityGraphService.Business.SpanEquipments.QueryHandlers.Trace;
+using OpenFTTH.UtilityGraphService.Business.Trace;
 using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.Common;
 using System.Linq;
 
 namespace OpenFTTH.APIGateway.Conversion
@@ -131,6 +129,13 @@ namespace OpenFTTH.APIGateway.Conversion
             var conduitName = "K" + nextConduitSeqStr.PadLeft(6, '0');
             var namingInfo = new NamingInfo(conduitName, null);
 
+            // HACK use NE id
+            var neIdSplit = externalId.Split(':');
+            namingInfo = new NamingInfo("K" + neIdSplit.Last(), null);
+
+            System.Diagnostics.Debug.WriteLine("---------------------------------------------------------------------------------------------------------------------------------------");
+            System.Diagnostics.Debug.WriteLine($"*** Place cable: {externalId} ***");
+            System.Diagnostics.Debug.WriteLine("---------------------------------------------------------------------------------------------------------------------------------------");
 
             // Get validated walk of interest
             var walk = new RouteNetworkElementIdList();
@@ -146,8 +151,19 @@ namespace OpenFTTH.APIGateway.Conversion
             // trace all conduits
             var conduitsTraceResult = TraceAllConduits(conduitRels);
 
+            foreach (var conduitTrace in conduitsTraceResult)
+            {
+                System.Diagnostics.Debug.WriteLine($"NE conduit path found starting in {conduitTrace.ConduitName} node {conduitTrace.OriginalTrace.FromRouteNodeName} ({conduitTrace.OriginalTrace.FromRouteNodeId}) <-> {conduitTrace.OriginalTrace.ToRouteNodeName} ({conduitTrace.OriginalTrace.ToRouteNodeId}) span segment id: {conduitTrace.SpanSegmentId}");
+            }
+
             var routingHops = BuildRouteHops(validateInterestResult.Value, conduitsTraceResult, externalId);
 
+            System.Diagnostics.Debug.WriteLine("---------------------------------------------------------------------------------------------------------------------------------------");
+
+            foreach (var hop in routingHops)
+            {
+                System.Diagnostics.Debug.WriteLine($"Routing hop: start route node id: {hop.StartRouteNode} span equipment id: {hop.StartSpanSegmentId}");
+            }
 
             // Place cable
             var placeSpanEquipmentCommand = new PlaceSpanEquipmentInUtilityNetwork(correlationId, new UserContext("conversion", _workTaskId), spanEquipmentId, specificationId, routingHops.ToArray())
@@ -160,6 +176,8 @@ namespace OpenFTTH.APIGateway.Conversion
 
             if (placeSpanEquipmentResult.IsFailed)
             {
+                System.Diagnostics.Debug.WriteLine("---------------------------------------------------------------------------------------------------------------------------------------");
+                System.Diagnostics.Debug.WriteLine($"Error: {placeSpanEquipmentResult.Errors.First().Message}");
                 _logger.LogInformation("Failed to add cable: " + externalId + " Error: " + placeSpanEquipmentResult.Errors.First().Message);
                 LogStatus((NpgsqlCommand)logCmd, _tableName, placeSpanEquipmentResult.Errors.First().Message, externalId);
                 return placeSpanEquipmentResult;
@@ -190,12 +208,15 @@ namespace OpenFTTH.APIGateway.Conversion
 
                 var nodeIdToFindTraceFrom = conduitToNodeId != Guid.Empty ? conduitToNodeId : shortestPathTraceNodeId;
 
+                System.Diagnostics.Debug.WriteLine($"Trying to find a conduit path from node: {nodeIdToFindTraceFrom}");
+
                 var routeNetworkTrace = FindConduitTraceThatStartOrEndInNode(conduitsTraceResult, shortestPathWalkNodeIdHash, nodeIdToFindTraceFrom, alreadyUsedSpanSegmentIds);
 
                 conduitToNodeId = Guid.Empty;
 
                 if (routeNetworkTrace != null)
                 {
+                    System.Diagnostics.Debug.WriteLine($" Found conduit from node: {nodeIdToFindTraceFrom} to node: {routeNetworkTrace.ToNodeId}");
                     // If the conduit end on a a node in the shortest path trace we're lucky and happy
                     if (nodeIds.IndexOf(routeNetworkTrace.ToNodeId) > nodeIndex)
                     {
@@ -234,6 +255,8 @@ namespace OpenFTTH.APIGateway.Conversion
                 }
                 else
                 {
+                    System.Diagnostics.Debug.WriteLine($" Did not found any conduit paths going from node: {nodeIdToFindTraceFrom}");
+
                     if (nodeIndex == 0)
                     {
                         directlyInRouteNetworkWalk.Add(shortestPathTraceNodeId);
@@ -295,10 +318,6 @@ namespace OpenFTTH.APIGateway.Conversion
             {
                 if (!alreadyUsedSpanSegmentIds.Contains(traceResult.SpanSegmentId))
                 {
-                    // If the conduit don't start and end on nodes of the original cable route, then we can't use it
-                    // now this check prevented not following conduit connection outside the shortest path trace
-                    //if (nodeIdHash.Contains(traceResult.OriginalTrace.FromRouteNodeId) && nodeIdHash.Contains(traceResult.OriginalTrace.ToRouteNodeId))
-                    //{
                     if (traceResult.OriginalTrace.FromRouteNodeId == nodeId)
                     {
                         traceResult.FromNodeId = traceResult.OriginalTrace.FromRouteNodeId;
@@ -344,9 +363,9 @@ namespace OpenFTTH.APIGateway.Conversion
                         // we only have one conduit (the outer)
                         var spanSegmentIdToTrace = conduit.SpanStructures[0].SpanSegments[0].Id;
 
-                        var traceBuilder = new RouteNetworkTraceResultBuilder(_queryDispatcher, _utilityNetwork);
+                        var traceBuilder = new SwissArmyKnifeTracer(_queryDispatcher, _utilityNetwork);
 
-                        var traceInfo = traceBuilder.GetTraceInfo(new List<SpanEquipment> { conduit }, spanSegmentIdToTrace);
+                        var traceInfo = traceBuilder.Trace(new List<SpanEquipment> { conduit }, spanSegmentIdToTrace);
 
                         if (traceInfo != null || traceInfo.RouteNetworkTraces.Count == 1)
                         {
@@ -356,7 +375,9 @@ namespace OpenFTTH.APIGateway.Conversion
                                 {
                                     SpanSegmentId = spanSegmentIdToTrace,
                                     SpanSegmentIds = traceInfo.UtilityNetworkTraceBySpanSegmentId[spanSegmentIdToTrace].SpanSegmentIds,
-                                    OriginalTrace = traceInfo.RouteNetworkTraces.First()
+                                    OriginalTrace = traceInfo.RouteNetworkTraces.First(),
+                                    ConduitName = conduit.Name + " (" + spec.Name + ")",
+                                    Subconduit = 0
                                 });
 
                                 foreach (var spanSegmentId in traceInfo.UtilityNetworkTraceBySpanSegmentId[spanSegmentIdToTrace].SpanSegmentIds)
@@ -369,9 +390,9 @@ namespace OpenFTTH.APIGateway.Conversion
                     {
                         var spanSegmentIdToTrace = conduit.SpanStructures[conduitRel.InnerConduitNumber].SpanSegments[0].Id;
 
-                        var traceBuilder = new RouteNetworkTraceResultBuilder(_queryDispatcher, _utilityNetwork);
+                        var traceBuilder = new SwissArmyKnifeTracer(_queryDispatcher, _utilityNetwork);
 
-                        var traceInfo = traceBuilder.GetTraceInfo(new List<SpanEquipment> { conduit }, spanSegmentIdToTrace);
+                        var traceInfo = traceBuilder.Trace(new List<SpanEquipment> { conduit }, spanSegmentIdToTrace);
 
                         if (traceInfo != null || traceInfo.RouteNetworkTraces.Count == 1)
                         {
@@ -381,7 +402,9 @@ namespace OpenFTTH.APIGateway.Conversion
                                 {
                                     SpanSegmentId = spanSegmentIdToTrace,
                                     SpanSegmentIds = traceInfo.UtilityNetworkTraceBySpanSegmentId[spanSegmentIdToTrace].SpanSegmentIds,
-                                    OriginalTrace = traceInfo.RouteNetworkTraces.First()
+                                    OriginalTrace = traceInfo.RouteNetworkTraces.First(),
+                                    ConduitName = conduit.Name + " Subrør " + conduitRel.InnerConduitNumber + " (" + spec.Name + ")",
+                                    Subconduit = conduitRel.InnerConduitNumber
                                 });
 
                                 foreach (var spanSegmentId in traceInfo.UtilityNetworkTraceBySpanSegmentId[spanSegmentIdToTrace].SpanSegmentIds)
@@ -394,9 +417,9 @@ namespace OpenFTTH.APIGateway.Conversion
                     {
                         var spanSegmentIdToTrace = conduit.SpanStructures[0].SpanSegments[0].Id;
 
-                        var traceBuilder = new RouteNetworkTraceResultBuilder(_queryDispatcher, _utilityNetwork);
+                        var traceBuilder = new SwissArmyKnifeTracer(_queryDispatcher, _utilityNetwork);
 
-                        var traceInfo = traceBuilder.GetTraceInfo(new List<SpanEquipment> { conduit }, spanSegmentIdToTrace);
+                        var traceInfo = traceBuilder.Trace(new List<SpanEquipment> { conduit }, spanSegmentIdToTrace);
 
                         if (traceInfo != null || traceInfo.RouteNetworkTraces.Count == 1)
                         {
@@ -406,7 +429,10 @@ namespace OpenFTTH.APIGateway.Conversion
                                 {
                                     SpanSegmentId = spanSegmentIdToTrace,
                                     SpanSegmentIds = traceInfo.UtilityNetworkTraceBySpanSegmentId[spanSegmentIdToTrace].SpanSegmentIds,
-                                    OriginalTrace = traceInfo.RouteNetworkTraces.First()
+                                    OriginalTrace = traceInfo.RouteNetworkTraces.First(),
+                                    ConduitName = conduit.Name + " Subrør " + conduitRel.InnerConduitNumber + " (" + spec.Name + ")",
+                                    Subconduit = conduitRel.InnerConduitNumber
+
                                 });
 
                                 foreach (var spanSegmentId in traceInfo.UtilityNetworkTraceBySpanSegmentId[spanSegmentIdToTrace].SpanSegmentIds)
@@ -534,8 +560,11 @@ namespace OpenFTTH.APIGateway.Conversion
 
             public Guid ToNodeId { get; set; }
 
-            public UtilityGraphService.API.Model.UtilityNetwork.Tracing.RouteNetworkTrace OriginalTrace { get; set; }
+            public RouteNetworkTraceResult OriginalTrace { get; set; }
             public Guid[] SpanSegmentIds { get; internal set; }
+
+            public string ConduitName { get; set; }
+            public int Subconduit { get; set; }
         }
     }
 

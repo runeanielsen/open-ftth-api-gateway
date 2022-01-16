@@ -100,9 +100,9 @@ namespace OpenFTTH.APIGateway.IntegrationTests.Conversion
             walkOfInterest.RouteNetworkElementRefs.Last().Should().Be(TestRouteNetwork.HH_11);
 
             // Check parent relationship
-            placedCable.ParentAffixes.Should().NotBeNull();
-            placedCable.ParentAffixes.Count().Should().Be(1);
-            placedCable.ParentAffixes.Single(p => p.SpanSegmentId == routeThroughConduit.SpanStructures[1].SpanSegments[0].Id).Should().NotBeNull();
+            placedCable.UtilityNetworkHops[0].ParentAffixes.Should().NotBeNull();
+            placedCable.UtilityNetworkHops[0].ParentAffixes.Count().Should().Be(1);
+            placedCable.UtilityNetworkHops[0].ParentAffixes.Single(p => p.SpanSegmentId == routeThroughConduit.SpanStructures[1].SpanSegments[0].Id).Should().NotBeNull();
 
 
         }
@@ -167,9 +167,9 @@ namespace OpenFTTH.APIGateway.IntegrationTests.Conversion
             walkOfInterest.RouteNetworkElementRefs.Last().Should().Be(TestRouteNetwork.HH_11);
 
             // Check parent relationship
-            placedCable.ParentAffixes.Should().NotBeNull();
-            placedCable.ParentAffixes.Count().Should().Be(1);
-            placedCable.ParentAffixes.Single(p => p.SpanSegmentId == routeThroughConduit.SpanStructures[1].SpanSegments[0].Id).Should().NotBeNull();
+            placedCable.UtilityNetworkHops[0].ParentAffixes.Should().NotBeNull();
+            placedCable.UtilityNetworkHops[0].ParentAffixes.Count().Should().Be(1);
+            placedCable.UtilityNetworkHops[0].ParentAffixes.Single(p => p.SpanSegmentId == routeThroughConduit.SpanStructures[1].SpanSegments[0].Id).Should().NotBeNull();
 
 
         }
@@ -232,15 +232,15 @@ namespace OpenFTTH.APIGateway.IntegrationTests.Conversion
             // Check walk of interest
             var walkOfInterest = routeNetworkQueryResult.Value.Interests[placedCable.WalkOfInterestId];
 
-            walkOfInterest.RouteNetworkElementRefs.First().Should().Be(TestRouteNetwork.HH_1);
-            walkOfInterest.RouteNetworkElementRefs.Last().Should().Be(TestRouteNetwork.HH_11);
+            walkOfInterest.RouteNetworkElementRefs.First().Should().Be(TestRouteNetwork.HH_11);
+            walkOfInterest.RouteNetworkElementRefs.Last().Should().Be(TestRouteNetwork.HH_1);
 
             // Check parent relationship
-            placedCable.ParentAffixes.Should().NotBeNull();
-            placedCable.ParentAffixes.Count().Should().Be(2);
+            placedCable.UtilityNetworkHops[0].ParentAffixes.Should().NotBeNull();
+            placedCable.UtilityNetworkHops[0].ParentAffixes.Count().Should().Be(2);
 
-            placedCable.ParentAffixes.Single(p => p.SpanSegmentId == routeThroughConduit1.SpanStructures[2].SpanSegments[0].Id).Should().NotBeNull();
-            placedCable.ParentAffixes.Single(p => p.SpanSegmentId == routeThroughConduit2.SpanStructures[2].SpanSegments[0].Id).Should().NotBeNull();
+            placedCable.UtilityNetworkHops[0].ParentAffixes.Single(p => p.SpanSegmentId == routeThroughConduit1.SpanStructures[2].SpanSegments[0].Id).Should().NotBeNull();
+            placedCable.UtilityNetworkHops[0].ParentAffixes.Single(p => p.SpanSegmentId == routeThroughConduit2.SpanStructures[2].SpanSegments[0].Id).Should().NotBeNull();
 
 
         }
