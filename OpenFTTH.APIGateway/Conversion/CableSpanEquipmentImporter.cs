@@ -108,7 +108,7 @@ namespace OpenFTTH.APIGateway.Conversion
 
                 if (result.IsFailed)
                 {
-                    LogStatus((NpgsqlCommand)logCmd, _tableName, result.Errors.First().Message, spanEquipment.ExternalId);
+                    LogStatus((NpgsqlCommand)logCmd, _tableName, "GENEREL ROUTING FAILURE: " + result.Errors.First().Message, spanEquipment.ExternalId);
                 }
                 else
                 {
@@ -176,10 +176,29 @@ namespace OpenFTTH.APIGateway.Conversion
 
             if (placeSpanEquipmentResult.IsFailed)
             {
+                var errorMsg = "Failed to route cable: " + externalId + " through conduit network: " + placeSpanEquipmentResult.Errors.First().Message;
+
                 System.Diagnostics.Debug.WriteLine("---------------------------------------------------------------------------------------------------------------------------------------");
-                System.Diagnostics.Debug.WriteLine($"Error: {placeSpanEquipmentResult.Errors.First().Message}");
-                _logger.LogInformation("Failed to add cable: " + externalId + " Error: " + placeSpanEquipmentResult.Errors.First().Message);
-                LogStatus((NpgsqlCommand)logCmd, _tableName, placeSpanEquipmentResult.Errors.First().Message, externalId);
+                System.Diagnostics.Debug.WriteLine(errorMsg);
+
+                _logger.LogInformation(errorMsg);
+
+                // Try place cable directly in route network
+                var placeSpanEquipmentDirectlyInRouteNetworkCmd = new PlaceSpanEquipmentInUtilityNetwork(correlationId, new UserContext("conversion", _workTaskId), spanEquipmentId, specificationId,
+                    new RoutingHop[] { new RoutingHop(validateInterestResult.Value.RouteNetworkElementRefs.ToArray()) }
+                    )
+                {
+                    NamingInfo = namingInfo,
+                };
+
+                var placeSpanEquipmentDirectlyInRouteNetworkResult = _commandDispatcher.HandleAsync<PlaceSpanEquipmentInUtilityNetwork, Result>(placeSpanEquipmentDirectlyInRouteNetworkCmd).Result;
+
+                if (placeSpanEquipmentDirectlyInRouteNetworkResult.IsFailed)
+                {
+                    errorMsg = "GENERAL FAILURE PLACING DIRECTLY IN ROUTE NETWORK: " + placeSpanEquipmentResult.Errors.First().Message + " " + errorMsg;
+                }
+
+                LogStatus((NpgsqlCommand)logCmd, _tableName, errorMsg, externalId);
                 return placeSpanEquipmentResult;
             }
             

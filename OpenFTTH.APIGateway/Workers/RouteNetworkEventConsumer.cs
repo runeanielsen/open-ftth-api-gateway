@@ -137,7 +137,7 @@ namespace OpenFTTH.APIGateway.Workers
                     throw new ApplicationException("Recieved no route network elements from Kafka topic.");
 
                 // Start conversion
-                //new ConversionRunner(_loggerFactory, _eventStore, _geoDatabaseSetting, _commandDispatcher, _queryDispatcher).Run();
+                new ConversionRunner(_loggerFactory, _eventStore, _geoDatabaseSetting, _commandDispatcher, _queryDispatcher).Run();
 
 
             }
