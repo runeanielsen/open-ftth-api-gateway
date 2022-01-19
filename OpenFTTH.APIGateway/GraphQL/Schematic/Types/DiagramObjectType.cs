@@ -15,6 +15,7 @@ namespace OpenFTTH.APIGateway.GraphQL.Schematic.Types
 
             Field(x => x.Style, type: typeof(StringGraphType)).Description("Style name");
             Field(x => x.Label, type: typeof(StringGraphType)).Description("Label");
+            Field(x => x.DrawingOrder, type: typeof(IntGraphType)).Description("DrawingOrder");
 
             Field<GeometryType>(
               "geometry",
