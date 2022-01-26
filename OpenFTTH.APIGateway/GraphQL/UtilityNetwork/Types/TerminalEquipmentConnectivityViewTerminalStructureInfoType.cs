@@ -4,7 +4,7 @@ using OpenFTTH.UtilityGraphService.API.Model.UtilityNetwork.Views;
 
 namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Types
 {
-    public class TerminalEquipmentConnectivityViewTerminalStructureInfoType : ObjectGraphType<TerminalEquipmentConnectivityViewTerminalStructureInfo>
+    public class TerminalEquipmentConnectivityViewTerminalStructureInfoType : ObjectGraphType<TerminalEquipmentAZConnectivityViewTerminalStructureInfo>
     {
         public TerminalEquipmentConnectivityViewTerminalStructureInfoType(ILogger<TerminalEquipmentConnectivityViewTerminalStructureInfoType> logger)
         {

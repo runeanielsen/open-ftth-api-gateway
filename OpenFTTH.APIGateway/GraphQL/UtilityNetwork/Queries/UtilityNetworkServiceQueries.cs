@@ -33,6 +33,7 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Queries
                 }
             );
 
+
             Field<ListGraphType<SpanEquipmentSpecificationType>>(
                 name: "spanEquipmentSpecifications",
                 description: "Retrieve all span equipment specifications.",
@@ -44,6 +45,7 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Queries
                     return queryResult.Value.OrderBy(s => s.Description);
                 }
             );
+
 
             Field<ListGraphType<TerminalEquipmentSpecificationType>>(
                 name: "terminalEquipmentSpecifications",
@@ -57,6 +59,7 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Queries
                 }
             );
 
+
             Field<ListGraphType<NodeContainerSpecificationType>>(
                 name: "nodeContainerSpecifications",
                 description: "Retrieve all node container specifications.",
@@ -67,6 +70,7 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Queries
                     return queryResult.Value.OrderBy(s => s.Description);
                 }
             );
+
 
             Field<ListGraphType<RackSpecificationType>>(
                name: "rackSpecifications",
@@ -170,147 +174,206 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Queries
 
                    return spanEquipment;
                }
-           );
-
+            );
 
 
             Field<NodeContainerType>(
-              name: "nodeContainer",
-              description: "Query information related to a specific node container",
-              arguments: new QueryArguments(
-                new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "nodeContainerId" }
-              ),
-              resolve: context =>
-              {
-                  var nodeContainerId = context.GetArgument<Guid>("nodeContainerId");
+                name: "nodeContainer",
+                description: "Query information related to a specific node container",
+                arguments: new QueryArguments(
+                    new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "nodeContainerId" }
+                ),
+                resolve: context =>
+                {
+                    var nodeContainerId = context.GetArgument<Guid>("nodeContainerId");
 
-                   // Get equipment information
-                   var equipmentQueryResult = queryDispatcher.HandleAsync<GetEquipmentDetails, FluentResults.Result<GetEquipmentDetailsResult>>(
-                      new GetEquipmentDetails(new InterestIdList() { nodeContainerId })
-                  ).Result;
+                    // Get equipment information
+                    var equipmentQueryResult = queryDispatcher.HandleAsync<GetEquipmentDetails, FluentResults.Result<GetEquipmentDetailsResult>>(
+                        new GetEquipmentDetails(new InterestIdList() { nodeContainerId })
+                    ).Result;
 
-                  if (equipmentQueryResult.IsFailed)
-                  {
-                      foreach (var error in equipmentQueryResult.Errors)
+                    if (equipmentQueryResult.IsFailed)
+                    {
+                        foreach (var error in equipmentQueryResult.Errors)
+                            context.Errors.Add(new ExecutionError(error.Message));
+
+                        return null;
+                    }
+
+                    if (equipmentQueryResult.Value.NodeContainers == null || equipmentQueryResult.Value.NodeContainers.Count == 0)
+                    {
+                        context.Errors.Add(new ExecutionError($"Cannot find any node container with id: {nodeContainerId}"));
+
+                        return null;
+                    }
+
+
+                    var nodeContainer = equipmentQueryResult.Value.NodeContainers.First();
+
+                    return nodeContainer;
+                }
+            );
+
+
+            Field<RackType>(
+                name: "rack",
+                description: "Query information related to a specific rack residing within a node",
+                arguments: new QueryArguments(
+                    new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "routeNodeId" },
+                    new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "rackId" }
+                ),
+                resolve: context =>
+                {
+                    var routeNodeId = context.GetArgument<Guid>("routeNodeId");
+                    var rackId = context.GetArgument<Guid>("rackId");
+
+                    var getNodeContainerResult = QueryHelper.GetNodeContainerFromRouteNodeId(queryDispatcher, routeNodeId);
+
+                    if (getNodeContainerResult.IsFailed)
+                    {
+                        foreach (var error in getNodeContainerResult.Errors)
+                            context.Errors.Add(new ExecutionError(error.Message));
+
+                        return null;
+                    }
+    
+                    var nodeContainer = getNodeContainerResult.Value;
+
+                    if (nodeContainer.Racks == null || !nodeContainer.Racks.Any(r => r.Id == rackId))
+                    {
+                        context.Errors.Add(new ExecutionError($"Cannot find any rack with id: {rackId} within node container with id: {nodeContainer.Id}"));
+                        return null;
+                    }
+
+                    return nodeContainer.Racks.First(r => r.Id == rackId);
+                }
+            );
+
+
+            Field<TerminalEquipmentAZConnectivityViewModelType>(
+                name: "terminalEquipmentConnectivityView",
+                description: "Query connectivity information related to ",
+                arguments: new QueryArguments(
+                    new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "routeNodeId" },
+                    new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "terminalEquipmentOrRackId" }
+                ),
+                resolve: context =>
+                {
+                    var routeNodeId = context.GetArgument<Guid>("routeNodeId");
+                    var terminalEquipmentOrRackId = context.GetArgument<Guid>("terminalEquipmentOrRackId");
+
+                    var connectivityQuery = new GetTerminalEquipmentConnectivityView(routeNodeId, terminalEquipmentOrRackId);
+
+                    var connectivityQueryResult = queryDispatcher.HandleAsync<GetTerminalEquipmentConnectivityView, Result<TerminalEquipmentAZConnectivityViewModel>>(
+                        connectivityQuery
+                    ).Result;
+
+                    if (connectivityQueryResult.IsFailed)
+                    {
+                        foreach (var error in connectivityQueryResult.Errors)
+                            context.Errors.Add(new ExecutionError(error.Message));
+
+                        return null;
+                    }
+
+                    return connectivityQueryResult.Value;
+                }
+            );
+
+
+            Field<ConnectivityTraceViewType>(
+                name: "connectivityTraceView",
+                description: "Trace connectivity",
+                arguments: new QueryArguments(
+                    new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "routeNetworkElementId" },
+                    new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "terminalOrSpanEquipmentId" }
+                ),
+                resolve: context =>
+                {
+                    var routeNetworkElementId = context.GetArgument<Guid>("routeNetworkElementId");
+                    var terminalOrSpanEquipmentId = context.GetArgument<Guid>("terminalOrSpanEquipmentId");
+
+                    var connectivityQuery = new GetConnectivityTraceView(routeNetworkElementId, terminalOrSpanEquipmentId);
+
+                    var connectivityQueryResult = queryDispatcher.HandleAsync<GetConnectivityTraceView, Result<ConnectivityTraceView>>(
+                        connectivityQuery
+                    ).Result;
+
+                    if (connectivityQueryResult.IsFailed)
+                    {
+                        foreach (var error in connectivityQueryResult.Errors)
+                            context.Errors.Add(new ExecutionError(error.Message));
+                        return null;
+                    }
+
+                    return connectivityQueryResult.Value;
+                }
+            );
+
+
+            Field<SpanEquipmentAZConnectivityViewModelType>(
+                name: "spanEquipmentConnectivityView",
+                description: "Query connectivity information related to span equipment",
+                arguments: new QueryArguments(
+                    new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "routeNetworkElementId" },
+                    new QueryArgument<NonNullGraphType<ListGraphType<IdGraphType>>> { Name = "spanEquipmentOrSegmentIds" }
+                ),
+                resolve: context =>
+                {
+                    var routeNetworkElementId = context.GetArgument<Guid>("routeNetworkElementId");
+                    var spanEquipmentOrSegmentIds = context.GetArgument<Guid[]>("spanEquipmentOrSegmentIds");
+
+                    var connectivityQuery = new GetSpanEquipmentConnectivityView(routeNetworkElementId, spanEquipmentOrSegmentIds);
+
+                    var connectivityQueryResult = queryDispatcher.HandleAsync<GetSpanEquipmentConnectivityView, Result<SpanEquipmentAZConnectivityViewModel>>(
+                      connectivityQuery
+                    ).Result;
+
+                    if (connectivityQueryResult.IsFailed)
+                    {
+                        foreach (var error in connectivityQueryResult.Errors)
                           context.Errors.Add(new ExecutionError(error.Message));
 
-                      return null;
-                  }
+                        return null;
+                    }
 
-                  if (equipmentQueryResult.Value.NodeContainers == null || equipmentQueryResult.Value.NodeContainers.Count == 0)
-                  {
-                      context.Errors.Add(new ExecutionError($"Cannot find any node container with id: {nodeContainerId}"));
-
-                      return null;
-                  }
-
-
-                  var nodeContainer = equipmentQueryResult.Value.NodeContainers.First();
-
-                  return nodeContainer;
-              }
-          );
-
-
-          Field<RackType>(
-            name: "rack",
-            description: "Query information related to a specific rack residing within a node",
-            arguments: new QueryArguments(
-              new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "routeNodeId" },
-              new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "rackId" }
-            ),
-            resolve: context =>
-            {
-                var routeNodeId = context.GetArgument<Guid>("routeNodeId");
-                var rackId = context.GetArgument<Guid>("rackId");
-
-                var getNodeContainerResult = QueryHelper.GetNodeContainerFromRouteNodeId(queryDispatcher, routeNodeId);
-
-                if (getNodeContainerResult.IsFailed)
-                {
-                    foreach (var error in getNodeContainerResult.Errors)
-                        context.Errors.Add(new ExecutionError(error.Message));
-
-                    return null;
+                    return connectivityQueryResult.Value;
                 }
-    
-                var nodeContainer = getNodeContainerResult.Value;
+            );
 
-                if (nodeContainer.Racks == null || !nodeContainer.Racks.Any(r => r.Id == rackId))
+
+            Field<SpanEquipmentPassageViewModelType>(
+                name: "spanEquipmentPassageView",
+                description: "Query passage information related to span equipment",
+                arguments: new QueryArguments(
+                    new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "routeNetworkElementId" },
+                    new QueryArgument<NonNullGraphType<ListGraphType<IdGraphType>>> { Name = "spanEquipmentOrSegmentIds" }
+                ),
+                resolve: context =>
                 {
-                    context.Errors.Add(new ExecutionError($"Cannot find any rack with id: {rackId} within node container with id: {nodeContainer.Id}"));
-                    return null;
+                    var routeNetworkElementId = context.GetArgument<Guid>("routeNetworkElementId");
+                    var spanEquipmentOrSegmentIds = context.GetArgument<Guid[]>("spanEquipmentOrSegmentIds");
+
+                    var connectivityQuery = new GetSpanEquipmentPassageView(routeNetworkElementId, spanEquipmentOrSegmentIds);
+
+                    var connectivityQueryResult = queryDispatcher.HandleAsync<GetSpanEquipmentPassageView, Result<SpanEquipmentPassageViewModel>>(
+                      connectivityQuery
+                    ).Result;
+
+                    if (connectivityQueryResult.IsFailed)
+                    {
+                        foreach (var error in connectivityQueryResult.Errors)
+                            context.Errors.Add(new ExecutionError(error.Message));
+
+                        return null;
+                    }
+
+                    return connectivityQueryResult.Value;
                 }
+            );
 
-                return nodeContainer.Racks.First(r => r.Id == rackId);
-            }
-        );
-
-
-         Field<TerminalEquipmentAZConnectivityViewModelType>(
-            name: "terminalEquipmentConnectivityView",
-            description: "Query connectivity information related to ",
-            arguments: new QueryArguments(
-              new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "routeNodeId" },
-              new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "terminalEquipmentOrRackId" }
-            ),
-            resolve: context =>
-            {
-                var routeNodeId = context.GetArgument<Guid>("routeNodeId");
-                var terminalEquipmentOrRackId = context.GetArgument<Guid>("terminalEquipmentOrRackId");
-
-                var connectivityQuery = new GetTerminalEquipmentConnectivityView(routeNodeId, terminalEquipmentOrRackId);
-
-                var connectivityQueryResult = queryDispatcher.HandleAsync<GetTerminalEquipmentConnectivityView, Result<TerminalEquipmentAZConnectivityViewModel>>(
-                    connectivityQuery
-                ).Result;
-
-                if (connectivityQueryResult.IsFailed)
-                {
-                    foreach (var error in connectivityQueryResult.Errors)
-                        context.Errors.Add(new ExecutionError(error.Message));
-
-                    return null;
-                }
-
-                return connectivityQueryResult.Value;
-            }
-        );
-
-
-
-        Field<ConnectivityTraceViewType>(
-          name: "connectivityTraceView",
-          description: "Trace connectivity",
-          arguments: new QueryArguments(
-            new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "routeNodeId" },
-            new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "terminalOrSpanEquipmentId" }
-          ),
-          resolve: context =>
-          {
-              var routeNodeId = context.GetArgument<Guid>("routeNodeId");
-              var terminalOrSpanEquipmentId = context.GetArgument<Guid>("terminalOrSpanEquipmentId");
-
-              var connectivityQuery = new GetConnectivityTraceView(routeNodeId, terminalOrSpanEquipmentId);
-
-              var connectivityQueryResult = queryDispatcher.HandleAsync<GetConnectivityTraceView, Result<ConnectivityTraceView>>(
-                  connectivityQuery
-              ).Result;
-
-              if (connectivityQueryResult.IsFailed)
-              {
-                  foreach (var error in connectivityQueryResult.Errors)
-                      context.Errors.Add(new ExecutionError(error.Message));
-
-                  return null;
-              }
-
-              return connectivityQueryResult.Value;
-          }
-      );
 
 
         }
-
     }
 }
