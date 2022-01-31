@@ -108,7 +108,7 @@ namespace OpenFTTH.APIGateway.Workers
 
                     TimeSpan timespan = waitStartTimestamp - inMemRouteNetworkState.LastEventRecievedTimestamp;
 
-                    if (timespan.TotalSeconds > 200)
+                    if (timespan.TotalSeconds > 20)
                     {
                         loadFinish = true;
                     }
