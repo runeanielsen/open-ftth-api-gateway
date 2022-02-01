@@ -15,8 +15,25 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Types
             Field(x => x.ConduitId, type: typeof(StringGraphType)).Description("Span equipment name");
             Field(x => x.OuterConduitInfo, type: typeof(StringGraphType)).Description("Outer conduit info");
             Field(x => x.InnerConduitInfo, type: typeof(StringGraphType)).Description("Inner conduit info");
-            Field(x => Math.Round(x.SegmentLength, 2), type: typeof(FloatGraphType)).Description("Segment length");
-            Field(x => Math.Round(x.CumulativeDistance), type: typeof(FloatGraphType)).Description("Cumulative distance");
+
+            Field<FloatGraphType>(
+                name: "SegmentLength",
+                description: "Segment length",
+                resolve: context =>
+                {
+                    return Math.Round(context.Source.SegmentLength, 2);
+                }
+            );
+
+            Field<FloatGraphType>(
+               name: "CumulativeDistance",
+               description: "Cumulative distance",
+               resolve: context =>
+               {
+                   return Math.Round(context.Source.CumulativeDistance);
+               }
+            );
+
             Field(x => x.RouteSegmentIds, type: typeof(ListGraphType<IdGraphType>)).Description("Route network segment ids of the span segment traversal");
             Field(x => x.RouteSegmentGeometries, type: typeof(ListGraphType<StringGraphType>)).Description("Route network segment geometries of the span segment traversal");
         }
