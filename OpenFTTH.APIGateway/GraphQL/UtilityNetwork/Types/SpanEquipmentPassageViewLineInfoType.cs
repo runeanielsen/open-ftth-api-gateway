@@ -1,5 +1,6 @@
 ﻿using GraphQL.Types;
 using Microsoft.Extensions.Logging;
+using OpenFTTH.APIGateway.Util;
 using OpenFTTH.UtilityGraphService.API.Model.UtilityNetwork.Views;
 using System;
 
@@ -35,7 +36,15 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Types
             );
 
             Field(x => x.RouteSegmentIds, type: typeof(ListGraphType<IdGraphType>)).Description("Route network segment ids of the span segment traversal");
-            Field(x => x.RouteSegmentGeometries, type: typeof(ListGraphType<StringGraphType>)).Description("Route network segment geometries of the span segment traversal");
+
+            Field<ListGraphType<StringGraphType>>(
+               name: "RouteSegmentGeometries",
+               description: "Route network segment geometries of the span segment traversal",
+               resolve: context =>
+               {
+                   return UTM32WGS84Converter.ConvertGeoJsonLineStringsToWgs84(context.Source.RouteSegmentGeometries);
+               }
+            );
         }
     }
 }
