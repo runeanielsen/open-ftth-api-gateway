@@ -30,7 +30,7 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Types
                description: "Cumulative distance",
                resolve: context =>
                {
-                   return Math.Round(context.Source.CumulativeDistance);
+                   return Math.Round(context.Source.CumulativeDistance, 2);
                }
             );
 
