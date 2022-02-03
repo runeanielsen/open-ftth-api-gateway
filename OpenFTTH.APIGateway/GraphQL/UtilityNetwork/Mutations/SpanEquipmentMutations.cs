@@ -138,7 +138,7 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                       var affixCommandResult = commandDispatcher.HandleAsync<AffixSpanEquipmentToNodeContainer, Result>(affixCommand).Result;
 
                       if (affixCommandResult.IsFailed)
-                        return new CommandResult(affixCommandResult);
+                          return new CommandResult(affixCommandResult);
                   }
 
                   return new CommandResult(Result.Ok());
@@ -178,7 +178,7 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                       var detachCommandResult = commandDispatcher.HandleAsync<DetachSpanEquipmentFromNodeContainer, Result>(detachCommand).Result;
 
                       if (detachCommandResult.IsFailed)
-                        return new CommandResult(detachCommandResult);
+                          return new CommandResult(detachCommandResult);
                   }
 
                   return new CommandResult(Result.Ok());
@@ -238,7 +238,7 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
 
                   // TODO: Get from work manager
                   var workTaskId = Guid.Parse("54800ae5-13a5-4b03-8626-a63b66a25568");
-                  
+
                   var commandUserContext = new UserContext(userName, workTaskId)
                   {
                       EditingRouteNodeId = routeNodeId
@@ -271,7 +271,7 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
 
                   // TODO: Get from work manager
                   var workTaskId = Guid.Parse("54800ae5-13a5-4b03-8626-a63b66a25568");
-                  
+
                   var commandUserContext = new UserContext(userName, workTaskId)
                   {
                       EditingRouteNodeId = routeNodeId
@@ -308,7 +308,7 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                   var commandUserContext = new UserContext(userName, workTaskId);
 
                   var addStructure = new PlaceAdditionalStructuresInSpanEquipment(
-                    correlationId: correlationId, 
+                    correlationId: correlationId,
                     userContext: commandUserContext,
                     spanEquipmentId: spanEquipmentOrSegmentId,
                     structureSpecificationIds: specificationsId
@@ -452,22 +452,64 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                  var userContext = context.UserContext as GraphQLUserContext;
                  var userName = userContext.Username;
 
-                  // TODO: Get from work manager
-                  var workTaskId = Guid.Parse("54800ae5-13a5-4b03-8626-a63b66a25568");
+                 // TODO: Get from work manager
+                 var workTaskId = Guid.Parse("54800ae5-13a5-4b03-8626-a63b66a25568");
 
                  var commandUserContext = new UserContext(userName, workTaskId);
 
-                    var affixCommand = new AffixSpanEquipmentToParent(correlationId, commandUserContext, routeNodeId, spanSegmentId1, spanSegmentId2);
+                 var affixCommand = new AffixSpanEquipmentToParent(correlationId, commandUserContext, routeNodeId, spanSegmentId1, spanSegmentId2);
 
-                     var affixCommandResult = commandDispatcher.HandleAsync<AffixSpanEquipmentToParent, Result>(affixCommand).Result;
+                 var affixCommandResult = commandDispatcher.HandleAsync<AffixSpanEquipmentToParent, Result>(affixCommand).Result;
 
-                     if (affixCommandResult.IsFailed)
-                         return new CommandResult(affixCommandResult);
+                 if (affixCommandResult.IsFailed)
+                     return new CommandResult(affixCommandResult);
 
                  return new CommandResult(Result.Ok());
              }
            );
+
+            Field<CommandResultType>(
+               "connectToTerminalEquipment",
+               description: "Connect one or more span segments inside a span equipment to terminals inside a terminal equipmment",
+               arguments: new QueryArguments(
+                   new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "routeNodeId" },
+                   new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "spanEquipmentId" },
+                   new QueryArgument<NonNullGraphType<ListGraphType<IdGraphType>>> { Name = "spanSegmentIds" },
+                   new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "terminalEquipmentId" },
+                   new QueryArgument<NonNullGraphType<ListGraphType<IdGraphType>>> { Name = "terminalIds" }
+               ),
+               resolve: context =>
+               {
+                    var routeNodeId = context.GetArgument<Guid>("routeNodeId");
+                    var spanEquipmentId = context.GetArgument<Guid>("spanEquipmentId");
+                    var spanSegmentIds = context.GetArgument<Guid[]>("spanSegmentIds");
+                    var terminalEquipmentId = context.GetArgument<Guid>("terminalEquipmentId");
+                    var terminalIds = context.GetArgument<Guid[]>("terminalIds");
+
+                    var correlationId = Guid.NewGuid();
+
+                    var userContext = context.UserContext as GraphQLUserContext;
+                    var userName = userContext.Username;
+
+                    // TODO: Get from work manager
+                    var workTaskId = Guid.Parse("54800ae5-13a5-4b03-8626-a63b66a25568");
+
+                    var commandUserContext = new UserContext(userName, workTaskId);
+
+                    var connectCommand = new ConnectSpanEquipmentAndTerminalEquipment(correlationId, commandUserContext, routeNodeId, spanEquipmentId, spanSegmentIds, terminalEquipmentId, terminalIds);
+
+                    var connectCommandResult = commandDispatcher.HandleAsync<ConnectSpanEquipmentAndTerminalEquipment, Result>(connectCommand).Result;
+
+                    if (connectCommandResult.IsFailed)
+                        return new CommandResult(connectCommandResult);
+
+                    return new CommandResult(Result.Ok());
+               }
+            );
+
+
         }
+
 
         private static NamingInfo CalculateName(IEventStore eventStore, NamingInfo namingInfo, SpanEquipmentSpecification spec)
         {

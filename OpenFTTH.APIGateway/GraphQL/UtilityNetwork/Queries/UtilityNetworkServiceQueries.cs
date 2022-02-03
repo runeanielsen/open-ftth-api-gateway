@@ -12,6 +12,7 @@ using OpenFTTH.UtilityGraphService.API.Model.UtilityNetwork;
 using OpenFTTH.UtilityGraphService.API.Model.UtilityNetwork.Views;
 using OpenFTTH.UtilityGraphService.API.Queries;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Queries
@@ -371,6 +372,68 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Queries
                     return connectivityQueryResult.Value;
                 }
             );
+
+
+            Field<ListGraphType<ConnectivityFaceType>>(
+                name: "connectivityFaces",
+                description: "Query terminal equipment sides and fiber cable ends available for connectivity (aka connectivity faces)",
+                arguments: new QueryArguments(
+                    new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "routeNodeId" }
+                ),
+                resolve: context =>
+                {
+                    var routeNodeId = context.GetArgument<Guid>("routeNodeId");
+
+                    var connectivityFacesQuery = new GetConnectivityFaces(routeNodeId);
+
+                    var connectivityFacesQueryResult = queryDispatcher.HandleAsync<GetConnectivityFaces, Result<List<ConnectivityFace>>>(
+                      connectivityFacesQuery
+                    ).Result;
+
+                    if (connectivityFacesQueryResult.IsFailed)
+                    {
+                        foreach (var error in connectivityFacesQueryResult.Errors)
+                            context.Errors.Add(new ExecutionError(error.Message));
+
+                        return null;
+                    }
+
+                    return connectivityFacesQueryResult.Value;
+                }
+            );
+
+            Field<ListGraphType<ConnectivityFaceConnectionType>>(
+                name: "connectivityFaceConnections",
+                description: "Query the connections available in a connectivity face",
+                arguments: new QueryArguments(
+                    new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "routeNodeId" },
+                    new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "spanOrTerminalEquipmentId" },
+                    new QueryArgument<NonNullGraphType<FaceKindEnumType>> { Name = "faceType" }
+                ),
+                resolve: context =>
+                {
+                    var routeNodeId = context.GetArgument<Guid>("routeNodeId");
+                    var spanOrTerminalEquipmentId = context.GetArgument<Guid>("spanOrTerminalEquipmentId");
+                    var faceType = context.GetArgument<FaceKindEnum>("faceType");
+
+                    var connectivityFacesConnectionsQuery = new GetConnectivityFaceConnections(routeNodeId, spanOrTerminalEquipmentId, faceType);
+
+                    var connectivityFaceConnectionsQueryResult = queryDispatcher.HandleAsync<GetConnectivityFaceConnections, Result<List<ConnectivityFaceConnection>>>(
+                      connectivityFacesConnectionsQuery
+                    ).Result;
+
+                    if (connectivityFaceConnectionsQueryResult.IsFailed)
+                    {
+                        foreach (var error in connectivityFaceConnectionsQueryResult.Errors)
+                            context.Errors.Add(new ExecutionError(error.Message));
+
+                        return null;
+                    }
+
+                    return connectivityFaceConnectionsQueryResult.Value;
+                }
+            );
+
 
 
 
