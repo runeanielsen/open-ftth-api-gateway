@@ -53,11 +53,13 @@ namespace OpenFTTH.APIGateway.Conversion
                     Port = "5432"
                 };
 
-                new CableSpanEquipmentImporter(_loggerFactory.CreateLogger<ConduitSpanEquipmentImporter>(), _eventStore, dbSettings, _commandDispatcher, _queryDispatcher).Run();
+                //new CableSpanEquipmentImporter(_loggerFactory.CreateLogger<ConduitSpanEquipmentImporter>(), _eventStore, dbSettings, _commandDispatcher, _queryDispatcher).Run();
+
+                new NodeContainerImporter(_loggerFactory.CreateLogger<NodeContainerImporter>(), _workTaskId, _eventStore, _geoDatabaseSetting, _commandDispatcher, _queryDispatcher).Run();
+
 
                 //new ConduitSpanEquipmentImporter(_loggerFactory.CreateLogger<ConduitSpanEquipmentImporter>(), _eventStore, _geoDatabaseSetting, _commandDispatcher, _queryDispatcher).Run();
 
-                //new NodeContainerImporter(_loggerFactory.CreateLogger<NodeContainerImporter>(), _workTaskId, _eventStore, _geoDatabaseSetting, _commandDispatcher, _queryDispatcher).Run();
             }
             else
             {

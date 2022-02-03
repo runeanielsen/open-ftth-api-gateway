@@ -12,6 +12,7 @@ using OpenFTTH.RouteNetwork.API.Queries;
 using OpenFTTH.UtilityGraphService.API.Commands;
 using OpenFTTH.UtilityGraphService.API.Model.UtilityNetwork;
 using OpenFTTH.UtilityGraphService.API.Queries;
+using OpenFTTH.UtilityGraphService.Business.Graph;
 using OpenFTTH.UtilityGraphService.Business.NodeContainers.Projections;
 using System;
 using System.Collections.Generic;
@@ -26,9 +27,11 @@ namespace OpenFTTH.APIGateway.Conversion
         private IEventStore _eventStore;
         private ICommandDispatcher _commandDispatcher;
         private IQueryDispatcher _queryDispatcher;
+        private UtilityNetworkProjection _utilityNetwork;
 
-        private string _nodeContainerTableName = "conversion.ne_node_containers_result";
-        private string _connectivityTableName = "conversion.ne_connectivity_result";
+        private string _nodeContainerTableName = "conversion.node_containers";
+        private string _connectivityTableName = "conversion.connectivity";
+        
 
         private Dictionary<string, NodeContainerSpecification> _nodeContainerSpecByName = null;
 
@@ -39,6 +42,8 @@ namespace OpenFTTH.APIGateway.Conversion
             _eventStore = eventSTore;
             _commandDispatcher = commandDispatcher;
             _queryDispatcher = queryDispatcher;
+
+            _utilityNetwork = _eventStore.Projections.Get<UtilityNetworkProjection>();
         }
 
 
@@ -47,7 +52,7 @@ namespace OpenFTTH.APIGateway.Conversion
             _logger.LogInformation("Conversion of node containers started...");
 
             CreateTableLogColumn(_nodeContainerTableName);
-            CreateTableLogColumn(_connectivityTableName);
+            //CreateTableLogColumn(_connectivityTableName);
 
             var nodeContainers = LoadDataFromConversionDatabase();
 
@@ -69,21 +74,19 @@ namespace OpenFTTH.APIGateway.Conversion
 
                 if (specId != null)
                 {
-                    var placeNodeContainerResult = PlaceNodeContainer(logCmd, nodeContainer, specId.Value);
+                    var relatedInfo = GetRelatedInformation(nodeContainer.NodeId);
+
+                    var placeNodeContainerResult = PlaceNodeContainer(logCmd, nodeContainer, specId.Value, relatedInfo);
 
                     if (placeNodeContainerResult.IsSuccess)
-                    { 
-                        var relatedInfo = GetRelatedInformation(nodeContainer.NodeId);
-
-                        AffixSpanEquipmentsToNodeContainer(logCmd, nodeContainer, relatedInfo);
-                        ConnectSpanEquipmentsInNodeContainer(logCmd, nodeContainer, relatedInfo);
+                    {
+                        LogStatus((NpgsqlCommand)logCmd, _nodeContainerTableName, "OK", nodeContainer.ExternalId);
+                        //AffixSpanEquipmentsToNodeContainer(logCmd, nodeContainer, relatedInfo);
+                        //ConnectSpanEquipmentsInNodeContainer(logCmd, nodeContainer, relatedInfo);
                     }
                     else
                     {
-                        var relatedInfo = GetRelatedInformation(nodeContainer.NodeId);
-
-                        if (placeNodeContainerResult.Errors.First().Message.Contains("NODE_CONTAINER_ALREADY_EXISTS"))
-                            ConnectSpanEquipmentsInNodeContainer(logCmd, nodeContainer, relatedInfo);
+                        LogStatus((NpgsqlCommand)logCmd, _nodeContainerTableName, placeNodeContainerResult.Errors.First().Message, nodeContainer.ExternalId);
                     }
                 }
                 else
@@ -161,8 +164,7 @@ namespace OpenFTTH.APIGateway.Conversion
             }
         }
 
-
-        private Result PlaceNodeContainer(NpgsqlCommand logCmd, NodeContainerForConversion nodeContainer, Guid specId)
+        private Result PlaceNodeContainer(NpgsqlCommand logCmd, NodeContainerForConversion nodeContainer, Guid specId, RelatedEquipmentInfo relatedInfo)
         {
             Guid correlationId = Guid.NewGuid();
 
@@ -170,6 +172,16 @@ namespace OpenFTTH.APIGateway.Conversion
             {
                 EditingRouteNodeId = nodeContainer.NodeId
             };
+
+            // Check if node container already exists
+            if (relatedInfo.NodeContainer != null)
+            {
+                if (_utilityNetwork.TryGetEquipment<NodeContainer>(relatedInfo.NodeContainer.Id, out var existingNodeContainer))
+                {
+                    System.Diagnostics.Debug.WriteLine($"Node container alreadu exists in node: {nodeContainer.NodeId}");
+                    return Result.Ok();
+                }
+            }
 
             // First register the node of interest where to place the node container
             var nodeOfInterestId = Guid.NewGuid();
@@ -274,7 +286,6 @@ namespace OpenFTTH.APIGateway.Conversion
             return null;
         }
 
-
         private RelatedEquipmentInfo GetRelatedInformation(Guid routeNodeId)
         {
 
@@ -295,11 +306,14 @@ namespace OpenFTTH.APIGateway.Conversion
                 if (interestIdsToFetch.Count == 0)
                     return result;
 
-                var spanEquipmentQueryResult = _queryDispatcher.HandleAsync<GetEquipmentDetails, Result<GetEquipmentDetailsResult>>(new GetEquipmentDetails(interestIdsToFetch)).Result;
+                var equipmentQueryResult = _queryDispatcher.HandleAsync<GetEquipmentDetails, Result<GetEquipmentDetailsResult>>(new GetEquipmentDetails(interestIdsToFetch)).Result;
 
-                if (spanEquipmentQueryResult.IsSuccess)
+                if (equipmentQueryResult.IsSuccess)
                 {
-                    Dictionary<Guid, SpanEquipmentWithRelatedInfo> spanEquipmentByInterestId = spanEquipmentQueryResult.Value.SpanEquipment.ToDictionary(s => s.WalkOfInterestId);
+                    Dictionary<Guid, SpanEquipmentWithRelatedInfo> spanEquipmentByInterestId = equipmentQueryResult.Value.SpanEquipment.ToDictionary(s => s.WalkOfInterestId);
+
+                    if (equipmentQueryResult.Value.NodeContainers != null && equipmentQueryResult.Value.NodeContainers.Count > 0)
+                        result.NodeContainer = equipmentQueryResult.Value.NodeContainers.First();
 
                     foreach (var interestRel in interestQueryResult.Value.RouteNetworkElements.First().InterestRelations)
                     {
@@ -318,15 +332,13 @@ namespace OpenFTTH.APIGateway.Conversion
                     }
                 }
                 else
-                    _logger.LogError($"Error querying equipment details in route node with id: {routeNodeId} " + spanEquipmentQueryResult.Errors.First().Message);
-
+                    _logger.LogError($"Error querying equipment details in route node with id: {routeNodeId} " + equipmentQueryResult.Errors.First().Message);
             }
             else
                 _logger.LogError($"Error querying interests related to route node with id: {routeNodeId} " + interestQueryResult.Errors.First().Message);
 
             return result;
         }
-
 
         private Dictionary<Guid, NodeContainerForConversion> LoadDataFromConversionDatabase()
         {
@@ -345,18 +357,17 @@ namespace OpenFTTH.APIGateway.Conversion
 
             // Load node containers
             using var nodeContainerSelectCmd = dbConn.CreateCommand();
-            nodeContainerSelectCmd.CommandText = "SELECT * FROM " + _nodeContainerTableName + " WHERE status is null ORDER BY external_id";
-            //nodeContainerSelectCmd.CommandText = "SELECT * FROM " + _nodeContainerTableName + " ORDER BY external_id";
+            nodeContainerSelectCmd.CommandText = "SELECT external_id, external_spec, route_node_id, node_container_id, specification FROM " + _nodeContainerTableName + " WHERE status is null ORDER BY external_id";
 
             using var nodeContainerReader = nodeContainerSelectCmd.ExecuteReader();
 
             while (nodeContainerReader.Read())
             {
-                var externalId = nodeContainerReader.GetString(1).Trim();
-                var externalSpec = nodeContainerReader.GetString(2).Trim();
-                var routeNodeId = Guid.Parse(nodeContainerReader.GetString(3));
-                var nodeContainerId = Guid.Parse(nodeContainerReader.GetString(4));
-                var specification = nodeContainerReader.GetString(5).Trim();
+                var externalId = nodeContainerReader.GetString(0).Trim();
+                var externalSpec = nodeContainerReader.GetString(1).Trim();
+                var routeNodeId = Guid.Parse(nodeContainerReader.GetString(2));
+                var nodeContainerId = Guid.Parse(nodeContainerReader.GetString(3));
+                var specification = nodeContainerReader.GetString(4).Trim();
 
                 var nodeCondtainerForConversion = new NodeContainerForConversion(externalId, specification, routeNodeId, nodeContainerId);
 
@@ -370,6 +381,7 @@ namespace OpenFTTH.APIGateway.Conversion
 
         private Dictionary<Guid, NodeContainerForConversion> LoadConnectivityFromConversionDatabase(Dictionary<Guid, NodeContainerForConversion> nodeContainersForConversions)
         {
+            /*
             using var dbConn = GetConnection();
          
             // Load connectivity
@@ -399,7 +411,9 @@ namespace OpenFTTH.APIGateway.Conversion
 
             dbConn.Close();
 
+            */
             return nodeContainersForConversions;
+
         }
 
         private class NodeContainerForConversion
@@ -457,6 +471,8 @@ namespace OpenFTTH.APIGateway.Conversion
                     return true;
                 }
             }
+
+            public NodeContainer NodeContainer { get; internal set; }
         }
     }
 }

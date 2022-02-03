@@ -49,11 +49,14 @@ namespace OpenFTTH.TestData
         public static Guid Building_Corehus = Guid.Parse("47acefcf-ff8e-40d6-880f-aa1f497a282e");
         public static Guid Building_Teknikhus = Guid.Parse("0e2aac87-909b-47b4-8021-6fd1345dada9");
         public static Guid Building_Flexhus = Guid.Parse("f9a5d838-a9c4-409a-9b4b-a01f7042f830");
+        public static Guid Building_Customer = Guid.Parse("11ec46f6-7b88-4117-80a0-7d410ad31a6a");
 
+        public static Guid Cabinet_Uknown = Guid.Parse("ab0aeb35-f35a-4618-bcb0-1f28a279f665");
         public static Guid Cabinet_PK20 = Guid.Parse("bff6d247-5888-4657-952a-b66de67757a9");
         public static Guid Cabinet_PK35 = Guid.Parse("a5200c4c-6359-417d-9b57-1f406dfab2a5");
         public static Guid Cabinet_PK48 = Guid.Parse("844cdea2-ea2c-45da-8acd-353610b82cdb");
         public static Guid Cabinet_BB800 = Guid.Parse("4086c494-b607-4f27-9ba4-0d62a91cad7d");
+        
 
 
         // 50mm Straight In-line Elongated Enclosure (gammel model)
@@ -308,6 +311,12 @@ namespace OpenFTTH.TestData
             });
 
             // Skabe
+            AddSpecification(new NodeContainerSpecification(Cabinet_Uknown, "Cabinets", "Ukendt Skab")
+            {
+                Description = "Ukendt Skab",
+            });
+
+
             AddSpecification(new NodeContainerSpecification(Cabinet_PK20, "Cabinets", "PK20 Skab")
             {
                 Description = "PK20 Skab",
@@ -349,6 +358,13 @@ namespace OpenFTTH.TestData
             {
                 Description = "Flexhus"
             });
+
+            // Bygninger
+            AddSpecification(new NodeContainerSpecification(Building_Customer, "Buildings", "Bygningsenhed")
+            {
+                Description = "Bygningsenhed"
+            });
+
         }
 
         private void AddConduitSpanEquipmentSpecifications()
@@ -1232,6 +1248,7 @@ namespace OpenFTTH.TestData
             AddSpecification(new TerminalEquipmentSpecification(SpliceClosure_Uknown12Fiber, "SpliceClosure", "Ukendt Splidseboks 12 Fiber", "Splidseboks", false, 0,
                 new TerminalStructureTemplate[]
                 {
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 1)
                 }
             ));
 
@@ -1239,6 +1256,12 @@ namespace OpenFTTH.TestData
             AddSpecification(new TerminalEquipmentSpecification(SpliceClosure_Uknown72Fiber, "SpliceClosure", "Ukendt Splidseboks 72 Fiber", "Splidseboks", false, 0,
                 new TerminalStructureTemplate[]
                 {
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 1),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 2),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 3),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 4),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 5),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 6)
                 }
             ));
 
