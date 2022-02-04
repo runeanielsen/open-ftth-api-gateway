@@ -17,7 +17,6 @@ namespace OpenFTTH.APIGateway.GraphQL.Root
 
             routeNetworkEventSubscription.AddFields(this);
             schematicUpdatedSubscription.AddFields(this);
-            schematicUpdatedSubscription.AddFields(this);
             terminalEquipmentConnectivityUpdatedSubscription.AddFields(this);
         }
     }
