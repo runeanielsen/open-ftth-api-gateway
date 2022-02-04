@@ -4,6 +4,7 @@ using GraphQL.Server.Transports.Subscriptions.Abstractions;
 using GraphQL.Types;
 using Microsoft.Extensions.Options;
 using OpenFTTH.APIGateway.GraphQL.Schematic.Types;
+using OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Types;
 using OpenFTTH.APIGateway.Settings;
 using OpenFTTH.Schematic.API.Model.DiagramLayout;
 using OpenFTTH.UtilityGraphService.API.Model.UtilityNetwork.Views;
@@ -27,7 +28,7 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Subscriptions
             objectGraphType.AddField(new EventStreamFieldType
             {
                 Name = "terminalEquipmentConnectivityUpdated",
-                Type = typeof(DiagramType),
+                Type = typeof(TerminalEquipmentAZConnectivityViewModelType),
                 Resolver = new FuncFieldResolver<TerminalEquipmentAZConnectivityViewModel>(context => context.Source as TerminalEquipmentAZConnectivityViewModel),
                 Arguments = new QueryArguments(
                     new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "routeNodeId" },
