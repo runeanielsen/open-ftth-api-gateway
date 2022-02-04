@@ -119,6 +119,7 @@ namespace OpenFTTH.APIGateway.Conversion
                correlationId,
                commandUserContext,
                relatedInfo.NodeContainer.Id,
+               Guid.NewGuid(),
                rackSpecId.Value,
                rack.Name,
                rack.HeightInUnits

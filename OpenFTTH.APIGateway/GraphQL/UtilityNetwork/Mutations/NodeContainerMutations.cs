@@ -216,6 +216,7 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                     userContext: commandUserContext,
                     nodeContainerId: nodeContainerId,
                     rackSpecificationId: rackSpecificationId,
+                    rackId: Guid.NewGuid(),
                     rackName: rackName,
                     rackHeightInUnits: rackHeightInUnits
                   );
