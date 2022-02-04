@@ -276,6 +276,7 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                    userContext: commandUserContext,
                    nodeContainerId: nodeContainer.Id,
                    terminalEquipmentSpecificationId: terminalEquipmentSpecificationId,
+                   terminalEquipmentId: Guid.NewGuid(),
                    numberOfEquipments: numberOfEquipments,
                    startSequenceNumber: startSequenceNumber,
                    namingMethod: terminalEquipmentNamingMethod,
