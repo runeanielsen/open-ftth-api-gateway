@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations;
 using OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Queries;
+using OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Subscriptions;
 using OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Types;
 
 namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork
@@ -23,6 +24,9 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork
             services.AddSingleton<SpanEquipmentSpecificationType>();
             services.AddSingleton<NodeContainerSpecificationType>();
             services.AddSingleton<NodeContainerSideEnumType>();
+
+            // Subscriptions
+            services.AddSingleton<TerminalEquipmentConnectivityUpdatedSubscription>();
         }
     }
 }
