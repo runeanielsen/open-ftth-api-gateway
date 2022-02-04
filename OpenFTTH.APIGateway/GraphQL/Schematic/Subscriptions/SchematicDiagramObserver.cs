@@ -61,6 +61,10 @@ namespace OpenFTTH.APIGateway.GraphQL.Schematic.Subscriptions
             {
                 if (_observableByRouteNetworkElementId.TryGetValue(routeNetworkElementId, out var observable))
                 {
+                    // Don't update schematic diagram in case of fiber connectivity changes
+                    if (@event.Category != null && @event.Category.StartsWith("FiberConnectivity"))
+                        continue;
+
                     observable.OnNext(GetDiagram(routeNetworkElementId));
                 }
             }
