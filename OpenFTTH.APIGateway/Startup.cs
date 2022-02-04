@@ -30,6 +30,7 @@ using OpenFTTH.APIGateway.GraphQL.Schematic;
 using OpenFTTH.APIGateway.GraphQL.Schematic.Subscriptions;
 using OpenFTTH.APIGateway.GraphQL.Search;
 using OpenFTTH.APIGateway.GraphQL.UtilityNetwork;
+using OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Subscriptions;
 using OpenFTTH.APIGateway.GraphQL.Work;
 using OpenFTTH.APIGateway.Logging;
 using OpenFTTH.APIGateway.Settings;
@@ -229,6 +230,7 @@ namespace OpenFTTH.APIGateway
             services.AddHostedService<UtilityNetworkUpdatedEventConsumer>();
             services.AddSingleton<IToposTypedEventObservable<RouteNetworkElementContainedEquipmentUpdated>, ToposTypedEventObservable<RouteNetworkElementContainedEquipmentUpdated>>();
             services.AddSingleton<SchematicDiagramObserver>();
+            services.AddSingleton<TerminalEquipmentConnectivityObserver>();
 
             // Typesense
             services.AddTypesenseClient(config =>
