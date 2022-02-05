@@ -47,6 +47,13 @@ namespace OpenFTTH.APIGateway.Conversion
         {
             _logger.LogInformation("Conversion of racks started...");
 
+            if (!CheckIfConversionTableExists(_rackTableName))
+            {
+                _logger.LogInformation($"{_rackTableName} don't exists. Will not import racks.");
+                return;
+            }
+
+
             CreateTableLogColumn(_rackTableName);
             //CreateTableLogColumn(_connectivityTableName);
 

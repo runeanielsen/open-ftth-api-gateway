@@ -54,6 +54,13 @@ namespace OpenFTTH.APIGateway.Conversion
 
             _logger.LogInformation("Starting span equipment cable conversion...");
 
+            if (!CheckIfConversionTableExists(_tableName))
+            {
+                _logger.LogInformation($"{_tableName} don't exists. Will not import cables.");
+                return;
+            }
+
+
             CreateTableLogColumn(_tableName);
 
             var conduits = LoadSpanEquipmentsFromConversionDatabase(_tableName);

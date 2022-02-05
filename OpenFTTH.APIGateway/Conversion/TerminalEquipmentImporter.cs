@@ -49,6 +49,13 @@ namespace OpenFTTH.APIGateway.Conversion
         {
             _logger.LogInformation("Conversion of terminal equipment(s) started...");
 
+            if (!CheckIfConversionTableExists(_terminalEquipmentTableName))
+            {
+                _logger.LogInformation($"{_terminalEquipmentTableName} don't exists. Will not import terminal equipments.");
+                return;
+            }
+
+
             CreateTableLogColumn(_terminalEquipmentTableName);
 
             var terminalEquipments = LoadDataFromConversionDatabase();

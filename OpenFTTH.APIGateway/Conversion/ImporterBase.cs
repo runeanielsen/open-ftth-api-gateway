@@ -72,5 +72,20 @@ namespace OpenFTTH.APIGateway.Conversion
             conn.Open();
             return conn;
         }
+
+        protected bool CheckIfConversionTableExists(string tableName)
+        {
+            using var dbConn = GetConnection();
+
+            using var dbCmd = dbConn.CreateCommand();
+            dbCmd.CommandText = "SELECT tablename FROM pg_tables WHERE schemaname = 'conversion' AND tablename = '" + tableName.Split('.').Last() + "';";
+
+            using var dbReader = dbCmd.ExecuteReader();
+
+            if (dbReader.Read())
+                return true;
+            else
+                return false;
+        }
     }
 }

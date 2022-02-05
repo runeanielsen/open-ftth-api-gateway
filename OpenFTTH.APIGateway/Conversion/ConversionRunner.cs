@@ -44,7 +44,7 @@ namespace OpenFTTH.APIGateway.Conversion
                 _logger.LogInformation("Finish seeding database with test specifications.");
                            
 
-                var dbSettings = new Settings.GeoDatabaseSetting()
+                var localDb = new Settings.GeoDatabaseSetting()
                 {
                     Host = "localhost",
                     Database = "open-ftth",
@@ -53,14 +53,16 @@ namespace OpenFTTH.APIGateway.Conversion
                     Port = "5432"
                 };
 
-                //new CableSpanEquipmentImporter(_loggerFactory.CreateLogger<ConduitSpanEquipmentImporter>(), _eventStore, dbSettings, _commandDispatcher, _queryDispatcher).Run();
-
-                //new NodeContainerImporter(_loggerFactory.CreateLogger<NodeContainerImporter>(), _workTaskId, _eventStore, _geoDatabaseSetting, _commandDispatcher, _queryDispatcher).Run();
+                var dbToReadConversionDataFrom = _geoDatabaseSetting;
 
 
-                //new RackImporter(_loggerFactory.CreateLogger<RackImporter>(), _workTaskId, _eventStore, dbSettings, _commandDispatcher, _queryDispatcher).Run();
+                new CableSpanEquipmentImporter(_loggerFactory.CreateLogger<ConduitSpanEquipmentImporter>(), _eventStore, dbToReadConversionDataFrom, _commandDispatcher, _queryDispatcher).Run();
 
-                new TerminalEquipmentImporter(_loggerFactory.CreateLogger<TerminalEquipmentImporter>(), _workTaskId, _eventStore, dbSettings, _commandDispatcher, _queryDispatcher).Run();
+                new NodeContainerImporter(_loggerFactory.CreateLogger<NodeContainerImporter>(), _workTaskId, _eventStore, dbToReadConversionDataFrom, _commandDispatcher, _queryDispatcher).Run();
+
+                new RackImporter(_loggerFactory.CreateLogger<RackImporter>(), _workTaskId, _eventStore, dbToReadConversionDataFrom, _commandDispatcher, _queryDispatcher).Run();
+
+                new TerminalEquipmentImporter(_loggerFactory.CreateLogger<TerminalEquipmentImporter>(), _workTaskId, _eventStore, dbToReadConversionDataFrom, _commandDispatcher, _queryDispatcher).Run();
 
 
                 //new ConduitSpanEquipmentImporter(_loggerFactory.CreateLogger<ConduitSpanEquipmentImporter>(), _eventStore, _geoDatabaseSetting, _commandDispatcher, _queryDispatcher).Run();
@@ -86,6 +88,8 @@ namespace OpenFTTH.APIGateway.Conversion
             else
                 return false;
         }
+
+        
 
         private IDbConnection GetConnection()
         {

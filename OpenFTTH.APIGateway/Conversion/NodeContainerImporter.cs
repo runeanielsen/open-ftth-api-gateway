@@ -51,6 +51,12 @@ namespace OpenFTTH.APIGateway.Conversion
         {
             _logger.LogInformation("Conversion of node containers started...");
 
+            if (!CheckIfConversionTableExists(_nodeContainerTableName))
+            {
+                _logger.LogInformation($"{_nodeContainerTableName} don't exists. Will not import node containers.");
+                return;
+            }
+
             CreateTableLogColumn(_nodeContainerTableName);
             //CreateTableLogColumn(_connectivityTableName);
 
