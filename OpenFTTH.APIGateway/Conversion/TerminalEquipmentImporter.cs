@@ -135,8 +135,8 @@ namespace OpenFTTH.APIGateway.Conversion
                     terminalEquipmentSpecificationId: terminalEquipmentSpecificationId.Value,
                     numberOfEquipments: 1,
                     startSequenceNumber: 1,
-                    namingMethod: TerminalEquipmentNamingMethodEnum.NameAndNumber,
-                    namingInfo: new NamingInfo("Splidsemuffe", null)
+                    namingMethod: TerminalEquipmentNamingMethodEnum.NameOnly,
+                    namingInfo: new NamingInfo(terminalEquipment.Name, null)
                 );
 
                 var placeEqResult = _commandDispatcher.HandleAsync<PlaceTerminalEquipmentInNodeContainer, Result>(placeEqCmd).Result;
