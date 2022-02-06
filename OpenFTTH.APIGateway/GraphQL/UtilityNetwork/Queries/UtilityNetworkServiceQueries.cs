@@ -125,8 +125,9 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Queries
 
                     if (equipmentQueryResult.Value.RouteNetworkTraces.Count != 1)
                     {
-                        context.Errors.Add(new ExecutionError($"Expected only one trace returned for span segment with id: {spanSegmentId}. Are you sure you did a query on a span segment id and not a span equipment id?"));
-                        return null;
+                        //context.Errors.Add(new ExecutionError($"Expected only one trace returned for span segment with id: {spanSegmentId}. Are you sure you did a query on a span segment id and not a span equipment id?"));
+                        //return null;
+                        logger.LogWarning($"Got {equipmentQueryResult.Value.RouteNetworkTraces.Count} trace results tracing span segment or equipment with id: {spanSegmentId}. Will just use the first trace returned.")
                     }
 
                     var theTrace = equipmentQueryResult.Value.RouteNetworkTraces.First();
