@@ -30,6 +30,7 @@
     <PackageReference Include="OpenFTTH.Schematic.API" Version="1.7.6" />
     <PackageReference Include="OpenFTTH.Schematic.Business" Version="1.7.6" />
     <PackageReference Include="OpenFTTH.UtilityGraphService.API" Version="1.29.2" />
+    <PackageReference Include="OpenFTTH.UtilityGraphService.Business" Version="1.29.2" />
     <PackageReference Include="ProjNet" Version="2.0.0" />
     <PackageReference Include="Serilog" Version="2.10.0" />
     <PackageReference Include="Serilog.Extensions.Logging" Version="3.0.1" />
@@ -45,7 +46,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\open-ftth-utility-graph-service\OpenFTTH.UtilityGraphService.Business\OpenFTTH.UtilityGraphService.Business.csproj" />
     <ProjectReference Include="..\OpenFTTH.Work.API\OpenFTTH.Work.API.csproj" />
     <ProjectReference Include="..\OpenFTTH.Work.Business\OpenFTTH.Work.Business.csproj" />
   </ItemGroup>
