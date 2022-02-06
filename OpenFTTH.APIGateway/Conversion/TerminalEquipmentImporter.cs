@@ -262,7 +262,7 @@ namespace OpenFTTH.APIGateway.Conversion
 
             // Load terminal equipments
             using var terminalEquipmentSelectCmd = dbConn.CreateCommand();
-            terminalEquipmentSelectCmd.CommandText = "SELECT external_id, external_spec, route_node_id, terminal_equipment_id, specification, name, rack_id, rack_position FROM " + _terminalEquipmentTableName + " WHERE status is null and rack_position <> '-1' ORDER BY external_id";
+            terminalEquipmentSelectCmd.CommandText = "SELECT external_id, external_spec, route_node_id, terminal_equipment_id, specification, name, rack_id, rack_position FROM " + _terminalEquipmentTableName + " WHERE status is null ORDER BY external_id";
 
             using var terminalEquipmentReader = terminalEquipmentSelectCmd.ExecuteReader();
 
