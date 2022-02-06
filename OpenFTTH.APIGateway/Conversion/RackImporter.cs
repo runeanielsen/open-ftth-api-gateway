@@ -121,12 +121,12 @@ namespace OpenFTTH.APIGateway.Conversion
             if (rackSpecId == null)
                 return Result.Fail(new Error($"Cannot find rack specfication: {rack.Specification}"));
 
-            // Place the node container in the walk
+            // Place rack
             var placeRackCmd = new PlaceRackInNodeContainer(
                correlationId,
                commandUserContext,
                relatedInfo.NodeContainer.Id,
-               Guid.NewGuid(),
+               rack.RackId,
                rackSpecId.Value,
                rack.Name,
                rack.HeightInUnits

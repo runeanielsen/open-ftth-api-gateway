@@ -124,7 +124,7 @@ namespace OpenFTTH.APIGateway.Conversion
                 return Result.Fail(new Error($"Cannot find terminal equipment specfication: {terminalEquipment.Specification}"));
 
 
-            // Place normal equipment in node
+            // Stand-alone splice equipment in node
             if (terminalEquipment.RackId == Guid.Empty)
             {
                 var placeEqCmd = new PlaceTerminalEquipmentInNodeContainer(
@@ -147,6 +147,7 @@ namespace OpenFTTH.APIGateway.Conversion
             }
             else
             {
+                // Rack equipment
                 var placeEqCmd = new PlaceTerminalEquipmentInNodeContainer(
                     correlationId: Guid.NewGuid(),
                     userContext: commandUserContext,
@@ -155,8 +156,8 @@ namespace OpenFTTH.APIGateway.Conversion
                     terminalEquipmentSpecificationId: terminalEquipmentSpecificationId.Value,
                     numberOfEquipments: 1,
                     startSequenceNumber: 80 - terminalEquipment.RackPosition,
-                    namingMethod: TerminalEquipmentNamingMethodEnum.NameAndNumber,
-                    namingInfo: new NamingInfo("Splidsemuffe", null)
+                    namingMethod: TerminalEquipmentNamingMethodEnum.NumberOnly,
+                    namingInfo: null
                 )
                 {
                     SubrackPlacementInfo = new SubrackPlacementInfo(terminalEquipment.RackId, terminalEquipment.RackPosition, SubrackPlacmentMethod.BottomUp)
