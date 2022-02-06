@@ -40,7 +40,7 @@ namespace OpenFTTH.APIGateway.Conversion
             if (CheckIfConversionSchemaExists())
             {
                 _logger.LogInformation("Start seeding database with test specifications...");
-                var result = new TestSpecifications(_loggerFactory, _commandDispatcher, _queryDispatcher).Run();
+                //var result = new TestSpecifications(_loggerFactory, _commandDispatcher, _queryDispatcher).Run();
                 _logger.LogInformation("Finish seeding database with test specifications.");
                            
 
@@ -62,7 +62,12 @@ namespace OpenFTTH.APIGateway.Conversion
 
                 //new RackImporter(_loggerFactory.CreateLogger<RackImporter>(), _workTaskId, _eventStore, dbToReadConversionDataFrom, _commandDispatcher, _queryDispatcher).Run();
 
-                new TerminalEquipmentImporter(_loggerFactory.CreateLogger<TerminalEquipmentImporter>(), _workTaskId, _eventStore, dbToReadConversionDataFrom, _commandDispatcher, _queryDispatcher).Run();
+                //new TerminalEquipmentImporter(_loggerFactory.CreateLogger<TerminalEquipmentImporter>(), _workTaskId, _eventStore, dbToReadConversionDataFrom, _commandDispatcher, _queryDispatcher).Run();
+
+
+
+                new SegmentToTerminalConnectionsImporter(_loggerFactory.CreateLogger<SegmentToTerminalConnectionsImporter>(), _workTaskId, _eventStore, dbToReadConversionDataFrom, _commandDispatcher, _queryDispatcher).Run();
+
 
                 //new ConduitSpanEquipmentImporter(_loggerFactory.CreateLogger<ConduitSpanEquipmentImporter>(), _eventStore, _geoDatabaseSetting, _commandDispatcher, _queryDispatcher).Run();
 
