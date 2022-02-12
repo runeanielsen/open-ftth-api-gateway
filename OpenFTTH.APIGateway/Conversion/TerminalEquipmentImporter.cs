@@ -137,7 +137,10 @@ namespace OpenFTTH.APIGateway.Conversion
                     startSequenceNumber: 1,
                     namingMethod: TerminalEquipmentNamingMethodEnum.NameOnly,
                     namingInfo: new NamingInfo(terminalEquipment.Name, null)
-                );
+                )
+                {
+                    AddressInfo = terminalEquipment.AccessAddressId == null ? null : new AddressInfo(terminalEquipment.AccessAddressId, terminalEquipment.UnitAddressId, null)
+                };
 
                 var placeEqResult = _commandDispatcher.HandleAsync<PlaceTerminalEquipmentInNodeContainer, Result>(placeEqCmd).Result;
 
@@ -262,7 +265,7 @@ namespace OpenFTTH.APIGateway.Conversion
 
             // Load terminal equipments
             using var terminalEquipmentSelectCmd = dbConn.CreateCommand();
-            terminalEquipmentSelectCmd.CommandText = "SELECT external_id, external_spec, route_node_id, terminal_equipment_id, specification, name, rack_id, rack_position FROM " + _terminalEquipmentTableName + " WHERE status is null ORDER BY external_id";
+            terminalEquipmentSelectCmd.CommandText = "SELECT external_id, external_spec, route_node_id, terminal_equipment_id, specification, name, rack_id, rack_position, access_address_id, unit_address_id FROM " + _terminalEquipmentTableName + " WHERE status is null ORDER BY external_id";
 
             using var terminalEquipmentReader = terminalEquipmentSelectCmd.ExecuteReader();
 
@@ -279,6 +282,8 @@ namespace OpenFTTH.APIGateway.Conversion
                 terminalEquipment.Name = terminalEquipmentReader.GetString(5).Trim();
                 terminalEquipment.RackId = Guid.Parse(terminalEquipmentReader.GetString(6));
                 terminalEquipment.RackPosition = Int32.Parse(terminalEquipmentReader.GetString(7).Trim());
+                terminalEquipment.AccessAddressId = terminalEquipmentReader.IsDBNull(8) || terminalEquipmentReader.GetString(8) == "" ? null : Guid.Parse(terminalEquipmentReader.GetString(8));
+                terminalEquipment.UnitAddressId = terminalEquipmentReader.IsDBNull(9) || terminalEquipmentReader.GetString(9) == "" ? null : Guid.Parse(terminalEquipmentReader.GetString(9));
 
                 termianEquipmentsForConversions.Add(terminalEquipment.TerminalEquipmentId, terminalEquipment);
             }
@@ -297,6 +302,8 @@ namespace OpenFTTH.APIGateway.Conversion
             public string Name { get; set; }
             public Guid RackId { get; set; }
             public int RackPosition { get; set; }
+            public Guid? AccessAddressId { get; internal set; }
+            public Guid? UnitAddressId { get; internal set; }
         }
 
         private class RelatedEquipmentInfo

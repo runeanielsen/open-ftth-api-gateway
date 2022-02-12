@@ -332,7 +332,7 @@ namespace OpenFTTH.TestData
                 ManufacturerRefs = new Guid[] { Manu_ABB }
             });
 
-            AddSpecification(new NodeContainerSpecification(Cabinet_PK48, "Cabinets", "PK35 Skab")
+            AddSpecification(new NodeContainerSpecification(Cabinet_PK48, "Cabinets", "PK48 Skab")
             {
                 Description = "PK48 Skab",
                 ManufacturerRefs = new Guid[] { Manu_ABB }
