@@ -219,7 +219,7 @@ namespace OpenFTTH.APIGateway.IntegrationTests.SpanEquipments
             // Affix conduit 1
             var testConduitId1 = TestConduits.Conduit_3x10_HH_10_to_HH_11;
 
-            var testConduit1 = _eventStore.Projections.Get<UtilityNetworkProjection>().SpanEquipments[testConduitId1];
+            var testConduit1 = _eventStore.Projections.Get<UtilityNetworkProjection>().SpanEquipmentsByEquipmentId[testConduitId1];
 
             var affixConduitToContainerCommand1 = new AffixSpanEquipmentToNodeContainer(Guid.NewGuid(), new UserContext("test", Guid.Empty),
                 spanEquipmentOrSegmentId: testConduit1.SpanStructures[0].SpanSegments[0].Id,
@@ -233,7 +233,7 @@ namespace OpenFTTH.APIGateway.IntegrationTests.SpanEquipments
             // Affix conduit 2
             var testConduitId2 = TestConduits.Conduit_5x10_HH_1_to_HH_10;
 
-            var testConduit2 = _eventStore.Projections.Get<UtilityNetworkProjection>().SpanEquipments[testConduitId2];
+            var testConduit2 = _eventStore.Projections.Get<UtilityNetworkProjection>().SpanEquipmentsByEquipmentId[testConduitId2];
 
             var affixConduitToContainerCommand2 = new AffixSpanEquipmentToNodeContainer(Guid.NewGuid(), new UserContext("test", Guid.Empty),
                 spanEquipmentOrSegmentId: testConduit2.SpanStructures[0].SpanSegments[0].Id,

@@ -51,7 +51,7 @@ namespace OpenFTTH.APIGateway.TestData
             {
                 var utilityNetwork = _eventStore.Projections.Get<UtilityNetworkProjection>();
 
-                if (utilityNetwork.SpanEquipments.Count > 0)
+                if (utilityNetwork.SpanEquipmentsByEquipmentId.Count > 0)
                 {
                     _logger.LogInformation("Database already contain converted data. Will therefor not seed conversion data.");
                     return;

@@ -63,7 +63,7 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                   var workTaskId = Guid.Parse("54800ae5-13a5-4b03-8626-a63b66a25568");
                   var commandUserContext = new UserContext(userName, workTaskId);
 
-                  var spanEquipments = eventStore.Projections.Get<UtilityNetworkProjection>().SpanEquipments;
+                  var spanEquipments = eventStore.Projections.Get<UtilityNetworkProjection>().SpanEquipmentsByEquipmentId;
 
                   // First register the walk in the route network where the client want to place the span equipment
                   var walkOfInterestId = Guid.NewGuid();
