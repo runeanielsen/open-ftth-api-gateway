@@ -436,8 +436,34 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Queries
             );
 
 
+            Field<DisconnectSpanEquipmentFromTerminalViewType>(
+               name: "disconnectSpanEquipmentFromTerminalView",
+               description: "Information needed to show disconnect information to user",
+               arguments: new QueryArguments(
+                   new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "spanSegmentId" },
+                   new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "terminalId" }
+               ),
+               resolve: context =>
+               {
+                   var spanSegmentId = context.GetArgument<Guid>("spanSegmentId");
+                   var terminalId = context.GetArgument<Guid>("terminalId");
 
+                   var query = new GetDisconnectSpanEquipmentFromTerminalView(spanSegmentId, terminalId);
 
+                   var queryResult = queryDispatcher.HandleAsync<GetDisconnectSpanEquipmentFromTerminalView, Result<DisconnectSpanEquipmentFromTerminalView>>(
+                       query
+                   ).Result;
+
+                   if (queryResult.IsFailed)
+                   {
+                       foreach (var error in queryResult.Errors)
+                           context.Errors.Add(new ExecutionError(error.Message));
+                       return null;
+                   }
+
+                   return queryResult.Value;
+               }
+           );
         }
     }
 }
