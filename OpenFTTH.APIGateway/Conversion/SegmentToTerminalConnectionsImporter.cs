@@ -104,14 +104,16 @@ namespace OpenFTTH.APIGateway.Conversion
 
             // Find span equipment ids
             List<ConnectSpanSegmentToTerminalOperation> connects = new();
-                        
+
+            int terminalIndexPos = 0;
+
             foreach (var spanIndex in connection.SpanEquipmentIndexes)
             {
                 if (spanEquipment.SpanStructures.Length > spanIndex)
                 {
                     var spanSegmentId = spanEquipment.SpanStructures[spanIndex].SpanSegments[0].Id;
 
-                    var terminalIndex = connection.TerminalEquipmentIndexes[spanIndex];
+                    var terminalIndex = connection.TerminalEquipmentIndexes[terminalIndexPos];
 
                     if (terminalEquipment.TerminalStructures.Length > terminalIndex.Item1)
                     {
@@ -132,6 +134,9 @@ namespace OpenFTTH.APIGateway.Conversion
                 }
                 else
                     System.Diagnostics.Debug.WriteLine($"Span equipment {spanEquipment.Id} has no structure at index {spanIndex}");
+
+
+                terminalIndexPos++;
             }
 
             
