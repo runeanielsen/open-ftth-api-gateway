@@ -103,48 +103,47 @@ namespace OpenFTTH.APIGateway.Conversion
 
 
             // Find span equipment ids
-            List<Guid> spanEquipmentIds = new();
+            List<ConnectSpanSegmentToTerminalOperation> connects = new();
                         
             foreach (var spanIndex in connection.SpanEquipmentIndexes)
             {
                 if (spanEquipment.SpanStructures.Length > spanIndex)
-                    spanEquipmentIds.Add(spanEquipment.SpanStructures[spanIndex].SpanSegments[0].Id);
+                {
+                    var spanSegmentId = spanEquipment.SpanStructures[spanIndex].SpanSegments[0].Id;
+
+                    var terminalIndex = connection.TerminalEquipmentIndexes[spanIndex];
+
+                    if (terminalEquipment.TerminalStructures.Length > terminalIndex.Item1)
+                    {
+                        var structure = terminalEquipment.TerminalStructures[terminalIndex.Item1];
+
+                        if (structure.Terminals.Length > terminalIndex.Item2)
+                        {
+                           var terminalId = structure.Terminals[terminalIndex.Item2].Id;
+
+                            connects.Add(new ConnectSpanSegmentToTerminalOperation(spanSegmentId, terminalId));
+                        }
+                        else
+                            System.Diagnostics.Debug.WriteLine($"Terminal equipment {terminalEquipment.Id} has no terminal at structure {terminalIndex.Item1} terminal index {terminalIndex.Item2}");
+                    }
+                    else
+                        System.Diagnostics.Debug.WriteLine($"Terminal equipment {terminalEquipment.Id} has no structure at index {terminalIndex.Item1}");
+
+                }
                 else
                     System.Diagnostics.Debug.WriteLine($"Span equipment {spanEquipment.Id} has no structure at index {spanIndex}");
             }
 
-            // Find terminal equipment ids
-            List<Guid> terminalIds = new();
-
-            foreach (var terminalIndex in connection.TerminalEquipmentIndexes)
-            {
-                if (terminalEquipment.TerminalStructures.Length > terminalIndex.Item1)
-                {
-                    var structure = terminalEquipment.TerminalStructures[terminalIndex.Item1];
-
-                    if (structure.Terminals.Length > terminalIndex.Item2)
-                    {
-                        terminalIds.Add(structure.Terminals[terminalIndex.Item2].Id);
-                    }
-                    else
-                        System.Diagnostics.Debug.WriteLine($"Terminal equipment {terminalEquipment.Id} has no terminal at structure {terminalIndex.Item1} terminal index {terminalIndex.Item2}");
-                }
-                else
-                    System.Diagnostics.Debug.WriteLine($"Terminal equipment {terminalEquipment.Id} has no structure at index {terminalIndex.Item1}");
-            }
-
+            
 
             // ACT (do the connect between cable and equipment)
-            var connectCmd = new ConnectSpanEquipmentAndTerminalEquipment(
+            var connectCmd = new ConnectSpanSegmentsWithTerminalsAtRouteNode(
                 correlationId: Guid.NewGuid(),
                 userContext: new UserContext("test", Guid.Empty),
                 routeNodeId: connection.NodeId,
-                spanEquipmentId: connection.SpanEquipmentId,
-                spanSegmentsIds: spanEquipmentIds.ToArray(),
-                terminalEquipmentId: connection.TerminalEquipmentId,
-                terminalIds: terminalIds.ToArray()
+                connects: connects.ToArray()
             );
-            var connectCmdResult = _commandDispatcher.HandleAsync<ConnectSpanEquipmentAndTerminalEquipment, Result>(connectCmd).Result;
+            var connectCmdResult = _commandDispatcher.HandleAsync<ConnectSpanSegmentsWithTerminalsAtRouteNode, Result>(connectCmd).Result;
 
 
             LogStatus((NpgsqlCommand)logCmd, _segmentToTerminalConnectionsTableName, "external_id", connection.ExternalId, connectCmdResult);

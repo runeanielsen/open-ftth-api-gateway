@@ -468,23 +468,17 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
              }
            );
 
-            Field<CommandResultType>(
+           Field<CommandResultType>(
                "connectToTerminalEquipment",
                description: "Connect one or more span segments inside a span equipment to terminals inside a terminal equipmment",
                arguments: new QueryArguments(
                    new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "routeNodeId" },
-                   new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "spanEquipmentId" },
-                   new QueryArgument<NonNullGraphType<ListGraphType<IdGraphType>>> { Name = "spanSegmentIds" },
-                   new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "terminalEquipmentId" },
-                   new QueryArgument<NonNullGraphType<ListGraphType<IdGraphType>>> { Name = "terminalIds" }
+                   new QueryArgument<NonNullGraphType<ListGraphType<ConnectSpanSegmentToTerminalOperationType>>> { Name = "connects" }
                ),
                resolve: context =>
                {
                     var routeNodeId = context.GetArgument<Guid>("routeNodeId");
-                    var spanEquipmentId = context.GetArgument<Guid>("spanEquipmentId");
-                    var spanSegmentIds = context.GetArgument<Guid[]>("spanSegmentIds");
-                    var terminalEquipmentId = context.GetArgument<Guid>("terminalEquipmentId");
-                    var terminalIds = context.GetArgument<Guid[]>("terminalIds");
+                    var connects = context.GetArgument<ConnectSpanSegmentToTerminalOperation[]>("connects");
 
                     var correlationId = Guid.NewGuid();
 
@@ -496,9 +490,43 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
 
                     var commandUserContext = new UserContext(userName, workTaskId);
 
-                    var connectCommand = new ConnectSpanEquipmentAndTerminalEquipment(correlationId, commandUserContext, routeNodeId, spanEquipmentId, spanSegmentIds, terminalEquipmentId, terminalIds);
+                    var connectCommand = new ConnectSpanSegmentsWithTerminalsAtRouteNode(correlationId, commandUserContext, routeNodeId, connects);
 
-                    var connectCommandResult = commandDispatcher.HandleAsync<ConnectSpanEquipmentAndTerminalEquipment, Result>(connectCommand).Result;
+                    var connectCommandResult = commandDispatcher.HandleAsync<ConnectSpanSegmentsWithTerminalsAtRouteNode, Result>(connectCommand).Result;
+
+                    if (connectCommandResult.IsFailed)
+                        return new CommandResult(connectCommandResult);
+
+                    return new CommandResult(Result.Ok());
+               }
+            );
+
+
+            Field<CommandResultType>(
+               "disconnectFromTerminalEquipment",
+               description: "Disconnect one or more span segments inside a span equipment from terminals inside a terminal equipmment",
+               arguments: new QueryArguments(
+                   new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "routeNodeId" },
+                   new QueryArgument<NonNullGraphType<ListGraphType<DisconnectSpanSegmentFromTerminalOperationType>>> { Name = "disconnects" }
+               ),
+               resolve: context =>
+               {
+                    var routeNodeId = context.GetArgument<Guid>("routeNodeId");
+                    var connects = context.GetArgument<DisconnectSpanSegmentFromTerminalOperation[]>("disconnects");
+
+                    var correlationId = Guid.NewGuid();
+
+                    var userContext = context.UserContext as GraphQLUserContext;
+                    var userName = userContext.Username;
+
+                    // TODO: Get from work manager
+                    var workTaskId = Guid.Parse("54800ae5-13a5-4b03-8626-a63b66a25568");
+
+                    var commandUserContext = new UserContext(userName, workTaskId);
+
+                    var connectCommand = new DisconnectSpanSegmentsFromTerminalsAtRouteNode(correlationId, commandUserContext, routeNodeId, connects);
+
+                    var connectCommandResult = commandDispatcher.HandleAsync<DisconnectSpanSegmentsFromTerminalsAtRouteNode, Result>(connectCommand).Result;
 
                     if (connectCommandResult.IsFailed)
                         return new CommandResult(connectCommandResult);
