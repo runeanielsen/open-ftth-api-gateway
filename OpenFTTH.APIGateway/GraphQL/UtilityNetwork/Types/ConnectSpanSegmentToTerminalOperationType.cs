@@ -13,4 +13,13 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Types
             Field(x => x.TerminalId, type: typeof(IdGraphType)).Description("Terminal id id");
         }
     }
+
+    public class ConnectSpanSegmentToTerminalOperationInputType : InputObjectGraphType<ConnectSpanSegmentToTerminalOperation>
+    {
+        public ConnectSpanSegmentToTerminalOperationInputType(ILogger<ConnectSpanSegmentToTerminalOperationInputType> logger)
+        {
+            Field(x => x.SpanSegmentId, type: typeof(IdGraphType)).Description("Span segment id");
+            Field(x => x.TerminalId, type: typeof(IdGraphType)).Description("Terminal id id");
+        }
+    }
 }

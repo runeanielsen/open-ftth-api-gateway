@@ -473,7 +473,7 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                description: "Connect one or more span segments inside a span equipment to terminals inside a terminal equipmment",
                arguments: new QueryArguments(
                    new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "routeNodeId" },
-                   new QueryArgument<NonNullGraphType<ListGraphType<ConnectSpanSegmentToTerminalOperationType>>> { Name = "connects" }
+                   new QueryArgument<NonNullGraphType<ListGraphType<ConnectSpanSegmentToTerminalOperationInputType>>> { Name = "connects" }
                ),
                resolve: context =>
                {
@@ -507,7 +507,7 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                description: "Disconnect one or more span segments inside a span equipment from terminals inside a terminal equipmment",
                arguments: new QueryArguments(
                    new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "routeNodeId" },
-                   new QueryArgument<NonNullGraphType<ListGraphType<DisconnectSpanSegmentFromTerminalOperationType>>> { Name = "disconnects" }
+                   new QueryArgument<NonNullGraphType<ListGraphType<DisconnectSpanSegmentFromTerminalOperationInputType>>> { Name = "disconnects" }
                ),
                resolve: context =>
                {
