@@ -87,6 +87,7 @@ namespace OpenFTTH.APIGateway.Conversion
 
         private Result AddConnection(NpgsqlCommand logCmd, ConnectionForConversion connection)
         {
+
             Guid correlationId = Guid.NewGuid();
 
             var commandUserContext = new UserContext("conversion", _workTaskId)
@@ -144,7 +145,7 @@ namespace OpenFTTH.APIGateway.Conversion
             // ACT (do the connect between cable and equipment)
             var connectCmd = new ConnectSpanSegmentsWithTerminalsAtRouteNode(
                 correlationId: Guid.NewGuid(),
-                userContext: new UserContext("test", Guid.Empty),
+                userContext: commandUserContext,
                 routeNodeId: connection.NodeId,
                 connects: connects.ToArray()
             );

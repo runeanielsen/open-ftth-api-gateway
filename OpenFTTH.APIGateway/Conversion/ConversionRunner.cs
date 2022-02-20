@@ -62,7 +62,9 @@ namespace OpenFTTH.APIGateway.Conversion
                 new CableSpanEquipmentImporter(_loggerFactory.CreateLogger<ConduitSpanEquipmentImporter>(), _eventStore, dbToReadConversionDataFrom, _commandDispatcher, _queryDispatcher).Run();
 
                 new NodeContainerImporter(_loggerFactory.CreateLogger<NodeContainerImporter>(), _workTaskId, _eventStore, dbToReadConversionDataFrom, _commandDispatcher, _queryDispatcher).Run();
-               
+
+                new RackImporter(_loggerFactory.CreateLogger<RackImporter>(), _workTaskId, _eventStore, dbToReadConversionDataFrom, _commandDispatcher, _queryDispatcher).Run();
+
                 new TerminalEquipmentImporter(_loggerFactory.CreateLogger<TerminalEquipmentImporter>(), _workTaskId, _eventStore, dbToReadConversionDataFrom, _commandDispatcher, _queryDispatcher).Run();
 
                 new SegmentToTerminalConnectionsImporter(_loggerFactory.CreateLogger<SegmentToTerminalConnectionsImporter>(), _workTaskId, _eventStore, dbToReadConversionDataFrom, _commandDispatcher, _queryDispatcher).Run();
