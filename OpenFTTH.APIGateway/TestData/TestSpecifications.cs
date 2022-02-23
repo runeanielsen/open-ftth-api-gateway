@@ -1449,7 +1449,10 @@ namespace OpenFTTH.TestData
                     new TerminalStructureTemplate(SpliceTray_Uknown4Pin, 1)
                }
             )
-            { ManufacturerRefs = new Guid[] { Manu_CommScope } });
+            {
+                IsAddressable = true,
+                IsCustomerTermination = true
+            });
 
 
 
