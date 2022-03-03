@@ -2,6 +2,7 @@
 using GraphQL;
 using GraphQL.Types;
 using OpenFTTH.APIGateway.CoreTypes;
+using OpenFTTH.APIGateway.GraphQL.Addresses.Types;
 using OpenFTTH.APIGateway.GraphQL.Core.Model;
 using OpenFTTH.APIGateway.GraphQL.RouteNetwork.Types;
 using OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Types;
@@ -238,7 +239,8 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                  new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "startSequenceNumber" },
                  new QueryArgument<NonNullGraphType<TerminalEquipmentNamingMethodEnumType>> { Name = "terminalEquipmentNamingMethod" },
                  new QueryArgument<NamingInfoInputType> { Name = "namingInfo" },
-                 new QueryArgument<SubrackPlacementInfoInputType> { Name = "subrackPlacementInfo" }
+                 new QueryArgument<SubrackPlacementInfoInputType> { Name = "subrackPlacementInfo" },
+                 new QueryArgument<AddressInfoInputType> { Name = "addressInfo" }
              ),
              resolve: context =>
              {
@@ -249,6 +251,7 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                  var terminalEquipmentNamingMethod = context.GetArgument<TerminalEquipmentNamingMethodEnum>("terminalEquipmentNamingMethod");
                  var namingInfo = context.GetArgument<NamingInfo>("namingInfo");
                  var subrackPlacementInfo = context.GetArgument<SubrackPlacementInfo>("subrackPlacementInfo");
+                 var addressInfo = context.GetArgument<AddressInfo>("addressInfo");
 
                  var getNodeContainerResult = QueryHelper.GetNodeContainerFromRouteNodeId(queryDispatcher, routeNodeId);
 
@@ -284,6 +287,7 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                    namingInfo: namingInfo
                  )
                  {
+                     AddressInfo = addressInfo,
                      SubrackPlacementInfo = subrackPlacementInfo
                  };
 

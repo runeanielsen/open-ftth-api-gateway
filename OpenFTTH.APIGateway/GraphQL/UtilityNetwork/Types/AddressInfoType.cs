@@ -13,9 +13,9 @@ using System.Threading.Tasks;
 
 namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Types
 {
-    public class SpanEquipmentAddressInfoType : ObjectGraphType<AddressInfo>
+    public class AddressInfoType : ObjectGraphType<AddressInfo>
     {
-        public SpanEquipmentAddressInfoType(IQueryDispatcher queryDispatcher)
+        public AddressInfoType(IQueryDispatcher queryDispatcher)
         {
             Field(x => x.AccessAddressId, type: typeof(IdGraphType)).Description("Internal or external access address id");
             Field(x => x.UnitAddressId, type: typeof(IdGraphType)).Description("Internal or external unit address id");

@@ -141,19 +141,19 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Queries
             );
 
 
-            Field<SpanEquipmentType>(
-               name: "spanEquipment",
-               description: "Query information related to a specific span equipment",
+            Field<TerminalEquipmentType>(
+               name: "terminalEquipment",
+               description: "Query information related to a specific terminal equipment",
                arguments: new QueryArguments(
-                 new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "spanEquipmentOrSegmentId" }
+                 new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "terminalEquipmentOrTerminalId" }
                ),
                resolve: context =>
                {
-                   var spanEquipmentOrSegmentId = context.GetArgument<Guid>("spanEquipmentOrSegmentId");
+                   var terminalEquipmentOrTerminalId = context.GetArgument<Guid>("terminalEquipmentOrTerminalId");
 
                    // Get equipment information
                    var equipmentQueryResult = queryDispatcher.HandleAsync<GetEquipmentDetails, FluentResults.Result<GetEquipmentDetailsResult>>(
-                       new GetEquipmentDetails(new EquipmentIdList() { spanEquipmentOrSegmentId })
+                       new GetEquipmentDetails(new EquipmentIdList() { terminalEquipmentOrTerminalId })
                    ).Result;
 
                    if (equipmentQueryResult.IsFailed)
@@ -164,19 +164,56 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Queries
                        return null;
                    }
 
-                   if (equipmentQueryResult.Value.SpanEquipment == null || equipmentQueryResult.Value.SpanEquipment.Count == 0)
+                   if (equipmentQueryResult.Value.TerminalEquipment == null || equipmentQueryResult.Value.TerminalEquipment.Count == 0)
                    {
-                       context.Errors.Add(new ExecutionError($"Cannot find any span equipment containing a span segment with id: {spanEquipmentOrSegmentId}"));
+                       context.Errors.Add(new ExecutionError($"Cannot find any terminal equipment or terminal with id: {terminalEquipmentOrTerminalId}"));
 
                        return null;
                    }
 
 
-                   var spanEquipment = equipmentQueryResult.Value.SpanEquipment.First();
+                   var terminalEquipment = equipmentQueryResult.Value.SpanEquipment.First();
 
-                   return spanEquipment;
+                   return terminalEquipment;
                }
             );
+
+            Field<SpanEquipmentType>(
+             name: "spanEquipment",
+             description: "Query information related to a specific span equipment",
+             arguments: new QueryArguments(
+               new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "spanEquipmentOrSegmentId" }
+             ),
+             resolve: context =>
+             {
+                 var spanEquipmentOrSegmentId = context.GetArgument<Guid>("spanEquipmentOrSegmentId");
+
+                   // Get equipment information
+                   var equipmentQueryResult = queryDispatcher.HandleAsync<GetEquipmentDetails, FluentResults.Result<GetEquipmentDetailsResult>>(
+                     new GetEquipmentDetails(new EquipmentIdList() { spanEquipmentOrSegmentId })
+                 ).Result;
+
+                 if (equipmentQueryResult.IsFailed)
+                 {
+                     foreach (var error in equipmentQueryResult.Errors)
+                         context.Errors.Add(new ExecutionError(error.Message));
+
+                     return null;
+                 }
+
+                 if (equipmentQueryResult.Value.SpanEquipment == null || equipmentQueryResult.Value.SpanEquipment.Count == 0)
+                 {
+                     context.Errors.Add(new ExecutionError($"Cannot find any span equipment containing a span segment with id: {spanEquipmentOrSegmentId}"));
+
+                     return null;
+                 }
+
+
+                 var spanEquipment = equipmentQueryResult.Value.SpanEquipment.First();
+
+                 return spanEquipment;
+             }
+          );
 
 
             Field<NodeContainerType>(
