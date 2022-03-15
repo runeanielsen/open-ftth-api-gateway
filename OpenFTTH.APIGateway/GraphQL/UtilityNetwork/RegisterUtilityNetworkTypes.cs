@@ -12,6 +12,7 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork
         {
             // Mutations
             services.AddSingleton<SpanEquipmentMutations>();
+            services.AddSingleton<TerminalEquipmentMutations>();
             services.AddSingleton<NodeContainerMutations>();
 
             // Queries

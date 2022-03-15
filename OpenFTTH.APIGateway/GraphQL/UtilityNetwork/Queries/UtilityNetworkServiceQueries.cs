@@ -288,6 +288,38 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Queries
             );
 
 
+            Field<ListGraphType<RackType>>(
+                 name: "racks",
+                 description: "Query all racks within node",
+                 arguments: new QueryArguments(
+                     new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "routeNodeId" }
+                 ),
+                 resolve: context =>
+                 {
+                     var routeNodeId = context.GetArgument<Guid>("routeNodeId");
+
+                     var getNodeContainerResult = QueryHelper.GetNodeContainerFromRouteNodeId(queryDispatcher, routeNodeId);
+
+                     if (getNodeContainerResult.IsFailed)
+                     {
+                         foreach (var error in getNodeContainerResult.Errors)
+                             context.Errors.Add(new ExecutionError(error.Message));
+
+                         return null;
+                     }
+
+                     var nodeContainer = getNodeContainerResult.Value;
+
+                     if (nodeContainer.Racks == null)
+                     {
+                         return new Rack[] { };
+                     }
+
+                     return nodeContainer.Racks;
+                 }
+             );
+
+
             Field<TerminalEquipmentAZConnectivityViewModelType>(
                 name: "terminalEquipmentConnectivityView",
                 description: "Query connectivity information related to ",
@@ -500,6 +532,8 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Queries
                    return queryResult.Value;
                }
            );
+
+
         }
     }
 }

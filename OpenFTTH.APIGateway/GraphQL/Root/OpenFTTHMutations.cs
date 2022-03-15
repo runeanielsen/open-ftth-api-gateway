@@ -14,6 +14,7 @@ namespace OpenFTTH.APIGateway.GraphQL.Root
             this.AuthorizeWith("Authenticated");
 
             Field<SpanEquipmentMutations>("spanEquipment", resolve: context => new { });
+            Field<TerminalEquipmentMutations>("terminalEquipment", resolve: context => new { });
             Field<NodeContainerMutations>("nodeContainer", resolve: context => new { });
             Field<UserWorkContextMutations>("userContext", resolve: context => new { });
             Field<SchematicMutations>("schematic", resolve: context => new { });
