@@ -62,8 +62,8 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Types
 
                     var nodeContainer = getNodeContainerResult.Value;
 
-                    // If the termnal equipment is placed within a rack in the node container, then return rack information
-                    if (nodeContainer.Racks != null || nodeContainer.Racks.Any(r => r.SubrackMounts.Any(m => m.TerminalEquipmentId == context.Source.Id)))
+                    // If the terminal equipment is placed within a rack in the node container, then return rack information
+                    if (nodeContainer.Racks != null && nodeContainer.Racks.Any(r => r.SubrackMounts.Any(m => m.TerminalEquipmentId == context.Source.Id)))
                     {
                         var rack = nodeContainer.Racks.First(r => r.SubrackMounts.Any(m => m.TerminalEquipmentId == context.Source.Id));
                         var mount = rack.SubrackMounts.First(m => m.TerminalEquipmentId == context.Source.Id);
