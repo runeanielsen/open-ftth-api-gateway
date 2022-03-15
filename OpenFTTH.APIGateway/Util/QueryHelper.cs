@@ -49,5 +49,30 @@ namespace OpenFTTH.APIGateway.Util
 
             return Result.Fail(new Error($"Failed to find node container in route node with id: {routeNodeId}"));
         }
+
+        public static Result<NodeContainer> GetNodeContainer(IQueryDispatcher queryDispatcher, Guid nodeContainerId)
+        {
+            var equipmentIdList = new EquipmentIdList();
+            equipmentIdList.Add(nodeContainerId);
+
+            // Query all the equipments related to the route network element
+            var equipmentQueryResult = queryDispatcher.HandleAsync<GetEquipmentDetails, Result<GetEquipmentDetailsResult>>(
+                    new GetEquipmentDetails(equipmentIdList)
+                    {
+                        EquipmentDetailsFilter = new EquipmentDetailsFilterOptions() { IncludeRouteNetworkTrace = false }
+                    }
+                ).Result;
+
+            if (equipmentQueryResult.IsFailed)
+                return Result.Fail(equipmentQueryResult.Errors.First());
+
+            if (equipmentQueryResult.Value.NodeContainers != null && equipmentQueryResult.Value.NodeContainers.Count > 0)
+            {
+                return Result.Ok(equipmentQueryResult.Value.NodeContainers.First());
+            }
+
+
+            return Result.Fail(new Error($"Failed to find node container with id: {nodeContainerId}"));
+        }
     }
 }
