@@ -50,8 +50,8 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                  {
                      SpecificationId = context.HasArgument("terminalEquipmentSpecificationId") ? context.GetArgument<Guid>("terminalEquipmentSpecificationId") : null,
                      ManufacturerId = context.HasArgument("manufacturerId") ? context.GetArgument<Guid>("manufacturerId") : null,
-                     NamingInfo = context.HasArgument("namingInfo") ? context.GetArgument<NamingInfo>("namigInfo") : null,
-                     AddressInfo = context.HasArgument("adressInfo") ? context.GetArgument<AddressInfo>("adressInfo") : null,
+                     NamingInfo = context.HasArgument("namingInfo") ? context.GetArgument<NamingInfo>("namingInfo") : null,
+                     AddressInfo = context.HasArgument("addressInfo") ? context.GetArgument<AddressInfo>("addressInfo") : null,
                      RackId = context.HasArgument("rackId") ? context.GetArgument<Guid>("rackId") : null,
                      StartUnitPosition = context.HasArgument("rackStartUnitPosition") ? context.GetArgument<int>("rackStartUnitPosition") : null,
                  };
