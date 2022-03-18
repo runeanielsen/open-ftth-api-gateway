@@ -13,32 +13,11 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Types
         {
             Field(x => x.Id, type: typeof(IdGraphType)).Description("Master Resource Identifier UUID Property");
             Field(x => x.Name, type: typeof(StringGraphType)).Description("Name of the node structure");
+            Field(x => x.IsCable, type: typeof(BooleanGraphType)).Description("True if span equipment is a cable. Otherwise it's a conduit.");
             Field(x => x.Category, type: typeof(StringGraphType)).Description("Category");
             Field(x => x.Info, type: typeof(StringGraphType)).Description("Additional information (remark)");
             Field(x => x.SpecName, type: typeof(StringGraphType)).Description("Specification name");
             Field(x => x.Lines, type: typeof(ListGraphType<SpanEquipmentAZConnectivityViewLineInfoType>)).Description("Connectivity lines");
-
-            FieldAsync<SpanEquipmentType>(
-              name: "spanEquipment",
-              description: "The span equipment",
-              resolve: async context =>
-              {
-                  var spanEquipmentId = context.Source.Id;
-
-                  // Get equipment information
-                  var equipmentQueryResult = await queryDispatcher.HandleAsync<GetEquipmentDetails, FluentResults.Result<GetEquipmentDetailsResult>>(
-                      new GetEquipmentDetails(new EquipmentIdList() { spanEquipmentId })
-                  );
-
-                  if (equipmentQueryResult.IsSuccess || equipmentQueryResult.Value.SpanEquipment != null && equipmentQueryResult.Value.SpanEquipment.ContainsKey(spanEquipmentId))
-                  {
-                      return equipmentQueryResult.Value.SpanEquipment[spanEquipmentId];
-                  }
-
-                  return null;
-              }
-           );
-
         }
     }
 }

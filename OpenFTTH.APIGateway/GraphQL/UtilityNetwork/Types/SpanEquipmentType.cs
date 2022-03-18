@@ -27,6 +27,9 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Types
             Field(x => x.SpecificationId, type: typeof(IdGraphType)).Description("Span equipment specification id");
             Field(x => x.ManufacturerId, type: typeof(IdGraphType)).Description("Span equipment manufacturer id");
 
+            Field(x => x.IsCable, type: typeof(BooleanGraphType)).Description("True if span equipment is a cable. Otherwise it's a conduit.");
+
+
             Field<SpanEquipmentSpecificationType>(
                name: "specification",
                description: "The specification used to create the span equipment",
