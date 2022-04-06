@@ -3,6 +3,7 @@ using GraphQL.Types;
 using Microsoft.Extensions.Logging;
 using OpenFTTH.APIGateway.GraphQL.Search.Types;
 using OpenFTTH.APIGateway.Search;
+using OpenFTTH.APIGateway.Util;
 using OpenFTTH.CQRS;
 using Typesense;
 
@@ -10,7 +11,7 @@ namespace OpenFTTH.APIGateway.GraphQL.Search.Queries
 {
     public class SearchQueries : ObjectGraphType
     {
-        public SearchQueries(ILogger<SearchQueries> logger, IQueryDispatcher queryDispatcher, ITypesenseClient typesenseClient)
+        public SearchQueries(ILogger<SearchQueries> logger, IQueryDispatcher queryDispatcher, ITypesenseClient typesenseClient, UTM32WGS84Converter coordinateConverter)
         {
             Description = "GraphQL API for search operations";
 
@@ -25,7 +26,7 @@ namespace OpenFTTH.APIGateway.GraphQL.Search.Queries
                 {
                     var searchString = context.GetArgument<string>("searchString");
                     var pageSize = context.GetArgument<int>("pageSize");
-                    var searchClient = new GlobalSearchClient(typesenseClient, queryDispatcher);
+                    var searchClient = new GlobalSearchClient(typesenseClient, queryDispatcher, coordinateConverter);
                     return await searchClient.Search(searchString, pageSize);
                 }
             );

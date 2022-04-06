@@ -8,7 +8,7 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Types
 {
     public class SpanEquipmentPassageViewLineInfoType : ObjectGraphType<SpanEquipmentPassageViewLineInfo>
     {
-        public SpanEquipmentPassageViewLineInfoType(ILogger<SpanEquipmentPassageViewLineInfoType> logger)
+        public SpanEquipmentPassageViewLineInfoType(ILogger<SpanEquipmentPassageViewLineInfoType> logger, UTM32WGS84Converter coordinateConverter)
         {
             Field(x => x.SpanSegmentId, type: typeof(IdGraphType)).Description("Span segment id");
             Field(x => x.From, type: typeof(StringGraphType)).Description("From");
@@ -42,7 +42,7 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Types
                description: "Route network segment geometries of the span segment traversal",
                resolve: context =>
                {
-                   return UTM32WGS84Converter.ConvertGeoJsonLineStringsToWgs84(context.Source.RouteSegmentGeometries);
+                   return coordinateConverter.ConvertGeoJsonLineStringsToWgs84(context.Source.RouteSegmentGeometries);
                }
             );
         }

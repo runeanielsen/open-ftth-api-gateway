@@ -50,6 +50,7 @@ using System.Collections.Generic;
 using MicrosoftDI = GraphQL.MicrosoftDI;
 using System.Reflection;
 using Typesense.Setup;
+using OpenFTTH.APIGateway.Util;
 
 namespace OpenFTTH.APIGateway
 {
@@ -244,6 +245,10 @@ namespace OpenFTTH.APIGateway
             services.AddSingleton<IAddressRepository>(x =>
                     new PostgresAddressRepository(x.GetRequiredService<IOptions<GeoDatabaseSetting>>().Value.PostgresConnectionString)
             );
+
+            // Coordinate converter
+            services.AddSingleton<UTM32WGS84Converter>();
+
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

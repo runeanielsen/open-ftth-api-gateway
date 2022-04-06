@@ -8,12 +8,13 @@ using OpenFTTH.CQRS;
 using OpenFTTH.Events.Core.Infos;
 using System;
 using System.Linq;
+using OpenFTTH.APIGateway.Util;
 
 namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Types
 {
     public class AddressInfoType : ObjectGraphType<AddressInfo>
     {
-        public AddressInfoType(IQueryDispatcher queryDispatcher)
+        public AddressInfoType(IQueryDispatcher queryDispatcher, UTM32WGS84Converter coordinateConverter)
         {
             Field(x => x.AccessAddressId, type: typeof(IdGraphType)).Description("Internal or external access address id");
             Field(x => x.UnitAddressId, type: typeof(IdGraphType)).Description("Internal or external unit address id");
@@ -42,7 +43,7 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Types
                            return null;
                        }
 
-                       return AddressServiceQueries.MapAccessAddress(result.Value.AccessAddresses.First().Id, result.Value);
+                       return AddressServiceQueries.MapAccessAddress(result.Value.AccessAddresses.First().Id, result.Value, coordinateConverter);
                    }
                    else
                        return null;

@@ -23,7 +23,7 @@ namespace OpenFTTH.APIGateway.GraphQL.Addresses.Queries
     {
         private readonly ILogger<AddressServiceQueries> _logger;
 
-        public AddressServiceQueries(ILogger<AddressServiceQueries> logger, IQueryDispatcher queryDispatcher)
+        public AddressServiceQueries(ILogger<AddressServiceQueries> logger, IQueryDispatcher queryDispatcher, UTM32WGS84Converter coordinateConverter)
         {
             _logger = logger;
 
@@ -69,7 +69,7 @@ namespace OpenFTTH.APIGateway.GraphQL.Addresses.Queries
                             return null;
                         }
 
-                        return MapToGraphQLAddressHits(result.Value);
+                        return MapToGraphQLAddressHits(result.Value, coordinateConverter);
                     }
                     else if (spanEquipmentOrSegmentId != Guid.Empty)
                     {
@@ -85,7 +85,7 @@ namespace OpenFTTH.APIGateway.GraphQL.Addresses.Queries
                             return null;
                         }
 
-                        return MapToGraphQLAddressHits(getAddressInfoQueryResult.Value);
+                        return MapToGraphQLAddressHits(getAddressInfoQueryResult.Value, coordinateConverter);
                     }
                     else
                     {
@@ -99,7 +99,7 @@ namespace OpenFTTH.APIGateway.GraphQL.Addresses.Queries
                             return null;
                         }
 
-                        return MapToGraphQLAddressHits(result.Value);
+                        return MapToGraphQLAddressHits(result.Value, coordinateConverter);
                     }
                 }
            );
@@ -189,7 +189,7 @@ namespace OpenFTTH.APIGateway.GraphQL.Addresses.Queries
             return result;
         }
 
-        private List<NearestAddressSearchHit> MapToGraphQLAddressHits(GetAddressInfoResult addressQueryResult)
+        private List<NearestAddressSearchHit> MapToGraphQLAddressHits(GetAddressInfoResult addressQueryResult, UTM32WGS84Converter coordinateConverter)
         {
             List<NearestAddressSearchHit> result = new();
 
@@ -197,7 +197,7 @@ namespace OpenFTTH.APIGateway.GraphQL.Addresses.Queries
             {
                 result.Add(new NearestAddressSearchHit()
                 {
-                    AccessAddress = MapAccessAddress(addressHit.Key, addressQueryResult),
+                    AccessAddress = MapAccessAddress(addressHit.Key, addressQueryResult, coordinateConverter),
                     Distance = addressHit.Distance.Value
                 });
             }
@@ -205,11 +205,11 @@ namespace OpenFTTH.APIGateway.GraphQL.Addresses.Queries
             return result;
         }
 
-        public static AccessAddressData MapAccessAddress(Guid accessAddressId, GetAddressInfoResult addressQueryResult)
+        public static AccessAddressData MapAccessAddress(Guid accessAddressId, GetAddressInfoResult addressQueryResult, UTM32WGS84Converter coordinateConverter)
         {
             var searchAccessAddress = addressQueryResult.AccessAddresses[accessAddressId];
 
-            var wgs84Coord = UTM32WGS84Converter.ConvertFromUTM32NToWGS84(searchAccessAddress.AddressPoint.X, searchAccessAddress.AddressPoint.Y);
+            var wgs84Coord = coordinateConverter.ConvertFromUTM32NToWGS84(searchAccessAddress.AddressPoint.X, searchAccessAddress.AddressPoint.Y);
 
             List<UnitAddress> unitAddresses = new();
 

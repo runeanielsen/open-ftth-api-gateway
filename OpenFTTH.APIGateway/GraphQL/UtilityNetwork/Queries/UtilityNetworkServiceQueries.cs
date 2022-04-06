@@ -18,7 +18,7 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Queries
 {
     public class UtilityNetworkServiceQueries : ObjectGraphType
     {
-        public UtilityNetworkServiceQueries(ILogger<UtilityNetworkServiceQueries> logger, IQueryDispatcher queryDispatcher)
+        public UtilityNetworkServiceQueries(ILogger<UtilityNetworkServiceQueries> logger, IQueryDispatcher queryDispatcher, UTM32WGS84Converter coordinateConverter)
         {
             Description = "GraphQL API for querying data owned by utility network service";
 
@@ -130,7 +130,7 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Queries
                     return new SpanSegmentTrace()
                     {
                         RouteNetworkSegmentIds = theTrace.RouteSegmentIds,
-                        RouteNetworkSegmentGeometries = UTM32WGS84Converter.ConvertGeoJsonLineStringsToWgs84(theTrace.RouteSegmentGeometries)
+                        RouteNetworkSegmentGeometries = coordinateConverter.ConvertGeoJsonLineStringsToWgs84(theTrace.RouteSegmentGeometries)
                     };
                 });
 
