@@ -56,7 +56,7 @@ namespace OpenFTTH.APIGateway.Conversion
                 {
                     // trace terminal one
 
-                    var traceResult = _utilityNetwork.Graph.Trace(terminalEquipment.TerminalStructures[0].Terminals[0].Id);
+                    var traceResult = _utilityNetwork.Graph.SimpleTrace(terminalEquipment.TerminalStructures[0].Terminals[0].Id);
 
                     string endsInRack = "nej";
 
