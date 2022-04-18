@@ -228,6 +228,42 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
             );
 
             FieldAsync<CommandResultType>(
+              "removeRackFromNodeContainer",
+              description: "Remove a rack from the node container",
+              arguments: new QueryArguments(
+                  new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "routeNodeId" },
+                  new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "rackId" }
+              ),
+              resolve: async context =>
+              {
+                  var routeNodeId = context.GetArgument<Guid>("routeNodeId");
+                  var rackId = context.GetArgument<Guid>("rackId");
+
+                  var correlationId = Guid.NewGuid();
+
+                  var userContext = context.UserContext as GraphQLUserContext;
+                  var userName = userContext.Username;
+
+                  // TODO: Get from work manager
+                  var workTaskId = Guid.Parse("54800ae5-13a5-4b03-8626-a63b66a25568");
+
+                  var commandUserContext = new UserContext(userName, workTaskId);
+
+                  var removeRackFromNodeContainer = new RemoveRackFromNodeContainer(
+                    correlationId: correlationId,
+                    userContext: commandUserContext,
+                    routeNodeId: routeNodeId,
+                    rackId: rackId
+                  );
+
+                  var removeResult = await commandDispatcher.HandleAsync<RemoveRackFromNodeContainer, Result>(removeRackFromNodeContainer);
+
+                  return new CommandResult(removeResult);
+              }
+            );
+
+
+            FieldAsync<CommandResultType>(
                 "placeTerminalEquipmentInNodeContainer",
                 description: "Place a terminal directly in a node container or in a node container rack",
                 arguments: new QueryArguments(
