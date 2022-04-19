@@ -127,10 +127,20 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Queries
 
                     var theTrace = equipmentQueryResult.Value.RouteNetworkTraces.First();
 
+                    var coordinateConverterResult = coordinateConverter.ConvertGeoJsonLineStringsToWgs84(theTrace.RouteSegmentGeometries);
+
                     return new SpanSegmentTrace()
                     {
                         RouteNetworkSegmentIds = theTrace.RouteSegmentIds,
-                        RouteNetworkSegmentGeometries = coordinateConverter.ConvertGeoJsonLineStringsToWgs84(theTrace.RouteSegmentGeometries)
+                        RouteNetworkSegmentGeometries = coordinateConverterResult.WGS84GeoJsonStrings,
+                        WGS84MinX = coordinateConverterResult.WGS84BoundingBox.MinX,
+                        WGS84MinY = coordinateConverterResult.WGS84BoundingBox.MinY,
+                        WGS84MaxX = coordinateConverterResult.WGS84BoundingBox.MaxX,
+                        WGS84MaxY = coordinateConverterResult.WGS84BoundingBox.MaxY,
+                        ETRS89MinX = coordinateConverterResult.ETRS89BoundingBox.MinX,
+                        ETRS89MinY = coordinateConverterResult.ETRS89BoundingBox.MinY,
+                        ETRS89MaxX = coordinateConverterResult.ETRS89BoundingBox.MaxX,
+                        ETRS89MaxY = coordinateConverterResult.ETRS89BoundingBox.MaxY,
                     };
                 });
 

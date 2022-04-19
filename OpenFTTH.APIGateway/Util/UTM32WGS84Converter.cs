@@ -66,7 +66,7 @@ namespace OpenFTTH.APIGateway.Util
             return toPoint;
         }
 
-        public string[] ConvertGeoJsonLineStringsToWgs84(string[] geoJsonLineStrings)
+        public CoordinateConversionResult ConvertGeoJsonLineStringsToWgs84(string[] geoJsonLineStrings)
         {
             if (geoJsonLineStrings == null)
                 return null;
@@ -74,11 +74,18 @@ namespace OpenFTTH.APIGateway.Util
             var geoJsonReader = new GeoJsonReader();
             var geoJsonWriter = new GeoJsonWriter();
 
-            List<string> result = new();
+            Envelope wgs84BoundingBox = new();
+
+            Envelope etrs89BoundingBox = new();
+
+
+            List<string> wgs85geoJsonStrings = new();
 
             foreach (var inputGeoJson in geoJsonLineStrings)
             {
                 var line = geoJsonReader.Read<LineString>("{ \"type\": \"LineString\",\"coordinates\":" + inputGeoJson + " }");
+
+                etrs89BoundingBox.ExpandToInclude(line.EnvelopeInternal);
 
                 foreach (var coord in line.Coordinates)
                 {
@@ -87,15 +94,34 @@ namespace OpenFTTH.APIGateway.Util
                     coord.Y = conversionResult[1];
                 }
 
+                line.GeometryChanged();
+
+                wgs84BoundingBox.ExpandToInclude(line.EnvelopeInternal);
+
                 var newGeoJson = geoJsonWriter.Write(line);
 
                 newGeoJson = newGeoJson.Replace("{\"type\":\"LineString\",\"coordinates\":", "");
                 newGeoJson = newGeoJson.Replace("}", "");
 
-                result.Add(newGeoJson);
+                wgs85geoJsonStrings.Add(newGeoJson);
             }
 
-            return result.ToArray();
+
+            return new CoordinateConversionResult(wgs84BoundingBox, etrs89BoundingBox, wgs85geoJsonStrings.ToArray());
+        }
+    }
+
+    public class CoordinateConversionResult
+    {
+        public Envelope WGS84BoundingBox { get; }
+        public Envelope ETRS89BoundingBox { get;  }
+        public string[] WGS84GeoJsonStrings { get; }
+
+        public CoordinateConversionResult(Envelope wGS84BoundingBox, Envelope eTRS89BoundingBox, string[] wGS84GeoJsonStrings)
+        {
+            WGS84BoundingBox = wGS84BoundingBox;
+            ETRS89BoundingBox = eTRS89BoundingBox;
+            WGS84GeoJsonStrings = wGS84GeoJsonStrings;
         }
     }
 }
