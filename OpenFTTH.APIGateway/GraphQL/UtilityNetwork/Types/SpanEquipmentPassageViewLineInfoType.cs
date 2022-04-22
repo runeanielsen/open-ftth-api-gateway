@@ -42,7 +42,7 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Types
                description: "Route network segment geometries of the span segment traversal",
                resolve: context =>
                {
-                   return coordinateConverter.ConvertGeoJsonLineStringsToWgs84(context.Source.RouteSegmentGeometries);
+                   return coordinateConverter.ConvertGeoJsonLineStringsToWgs84(context.Source.RouteSegmentGeometries).WGS84GeoJsonStrings;
                }
             );
         }
