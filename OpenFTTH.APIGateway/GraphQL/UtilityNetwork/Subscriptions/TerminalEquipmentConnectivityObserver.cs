@@ -7,6 +7,7 @@ using OpenFTTH.UtilityGraphService.API.Model.UtilityNetwork.Views;
 using OpenFTTH.UtilityGraphService.API.Queries;
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
@@ -19,7 +20,7 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Subscriptions
         private readonly IToposTypedEventObservable<RouteNetworkElementContainedEquipmentUpdated> _toposTypedEventObserable;
         private readonly IQueryDispatcher _queryDispatcher;
 
-        private ConcurrentDictionary<Guid, ObserverSubject> _observableByRouteNetworkElementId = new ConcurrentDictionary<Guid, ObserverSubject>();
+        private ConcurrentDictionary<Guid, ConcurrentDictionary<Guid,ObserverSubject>> _observableByRouteNetworkElementId = new ConcurrentDictionary<Guid, ConcurrentDictionary<Guid,ObserverSubject>>();
 
         public TerminalEquipmentConnectivityObserver(ILogger<TerminalEquipmentConnectivityObserver> logger, IToposTypedEventObservable<RouteNetworkElementContainedEquipmentUpdated> toposTypedEventObserable, IQueryDispatcher queryDispatcher)
         {
@@ -36,45 +37,54 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Subscriptions
 
         private ObserverSubject GetObservable(Guid routeNodeId, Guid terminalEquipmentOrRackId)
         {
-            var subject = new ObserverSubject(new Subject<TerminalEquipmentAZConnectivityViewModel>(), terminalEquipmentOrRackId);
+            var subject = new ObserverSubject(new Subject<TerminalEquipmentAZConnectivityViewModel>(), terminalEquipmentOrRackId, routeNodeId);
 
-            var observable = _observableByRouteNetworkElementId.GetOrAdd(routeNodeId, subject);
-            observable.TerminalEquipmentOrRackId = terminalEquipmentOrRackId;
+            var observableList = _observableByRouteNetworkElementId.GetOrAdd(routeNodeId, new ConcurrentDictionary<Guid,ObserverSubject>());
 
-            return observable;
-
-        }
-
-        public void Ping(Guid routeNetworkElementId)
-        {
-            if (_observableByRouteNetworkElementId.TryGetValue(routeNetworkElementId, out var observable))
+            if (observableList.TryGetValue(terminalEquipmentOrRackId, out var observerSubject))
             {
-                observable.Subject.OnNext(GetTerminalEquipmentConnectivity(routeNetworkElementId, observable.TerminalEquipmentOrRackId));
+                return observerSubject;
             }
-        }
-
-        public void OnCompleted()
-        {
-        }
-
-        public void OnError(Exception error)
-        {
+            else
+            {
+                observableList.TryAdd(terminalEquipmentOrRackId, subject);
+                return subject;
+            }
         }
 
         void IObserver<RouteNetworkElementContainedEquipmentUpdated>.OnNext(RouteNetworkElementContainedEquipmentUpdated @event)
         {
             foreach (var routeNetworkElementId in @event.AffectedRouteNetworkElementIds)
             {
-                if (_observableByRouteNetworkElementId.TryGetValue(routeNetworkElementId, out var observable))
+                if (_observableByRouteNetworkElementId.TryGetValue(routeNetworkElementId, out var observers))
                 {
-                    observable.Subject.OnNext(GetTerminalEquipmentConnectivity(routeNetworkElementId, observable.TerminalEquipmentOrRackId));
+                    if (@event.Category == "EquipmentDeletion")
+                    {
+                        if (@event.IdChangeSets != null && @event.IdChangeSets.Any(i => i.ObjectType == "TerminalEquipment"))
+                        {
+                            var idChangeSet = @event.IdChangeSets.First(i => i.ObjectType == "TerminalEquipment");
+
+                            foreach (var terminalEquipmentId in idChangeSet.IdList)
+                            {
+                                if (observers.ContainsKey(terminalEquipmentId))
+                                    observers.TryRemove(terminalEquipmentId, out _);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        foreach (var observer in observers.Values)
+                        {
+                            observer.Subject.OnNext(GetTerminalEquipmentConnectivity(routeNetworkElementId, observer.TerminalEquipmentOrRackId));
+                        }
+                    }
                 }
             }
         }
 
         private TerminalEquipmentAZConnectivityViewModel GetTerminalEquipmentConnectivity(Guid routeNodeId, Guid terminalEquipmentOrRackId)
         {
-            // We catch all execeptions to avoid Topos retrying (calling the message handler again and again)
+            // We catch all exceptions to avoid Topos retrying (calling the message handler again and again)
             // It does not matter that the failed event is never processed again, because it's just a notification topic
             try
             {
@@ -100,15 +110,25 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Subscriptions
         }
 
 
+        public void OnCompleted()
+        {
+        }
+
+        public void OnError(Exception error)
+        {
+        }
+
         private class ObserverSubject
         {
             public Subject<TerminalEquipmentAZConnectivityViewModel> Subject { get; set; }
             public Guid TerminalEquipmentOrRackId { get; set; }
+            public Guid RouteNodeId { get; set; }
 
-            public ObserverSubject(Subject<TerminalEquipmentAZConnectivityViewModel> subject, Guid terminalEquipmentOrRackId)
+            public ObserverSubject(Subject<TerminalEquipmentAZConnectivityViewModel> subject, Guid terminalEquipmentOrRackId, Guid routeNodeId)
             {
                 Subject = subject;
                 TerminalEquipmentOrRackId = terminalEquipmentOrRackId;
+                RouteNodeId = routeNodeId;
             }
         }
     }
