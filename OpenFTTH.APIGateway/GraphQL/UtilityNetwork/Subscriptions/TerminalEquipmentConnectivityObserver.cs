@@ -67,7 +67,13 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Subscriptions
                             foreach (var terminalEquipmentId in idChangeSet.IdList)
                             {
                                 if (observers.ContainsKey(terminalEquipmentId))
-                                    observers.TryRemove(terminalEquipmentId, out _);
+                                {
+                                    if (observers.TryRemove(terminalEquipmentId, out var observerSubject))
+                                    {
+                                        if (!observerSubject.Subject.IsDisposed)
+                                            observerSubject.Subject.Dispose();
+                                    }
+                                }
                             }
                         }
                     }
