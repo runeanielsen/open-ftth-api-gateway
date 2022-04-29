@@ -7,6 +7,7 @@ using OpenFTTH.APIGateway.Util;
 using OpenFTTH.CQRS;
 using OpenFTTH.RouteNetwork.API.Model;
 using OpenFTTH.Util;
+using OpenFTTH.UtilityGraphService.API.Model.Trace;
 using OpenFTTH.UtilityGraphService.API.Model.UtilityNetwork;
 using OpenFTTH.UtilityGraphService.API.Model.UtilityNetwork.Views;
 using OpenFTTH.UtilityGraphService.API.Queries;
@@ -82,56 +83,71 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Queries
 
             FieldAsync<SpanSegmentTraceType>(
                 name: "spanSegmentTrace",
-                description: "Trace a specific span segment",
+                description: "Trace one or more span segments",
                 arguments: new QueryArguments(
-                  new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "spanSegmentId" }
+                  new QueryArgument<NonNullGraphType<ListGraphType<IdGraphType>>> { Name = "spanSegmentIds" }
                 ),
                 resolve: async context =>
                 {
-                    var spanSegmentId = context.GetArgument<Guid>("spanSegmentId");
+                    var spanSegmentIds = context.GetArgument<List<Guid>>("spanSegmentIds");
 
-                    // Get equipment information
-                    var equipmentQueryResult = await queryDispatcher.HandleAsync<GetEquipmentDetails, FluentResults.Result<GetEquipmentDetailsResult>>(
-                        new GetEquipmentDetails(new EquipmentIdList() { spanSegmentId })
+                    if (spanSegmentIds.Count == 0)
+                    {
+                        context.Errors.Add(new ExecutionError($"spanSegmentIds parameter cannot be empty"));
+                        return null;
+                    }
+
+                    List<string> segmentJsonGeometries = new();
+                    List<Guid> routeSegmentIds = new();
+
+                    foreach (var spanSegmentId in spanSegmentIds)
+                    {
+                        // Get equipment information
+                        var equipmentQueryResult = await queryDispatcher.HandleAsync<GetEquipmentDetails, FluentResults.Result<GetEquipmentDetailsResult>>(
+                            new GetEquipmentDetails(new EquipmentIdList() { spanSegmentId })
+                            {
+                                EquipmentDetailsFilter = new EquipmentDetailsFilterOptions { IncludeRouteNetworkTrace = true }
+                            }
+                        );
+
+                        if (equipmentQueryResult.IsFailed)
                         {
-                            EquipmentDetailsFilter = new EquipmentDetailsFilterOptions { IncludeRouteNetworkTrace = true }
+                            foreach (var error in equipmentQueryResult.Errors)
+                                context.Errors.Add(new ExecutionError(error.Message));
+
+                            return null;
                         }
-                    );
 
-                    if (equipmentQueryResult.IsFailed)
-                    {
-                        foreach (var error in equipmentQueryResult.Errors)
-                            context.Errors.Add(new ExecutionError(error.Message));
+                        if (equipmentQueryResult.Value.SpanEquipment == null || equipmentQueryResult.Value.SpanEquipment.Count == 0)
+                        {
+                            context.Errors.Add(new ExecutionError($"Cannot find any span equipment containing a span segment with id: {spanSegmentId}"));
+                            return null;
+                        }
 
-                        return null;
+                        if (equipmentQueryResult.Value.RouteNetworkTraces == null)
+                        {
+                            context.Errors.Add(new ExecutionError($"No trace information returned for span segment with id: {spanSegmentId}"));
+                            return null;
+                        }
+
+                        if (equipmentQueryResult.Value.RouteNetworkTraces.Count != 1)
+                        {
+                            //context.Errors.Add(new ExecutionError($"Expected only one trace returned for span segment with id: {spanSegmentId}. Are you sure you did a query on a span segment id and not a span equipment id?"));
+                            //return null;
+                            logger.LogWarning($"Got {equipmentQueryResult.Value.RouteNetworkTraces.Count} trace results tracing span segment or equipment with id: {spanSegmentId}. Will just use the first trace returned.");
+                        }
+
+                        var theTrace = equipmentQueryResult.Value.RouteNetworkTraces.First();
+
+                        segmentJsonGeometries.AddRange(theTrace.RouteSegmentGeometries);
+                        spanSegmentIds.AddRange(theTrace.RouteSegmentIds);
                     }
 
-                    if (equipmentQueryResult.Value.SpanEquipment == null || equipmentQueryResult.Value.SpanEquipment.Count == 0)
-                    {
-                        context.Errors.Add(new ExecutionError($"Cannot find any span equipment containing a span segment with id: {spanSegmentId}"));
-                        return null;
-                    }
-
-                    if (equipmentQueryResult.Value.RouteNetworkTraces == null)
-                    {
-                        context.Errors.Add(new ExecutionError($"No trace information returned for span segment with id: {spanSegmentId}"));
-                        return null;
-                    }
-
-                    if (equipmentQueryResult.Value.RouteNetworkTraces.Count != 1)
-                    {
-                        //context.Errors.Add(new ExecutionError($"Expected only one trace returned for span segment with id: {spanSegmentId}. Are you sure you did a query on a span segment id and not a span equipment id?"));
-                        //return null;
-                        logger.LogWarning($"Got {equipmentQueryResult.Value.RouteNetworkTraces.Count} trace results tracing span segment or equipment with id: {spanSegmentId}. Will just use the first trace returned.");
-                    }
-
-                    var theTrace = equipmentQueryResult.Value.RouteNetworkTraces.First();
-
-                    var coordinateConverterResult = coordinateConverter.ConvertGeoJsonLineStringsToWgs84(theTrace.RouteSegmentGeometries);
+                    var coordinateConverterResult = coordinateConverter.ConvertGeoJsonLineStringsToWgs84(segmentJsonGeometries.ToArray());
 
                     return new SpanSegmentTrace()
                     {
-                        RouteNetworkSegmentIds = theTrace.RouteSegmentIds,
+                        RouteNetworkSegmentIds = spanSegmentIds.ToArray(),
                         RouteNetworkSegmentGeometries = coordinateConverterResult.WGS84GeoJsonStrings,
                         WGS84MinX = coordinateConverterResult.WGS84BoundingBox.MinX,
                         WGS84MinY = coordinateConverterResult.WGS84BoundingBox.MinY,
