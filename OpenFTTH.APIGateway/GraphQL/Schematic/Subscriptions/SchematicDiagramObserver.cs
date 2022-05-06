@@ -65,6 +65,11 @@ namespace OpenFTTH.APIGateway.GraphQL.Schematic.Subscriptions
                     if (@event.Category != null && @event.Category.StartsWith("FiberConnectivity"))
                         continue;
 
+                    // Don't update schematic diagram in case of equipment structure changes (adding or removal of terminal structures)
+                    if (@event.Category != null && @event.Category.StartsWith("EquipmentStructureModification"))
+                        continue;
+
+
                     observable.OnNext(GetDiagram(routeNetworkElementId));
                 }
             }
