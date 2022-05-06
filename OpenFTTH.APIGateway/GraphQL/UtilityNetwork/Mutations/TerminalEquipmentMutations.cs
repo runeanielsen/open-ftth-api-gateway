@@ -175,6 +175,46 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                  return new CommandResult(addStructureResult);
              }
            );
+
+
+           FieldAsync<CommandResultType>(
+            "removeStructure",
+            description: "Remove terminal structure from equipment",
+            arguments: new QueryArguments(
+                new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "routeNodeId" },
+                new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "terminalEquipmentId" },
+                new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "terminalStructureId" }
+            ),
+            resolve: async context =>
+            {
+                var routeNodeId = context.GetArgument<Guid>("routeNodeId");
+                var terminalEquipmentId = context.GetArgument<Guid>("terminalEquipmentId");
+                var terminalStructureId = context.GetArgument<Guid>("terminalStructureId");
+
+                var correlationId = Guid.NewGuid();
+
+                var userContext = context.UserContext as GraphQLUserContext;
+                var userName = userContext.Username;
+
+                 // TODO: Get from work manager
+                 var workTaskId = Guid.Parse("54800ae5-13a5-4b03-8626-a63b66a25568");
+
+                var commandUserContext = new UserContext(userName, workTaskId);
+
+                var removeStructure = new RemoveTerminalStructureFromTerminalEquipment(
+                  correlationId: correlationId,
+                  userContext: commandUserContext,
+                  routeNodeId: routeNodeId,
+                  terminalEquipmentId: terminalEquipmentId,
+                  terminalStructureId: terminalStructureId
+                );
+
+                var removeStructureResult = await commandDispatcher.HandleAsync<RemoveTerminalStructureFromTerminalEquipment, Result>(removeStructure);
+
+                return new CommandResult(removeStructureResult);
+            }
+          );
+
         }
     }
 }
