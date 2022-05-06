@@ -95,6 +95,86 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                  return new CommandResult(removeResult);
              }
            );
+
+            FieldAsync<CommandResultType>(
+               "connectTerminals",
+               description: "Connect terminals - i.e. create a patch from one terminal equipment to another",
+               arguments: new QueryArguments(
+                   new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "routeNodeId" },
+                   new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "fromTerminalId" },
+                   new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "toTerminalId" },
+                   new QueryArgument<NonNullGraphType<FloatGraphType>> { Name = "fiberCoordLength" }
+               ),
+               resolve: async context =>
+               {
+                   var routeNodeId = context.GetArgument<Guid>("routeNodeId");
+                   var fromTerminalId = context.GetArgument<Guid>("fromTerminalId");
+                   var toTerminalId = context.GetArgument<Guid>("toTerminalId");
+                   var fiberCoordLength = context.GetArgument<Double>("fiberCoordLength");
+
+                   var correlationId = Guid.NewGuid();
+
+                   var userContext = context.UserContext as GraphQLUserContext;
+                   var userName = userContext.Username;
+
+                    // TODO: Get from work manager
+                    var workTaskId = Guid.Parse("54800ae5-13a5-4b03-8626-a63b66a25568");
+
+                   var commandUserContext = new UserContext(userName, workTaskId);
+
+                   var connectCommand = new ConnectTerminalsAtRouteNode(correlationId, commandUserContext, routeNodeId, fromTerminalId, toTerminalId, fiberCoordLength);
+                   var connectCommandResult = await commandDispatcher.HandleAsync<ConnectTerminalsAtRouteNode, Result>(connectCommand);
+
+                   if (connectCommandResult.IsFailed)
+                       return new CommandResult(connectCommandResult);
+
+                   return new CommandResult(Result.Ok());
+               }
+            );
+
+           FieldAsync<CommandResultType>(
+             "addAdditionalStructures",
+             description: "Add additional terminal structure to terminal equipment - i.e. trays, cards etc.",
+             arguments: new QueryArguments(
+                 new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "routeNodeId" },
+                 new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "terminalEquipmentId" },
+                 new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "structureSpecificationId" },
+                 new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "numberOfStructures" },
+                 new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "position" }
+             ),
+             resolve: async context =>
+             {
+                 var routeNodeId = context.GetArgument<Guid>("routeNodeId");
+                 var terminalEquipmentId = context.GetArgument<Guid>("terminalEquipmentId");
+                 var structureSpecificationId = context.GetArgument<Guid>("structureSpecificationId");
+                 var numberOfStructures = context.GetArgument<int>("numberOfStructures");
+                 var position = context.GetArgument<int>("position");
+
+                 var correlationId = Guid.NewGuid();
+
+                 var userContext = context.UserContext as GraphQLUserContext;
+                 var userName = userContext.Username;
+
+                  // TODO: Get from work manager
+                  var workTaskId = Guid.Parse("54800ae5-13a5-4b03-8626-a63b66a25568");
+
+                 var commandUserContext = new UserContext(userName, workTaskId);
+
+                 var addStructure = new PlaceAdditionalStructuresInTerminalEquipment(
+                   correlationId: correlationId,
+                   userContext: commandUserContext,
+                   routeNodeId: routeNodeId,
+                   terminalEquipmentId: terminalEquipmentId,
+                   structureSpecificationId: structureSpecificationId,
+                   numberOfStructures: numberOfStructures,
+                   position: position
+                 );
+
+                 var addStructureResult = await commandDispatcher.HandleAsync<PlaceAdditionalStructuresInTerminalEquipment, Result>(addStructure);
+
+                 return new CommandResult(addStructureResult);
+             }
+           );
         }
     }
 }
