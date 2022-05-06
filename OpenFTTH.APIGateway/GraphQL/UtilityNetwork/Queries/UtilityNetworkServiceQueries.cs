@@ -58,6 +58,19 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Queries
                 }
             );
 
+
+            FieldAsync<ListGraphType<TerminalStructureSpecificationType>>(
+                name: "terminalStructureSpecifications",
+                description: "Retrieve all terminal structure specifications - i.e. cards, tray etc.",
+                resolve: async context =>
+                {
+                    var queryResult = await queryDispatcher.HandleAsync<GetTerminalStructureSpecifications,
+                        Result<LookupCollection<TerminalStructureSpecification>>>(new GetTerminalStructureSpecifications());
+
+                    return queryResult.Value.OrderBy(s => s.Description);
+                }
+            );
+
             FieldAsync<ListGraphType<NodeContainerSpecificationType>>(
                 name: "nodeContainerSpecifications",
                 description: "Retrieve all node container specifications.",
