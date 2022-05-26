@@ -13,6 +13,8 @@ namespace OpenFTTH.APIGateway.Util
         private readonly CoordinateTransformationFactory _ctfac;
         private readonly ICoordinateTransformation _trans;
 
+        private static readonly double _boundingBoxExtraMarginPercent = 5;
+
         public UTM32WGS84Converter()
         {
             // ETRS 89 UTM 32
@@ -106,8 +108,17 @@ namespace OpenFTTH.APIGateway.Util
                 wgs85geoJsonStrings.Add(newGeoJson);
             }
 
+            return new CoordinateConversionResult(AddBoundingBoxMargin(wgs84BoundingBox), AddBoundingBoxMargin(etrs89BoundingBox), wgs85geoJsonStrings.ToArray());
+        }
 
-            return new CoordinateConversionResult(wgs84BoundingBox, etrs89BoundingBox, wgs85geoJsonStrings.ToArray());
+
+        private static Envelope AddBoundingBoxMargin(Envelope envelope)
+        {
+            var expandDistance = ((envelope.Width * _boundingBoxExtraMarginPercent) / 100);
+
+            envelope.ExpandBy(expandDistance);
+
+            return envelope;
         }
     }
 
