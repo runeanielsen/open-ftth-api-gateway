@@ -55,11 +55,10 @@ namespace OpenFTTH.APIGateway.Conversion
 
 
             CreateTableLogColumn(_rackTableName);
-            //CreateTableLogColumn(_connectivityTableName);
+      
+            var racks = LoadDataFromConversionDatabase();
 
-            var nodeContainers = LoadDataFromConversionDatabase();
-
-            AddRacksToNetwork(nodeContainers.Values.ToList());
+            AddRacksToNetwork(racks.Values.ToList());
 
             _logger.LogInformation("Conversion of racks finish!");
         }
@@ -109,11 +108,7 @@ namespace OpenFTTH.APIGateway.Conversion
             // Check if node container already exists
             if (relatedInfo.NodeContainer == null)
             {
-                if (_utilityNetwork.TryGetEquipment<NodeContainer>(relatedInfo.NodeContainer.Id, out var existingNodeContainer))
-                {
-                    System.Diagnostics.Debug.WriteLine($"No container exists in node: {rack.NodeId}");
-                    return Result.Fail(new Error($"No container exists in node: {rack.NodeId}"));
-                }
+                return Result.Fail(new Error($"No container exists in node: {rack.NodeId}"));
             }
 
             var rackSpecId = GetRackSpecificationIdFromName(rack.Specification);

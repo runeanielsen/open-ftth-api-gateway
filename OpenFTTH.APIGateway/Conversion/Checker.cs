@@ -45,7 +45,7 @@ namespace OpenFTTH.APIGateway.Conversion
 
             using StreamWriter csvFile = new("c:/temp/openftth_kunde_check.csv");
 
-            var csvHeader = "\"instnr\";\"rammer_odf\"";
+            var csvHeader = "\"instnr\";\"rammer_rack\";\"rammer_eq\";\"rammer_kort\";\"rammer_port\"";
             csvFile.WriteLine(csvHeader);
 
             foreach (var terminalEquipment in terminalEquipments)
@@ -54,20 +54,41 @@ namespace OpenFTTH.APIGateway.Conversion
 
                 if (spec.Name == "Kundeterminering")
                 {
-                    // trace terminal one
-
-                    var traceResult = _utilityNetwork.Graph.SimpleTrace(terminalEquipment.TerminalStructures[0].Terminals[0].Id);
+                    // trace terminal to
+                    var traceResult = _utilityNetwork.Graph.SimpleTrace(terminalEquipment.TerminalStructures[0].Terminals[1].Id);
 
                     string endsInRack = "nej";
 
+                    UtilityGraphConnectedTerminal? endTerminal = null;
+
                     if (CheckIfEndTerminalIsWithinRackEquipment(terminalEquipmentSpecifications, traceResult.Upstream))
+                    {
+                        endTerminal = (UtilityGraphConnectedTerminal)traceResult.Upstream.Last();
                         endsInRack = "ja";
+                    }
                     else if (CheckIfEndTerminalIsWithinRackEquipment(terminalEquipmentSpecifications, traceResult.Downstream))
+                    {
+                        endTerminal = (UtilityGraphConnectedTerminal)traceResult.Downstream.Last();
                         endsInRack = "ja";
+                    }
+
+                    string eqName = "";
+                    string eqKort = "";
+                    string eqPort = "";
+
+                    if (endTerminal != null)
+                    {
+                        var terminal = endTerminal.Terminal(_utilityNetwork);
+                        var structure = endTerminal.TerminalStructure(_utilityNetwork);
+                        var equipment = endTerminal.TerminalEquipment(_utilityNetwork);
+
+                        eqName = equipment.Name;
+                        eqKort = structure.Name;
+                        eqPort = terminal.Name;
+                    }
 
 
-
-                    var csvLine = "\"" + terminalEquipment.Name + "\";\"" + endsInRack + "\"";
+                    var csvLine = "\"" + terminalEquipment.Name + "\";\"" + endsInRack + "\";\"" + eqName + "\";\"" + eqKort + "\";\"" + eqPort + "\"";
 
                     csvFile.WriteLine(csvLine);
                 }

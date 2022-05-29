@@ -109,11 +109,8 @@ namespace OpenFTTH.APIGateway.Conversion
             // Check if node container already exists
             if (relatedInfo.NodeContainer == null)
             {
-                if (_utilityNetwork.TryGetEquipment<NodeContainer>(relatedInfo.NodeContainer.Id, out var existingNodeContainer))
-                {
                     System.Diagnostics.Debug.WriteLine($"No container exists in node: {terminalEquipment.NodeId}");
                     return Result.Fail(new Error($"No container exists in node: {terminalEquipment.NodeId}"));
-                }
             }
 
 
@@ -124,7 +121,7 @@ namespace OpenFTTH.APIGateway.Conversion
 
 
             // Stand-alone splice equipment in node
-            if (terminalEquipment.RackId == Guid.Empty)
+            if (terminalEquipment.RackId == null)
             {
                 var placeEqCmd = new PlaceTerminalEquipmentInNodeContainer(
                     correlationId: Guid.NewGuid(),
@@ -149,6 +146,23 @@ namespace OpenFTTH.APIGateway.Conversion
             }
             else
             {
+                var rackId = Guid.Empty;
+
+                if (!Guid.TryParse(terminalEquipment.RackId, out rackId))
+                {
+                    // Try find rack in node by name
+                    if (relatedInfo.NodeContainer.Racks != null && relatedInfo.NodeContainer.Racks.Any(r => r.Name == terminalEquipment.RackId))
+                    {
+                        rackId = relatedInfo.NodeContainer.Racks.First(r => r.Name == terminalEquipment.RackId).Id;
+                    }
+                    else
+                    {
+                        return Result.Fail(new Error($"Cannot find rack by name: '{terminalEquipment.RackId} in node: {relatedInfo.NodeContainer.Id}"));
+                    }
+
+                }
+
+
                 // Rack equipment
                 var placeEqCmd = new PlaceTerminalEquipmentInNodeContainer(
                     correlationId: Guid.NewGuid(),
@@ -158,18 +172,26 @@ namespace OpenFTTH.APIGateway.Conversion
                     terminalEquipmentSpecificationId: terminalEquipmentSpecificationId.Value,
                     numberOfEquipments: 1,
                     startSequenceNumber: 80 - terminalEquipment.RackPosition,
-                    namingMethod: TerminalEquipmentNamingMethodEnum.NumberOnly,
-                    namingInfo: null
+                    namingMethod: TerminalEquipmentNamingMethodEnum.NameOnly,
+                    namingInfo: new NamingInfo(terminalEquipment.Name, null)
                 )
                 {
-                    SubrackPlacementInfo = new SubrackPlacementInfo(terminalEquipment.RackId, terminalEquipment.RackPosition, SubrackPlacmentMethod.BottomUp)
+                    SubrackPlacementInfo = new SubrackPlacementInfo(rackId, terminalEquipment.RackPosition, SubrackPlacmentMethod.BottomUp)
                 };
 
-                var placeEqResult = _commandDispatcher.HandleAsync<PlaceTerminalEquipmentInNodeContainer, Result>(placeEqCmd).Result;
+                try
+                {
+                    var placeEqResult = _commandDispatcher.HandleAsync<PlaceTerminalEquipmentInNodeContainer, Result>(placeEqCmd).Result;
 
-                LogStatus((NpgsqlCommand)logCmd, _terminalEquipmentTableName, "external_id", terminalEquipment.ExternalId, placeEqResult);
+                    LogStatus((NpgsqlCommand)logCmd, _terminalEquipmentTableName, "external_id", terminalEquipment.ExternalId, placeEqResult);
 
-                return placeEqResult;
+                    return placeEqResult;
+                }
+                catch (Exception ex)
+                {
+                    return Result.Fail(new Error($"Error: {ex.Message}"));
+
+                }
 
             }
         }
@@ -279,7 +301,7 @@ namespace OpenFTTH.APIGateway.Conversion
                 terminalEquipment.TerminalEquipmentId = Guid.Parse(terminalEquipmentReader.GetString(3));
                 terminalEquipment.Specification = terminalEquipmentReader.GetString(4).Trim();
                 terminalEquipment.Name = terminalEquipmentReader.GetString(5).Trim();
-                terminalEquipment.RackId = Guid.Parse(terminalEquipmentReader.GetString(6));
+                terminalEquipment.RackId = String.IsNullOrEmpty(terminalEquipmentReader.GetString(6)) ? null : terminalEquipmentReader.GetString(6);
                 terminalEquipment.RackPosition = Int32.Parse(terminalEquipmentReader.GetString(7).Trim());
                 terminalEquipment.AccessAddressId = terminalEquipmentReader.IsDBNull(8) || terminalEquipmentReader.GetString(8) == "" ? null : Guid.Parse(terminalEquipmentReader.GetString(8));
                 terminalEquipment.UnitAddressId = terminalEquipmentReader.IsDBNull(9) || terminalEquipmentReader.GetString(9) == "" ? null : Guid.Parse(terminalEquipmentReader.GetString(9));
@@ -299,7 +321,7 @@ namespace OpenFTTH.APIGateway.Conversion
             public Guid NodeId { get; set; }
             public Guid TerminalEquipmentId { get; set; }
             public string Name { get; set; }
-            public Guid RackId { get; set; }
+            public string RackId { get; set; }
             public int RackPosition { get; set; }
             public Guid? AccessAddressId { get; internal set; }
             public Guid? UnitAddressId { get; internal set; }

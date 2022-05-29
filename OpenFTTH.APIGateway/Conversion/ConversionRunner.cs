@@ -55,10 +55,6 @@ namespace OpenFTTH.APIGateway.Conversion
 
                 var dbToReadConversionDataFrom = _geoDatabaseSetting;
 
-
-                //new Checker(_loggerFactory.CreateLogger<Checker>(), _workTaskId, _eventStore, dbToReadConversionDataFrom, _commandDispatcher, _queryDispatcher).Run();
-
-
                 new CableSpanEquipmentImporter(_loggerFactory.CreateLogger<ConduitSpanEquipmentImporter>(), _eventStore, dbToReadConversionDataFrom, _commandDispatcher, _queryDispatcher).Run();
 
                 new NodeContainerImporter(_loggerFactory.CreateLogger<NodeContainerImporter>(), _workTaskId, _eventStore, dbToReadConversionDataFrom, _commandDispatcher, _queryDispatcher).Run();
@@ -67,11 +63,15 @@ namespace OpenFTTH.APIGateway.Conversion
 
                 new TerminalEquipmentImporter(_loggerFactory.CreateLogger<TerminalEquipmentImporter>(), _workTaskId, _eventStore, dbToReadConversionDataFrom, _commandDispatcher, _queryDispatcher).Run();
 
+                new TerminalStructureImporter(_loggerFactory.CreateLogger<TerminalStructureImporter>(), _workTaskId, _eventStore, dbToReadConversionDataFrom, _commandDispatcher, _queryDispatcher).Run();
+
                 new SegmentToTerminalConnectionsImporter(_loggerFactory.CreateLogger<SegmentToTerminalConnectionsImporter>(), _workTaskId, _eventStore, dbToReadConversionDataFrom, _commandDispatcher, _queryDispatcher).Run();
 
+                new TerminalToTerminalConnectionsImporter(_loggerFactory.CreateLogger<TerminalToTerminalConnectionsImporter>(), _workTaskId, _eventStore, dbToReadConversionDataFrom, _commandDispatcher, _queryDispatcher).Run();
 
-                // Old don't run
+                // Ddn't run
                 //new ConduitSpanEquipmentImporter(_loggerFactory.CreateLogger<ConduitSpanEquipmentImporter>(), _eventStore, _geoDatabaseSetting, _commandDispatcher, _queryDispatcher).Run();
+                //new Checker(_loggerFactory.CreateLogger<Checker>(), _workTaskId, _eventStore, dbToReadConversionDataFrom, _commandDispatcher, _queryDispatcher).Run();
 
             }
             else
