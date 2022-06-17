@@ -133,6 +133,19 @@ namespace OpenFTTH.APIGateway.Workers
                 // Start conversion
                 new ConversionRunner(_loggerFactory, _eventStore, _geoDatabaseSetting, _commandDispatcher, _queryDispatcher).Run();
 
+                // Catchup external events
+                _logger.LogInformation("Start catching up external events...");
+
+                while (!stoppingToken.IsCancellationRequested)
+                {
+                    Thread.Sleep(2000);
+
+                    var eventsProcessed = _eventStore.CatchUp();
+
+                    if (eventsProcessed > 0)
+                        _logger.LogInformation($"Processed {eventsProcessed} new external events.");
+                }
+
 
             }
             catch (Exception ex)
