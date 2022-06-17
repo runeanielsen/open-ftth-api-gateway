@@ -1,9 +1,13 @@
-﻿using GraphQL;
+﻿using FluentResults;
+using GraphQL;
 using GraphQL.Types;
 using Microsoft.Extensions.Logging;
 using OpenFTTH.APIGateway.GraphQL.Work.Types;
 using OpenFTTH.CQRS;
+using OpenFTTH.Work.API.Model;
 using OpenFTTH.Work.API.Queries;
+using OpenFTTH.Work.Business;
+using System.Collections.Generic;
 
 namespace OpenFTTH.APIGateway.GraphQL.Work.Queries
 {
@@ -17,16 +21,16 @@ namespace OpenFTTH.APIGateway.GraphQL.Work.Queries
 
             Description = "GraphQL API for querying work order related data";
 
-            Field<ListGraphType<ProjectType>>(
-                name: "projectsAndWorkTasks",
-                description: "Retrieve all projects and underlying work tasks.",
+            Field<ListGraphType<WorkTaskAndProjectType>>(
+                name: "workTasksWithProjectInformation",
+                description: "Retrieve all work tasks including related project information",
                 resolve: context =>
                 {
-                    var queryRequest = new ProjectsAndWorkTasksQuery();
+                    var queryRequest = new GetAllWorkTaskAndProjects();
 
-                    var queryResult = this._queryDispatcher.HandleAsync<ProjectsAndWorkTasksQuery, ProjectsAndWorkTasksQueryResult>(queryRequest).Result;
+                    var queryResult = this._queryDispatcher.HandleAsync<GetAllWorkTaskAndProjects, Result<List<WorkTaskAndProject>>>(queryRequest).Result;
 
-                    return queryResult.Projects;
+                    return queryResult.Value;
                 }
             );
 
@@ -38,11 +42,11 @@ namespace OpenFTTH.APIGateway.GraphQL.Work.Queries
                 {
                     var userName = context.GetArgument<string>("userName");
 
-                    var queryRequest = new UserWorkContextQuery(userName);
+                    var queryRequest = new GetUserWorkContext(userName);
 
-                    var queryResult = this._queryDispatcher.HandleAsync<UserWorkContextQuery, UserWorkContextQueryResult>(queryRequest).Result;
+                    var queryResult = this._queryDispatcher.HandleAsync<GetUserWorkContext, Result<UserWorkContext>>(queryRequest).Result;
 
-                    return queryResult.UserWorkContext;
+                    return queryResult.Value;
                 }
             );
 

@@ -1,17 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29613.14
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenFTTH.APIGateway", "OpenFTTH.APIGateway\OpenFTTH.APIGateway.csproj", "{74EC242E-4E36-47D4-8AF5-6601A901397C}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenFTTH.Work.Business", "OpenFTTH.Work.Business\OpenFTTH.Work.Business.csproj", "{5FF78588-4892-4723-9009-BECB184CF2CA}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenFTTH.Work.API", "OpenFTTH.Work.API\OpenFTTH.Work.API.csproj", "{4C16619A-AFF8-4B20-A27A-8F7CF0275BA7}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WorkService", "WorkService", "{C497BAA2-241C-4203-9F47-A5021FCA4A4F}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenFTTH.Work.Tests", "OpenFTTH.Work.Tests\OpenFTTH.Work.Tests.csproj", "{0065F950-4E90-46C2-BFE4-D58E97A185D2}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenFTTH.APIGateway.IntegrationTests", "OpenFTTH.APIGateway.IntegrationTests\OpenFTTH.APIGateway.IntegrationTests.csproj", "{9D680995-B0DA-4579-9081-3284B38568D6}"
 EndProject
@@ -25,18 +17,6 @@ Global
 		{74EC242E-4E36-47D4-8AF5-6601A901397C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{74EC242E-4E36-47D4-8AF5-6601A901397C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{74EC242E-4E36-47D4-8AF5-6601A901397C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5FF78588-4892-4723-9009-BECB184CF2CA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5FF78588-4892-4723-9009-BECB184CF2CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5FF78588-4892-4723-9009-BECB184CF2CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5FF78588-4892-4723-9009-BECB184CF2CA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4C16619A-AFF8-4B20-A27A-8F7CF0275BA7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4C16619A-AFF8-4B20-A27A-8F7CF0275BA7}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4C16619A-AFF8-4B20-A27A-8F7CF0275BA7}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4C16619A-AFF8-4B20-A27A-8F7CF0275BA7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0065F950-4E90-46C2-BFE4-D58E97A185D2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0065F950-4E90-46C2-BFE4-D58E97A185D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0065F950-4E90-46C2-BFE4-D58E97A185D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0065F950-4E90-46C2-BFE4-D58E97A185D2}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9D680995-B0DA-4579-9081-3284B38568D6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{9D680995-B0DA-4579-9081-3284B38568D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9D680995-B0DA-4579-9081-3284B38568D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -44,11 +24,6 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{5FF78588-4892-4723-9009-BECB184CF2CA} = {C497BAA2-241C-4203-9F47-A5021FCA4A4F}
-		{4C16619A-AFF8-4B20-A27A-8F7CF0275BA7} = {C497BAA2-241C-4203-9F47-A5021FCA4A4F}
-		{0065F950-4E90-46C2-BFE4-D58E97A185D2} = {C497BAA2-241C-4203-9F47-A5021FCA4A4F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1DB50536-F305-4178-A66B-483B1C17937A}

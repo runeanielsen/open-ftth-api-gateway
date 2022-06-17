@@ -16,7 +16,6 @@ namespace OpenFTTH.APIGateway.GraphQL.Work
             services.AddSingleton<UserWorkContextMutations>();
 
             // Work specific types
-            services.AddSingleton<ProjectType>();
             services.AddSingleton<WorkTaskType>();
             services.AddSingleton<UserWorkContextType>();
         }

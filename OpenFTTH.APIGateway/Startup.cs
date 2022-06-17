@@ -42,7 +42,6 @@ using OpenFTTH.Events.RouteNetwork;
 using OpenFTTH.Events.UtilityNetwork;
 using OpenFTTH.RouteNetwork.Business.RouteElements.EventHandling;
 using OpenFTTH.RouteNetwork.Business.RouteElements.StateHandling;
-using OpenFTTH.Work.Business.InMemTestImpl;
 using Serilog;
 using Serilog.Events;
 using Serilog.Formatting.Compact;
@@ -51,6 +50,7 @@ using MicrosoftDI = GraphQL.MicrosoftDI;
 using System.Collections.Generic;
 using System.Reflection;
 using Typesense.Setup;
+using OpenFTTH.Work.Business;
 
 namespace OpenFTTH.APIGateway
 {
@@ -198,9 +198,9 @@ namespace OpenFTTH.APIGateway
             // Core types
             RegisterCoreTypes.Register(services);
 
-            // Work service mockup stuff
+            // Work service
             RegisterWorkServiceTypes.Register(services);
-            services.AddSingleton<InMemRepoImpl, InMemRepoImpl>();
+            services.AddSingleton<WorkContextManager, WorkContextManager>();
 
             // Schematic stuff
             RegisterSchematicTypes.Register(services);
