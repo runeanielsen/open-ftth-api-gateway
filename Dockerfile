@@ -4,9 +4,6 @@ WORKDIR /app
 COPY ./*sln ./
 COPY ./OpenFTTH.APIGateway/*.csproj ./OpenFTTH.APIGateway/
 COPY ./OpenFTTH.APIGateway.IntegrationTests/*.csproj ./OpenFTTH.APIGateway.IntegrationTests/
-COPY ./OpenFTTH.Work.API/*.csproj ./OpenFTTH.Work.API/
-COPY ./OpenFTTH.Work.Business/*.csproj ./OpenFTTH.Work.Business/
-COPY ./OpenFTTH.Work.Tests/*.csproj ./OpenFTTH.Work.Tests/
 
 RUN dotnet restore --packages ./packages
 
