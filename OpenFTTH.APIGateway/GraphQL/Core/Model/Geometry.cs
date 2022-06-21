@@ -30,5 +30,10 @@ namespace OpenFTTH.APIGateway.CoreTypes
 
             return new Geometry(typeJson, coordinatesJson);
         }
+
+        public static Geometry MapToPointFromXY(double x, double y)
+        {
+            return new Geometry("Point", $"[{x.ToString(System.Globalization.CultureInfo.InvariantCulture)},{y.ToString(System.Globalization.CultureInfo.InvariantCulture)}]");
+        }
     }
 }

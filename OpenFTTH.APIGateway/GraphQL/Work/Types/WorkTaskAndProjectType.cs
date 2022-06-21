@@ -1,6 +1,7 @@
 ﻿using GraphQL.Types;
 using Microsoft.Extensions.Logging;
 using OpenFTTH.APIGateway.CoreTypes;
+using OpenFTTH.APIGateway.Util;
 using OpenFTTH.Work.API.Model;
 using OpenFTTH.Work.Business;
 
@@ -10,6 +11,8 @@ namespace OpenFTTH.APIGateway.GraphQL.Work.Types
     {
         public WorkTaskAndProjectType(ILogger<WorkTaskAndProjectType> logger, WorkContextManager workContextManager)
         {
+            var coordinateConverter = new UTM32WGS84Converter();
+
             Field<IdGraphType>(
                 name: "WorkTaskId",
                 description: "Work Task GUID",
@@ -96,7 +99,10 @@ namespace OpenFTTH.APIGateway.GraphQL.Work.Types
                description: "Work Task Name",
                resolve: context =>
                {
-                   return context.Source.WorkTask.Name;
+                   if (context.Source.AddressString != null && string.IsNullOrEmpty(context.Source.WorkTask.Name))
+                       return context.Source.AddressString;
+                   else
+                       return context.Source.WorkTask.Name;
                }
             );
 
@@ -168,7 +174,14 @@ namespace OpenFTTH.APIGateway.GraphQL.Work.Types
                description: "Work Task Geometry",
                resolve: context =>
                {
-                   return null;
+                   if (context.Source.X > 0)
+                   {
+                       var coordinatConversionResult = coordinateConverter.ConvertFromUTM32NToWGS84(context.Source.X, context.Source.Y);
+
+                       return Geometry.MapToPointFromXY(coordinatConversionResult[0],coordinatConversionResult[1]);
+                   }
+                   else
+                       return null;
                }
             );
 
