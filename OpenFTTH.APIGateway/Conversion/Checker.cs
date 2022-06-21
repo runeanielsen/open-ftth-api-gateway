@@ -54,43 +54,53 @@ namespace OpenFTTH.APIGateway.Conversion
 
                 if (spec.Name == "Kundeterminering")
                 {
-                    // trace terminal to
-                    var traceResult = _utilityNetwork.Graph.SimpleTrace(terminalEquipment.TerminalStructures[0].Terminals[1].Id);
-
-                    string endsInRack = "nej";
-
-                    UtilityGraphConnectedTerminal? endTerminal = null;
-
-                    if (CheckIfEndTerminalIsWithinRackEquipment(terminalEquipmentSpecifications, traceResult.Upstream))
-                    {
-                        endTerminal = (UtilityGraphConnectedTerminal)traceResult.Upstream.Last();
-                        endsInRack = "ja";
-                    }
-                    else if (CheckIfEndTerminalIsWithinRackEquipment(terminalEquipmentSpecifications, traceResult.Downstream))
-                    {
-                        endTerminal = (UtilityGraphConnectedTerminal)traceResult.Downstream.Last();
-                        endsInRack = "ja";
-                    }
-
                     string eqName = "";
                     string eqKort = "";
                     string eqPort = "";
+                    string endsInRack = "nej";
 
-                    if (endTerminal != null)
+                    for (int i = 0; i < 4; i++)
                     {
-                        var terminal = endTerminal.Terminal(_utilityNetwork);
-                        var structure = endTerminal.TerminalStructure(_utilityNetwork);
-                        var equipment = endTerminal.TerminalEquipment(_utilityNetwork);
+                        // trace terminal
+                        var traceResult = _utilityNetwork.Graph.SimpleTrace(terminalEquipment.TerminalStructures[0].Terminals[i].Id);
 
-                        eqName = equipment.Name;
-                        eqKort = structure.Name;
-                        eqPort = terminal.Name;
+
+                        UtilityGraphConnectedTerminal? endTerminal = null;
+
+                        if (CheckIfEndTerminalIsWithinRackEquipment(terminalEquipmentSpecifications, traceResult.Upstream))
+                        {
+                            endTerminal = (UtilityGraphConnectedTerminal)traceResult.Upstream.Last();
+                            endsInRack = "ja";
+                        }
+                        else if (CheckIfEndTerminalIsWithinRackEquipment(terminalEquipmentSpecifications, traceResult.Downstream))
+                        {
+                            endTerminal = (UtilityGraphConnectedTerminal)traceResult.Downstream.Last();
+                            endsInRack = "ja";
+                        }
+
+                    
+                        if (endTerminal != null)
+                        {
+                            var terminal = endTerminal.Terminal(_utilityNetwork);
+                            var structure = endTerminal.TerminalStructure(_utilityNetwork);
+                            var equipment = endTerminal.TerminalEquipment(_utilityNetwork);
+
+                            eqName = equipment.Name;
+                            eqKort = structure.Name;
+                            eqPort = terminal.Name;
+                        }
+
+                        // try another port if we have not reaced olt
+                        if (!eqName.ToLower().Contains("olt") && i < 3)
+                            continue;
+
+
+                        var csvLine = "\"" + terminalEquipment.Name + "\";\"" + endsInRack + "\";\"" + eqName + "\";\"" + eqKort + "\";\"" + eqPort + "\"";
+
+                        csvFile.WriteLine(csvLine);
+
+                        break;
                     }
-
-
-                    var csvLine = "\"" + terminalEquipment.Name + "\";\"" + endsInRack + "\";\"" + eqName + "\";\"" + eqKort + "\";\"" + eqPort + "\"";
-
-                    csvFile.WriteLine(csvLine);
                 }
             }
 
