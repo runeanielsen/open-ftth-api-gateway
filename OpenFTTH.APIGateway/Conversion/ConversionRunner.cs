@@ -36,7 +36,7 @@ namespace OpenFTTH.APIGateway.Conversion
         {
             _logger.LogInformation("Checking conversion database...");
 
-            new Checker(_loggerFactory.CreateLogger<Checker>(), _workTaskId, _eventStore, _geoDatabaseSetting, _commandDispatcher, _queryDispatcher).Run();
+            //new Checker(_loggerFactory.CreateLogger<Checker>(), _workTaskId, _eventStore, _geoDatabaseSetting, _commandDispatcher, _queryDispatcher).Run();
 
 
             if (CheckIfConversionSchemaExists())
@@ -73,7 +73,7 @@ namespace OpenFTTH.APIGateway.Conversion
 
                 // Ddn't run
                 //new ConduitSpanEquipmentImporter(_loggerFactory.CreateLogger<ConduitSpanEquipmentImporter>(), _eventStore, _geoDatabaseSetting, _commandDispatcher, _queryDispatcher).Run();
-                //new Checker(_loggerFactory.CreateLogger<Checker>(), _workTaskId, _eventStore, dbToReadConversionDataFrom, _commandDispatcher, _queryDispatcher).Run();
+                new Checker(_loggerFactory.CreateLogger<Checker>(), _workTaskId, _eventStore, dbToReadConversionDataFrom, _commandDispatcher, _queryDispatcher).Run();
 
             }
             else
