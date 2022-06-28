@@ -15,6 +15,7 @@ using OpenFTTH.RouteNetwork.API.Model;
 using OpenFTTH.UtilityGraphService.API.Commands;
 using OpenFTTH.UtilityGraphService.API.Model.UtilityNetwork;
 using System;
+using OpenFTTH.APIGateway.GraphQL.Work;
 
 namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
 {
@@ -45,10 +46,13 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
 
                     Guid correlationId = Guid.NewGuid();
 
-                    // TODO: Get from work manager
-                    var workTaskId = Guid.Parse("54800ae5-13a5-4b03-8626-a63b66a25568");
+                    // Get the users current work task (will fail, if user has not selected a work task)
+                    var currentWorkTaskIdResult = WorkQueryHelper.GetUserCurrentWorkId(userName, queryDispatcher);
 
-                    var commandUserContext = new UserContext(userName, workTaskId)
+                    if (currentWorkTaskIdResult.IsFailed)
+                        return new CommandResult(currentWorkTaskIdResult);
+
+                    var commandUserContext = new UserContext(userName, currentWorkTaskIdResult.Value)
                     {
                         EditingRouteNodeId = routeNodeId
                     };
@@ -101,10 +105,13 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
 
                     Guid correlationId = Guid.NewGuid();
 
-                    // TODO: Get from work manager
-                    var workTaskId = Guid.Parse("54800ae5-13a5-4b03-8626-a63b66a25568");
+                    // Get the users current work task (will fail, if user has not selected a work task)
+                    var currentWorkTaskIdResult = WorkQueryHelper.GetUserCurrentWorkId(userName, queryDispatcher);
 
-                    var commandUserContext = new UserContext(userName, workTaskId);
+                    if (currentWorkTaskIdResult.IsFailed)
+                        return new CommandResult(currentWorkTaskIdResult);
+
+                    var commandUserContext = new UserContext(userName, currentWorkTaskIdResult.Value);
 
                     var nodeContainerId = context.GetArgument<Guid>("nodeContainerId");
 
@@ -133,10 +140,13 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                     var userContext = context.UserContext as GraphQLUserContext;
                     var userName = userContext.Username;
 
-                    // TODO: Get from work manager
-                    var workTaskId = Guid.Parse("54800ae5-13a5-4b03-8626-a63b66a25568");
+                    // Get the users current work task (will fail, if user has not selected a work task)
+                    var currentWorkTaskIdResult = WorkQueryHelper.GetUserCurrentWorkId(userName, queryDispatcher);
 
-                    var commandUserContext = new UserContext(userName, workTaskId);
+                    if (currentWorkTaskIdResult.IsFailed)
+                        return new CommandResult(currentWorkTaskIdResult);
+
+                    var commandUserContext = new UserContext(userName, currentWorkTaskIdResult.Value);
 
                     var updateCmd = new UpdateNodeContainerProperties(correlationId, commandUserContext, nodeContainerId)
                     {
@@ -165,10 +175,13 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                     var userContext = context.UserContext as GraphQLUserContext;
                     var userName = userContext.Username;
 
-                    // TODO: Get from work manager
-                    var workTaskId = Guid.Parse("54800ae5-13a5-4b03-8626-a63b66a25568");
+                    // Get the users current work task (will fail, if user has not selected a work task)
+                    var currentWorkTaskIdResult = WorkQueryHelper.GetUserCurrentWorkId(userName, queryDispatcher);
 
-                    var commandUserContext = new UserContext(userName, workTaskId);
+                    if (currentWorkTaskIdResult.IsFailed)
+                        return new CommandResult(currentWorkTaskIdResult);
+
+                    var commandUserContext = new UserContext(userName, currentWorkTaskIdResult.Value);
 
                     var removeNodeContainer = new RemoveNodeContainerFromRouteNetwork(
                       correlationId: correlationId,
@@ -206,10 +219,13 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                     var userContext = context.UserContext as GraphQLUserContext;
                     var userName = userContext.Username;
 
-                    // TODO: Get from work manager
-                    var workTaskId = Guid.Parse("54800ae5-13a5-4b03-8626-a63b66a25568");
+                    // Get the users current work task (will fail, if user has not selected a work task)
+                    var currentWorkTaskIdResult = WorkQueryHelper.GetUserCurrentWorkId(userName, queryDispatcher);
 
-                    var commandUserContext = new UserContext(userName, workTaskId);
+                    if (currentWorkTaskIdResult.IsFailed)
+                        return new CommandResult(currentWorkTaskIdResult);
+
+                    var commandUserContext = new UserContext(userName, currentWorkTaskIdResult.Value);
 
                     var placeRackInNodeContainer = new PlaceRackInNodeContainer(
                       correlationId: correlationId,
@@ -244,10 +260,13 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                   var userContext = context.UserContext as GraphQLUserContext;
                   var userName = userContext.Username;
 
-                  // TODO: Get from work manager
-                  var workTaskId = Guid.Parse("54800ae5-13a5-4b03-8626-a63b66a25568");
+                  // Get the users current work task (will fail, if user has not selected a work task)
+                  var currentWorkTaskIdResult = WorkQueryHelper.GetUserCurrentWorkId(userName, queryDispatcher);
 
-                  var commandUserContext = new UserContext(userName, workTaskId);
+                  if (currentWorkTaskIdResult.IsFailed)
+                      return new CommandResult(currentWorkTaskIdResult);
+
+                  var commandUserContext = new UserContext(userName, currentWorkTaskIdResult.Value);
 
                   var removeRackFromNodeContainer = new RemoveRackFromNodeContainer(
                     correlationId: correlationId,
@@ -306,10 +325,13 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                     var userContext = context.UserContext as GraphQLUserContext;
                     var userName = userContext.Username;
 
-                    // TODO: Get from work manager
-                    var workTaskId = Guid.Parse("54800ae5-13a5-4b03-8626-a63b66a25568");
+                    // Get the users current work task (will fail, if user has not selected a work task)
+                    var currentWorkTaskIdResult = WorkQueryHelper.GetUserCurrentWorkId(userName, queryDispatcher);
 
-                    var commandUserContext = new UserContext(userName, workTaskId);
+                    if (currentWorkTaskIdResult.IsFailed)
+                        return new CommandResult(currentWorkTaskIdResult);
+
+                    var commandUserContext = new UserContext(userName, currentWorkTaskIdResult.Value);
 
                     var placeEquipmentInNodeContainer = new PlaceTerminalEquipmentInNodeContainer(
                       correlationId: correlationId,
@@ -354,10 +376,13 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                    var userContext = context.UserContext as GraphQLUserContext;
                    var userName = userContext.Username;
 
-                   // TODO: Get from work manager
-                   var workTaskId = Guid.Parse("54800ae5-13a5-4b03-8626-a63b66a25568");
+                   // Get the users current work task (will fail, if user has not selected a work task)
+                   var currentWorkTaskIdResult = WorkQueryHelper.GetUserCurrentWorkId(userName, queryDispatcher);
 
-                   var commandUserContext = new UserContext(userName, workTaskId);
+                   if (currentWorkTaskIdResult.IsFailed)
+                       return new CommandResult(currentWorkTaskIdResult);
+
+                   var commandUserContext = new UserContext(userName, currentWorkTaskIdResult.Value);
 
                    var updateCmd = new UpdateRackProperties(correlationId, commandUserContext, routeNodeId, rackId)
                    {

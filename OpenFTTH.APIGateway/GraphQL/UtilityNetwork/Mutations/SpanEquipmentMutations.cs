@@ -17,12 +17,13 @@ using OpenFTTH.UtilityGraphService.Business.Graph;
 using OpenFTTH.UtilityGraphService.Business.SpanEquipments.Projections;
 using System;
 using System.Collections.Generic;
+using OpenFTTH.APIGateway.GraphQL.Work;
 
 namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
 {
     public class SpanEquipmentMutations : ObjectGraphType
     {
-        public SpanEquipmentMutations(ICommandDispatcher commandDispatcher, IEventStore eventStore)
+        public SpanEquipmentMutations(ICommandDispatcher commandDispatcher, IQueryDispatcher queryDispatcher, IEventStore eventStore)
         {
             Description = "Span equipment mutations";
 
@@ -58,9 +59,13 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                   var userContext = context.UserContext as GraphQLUserContext;
                   var userName = userContext.Username;
 
-                  // TODO: Get from work manager
-                  var workTaskId = Guid.Parse("54800ae5-13a5-4b03-8626-a63b66a25568");
-                  var commandUserContext = new UserContext(userName, workTaskId);
+                  // Get the users current work task (will fail, if user has not selected a work task)
+                  var currentWorkTaskIdResult = WorkQueryHelper.GetUserCurrentWorkId(userName, queryDispatcher);
+
+                  if (currentWorkTaskIdResult.IsFailed)
+                      return new CommandResult(currentWorkTaskIdResult);
+
+                  var commandUserContext = new UserContext(userName, currentWorkTaskIdResult.Value);
 
                   var spanEquipments = eventStore.Projections.Get<UtilityNetworkProjection>().SpanEquipmentsByEquipmentId;
 
@@ -124,10 +129,13 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                   var userContext = context.UserContext as GraphQLUserContext;
                   var userName = userContext.Username;
 
-                  // TODO: Get from work manager
-                  var workTaskId = Guid.Parse("54800ae5-13a5-4b03-8626-a63b66a25568");
+                  // Get the users current work task (will fail, if user has not selected a work task)
+                  var currentWorkTaskIdResult = WorkQueryHelper.GetUserCurrentWorkId(userName, queryDispatcher);
 
-                  var commandUserContext = new UserContext(userName, workTaskId);
+                  if (currentWorkTaskIdResult.IsFailed)
+                      return new CommandResult(currentWorkTaskIdResult);
+
+                  var commandUserContext = new UserContext(userName, currentWorkTaskIdResult.Value);
 
                   foreach (var spanSegmentId in spanSegmentIds)
                   {
@@ -160,10 +168,13 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                   var userContext = context.UserContext as GraphQLUserContext;
                   var userName = userContext.Username;
 
-                  // TODO: Get from work manager
-                  var workTaskId = Guid.Parse("54800ae5-13a5-4b03-8626-a63b66a25568");
+                  // Get the users current work task (will fail, if user has not selected a work task)
+                  var currentWorkTaskIdResult = WorkQueryHelper.GetUserCurrentWorkId(userName, queryDispatcher);
 
-                  var commandUserContext = new UserContext(userName, workTaskId)
+                  if (currentWorkTaskIdResult.IsFailed)
+                      return new CommandResult(currentWorkTaskIdResult);
+
+                  var commandUserContext = new UserContext(userName, currentWorkTaskIdResult.Value)
                   {
                       EditingRouteNodeId = routeNodeId
                   };
@@ -198,10 +209,13 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                   var userContext = context.UserContext as GraphQLUserContext;
                   var userName = userContext.Username;
 
-                  // TODO: Get from work manager
-                  var workTaskId = Guid.Parse("54800ae5-13a5-4b03-8626-a63b66a25568");
+                  // Get the users current work task (will fail, if user has not selected a work task)
+                  var currentWorkTaskIdResult = WorkQueryHelper.GetUserCurrentWorkId(userName, queryDispatcher);
 
-                  var commandUserContext = new UserContext(userName, workTaskId)
+                  if (currentWorkTaskIdResult.IsFailed)
+                      return new CommandResult(currentWorkTaskIdResult);
+
+                  var commandUserContext = new UserContext(userName, currentWorkTaskIdResult.Value)
                   {
                       EditingRouteNodeId = routeNodeId
                   };
@@ -230,10 +244,13 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                   var userContext = context.UserContext as GraphQLUserContext;
                   var userName = userContext.Username;
 
-                  // TODO: Get from work manager
-                  var workTaskId = Guid.Parse("54800ae5-13a5-4b03-8626-a63b66a25568");
+                  // Get the users current work task (will fail, if user has not selected a work task)
+                  var currentWorkTaskIdResult = WorkQueryHelper.GetUserCurrentWorkId(userName, queryDispatcher);
 
-                  var commandUserContext = new UserContext(userName, workTaskId)
+                  if (currentWorkTaskIdResult.IsFailed)
+                      return new CommandResult(currentWorkTaskIdResult);
+
+                  var commandUserContext = new UserContext(userName, currentWorkTaskIdResult.Value)
                   {
                       EditingRouteNodeId = routeNodeId
                   };
@@ -262,10 +279,13 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                   var userContext = context.UserContext as GraphQLUserContext;
                   var userName = userContext.Username;
 
-                  // TODO: Get from work manager
-                  var workTaskId = Guid.Parse("54800ae5-13a5-4b03-8626-a63b66a25568");
+                  // Get the users current work task (will fail, if user has not selected a work task)
+                  var currentWorkTaskIdResult = WorkQueryHelper.GetUserCurrentWorkId(userName, queryDispatcher);
 
-                  var commandUserContext = new UserContext(userName, workTaskId)
+                  if (currentWorkTaskIdResult.IsFailed)
+                      return new CommandResult(currentWorkTaskIdResult);
+
+                  var commandUserContext = new UserContext(userName, currentWorkTaskIdResult.Value)
                   {
                       EditingRouteNodeId = routeNodeId
                   };
@@ -294,10 +314,13 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                   var userContext = context.UserContext as GraphQLUserContext;
                   var userName = userContext.Username;
 
-                  // TODO: Get from work manager
-                  var workTaskId = Guid.Parse("54800ae5-13a5-4b03-8626-a63b66a25568");
+                  // Get the users current work task (will fail, if user has not selected a work task)
+                  var currentWorkTaskIdResult = WorkQueryHelper.GetUserCurrentWorkId(userName, queryDispatcher);
 
-                  var commandUserContext = new UserContext(userName, workTaskId);
+                  if (currentWorkTaskIdResult.IsFailed)
+                      return new CommandResult(currentWorkTaskIdResult);
+
+                  var commandUserContext = new UserContext(userName, currentWorkTaskIdResult.Value);
 
                   var addStructure = new PlaceAdditionalStructuresInSpanEquipment(
                     correlationId: correlationId,
@@ -327,10 +350,13 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                   var userContext = context.UserContext as GraphQLUserContext;
                   var userName = userContext.Username;
 
-                  // TODO: Get from work manager
-                  var workTaskId = Guid.Parse("54800ae5-13a5-4b03-8626-a63b66a25568");
+                  // Get the users current work task (will fail, if user has not selected a work task)
+                  var currentWorkTaskIdResult = WorkQueryHelper.GetUserCurrentWorkId(userName, queryDispatcher);
 
-                  var commandUserContext = new UserContext(userName, workTaskId);
+                  if (currentWorkTaskIdResult.IsFailed)
+                      return new CommandResult(currentWorkTaskIdResult);
+
+                  var commandUserContext = new UserContext(userName, currentWorkTaskIdResult.Value);
 
                   var removeStructure = new RemoveSpanStructureFromSpanEquipment(
                     correlationId: correlationId,
@@ -360,10 +386,13 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                   var userContext = context.UserContext as GraphQLUserContext;
                   var userName = userContext.Username;
 
-                  // TODO: Get from work manager
-                  var workTaskId = Guid.Parse("54800ae5-13a5-4b03-8626-a63b66a25568");
+                  // Get the users current work task (will fail, if user has not selected a work task)
+                  var currentWorkTaskIdResult = WorkQueryHelper.GetUserCurrentWorkId(userName, queryDispatcher);
 
-                  var commandUserContext = new UserContext(userName, workTaskId);
+                  if (currentWorkTaskIdResult.IsFailed)
+                      return new CommandResult(currentWorkTaskIdResult);
+
+                  var commandUserContext = new UserContext(userName, currentWorkTaskIdResult.Value);
 
                   Guid[] routeSegmentIds = context.GetArgument<Guid[]>("routeSegmentIds");
 
@@ -402,10 +431,13 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                  var userContext = context.UserContext as GraphQLUserContext;
                  var userName = userContext.Username;
 
-                 // TODO: Get from work manager
-                 var workTaskId = Guid.Parse("54800ae5-13a5-4b03-8626-a63b66a25568");
+                 // Get the users current work task (will fail, if user has not selected a work task)
+                 var currentWorkTaskIdResult = WorkQueryHelper.GetUserCurrentWorkId(userName, queryDispatcher);
 
-                 var commandUserContext = new UserContext(userName, workTaskId);
+                 if (currentWorkTaskIdResult.IsFailed)
+                     return new CommandResult(currentWorkTaskIdResult);
+
+                 var commandUserContext = new UserContext(userName, currentWorkTaskIdResult.Value);
 
                  var updateCmd = new UpdateSpanEquipmentProperties(correlationId, commandUserContext, spanEquipmentOrSegmentId: spanEquipmentOrSegmentId)
                  {
@@ -440,10 +472,13 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                  var userContext = context.UserContext as GraphQLUserContext;
                  var userName = userContext.Username;
 
-                 // TODO: Get from work manager
-                 var workTaskId = Guid.Parse("54800ae5-13a5-4b03-8626-a63b66a25568");
+                 // Get the users current work task (will fail, if user has not selected a work task)
+                 var currentWorkTaskIdResult = WorkQueryHelper.GetUserCurrentWorkId(userName, queryDispatcher);
 
-                 var commandUserContext = new UserContext(userName, workTaskId);
+                 if (currentWorkTaskIdResult.IsFailed)
+                     return new CommandResult(currentWorkTaskIdResult);
+
+                 var commandUserContext = new UserContext(userName, currentWorkTaskIdResult.Value);
 
                  var affixCommand = new AffixSpanEquipmentToParent(correlationId, commandUserContext, routeNodeId, spanSegmentId1, spanSegmentId2);
                  var affixCommandResult = await commandDispatcher.HandleAsync<AffixSpanEquipmentToParent, Result>(affixCommand);
@@ -472,10 +507,13 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                     var userContext = context.UserContext as GraphQLUserContext;
                     var userName = userContext.Username;
 
-                    // TODO: Get from work manager
-                    var workTaskId = Guid.Parse("54800ae5-13a5-4b03-8626-a63b66a25568");
+                    // Get the users current work task (will fail, if user has not selected a work task)
+                    var currentWorkTaskIdResult = WorkQueryHelper.GetUserCurrentWorkId(userName, queryDispatcher);
 
-                    var commandUserContext = new UserContext(userName, workTaskId);
+                    if (currentWorkTaskIdResult.IsFailed)
+                        return new CommandResult(currentWorkTaskIdResult);
+
+                    var commandUserContext = new UserContext(userName, currentWorkTaskIdResult.Value);
 
                     var connectCommand = new ConnectSpanSegmentsWithTerminalsAtRouteNode(correlationId, commandUserContext, routeNodeId, connects);
                     var connectCommandResult = await commandDispatcher.HandleAsync<ConnectSpanSegmentsWithTerminalsAtRouteNode, Result>(connectCommand);
@@ -504,10 +542,13 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                    var userContext = context.UserContext as GraphQLUserContext;
                    var userName = userContext.Username;
 
-                   // TODO: Get from work manager
-                   var workTaskId = Guid.Parse("54800ae5-13a5-4b03-8626-a63b66a25568");
+                   // Get the users current work task (will fail, if user has not selected a work task)
+                   var currentWorkTaskIdResult = WorkQueryHelper.GetUserCurrentWorkId(userName, queryDispatcher);
 
-                   var commandUserContext = new UserContext(userName, workTaskId);
+                   if (currentWorkTaskIdResult.IsFailed)
+                       return new CommandResult(currentWorkTaskIdResult);
+
+                   var commandUserContext = new UserContext(userName, currentWorkTaskIdResult.Value);
                    var connectCommand = new DisconnectSpanSegmentsFromTerminalsAtRouteNode(correlationId, commandUserContext, routeNodeId, connects);
 
                    var connectCommandResult = await commandDispatcher.HandleAsync<DisconnectSpanSegmentsFromTerminalsAtRouteNode, Result>(connectCommand);
