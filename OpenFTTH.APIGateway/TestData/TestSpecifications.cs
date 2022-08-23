@@ -57,7 +57,8 @@ namespace OpenFTTH.TestData
         public static Guid Cabinet_PK35 = Guid.Parse("a5200c4c-6359-417d-9b57-1f406dfab2a5");
         public static Guid Cabinet_PK48 = Guid.Parse("844cdea2-ea2c-45da-8acd-353610b82cdb");
         public static Guid Cabinet_BB800 = Guid.Parse("4086c494-b607-4f27-9ba4-0d62a91cad7d");
-        
+        public static Guid Cabinet_CP6 = Guid.Parse("14030fe9-33da-415f-9116-26f67848f99c");
+
 
 
         // 50mm Straight In-line Elongated Enclosure (gammel model)
@@ -364,6 +365,13 @@ namespace OpenFTTH.TestData
                 Description = "BB800 Skab",
                 ManufacturerRefs = new Guid[] { Manu_ABB }
             });
+
+            AddSpecification(new NodeContainerSpecification(Cabinet_CP6, "Cabinets", "CP6 Skab")
+            {
+                Description = "CP6 Skab",
+                ManufacturerRefs = new Guid[] { Manu_ABB }
+            });
+
 
             // Bygninger
             AddSpecification(new NodeContainerSpecification(Building_Corehus, "Buildings", "Corehus")

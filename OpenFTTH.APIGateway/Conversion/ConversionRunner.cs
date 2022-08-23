@@ -34,10 +34,7 @@ namespace OpenFTTH.APIGateway.Conversion
 
         public void Run()
         {
-            _logger.LogInformation("Checking conversion database...");
-
-            //new Checker(_loggerFactory.CreateLogger<Checker>(), _workTaskId, _eventStore, _geoDatabaseSetting, _commandDispatcher, _queryDispatcher).Run();
-
+            _logger.LogInformation("Checking if conversion schema exists...");
 
             if (CheckIfConversionSchemaExists())
             {
@@ -71,10 +68,9 @@ namespace OpenFTTH.APIGateway.Conversion
 
                 new TerminalToTerminalConnectionsImporter(_loggerFactory.CreateLogger<TerminalToTerminalConnectionsImporter>(), _workTaskId, _eventStore, dbToReadConversionDataFrom, _commandDispatcher, _queryDispatcher).Run();
 
-                // Ddn't run
-                //new ConduitSpanEquipmentImporter(_loggerFactory.CreateLogger<ConduitSpanEquipmentImporter>(), _eventStore, _geoDatabaseSetting, _commandDispatcher, _queryDispatcher).Run();
                 new Checker(_loggerFactory.CreateLogger<Checker>(), _workTaskId, _eventStore, dbToReadConversionDataFrom, _commandDispatcher, _queryDispatcher).Run();
 
+                //new ConduitSpanEquipmentImporter(_loggerFactory.CreateLogger<ConduitSpanEquipmentImporter>(), _eventStore, _geoDatabaseSetting, _commandDispatcher, _queryDispatcher).Run();
             }
             else
             {
