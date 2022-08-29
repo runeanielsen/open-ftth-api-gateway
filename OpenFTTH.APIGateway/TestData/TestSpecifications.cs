@@ -199,12 +199,19 @@ namespace OpenFTTH.TestData
         public static Guid SpliceTray_GSS_With6Trays = Guid.Parse("6351d851-4062-40c3-8fce-d52e9685144f");
 
         public static Guid SplicePatchTray_LX12UPC12APC = Guid.Parse("adabaab0-24bd-4ecf-b703-932c407cfba8");
+        public static Guid SplicePatchTray_LC_APC = Guid.Parse("b4575860-189a-4a88-b033-08087de616d9");
+
         public static Guid SplicePatchTray_GPS2_12SC = Guid.Parse("8e36b878-5f14-40f3-b088-f04f2ffb03d7");
         public static Guid SplicePatchTray_GPS2_24LC = Guid.Parse("e24b4f50-24f6-4a33-8b56-cf9a52dce522");
 
         public static Guid GSS_4x1_2_Splitter = Guid.Parse("52e3f107-872b-428b-8eff-af29a08f2e3a");
 
-        public static Guid LISA_1_32_Splitter = Guid.Parse("7f5b81b8-f0db-45ca-8cbf-6f7e458636b0");
+        public static Guid PLC_1_32_Splitter_LISA = Guid.Parse("7f5b81b8-f0db-45ca-8cbf-6f7e458636b0");
+        public static Guid PLC_1_32_Splitter_LX5 = Guid.Parse("a39b35df-bd97-41d6-84cf-c8fcbe55009b");
+        public static Guid OCM8_1_32_Splitter_BRAKIR = Guid.Parse("244d8b07-b00c-404c-8a7f-a15b92b8cde9");
+        public static Guid OCM5_1_32_Splitter_LC = Guid.Parse("1d8f37d8-14e1-40ca-b56a-fab88b9ac640");
+        public static Guid OCM5_1_32_Splitter_SC = Guid.Parse("b8463700-da4f-4b7e-bb7f-5e96d2d8d90c");
+
 
         public static Guid OLT_LineCard8Port = Guid.Parse("79e5653e-a06a-4921-8b43-2dbec1e0e914");
         public static Guid OLT_LineCard16Port = Guid.Parse("2238245d-8a85-4a49-8499-cd9c4045cd00");
@@ -230,6 +237,12 @@ namespace OpenFTTH.TestData
         public static Guid CustomerTermination = Guid.Parse("b0a3e179-ef1a-405c-8b4e-0082d8fc8c3d");
 
         public static Guid Subrack_LISA_APC_UPC = Guid.Parse("778b9d6f-7add-40eb-ae9d-da9660dc1799");
+
+        public static Guid Subrack_LISA_LC_APC = Guid.Parse("0af62d7f-7fbc-4fb7-a510-85058301efea");
+
+        public static Guid Subrack_LISA_Splice = Guid.Parse("350d2e5e-ed1a-412c-aecd-31a9cd46c3c5");
+
+
         public static Guid Subrack_GPS_72_SC = Guid.Parse("aa8027fc-25d6-498e-98e6-4eb7d634070c");
         public static Guid Subrack_GPS_144_LC = Guid.Parse("d1748de5-de10-45d9-a2a9-1b5b344bf159");
 
@@ -1105,6 +1118,7 @@ namespace OpenFTTH.TestData
 
         private void AddTerminalStructureSpecifications()
         {
+          
             // 4 Pin Tray Uknown Type
             AddSpecification(new TerminalStructureSpecification(SpliceTray_Uknown4Pin, "SpliceTray", "Splidsebakke 4 Søm", "Bakke 4 Søm",
                 new TerminalTemplate[]
@@ -1234,6 +1248,37 @@ namespace OpenFTTH.TestData
                     new TerminalTemplate("24", TerminalDirectionEnum.BI, false, true) { ConnectorType = "LX.5/UPC"}
                 }
             ));
+                      
+            // LISA 24 Søm LC/APC
+            AddSpecification(new TerminalStructureSpecification(SplicePatchTray_LC_APC, "SplicePatchTray", "LISATray 24 x LC/APC", "LISA LC/APC",
+                new TerminalTemplate[]
+                {
+                    new TerminalTemplate("1", TerminalDirectionEnum.BI, false, true) { ConnectorType = "LC/APC"},
+                    new TerminalTemplate("2", TerminalDirectionEnum.BI, false, true) { ConnectorType = "LC/APC"},
+                    new TerminalTemplate("3", TerminalDirectionEnum.BI, false, true) { ConnectorType = "LC/APC"},
+                    new TerminalTemplate("4", TerminalDirectionEnum.BI, false, true) { ConnectorType = "LC/APC"},
+                    new TerminalTemplate("5", TerminalDirectionEnum.BI, false, true) { ConnectorType = "LC/APC"},
+                    new TerminalTemplate("6", TerminalDirectionEnum.BI, false, true) { ConnectorType = "LC/APC"},
+                    new TerminalTemplate("7", TerminalDirectionEnum.BI, false, true) { ConnectorType = "LC/APC"},
+                    new TerminalTemplate("8", TerminalDirectionEnum.BI, false, true) { ConnectorType = "LC/APC"},
+                    new TerminalTemplate("9", TerminalDirectionEnum.BI, false, true) { ConnectorType = "LC/APC"},
+                    new TerminalTemplate("10", TerminalDirectionEnum.BI, false, true) { ConnectorType = "LC/APC"},
+                    new TerminalTemplate("11", TerminalDirectionEnum.BI, false, true) { ConnectorType = "LC/APC"},
+                    new TerminalTemplate("12", TerminalDirectionEnum.BI, false, true) { ConnectorType = "LC/APC"},
+                    new TerminalTemplate("13", TerminalDirectionEnum.BI, false, true) { ConnectorType = "LC/APC"},
+                    new TerminalTemplate("14", TerminalDirectionEnum.BI, false, true) { ConnectorType = "LC/APC"},
+                    new TerminalTemplate("15", TerminalDirectionEnum.BI, false, true) { ConnectorType = "LC/APC"},
+                    new TerminalTemplate("16", TerminalDirectionEnum.BI, false, true) { ConnectorType = "LC/APC"},
+                    new TerminalTemplate("17", TerminalDirectionEnum.BI, false, true) { ConnectorType = "LC/APC"},
+                    new TerminalTemplate("18", TerminalDirectionEnum.BI, false, true) { ConnectorType = "LC/APC"},
+                    new TerminalTemplate("19", TerminalDirectionEnum.BI, false, true) { ConnectorType = "LC/APC"},
+                    new TerminalTemplate("20", TerminalDirectionEnum.BI, false, true) { ConnectorType = "LC/APC"},
+                    new TerminalTemplate("21", TerminalDirectionEnum.BI, false, true) { ConnectorType = "LC/APC"},
+                    new TerminalTemplate("22", TerminalDirectionEnum.BI, false, true) { ConnectorType = "LC/APC"},
+                    new TerminalTemplate("23", TerminalDirectionEnum.BI, false, true) { ConnectorType = "LC/APC"},
+                    new TerminalTemplate("24", TerminalDirectionEnum.BI, false, true) { ConnectorType = "LC/APC"}
+                }
+            ));
 
 
             // CommScope GPS2 12 SC
@@ -1305,9 +1350,10 @@ namespace OpenFTTH.TestData
                     new TerminalTemplate("spl4_ud2 (søm 12)", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "spl4" },
                  }
             ));
+                    
 
-            // LISA 1:32 splitter
-            AddSpecification(new TerminalStructureSpecification(LISA_1_32_Splitter, "Splitters", "Splittermodul PLC 1:32 4,6m LC/Apc LISA", "1:32 Split",
+            // PLC LISA 1:32 splitter LC/APC
+            AddSpecification(new TerminalStructureSpecification(PLC_1_32_Splitter_LISA, "Splitters", "Splittermodul PLC 1:32 4,6m LC/APC (LISA)", "1:32 Split",
                 new TerminalTemplate[]
                 {
                     new TerminalTemplate("ind", TerminalDirectionEnum.IN, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "spl" },
@@ -1346,6 +1392,168 @@ namespace OpenFTTH.TestData
                 }
             ));
 
+            // PLC 1:32 splitter LC/LX.5
+            AddSpecification(new TerminalStructureSpecification(PLC_1_32_Splitter_LX5, "Splitters", "Splittermodul PLC 1:32 4,6m LX.5/APC", "1:32 Split",
+                new TerminalTemplate[]
+                {
+                    new TerminalTemplate("ind", TerminalDirectionEnum.IN, true, false) { ConnectorType = "LX.5/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud1", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LX.5/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud2", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LX.5/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud3", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LX.5/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud4", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LX.5/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud5", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LX.5/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud6", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LX.5/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud7", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LX.5/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud8", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LX.5/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud9", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LX.5/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud10", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LX.5/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud11", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LX.5/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud12", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LX.5/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud13", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LX.5/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud14", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LX.5/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud15", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LX.5/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud16", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LX.5/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud17", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LX.5/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud18", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LX.5/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud19", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LX.5/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud20", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LX.5/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud21", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LX.5/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud22", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LX.5/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud23", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LX.5/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud24", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LX.5/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud25", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LX.5/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud26", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LX.5/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud27", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LX.5/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud28", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LX.5/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud29", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LX.5/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud30", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LX.5/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud31", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LX.5/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud32", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LX.5/APC", InternalConnectivityNode = "spl" }
+                }
+            ));
+
+
+            // OCM8 BRAKIR 1:32 splitter LC/APC
+            AddSpecification(new TerminalStructureSpecification(OCM8_1_32_Splitter_BRAKIR, "Splitters", "Splittermodul OCM8 1:32 3,3m LC/APC (BRAKIR)", "1:32 Split",
+                new TerminalTemplate[]
+                {
+                    new TerminalTemplate("ind", TerminalDirectionEnum.IN, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud1", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud2", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud3", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud4", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud5", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud6", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud7", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud8", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud9", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud10", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud11", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud12", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud13", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud14", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud15", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud16", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud17", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud18", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud19", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud20", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud21", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud22", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud23", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud24", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud25", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud26", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud27", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud28", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud29", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud30", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud31", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud32", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "spl" }
+                }
+            ));
+
+            // OCM5 LC/APC 1:32 splitter 
+            AddSpecification(new TerminalStructureSpecification(OCM5_1_32_Splitter_LC, "Splitters", "Splittermodul OCM5 1:32 1,2m LC/APC", "1:32 Split",
+                new TerminalTemplate[]
+                {
+                    new TerminalTemplate("ind", TerminalDirectionEnum.IN, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud1", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud2", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud3", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud4", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud5", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud6", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud7", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud8", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud9", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud10", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud11", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud12", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud13", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud14", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud15", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud16", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud17", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud18", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud19", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud20", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud21", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud22", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud23", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud24", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud25", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud26", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud27", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud28", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud29", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud30", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud31", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud32", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "spl" }
+                }
+            ));
+
+            // OCM5 SC/APC 1:32 splitter 
+            AddSpecification(new TerminalStructureSpecification(OCM5_1_32_Splitter_SC, "Splitters", "Splittermodul OCM5 1:32 3m SC/APC", "1:32 Split",
+                new TerminalTemplate[]
+                {
+                    new TerminalTemplate("ind", TerminalDirectionEnum.IN, true, false) { ConnectorType = "SC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud1", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "SC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud2", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "SC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud3", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "SC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud4", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "SC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud5", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "SC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud6", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "SC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud7", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "SC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud8", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "SC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud9", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "SC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud10", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "SC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud11", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "SC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud12", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "SC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud13", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "SC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud14", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "SC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud15", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "SC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud16", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "SC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud17", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "SC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud18", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "SC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud19", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "SC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud20", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "SC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud21", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "SC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud22", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "SC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud23", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "SC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud24", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "SC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud25", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "SC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud26", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "SC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud27", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "SC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud28", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "SC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud29", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "SC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud30", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "SC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud31", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "SC/APC", InternalConnectivityNode = "spl" },
+                    new TerminalTemplate("ud32", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "SC/APC", InternalConnectivityNode = "spl" }
+                }
+            ));
+
+          
             // 8 Port Line Card
             AddSpecification(new TerminalStructureSpecification(OLT_LineCard8Port, "LineCards", "ISAM FD/FX 8port GPON Line board", "8 ports LT kort",
                 new TerminalTemplate[]
@@ -1434,6 +1642,7 @@ namespace OpenFTTH.TestData
 
         private void AddTerminalEquipmentSpecifications()
         {
+
             // 12 Fiber Tray Uknown Type
             AddSpecification(new TerminalEquipmentSpecification(SpliceClosure_Uknown12Fiber, "SpliceClosure", "Ukendt Splidseboks 12 Fiber", "Splidseboks", false, 0,
                 new TerminalStructureTemplate[]
@@ -1616,8 +1825,28 @@ namespace OpenFTTH.TestData
                }
             )
             { ManufacturerRefs = new Guid[] { Manu_HuberSuhner } });
+     
+
+            // LISA 24 Søm LC APC Tray
+            AddSpecification(new TerminalEquipmentSpecification(Subrack_LISA_LC_APC, "Subrack", "LISATray 24 x LC/APC", "LISA LC/APC", true, 1,
+                new TerminalStructureTemplate[]
+                {
+                    new TerminalStructureTemplate(SplicePatchTray_LC_APC, 1)
+               }
+            )
+            { ManufacturerRefs = new Guid[] { Manu_HuberSuhner } });
 
 
+            // LISA 24 Søm LC APC Tray
+            AddSpecification(new TerminalEquipmentSpecification(Subrack_LISA_Splice, "Subrack", "LISATray 24 x Gennemsplidsning", "LISA søm", true, 1,
+                new TerminalStructureTemplate[]
+                {
+                    new TerminalStructureTemplate(SpliceTray_Uknown24Pin, 1)
+               }
+            )
+            { ManufacturerRefs = new Guid[] { Manu_HuberSuhner } });
+
+  
             // Customer termination
             AddSpecification(new TerminalEquipmentSpecification(CustomerTermination, "Kundeterminering", "Kundeterminering", "Kundeterminering med 4 søm", false, 0,
                 new TerminalStructureTemplate[]
@@ -1709,6 +1938,7 @@ namespace OpenFTTH.TestData
                 Array.Empty<TerminalStructureTemplate>()
             )
             { ManufacturerRefs = new Guid[] { Manu_Nokia } });
+
         }
 
         private void AddSpecification(SpanEquipmentSpecification spec)
