@@ -121,14 +121,9 @@ namespace OpenFTTH.APIGateway.Workers
 
                 LogMenUsage();
 
-                // We are now ready to serve the public if the loaded objects are bigger than 0
-                if (inMemRouteNetworkState.NumberOfObjectsLoaded > 0)
-                {
-                    File.Create("/tmp/healthy");
-                    _logger.LogInformation("Healhty file written writen to tmp.");
-                }
-                else
-                    throw new ApplicationException("Recieved no route network elements from Kafka topic.");
+                // We are now ready to serve the public
+                File.Create("/tmp/healthy");
+                _logger.LogInformation("Healhty file written writen to tmp.");
 
                 // Start conversion
                 new ConversionRunner(_loggerFactory, _eventStore, _geoDatabaseSetting, _commandDispatcher, _queryDispatcher).Run();
