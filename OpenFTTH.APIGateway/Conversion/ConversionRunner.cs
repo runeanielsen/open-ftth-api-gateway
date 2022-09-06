@@ -36,14 +36,15 @@ namespace OpenFTTH.APIGateway.Conversion
         {
             _logger.LogInformation("Checking if conversion schema exists...");
 
-            var result = new TestSpecifications(_loggerFactory, _commandDispatcher, _queryDispatcher).Run();
 
             if (CheckIfConversionSchemaExists())
             {
                 _logger.LogInformation("Start seeding database with test specifications...");
                 //var result = new TestSpecifications(_loggerFactory, _commandDispatcher, _queryDispatcher).Run();
                 _logger.LogInformation("Finish seeding database with test specifications.");
-                           
+
+                var result = new TestSpecifications(_loggerFactory, _commandDispatcher, _queryDispatcher).Run();
+
 
                 var localDb = new Settings.GeoDatabaseSetting()
                 {
