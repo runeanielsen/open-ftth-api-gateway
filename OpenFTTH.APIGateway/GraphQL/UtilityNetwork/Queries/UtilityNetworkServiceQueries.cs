@@ -2,6 +2,7 @@
 using GraphQL;
 using GraphQL.Types;
 using Microsoft.Extensions.Logging;
+using OpenFTTH.APIGateway.DynamicProperties;
 using OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Types;
 using OpenFTTH.APIGateway.Util;
 using OpenFTTH.CQRS;

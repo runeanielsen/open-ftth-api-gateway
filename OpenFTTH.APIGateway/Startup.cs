@@ -51,6 +51,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using Typesense.Setup;
 using OpenFTTH.Work.Business;
+using OpenFTTH.APIGateway.DynamicProperties;
 
 namespace OpenFTTH.APIGateway
 {
@@ -250,6 +251,9 @@ namespace OpenFTTH.APIGateway
             // Coordinate converter
             services.AddSingleton<UTM32WGS84Converter>();
 
+
+            // Dynamic properties reader
+            services.AddSingleton<DynamicPropertiesClient>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

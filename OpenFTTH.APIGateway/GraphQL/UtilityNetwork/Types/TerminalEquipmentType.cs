@@ -1,6 +1,8 @@
 ﻿using FluentResults;
 using GraphQL.Types;
 using Microsoft.Extensions.Logging;
+using OpenFTTH.APIGateway.DynamicProperties;
+using OpenFTTH.APIGateway.GraphQL.DynamicProperties.Types;
 using OpenFTTH.APIGateway.Util;
 using OpenFTTH.CQRS;
 using OpenFTTH.Util;
@@ -13,7 +15,7 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Types
 {
     public class TerminalEquipmentType : ObjectGraphType<TerminalEquipment>
     {
-        public TerminalEquipmentType(ILogger<TerminalEquipmentType> logger, IQueryDispatcher queryDispatcher)
+        public TerminalEquipmentType(ILogger<TerminalEquipmentType> logger, IQueryDispatcher queryDispatcher, DynamicPropertiesClient dynamicPropertiesReader)
         {
             Field(x => x.Id, type: typeof(IdGraphType)).Description("Master Resource Identifier UUID Property");
             Field(x => x.Name, type: typeof(StringGraphType)).Description("Short name");
@@ -76,6 +78,16 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Types
                     }
                 }
             );
+
+
+            Field<ListGraphType<DynamicPropertiesSectionType>>(
+               name: "dynamicProperties",
+               description: "eventually extra dynamic properties defined on this object",
+               resolve: context =>
+               {
+                   return dynamicPropertiesReader.ReadProperties(context.Source.Id);
+               }
+           );
         }
     }
 }
