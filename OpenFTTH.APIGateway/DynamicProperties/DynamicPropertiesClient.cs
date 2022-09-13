@@ -11,14 +11,14 @@ namespace OpenFTTH.APIGateway.DynamicProperties
 {
     public class DynamicPropertiesClient
     {
-        private readonly string _schemaName = "custom";
-        private readonly string _installationTableName = "installation";
+        private readonly string _schemaName = "web";
+        private readonly string _installationTableName = "view_installation";
 
         private readonly ILogger<DynamicPropertiesClient> _logger;
         private readonly GeoDatabaseSetting _geoDatabaseSetting;
 
         private bool _isInitialized = false;
-        private bool _installationTableExists = false;
+        private bool _installationTableOrViewExists = false;
 
         public DynamicPropertiesClient(ILogger<DynamicPropertiesClient> logger, IOptions<GeoDatabaseSetting> geoDatabaseSetting)
         {
@@ -31,25 +31,28 @@ namespace OpenFTTH.APIGateway.DynamicProperties
             if (_isInitialized)
                 return;
 
-            _installationTableExists = CheckIfTableExists(_schemaName, _installationTableName);
+            if (CheckIfTableExists(_schemaName, _installationTableName) || CheckIfViewExists(_schemaName, _installationTableName))
+            {
+                _installationTableOrViewExists = true;
+            }
 
             _isInitialized = true;
         }
 
-        public List<DynamicPropertiesSection> ReadProperties(Guid id)
+        public List<DynamicPropertiesSection> ReadProperties(Guid equipment_id)
         {
             // We lazy initialize when properties are read the first time
             Initialize();
 
             // If there's not an installation table in the database, we just return an empty property section list
-            if (!_installationTableExists)
+            if (!_installationTableOrViewExists)
                 return new List<DynamicPropertiesSection> { };
 
             using var dbConn = GetConnection();
 
             using var selectCmd = dbConn.CreateCommand();
 
-            selectCmd.CommandText = $"SELECT * from {_schemaName}.{_installationTableName} WHERE id = '{id}'";
+            selectCmd.CommandText = $"SELECT * from {_schemaName}.{_installationTableName} WHERE equipment_id = '{equipment_id}'";
 
             using var installaionReader = selectCmd.ExecuteReader();
 
@@ -63,7 +66,7 @@ namespace OpenFTTH.APIGateway.DynamicProperties
                     var tablefieldName = installaionReader.GetName(fieldIndex);
 
                     // Skip if id field
-                    if (tablefieldName.ToLower() == "id")
+                    if (tablefieldName.ToLower() == "equipment_id")
                         continue;
 
                     // Check if underscore is present
@@ -93,16 +96,9 @@ namespace OpenFTTH.APIGateway.DynamicProperties
             }
             else
             {
-                _logger.LogWarning($"Cannot find any installation with id: '{id.ToString()}'");
+                _logger.LogWarning($"Cannot find any installation with id: '{equipment_id.ToString()}'");
                 return new List<DynamicPropertiesSection> { };
             }
-        }
-
-        private IDbConnection GetConnection()
-        {
-            var conn = new NpgsqlConnection(_geoDatabaseSetting.PostgresConnectionString);
-            conn.Open();
-            return conn;
         }
 
         protected bool CheckIfTableExists(string schemaName, string tableName)
@@ -118,6 +114,28 @@ namespace OpenFTTH.APIGateway.DynamicProperties
                 return true;
             else
                 return false;
+        }
+
+        protected bool CheckIfViewExists(string schemaName, string viewName)
+        {
+            using var dbConn = GetConnection();
+
+            using var dbCmd = dbConn.CreateCommand();
+            dbCmd.CommandText = $"SELECT viewname FROM pg_views WHERE schemaname = '{schemaName}' AND viewname = '{viewName.Split('.').Last()}';";
+
+            using var dbReader = dbCmd.ExecuteReader();
+
+            if (dbReader.Read())
+                return true;
+            else
+                return false;
+        }
+
+        private IDbConnection GetConnection()
+        {
+            var conn = new NpgsqlConnection(_geoDatabaseSetting.PostgresConnectionString);
+            conn.Open();
+            return conn;
         }
     }
 }

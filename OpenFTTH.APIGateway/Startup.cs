@@ -177,7 +177,8 @@ namespace OpenFTTH.APIGateway
                 AppDomain.CurrentDomain.Load("OpenFTTH.UtilityGraphService.Business"),
                 AppDomain.CurrentDomain.Load("OpenFTTH.Schematic.Business"),
                 AppDomain.CurrentDomain.Load("OpenFTTH.Work.Business"),
-                AppDomain.CurrentDomain.Load("OpenFTTH.Address.Business")
+                AppDomain.CurrentDomain.Load("OpenFTTH.Address.Business"),
+                AppDomain.CurrentDomain.Load("OpenFTTH.APIGateway")
             };
 
             // Adds controllers
