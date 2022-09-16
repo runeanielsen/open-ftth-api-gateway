@@ -1,11 +1,15 @@
-﻿using GraphQL.Server.Transports.AspNetCore;
+using GraphQL;
+using GraphQL.Server.Transports.AspNetCore;
+using GraphQL.Transport;
 using GraphQL.Types;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace OpenFTTH.APIGateway.Logging
@@ -14,54 +18,52 @@ namespace OpenFTTH.APIGateway.Logging
         where TSchema : ISchema
     {
         private readonly ILogger _logger;
-        private readonly IHttpContextAccessor _httpContextAccessor;
 
         public GraphQLHttpMiddlewareWithLogs(
-            ILogger<GraphQLHttpMiddleware<TSchema>> logger,
             RequestDelegate next,
-            IHttpContextAccessor httpContextAccessor,
-            IGraphQLRequestDeserializer requestDeserializer)
-            : base(next, requestDeserializer)
+            IGraphQLTextSerializer serializer,
+            IDocumentExecuter<TSchema> documentExecuter,
+            IServiceScopeFactory serviceScopeFactory,
+            GraphQLHttpMiddlewareOptions options,
+            IHostApplicationLifetime hostApplicationLifetime,
+            ILogger<GraphQLHttpMiddleware<TSchema>> logger)
+            : base(next, serializer, documentExecuter, serviceScopeFactory, options, hostApplicationLifetime)
         {
             _logger = logger;
-            _httpContextAccessor = httpContextAccessor;
         }
 
-        protected override Task RequestExecutedAsync(in GraphQLRequestExecutionResult requestExecutionResult)
+        protected override async Task<ExecutionResult> ExecuteRequestAsync(
+            HttpContext context,
+            GraphQLRequest request,
+            IServiceProvider serviceProvider,
+            IDictionary<string, object> userContext)
         {
-            if (requestExecutionResult.Result.Errors != null)
+            var executionResult = await base.ExecuteRequestAsync(context, request, serviceProvider, userContext);
+            if (executionResult.Errors is not null)
             {
-                var username = _httpContextAccessor.HttpContext.User?.Claims.FirstOrDefault(x => x.Type == "preferred_username")?.Value ?? "";
-                var failedQuery = GetQueryWithParameters(requestExecutionResult);
-                if (requestExecutionResult.IndexInBatch.HasValue)
-                    _logger.LogError(@$"User: {username} - GraphQL execution with error(s) in batch [{requestExecutionResult.IndexInBatch}]: {requestExecutionResult.Result.Errors}\n{failedQuery}");
-                else
-                    _logger.LogError($"User: {username} - GraphQL execution with error(s): {requestExecutionResult.Result.Errors}.\n{failedQuery}");
+                var username = context.User?.Claims.FirstOrDefault(x => x.Type == "preferred_username")?.Value ?? "USERNAME NOT FOUND";
+                var failedQuery = GetQueryWithParameters(request);
+                _logger.LogError(
+                    "User: {Username} - GraphQL execution with error(s): {Errors}.\n{FailedQuery}",
+                    username,
+                    executionResult.Errors,
+                    failedQuery);
             }
-            else
-                _logger.LogDebug("GraphQL execution successfully completed in {Elapsed}", requestExecutionResult.Elapsed);
 
-            return base.RequestExecutedAsync(requestExecutionResult);
+            return executionResult;
         }
 
-        protected override CancellationToken GetCancellationToken(HttpContext context)
-        {
-            var cts = CancellationTokenSource.CreateLinkedTokenSource(
-                base.GetCancellationToken(context), new CancellationTokenSource(TimeSpan.FromSeconds(15)).Token);
-            return cts.Token;
-        }
-
-        private static string GetQueryWithParameters(GraphQLRequestExecutionResult requestExecutionResult)
+        private static string GetQueryWithParameters(GraphQLRequest request)
         {
             var failedQuery = string.Empty;
-            if (requestExecutionResult.Request?.Inputs is not null)
+            if (request.Variables is not null)
             {
-                var inputs = JsonConvert.SerializeObject(requestExecutionResult.Request.Inputs);
-                failedQuery = $"Inputs: {inputs}\nQuery/Mutation: {requestExecutionResult.Request.Query}";
+                var inputs = JsonConvert.SerializeObject(request.Variables);
+                failedQuery = $"Inputs: {inputs}\nQuery/Mutation: {request.Query}";
             }
             else
             {
-                failedQuery = $"Inputs: None\nQuery/Mutation: {requestExecutionResult.Request.Query}";
+                failedQuery = $"Inputs: None\nQuery/Mutation: {request.Query}";
             }
 
             return failedQuery;

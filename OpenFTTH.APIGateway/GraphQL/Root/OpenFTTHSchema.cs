@@ -1,22 +1,15 @@
 ﻿using GraphQL.Types;
-using OpenFTTH.APIGateway.GraphQL.RouteNetwork.Types;
 using System;
 
 namespace OpenFTTH.APIGateway.GraphQL.Root
 {
     public class OpenFTTHSchema : Schema
     {
-        public OpenFTTHSchema(
-            IServiceProvider serviceProvider,
-            OpenFTTHQueries queries,
-            OpenFTTHSubscriptions subscriptions,
-            OpenFTTHMutations mutations)
-            : base(serviceProvider)
+        public OpenFTTHSchema(IServiceProvider serviceProvider) : base(serviceProvider)
         {
-            Query = queries;
-            Subscription = subscriptions;
-            Mutation = mutations;
-            RegisterType(typeof(RouteNetworkEditOperationOccuredEventType));
+            Query = (OpenFTTHQueries)serviceProvider.GetService(typeof(OpenFTTHQueries));
+            Mutation = (OpenFTTHMutations)serviceProvider.GetService(typeof(OpenFTTHMutations));
+            Subscription = (OpenFTTHSubscriptions)serviceProvider.GetService(typeof(OpenFTTHSubscriptions));
         }
     }
 }
