@@ -8,6 +8,7 @@ using OpenFTTH.APIGateway.Util;
 using OpenFTTH.CQRS;
 using OpenFTTH.RouteNetwork.API.Model;
 using OpenFTTH.Util;
+using OpenFTTH.UtilityGraphService.API.Model.Outage;
 using OpenFTTH.UtilityGraphService.API.Model.Trace;
 using OpenFTTH.UtilityGraphService.API.Model.UtilityNetwork;
 using OpenFTTH.UtilityGraphService.API.Model.UtilityNetwork.Views;
@@ -553,6 +554,36 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Queries
                    return queryResult.Value;
                }
            );
+
+
+           FieldAsync<OutageViewNodeType>(
+              name: "outageView",
+              description: "Information needed to show outage tree to the user",
+              arguments: new QueryArguments(
+                  new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "routeNetworkElementId" }
+              ),
+              resolve: async context =>
+              {
+                  var routeNetworkElementId = context.GetArgument<Guid>("routeNetworkElementId");
+
+                  var getOutageViewQuery = new GetOutageView(routeNetworkElementId);
+
+                  var queryResult = await queryDispatcher.HandleAsync<GetOutageView, Result<OutageViewNode>>(getOutageViewQuery);
+
+                  if (queryResult.IsFailed)
+                  {
+                      foreach (var error in queryResult.Errors)
+                          context.Errors.Add(new ExecutionError(error.Message));
+
+                      return null;
+                  }
+
+                  return queryResult.Value;
+              }
+           );
+
+           
+
         }
     }
 }
