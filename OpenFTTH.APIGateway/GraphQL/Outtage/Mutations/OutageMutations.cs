@@ -16,7 +16,7 @@ namespace OpenFTTH.APIGateway.GraphQL.Outage.Mutations
               "sendTroubleTicket",
               description: "Send trouble ticket information to external systems",
               arguments: new QueryArguments(
-                  new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "workOrderNumber" },
+                  new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "workTaskId" },
                   new QueryArgument<NonNullGraphType<ListGraphType<StringGraphType>>> { Name = "installationsIds" }
               ),
               resolve: context =>
