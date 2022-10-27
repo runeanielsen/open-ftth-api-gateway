@@ -1,9 +1,10 @@
 ﻿using GraphQL.Types;
 using Microsoft.Extensions.Logging;
+using OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Types;
 using OpenFTTH.APIGateway.Util;
 using OpenFTTH.UtilityGraphService.API.Model.Outage;
 
-namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Types
+namespace OpenFTTH.APIGateway.GraphQL.Outage.Types
 {
     public class OutageViewNodeType : ObjectGraphType<OutageViewNode>
     {

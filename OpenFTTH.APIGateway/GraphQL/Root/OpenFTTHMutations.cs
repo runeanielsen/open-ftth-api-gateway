@@ -1,4 +1,5 @@
 ﻿using GraphQL.Types;
+using OpenFTTH.APIGateway.GraphQL.Outage.Mutations;
 using OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations;
 using OpenFTTH.APIGateway.GraphQL.Work.Mutations;
 
@@ -21,6 +22,8 @@ namespace OpenFTTH.APIGateway.GraphQL.Root
             Field<SchematicMutations>("schematic").Resolve(_ => new { });
 
             Field<TestDataMutations>("testData").Resolve(_ => new { });
+
+            Field<OutageMutations>("outage").Resolve(_ => new { });
         }
     }
 }

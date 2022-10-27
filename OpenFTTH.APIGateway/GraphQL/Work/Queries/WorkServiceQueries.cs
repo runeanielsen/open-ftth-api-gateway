@@ -8,6 +8,7 @@ using OpenFTTH.Work.API.Model;
 using OpenFTTH.Work.API.Queries;
 using OpenFTTH.Work.Business;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace OpenFTTH.APIGateway.GraphQL.Work.Queries
 {
@@ -49,7 +50,6 @@ namespace OpenFTTH.APIGateway.GraphQL.Work.Queries
                     return queryResult.Value;
                 }
             );
-
         }
 
     }
