@@ -6,12 +6,10 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using OpenFTTH.APIGateway.CoreTypes;
 using OpenFTTH.APIGateway.GraphQL.Core.Model;
-using OpenFTTH.APIGateway.GraphQL.Schematic.Subscriptions;
 using OpenFTTH.APIGateway.Settings;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
-using System.Text.Json.Serialization;
 
 namespace OpenFTTH.APIGateway.GraphQL.Outage.Mutations
 {
@@ -51,20 +49,24 @@ namespace OpenFTTH.APIGateway.GraphQL.Outage.Mutations
 
 
                   // Call external service responsible for publishing trouble ticket information to external systems
-                  var client = new HttpClient();
+                  using var client = new HttpClient();
 
                   var troubleTicketRequestJson = JsonConvert.SerializeObject(new TroubleTicketRequest(workTaskId, installationsIds));
 
-                  var content = new StringContent(troubleTicketRequestJson, System.Text.Encoding.UTF8, "application/json");
+                  using var content = new StringContent(troubleTicketRequestJson, System.Text.Encoding.UTF8, "application/json");
 
                   try
                   {
-                      HttpResponseMessage result = await client.PostAsync(_outageServiceSetting.OutageServiceUrl, content).ConfigureAwait(false);
+                      HttpResponseMessage result = await client.PostAsync(_outageServiceSetting.OutageServiceUrl + "/send-trouble-ticket", content);
 
                       if (result.StatusCode == System.Net.HttpStatusCode.OK)
                           return new CommandResult(Result.Ok());
 
-                      return new CommandResult(Result.Fail(new Error(result.ReasonPhrase)));
+                      var resultErrorTxt = await result.Content.ReadAsStringAsync();
+
+                      logger.LogWarning(resultErrorTxt);
+
+                      return new CommandResult(Result.Fail(new Error(resultErrorTxt)));
                   }
                   catch (Exception ex)
                   {
@@ -77,13 +79,13 @@ namespace OpenFTTH.APIGateway.GraphQL.Outage.Mutations
 
         internal sealed record TroubleTicketRequest
         {
-            [JsonPropertyName("workTaskId")]
+            [JsonProperty("workTaskId")]
             public Guid WorkTaskId { get; init; }
 
-            [JsonPropertyName("installationIds")]
+            [JsonProperty("installationIds")]
             public IEnumerable<string> InstallationIds { get; init; }
 
-            [Newtonsoft.Json.JsonConstructor]
+            [JsonConstructor]
             public TroubleTicketRequest(
                 Guid workTaskId,
                 IEnumerable<string> installationIds)
