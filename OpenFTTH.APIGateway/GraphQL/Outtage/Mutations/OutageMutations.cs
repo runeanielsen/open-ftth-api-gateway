@@ -62,11 +62,13 @@ namespace OpenFTTH.APIGateway.GraphQL.Outage.Mutations
                       if (result.StatusCode == System.Net.HttpStatusCode.OK)
                           return new CommandResult(Result.Ok());
 
-                      var resultErrorTxt = await result.Content.ReadAsStringAsync();
+                      var resultErrorJson = await result.Content.ReadAsStringAsync();
 
-                      logger.LogWarning(resultErrorTxt);
+                      var resultErrorText = JsonConvert.DeserializeObject<string>(resultErrorJson);
 
-                      return new CommandResult(Result.Fail(new Error(resultErrorTxt)));
+                      logger.LogWarning(resultErrorText);
+
+                      return new CommandResult(Result.Fail(new Error(resultErrorText)));
                   }
                   catch (Exception ex)
                   {
