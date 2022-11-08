@@ -136,6 +136,9 @@ namespace OpenFTTH.APIGateway
             services.Configure<AuthSetting>(authSettings =>
                             Configuration.GetSection("Auth").Bind(authSettings));
 
+            services.Configure<OutageServiceSetting>(outageServceSettings =>
+                          Configuration.GetSection("OutageService").Bind(outageServceSettings));
+
             // Web stuff
             services.AddRazorPages();
             // CORS
