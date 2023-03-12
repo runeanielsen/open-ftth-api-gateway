@@ -40,7 +40,7 @@ namespace OpenFTTH.TestData
 
         public static Guid Well_Cubis_STAKKAbox_MODULA_600x450 = Guid.Parse("0fb389b5-4bbd-4ebf-b506-bfc636001171");
         public static Guid Well_Cubis_STAKKAbox_MODULA_900x450 = Guid.Parse("8251e1d3-c586-4632-952a-41332aa61a47");
-
+    
         public static Guid Well_Fiberpowertech_37_EK_378_400x800 = Guid.Parse("7fd8266e-44e1-46ee-a183-bc3068deadf3");
         public static Guid Well_Fiberpowertech_37_EK_338_550x1165 = Guid.Parse("b93c3bcf-3013-4b6c-814d-06ff14d9139f");
         public static Guid Well_Fiberpowertech_37_EK_328_800x800 = Guid.Parse("6c1c9ab8-b1f2-4021-bece-d9b4f65c6723");
@@ -217,18 +217,25 @@ namespace OpenFTTH.TestData
 
         public static Guid LGX_WDMType1 = Guid.Parse("5602395b-f3f0-4e99-adb1-77901f4c711b");
         public static Guid LGX_WDMType2 = Guid.Parse("fe781a46-4402-4d7b-9518-48dcd36e9128");
+        public static Guid LGX_WDMTypeKina = Guid.Parse("e2d6ef08-4504-4eb2-8188-e60f2aad5aa5");
 
+        public static Guid SpliceTray_EMCoupler32 = Guid.Parse("27dfd2b0-e51e-46df-9648-7a6aea5f3067");
+        public static Guid SpliceTray_EMCoupler48 = Guid.Parse("d8480bd4-75c3-4904-9cde-6d1cce427acb");
+
+      
 
         // Terminal Equipments
         public static Guid SpliceClosure_VMC_12Tray = Guid.Parse("c27377df-f5d0-483c-bc35-2ce8ab56c31b");
         public static Guid SpliceClosure_VMC_24Tray = Guid.Parse("420cdc14-5eaf-4d28-ade2-1cb5a940d818");
         public static Guid SpliceClosure_VMC_LZ = Guid.Parse("6ed9bc08-51b7-4c0c-a286-16f27f2f3ffb");
         public static Guid SpliceClosure_3M_72Fiber = Guid.Parse("c20fb96a-18c7-4730-aae2-e2e5882006d9");
+        public static Guid SpliceClosure_Uknown = Guid.Parse("803401a2-45b2-4958-81ee-4944833fc98f");
         public static Guid SpliceClosure_Uknown12Fiber = Guid.Parse("a3de806d-8e3b-4280-8e12-ff875bf87469");
         public static Guid SpliceClosure_Uknown72Fiber = Guid.Parse("411b565b-2704-4416-bfaa-09e1faa62f8b");
         public static Guid SpliceClosure_BUDI1S_16SCTrays = Guid.Parse("b982398f-d546-41ab-a5d1-10048d5b9db6");
         public static Guid SpliceClosure_BUDI1S_6SETrays = Guid.Parse("a27fd2e9-9c5e-459d-b3e2-10dd8932cca0");
         public static Guid SpliceClosure_BUDI2S_1SETrays = Guid.Parse("57a1d8ae-38c5-499e-b55a-5afc00687a20");
+        public static Guid SpliceClosure_BUDI2S_6SETrays = Guid.Parse("d0bb5a04-8e0a-4b45-962f-7db99b7eef6c");
         public static Guid SpliceClosure_FTUO = Guid.Parse("a469960e-f650-487e-b16b-ce094ef4d9e6");
         public static Guid SpliceClosure_FIST = Guid.Parse("7a038a46-297d-490c-8796-42b44d1218e0");
         public static Guid SpliceClosure_FOSC400 = Guid.Parse("5d95fe82-c563-47ff-8356-81d63bb512ee");
@@ -252,6 +259,17 @@ namespace OpenFTTH.TestData
         public static Guid OLT = Guid.Parse("00bb0c1d-f540-4000-af1d-0d180ce0d3bb");
 
         public static Guid LGX_Holder = Guid.Parse("6f648aae-0fb8-4a41-9de4-617573da26a9");
+
+        public static Guid FP_SplitterPanel = Guid.Parse("f36dd9ff-338a-456e-9435-d43f40d0b452");
+        
+        public static Guid FP_SplitterSkuffe = Guid.Parse("52266e8e-94bb-43e3-a176-a38fae650bb9");
+            
+        public static Guid FP_GSS = Guid.Parse("44970d3c-bc3a-45ba-8229-d18124b4cfbc");
+
+        public static Guid Subrack_EMCoupler32 = Guid.Parse("15954f7c-b4d7-48d8-87bb-f12e5e23719b");
+        public static Guid Subrack_EMCoupler48 = Guid.Parse("4a61883e-5d0c-44c7-a692-29fbc05c8827");
+
+
 
         public FluentResults.Result<TestSpecifications> Run()
         {
@@ -1633,10 +1651,110 @@ namespace OpenFTTH.TestData
                 }
             ));
 
+            // KINA
+            AddSpecification(new TerminalStructureSpecification(LGX_WDMTypeKina, "Couplers", "WDM Coupler Type KINA (LGX Modul)", "WDM type KINA",
+                new TerminalTemplate[]
+                {
+                    new TerminalTemplate("IP 1", TerminalDirectionEnum.IN, false, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "tv" },
+                    new TerminalTemplate("RF 2", TerminalDirectionEnum.IN, false, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "spl1" },
+                    new TerminalTemplate("RF 3", TerminalDirectionEnum.IN, false, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "tv" },
+
+                    new TerminalTemplate("UD 4", TerminalDirectionEnum.OUT, false, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "spl1" },
+                    new TerminalTemplate("UD 5", TerminalDirectionEnum.OUT, false, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "spl1" },
+                    new TerminalTemplate("UD 6", TerminalDirectionEnum.OUT, false, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "spl1" },
+                    new TerminalTemplate("UD 7", TerminalDirectionEnum.OUT, false, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "spl1" }
+                }
+            ));
+
+            // EM Coupler 32
+            var em32terminals = new List<TerminalTemplate>();
+
+            // Contains 4 modules with 2x1:2 splitter + 4xWDM + 4x1:2 splitters
+            for (int wdmModul = 1; wdmModul < 5; wdmModul++)
+            {
+                int inPortOffset = (wdmModul - 1) * 6;
+                int outPortOffset = (wdmModul - 1) * 8;
+
+                // Input terminaler
+                em32terminals.Add(new TerminalTemplate("RF " + wdmModul + " spl 1", TerminalDirectionEnum.IN, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "tv" });
+                em32terminals.Add(new TerminalTemplate("IP " + wdmModul + " spl 1-2", TerminalDirectionEnum.IN, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = wdmModul + "-cn1"});
+                em32terminals.Add(new TerminalTemplate("RF " + wdmModul + " spl 2", TerminalDirectionEnum.IN, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "tv" });
+                em32terminals.Add(new TerminalTemplate("RF " + wdmModul + " spl 3", TerminalDirectionEnum.IN, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "tv" });
+                em32terminals.Add(new TerminalTemplate("IP " + wdmModul + " spl 3-4", TerminalDirectionEnum.IN, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = wdmModul + "-cn2" });
+                em32terminals.Add(new TerminalTemplate("RF " + wdmModul + " spl 4", TerminalDirectionEnum.IN, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "tv" });
+       
+                // Output terminals
+                em32terminals.Add(new TerminalTemplate("UD " + wdmModul + " spl 1-1", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = wdmModul + "-cn1" });
+                em32terminals.Add(new TerminalTemplate("UD " + wdmModul + " spl 1-2", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = wdmModul + "-cn1" });
+                em32terminals.Add(new TerminalTemplate("UD " + wdmModul + " spl 2-1", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = wdmModul + "-cn1" });
+                em32terminals.Add(new TerminalTemplate("UD " + wdmModul + " spl 2-2", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = wdmModul + "-cn1" });
+                em32terminals.Add(new TerminalTemplate("UD " + wdmModul + " spl 3-1", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = wdmModul + "-cn2" });
+                em32terminals.Add(new TerminalTemplate("UD " + wdmModul + " spl 3-2", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = wdmModul + "-cn2" });
+                em32terminals.Add(new TerminalTemplate("UD " + wdmModul + " spl 4-1", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = wdmModul + "-cn2" });
+                em32terminals.Add(new TerminalTemplate("UD " + wdmModul + " spl 4-2", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = wdmModul + "-cn2" });
+            }
+
+            AddSpecification(new TerminalStructureSpecification(SpliceTray_EMCoupler32, "Couplers", "EM32 Coupler", "EM32 Coupler", em32terminals.ToArray()));
+
+
+            // EM Coupler 48
+            var em48terminals = new List<TerminalTemplate>();
+
+            // Contains 3 modules with 4x1:2 splitter + 8xWDM + 8x1:2 splitters
+            for (int wdmModul = 1; wdmModul < 4; wdmModul++)
+            {
+                int inPortOffset = (wdmModul - 1) * 12;
+                int outPortOffset = (wdmModul - 1) * 16;
+
+
+                // Input terminaler
+                em48terminals.Add(new TerminalTemplate("RF " + wdmModul + " spl 1", TerminalDirectionEnum.IN, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "tv" });
+                em48terminals.Add(new TerminalTemplate("IP " + wdmModul + " spl 1-2", TerminalDirectionEnum.IN, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = wdmModul + "-cn1" });
+                em48terminals.Add(new TerminalTemplate("RF " + wdmModul + " spl 2", TerminalDirectionEnum.IN, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "tv" });
+                em48terminals.Add(new TerminalTemplate("RF " + wdmModul + " spl 3", TerminalDirectionEnum.IN, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "tv" });
+                em48terminals.Add(new TerminalTemplate("IP " + wdmModul + " spl 3-4", TerminalDirectionEnum.IN, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = wdmModul + "-cn2" });
+                em48terminals.Add(new TerminalTemplate("RF " + wdmModul + " spl 4", TerminalDirectionEnum.IN, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "tv" });
+
+                em48terminals.Add(new TerminalTemplate("RF " + wdmModul + " spl 5", TerminalDirectionEnum.IN, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "tv" });
+                em48terminals.Add(new TerminalTemplate("IP " + wdmModul + " spl 5-6", TerminalDirectionEnum.IN, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = wdmModul + "-cn3" });
+                em48terminals.Add(new TerminalTemplate("RF " + wdmModul + " spl 6", TerminalDirectionEnum.IN, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "tv" });
+                em48terminals.Add(new TerminalTemplate("RF " + wdmModul + " spl 7", TerminalDirectionEnum.IN, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "tv" });
+                em48terminals.Add(new TerminalTemplate("IP " + wdmModul + " spl 7-8", TerminalDirectionEnum.IN, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = wdmModul + "-cn4" });
+                em48terminals.Add(new TerminalTemplate("RF " + wdmModul + " spl 8", TerminalDirectionEnum.IN, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "tv" });
+
+                // Output terminals
+                em48terminals.Add(new TerminalTemplate("UD " + wdmModul + " spl 1-1", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = wdmModul + "-cn1" });
+                em48terminals.Add(new TerminalTemplate("UD " + wdmModul + " spl 1-2", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = wdmModul + "-cn1" });
+                em48terminals.Add(new TerminalTemplate("UD " + wdmModul + " spl 2-1", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = wdmModul + "-cn1" });
+                em48terminals.Add(new TerminalTemplate("UD " + wdmModul + " spl 2-2", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = wdmModul + "-cn1" });
+                em48terminals.Add(new TerminalTemplate("UD " + wdmModul + " spl 3-1", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = wdmModul + "-cn2" });
+                em48terminals.Add(new TerminalTemplate("UD " + wdmModul + " spl 3-2", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = wdmModul + "-cn2" });
+                em48terminals.Add(new TerminalTemplate("UD " + wdmModul + " spl 4-1", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = wdmModul + "-cn2" });
+                em48terminals.Add(new TerminalTemplate("UD " + wdmModul + " spl 4-2", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = wdmModul + "-cn2" });
+
+                em48terminals.Add(new TerminalTemplate("UD " + wdmModul + " spl 5-1", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = wdmModul + "-cn3" });
+                em48terminals.Add(new TerminalTemplate("UD " + wdmModul + " spl 5-2", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = wdmModul + "-cn3" });
+                em48terminals.Add(new TerminalTemplate("UD " + wdmModul + " spl 6-1", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = wdmModul + "-cn3" });
+                em48terminals.Add(new TerminalTemplate("UD " + wdmModul + " spl 6-2", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = wdmModul + "-cn3" });
+                em48terminals.Add(new TerminalTemplate("UD " + wdmModul + " spl 7-1", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = wdmModul + "-cn4" });
+                em48terminals.Add(new TerminalTemplate("UD " + wdmModul + " spl 7-2", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = wdmModul + "-cn4" });
+                em48terminals.Add(new TerminalTemplate("UD " + wdmModul + " spl 8-1", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = wdmModul + "-cn4" });
+                em48terminals.Add(new TerminalTemplate("UD " + wdmModul + " spl 8-2", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "LC/APC", InternalConnectivityNode = wdmModul + "-cn4" });
+
+            }
+
+            AddSpecification(new TerminalStructureSpecification(SpliceTray_EMCoupler48, "Couplers", "EM48 Coupler", "EM48 Coupler", em48terminals.ToArray()));
+
+
+
         }
 
         private void AddTerminalEquipmentSpecifications()
         {
+            // Ukend Splidseboks
+            AddSpecification(new TerminalEquipmentSpecification(SpliceClosure_Uknown, "SpliceClosure", "Ukendt Splidseboks", "Splidseboks", false, 0,
+                Array.Empty<TerminalStructureTemplate>()
+            ));
 
             // 12 Fiber Tray Uknown Type
             AddSpecification(new TerminalEquipmentSpecification(SpliceClosure_Uknown12Fiber, "SpliceClosure", "Ukendt Splidseboks 12 Fiber", "Splidseboks", false, 0,
@@ -1797,6 +1915,23 @@ namespace OpenFTTH.TestData
             )
             { ManufacturerRefs = new Guid[] { Manu_CommScope } });
 
+
+            // BUDI 2S 6 bakke
+            AddSpecification(new TerminalEquipmentSpecification(SpliceClosure_BUDI2S_6SETrays, "SpliceClosure", "BUDI-2S splidseboks 6 stk. SE bakker med 12 søm", "BUDI-2S", false, 0,
+                new TerminalStructureTemplate[]
+                {
+                    new TerminalStructureTemplate(SpliceTray_SE12Pin, 1),
+                    new TerminalStructureTemplate(SpliceTray_SE12Pin, 2),
+                    new TerminalStructureTemplate(SpliceTray_SE12Pin, 3),
+                    new TerminalStructureTemplate(SpliceTray_SE12Pin, 4),
+                    new TerminalStructureTemplate(SpliceTray_SE12Pin, 5),
+                    new TerminalStructureTemplate(SpliceTray_SE12Pin, 6)
+                }
+            )
+            { ManufacturerRefs = new Guid[] { Manu_CommScope } });
+
+
+
             // FTUO
             AddSpecification(new TerminalEquipmentSpecification(SpliceClosure_FTUO, "SpliceClosure", "FTUO udvendig splideboks med plads til 12 søm", "FTUO", false, 0,
                 new TerminalStructureTemplate[]
@@ -1873,7 +2008,7 @@ namespace OpenFTTH.TestData
             )
             { ManufacturerRefs = new Guid[] { Manu_CommScope } });
 
-            // GSS with 24 1:2 splitters  
+            // GSS subrack with 24 1:2 splitters  
             AddSpecification(new TerminalEquipmentSpecification(GSS_24_Splitters, "Subrack", "GSS m. 1:2 split komplet", "1:2 Split", true, 4,
                 new TerminalStructureTemplate[]
                 {
@@ -1887,7 +2022,7 @@ namespace OpenFTTH.TestData
             )
             { ManufacturerRefs = new Guid[] { Manu_CommScope } });
 
-            // GSS with   
+            // GSS subrack with 6 trays
             AddSpecification(new TerminalEquipmentSpecification(SpliceTray_GSS_With6Trays, "Subrack", "GSS m. 6 bakker", "GSS", true, 4,
                 new TerminalStructureTemplate[]
                 {
@@ -1917,6 +2052,43 @@ namespace OpenFTTH.TestData
                 Array.Empty<TerminalStructureTemplate>()
             )
             { ManufacturerRefs = new Guid[] { Manu_Nokia } });
+
+
+            // FP splitter panel 
+            AddSpecification(new TerminalEquipmentSpecification(FP_SplitterPanel, "Subrack", "Splitterpanel f. 2x9 splittere", "Splitterpanel FP", true, 5,
+                Array.Empty<TerminalStructureTemplate>()
+            )
+            { ManufacturerRefs = new Guid[] { Manu_CommScope } });
+
+            // FP splitter skuffe
+            AddSpecification(new TerminalEquipmentSpecification(FP_SplitterSkuffe, "Subrack", "Splitterskuffe 19\" f. 1x6 splittere", "Splitterskuffe FP", true, 4,
+                Array.Empty<TerminalStructureTemplate>()
+            )
+            { ManufacturerRefs = new Guid[] { Manu_CommScope } });
+
+            // FP GSS skuffe   
+            AddSpecification(new TerminalEquipmentSpecification(FP_GSS, "Subrack", "Splidseskuffe GSS2 19\" 4x10mm Flex", "GSS Skuffe FP", true, 4,
+                Array.Empty<TerminalStructureTemplate>()
+            )
+            { ManufacturerRefs = new Guid[] { Manu_CommScope } });
+
+            // GSS subrack EM32 Coupler hylde
+            AddSpecification(new TerminalEquipmentSpecification(Subrack_EMCoupler32, "Subrack", "EM32 Coupler hylde", "GSS", true, 4,
+                new TerminalStructureTemplate[]
+                {
+                    new TerminalStructureTemplate(SpliceTray_EMCoupler32, 1),
+                }
+            )
+            { ManufacturerRefs = new Guid[] { Manu_CommScope } });
+
+            // GSS subrack EM48 Coupler hylde
+            AddSpecification(new TerminalEquipmentSpecification(Subrack_EMCoupler48, "Subrack", "EM48 Coupler hylde", "GSS", true, 4,
+                new TerminalStructureTemplate[]
+                {
+                    new TerminalStructureTemplate(SpliceTray_EMCoupler48, 1),
+                }
+            )
+            { ManufacturerRefs = new Guid[] { Manu_CommScope } });
         }
 
         private void AddSpecification(SpanEquipmentSpecification spec)
