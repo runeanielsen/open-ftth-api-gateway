@@ -80,7 +80,8 @@ namespace OpenFTTH.APIGateway.Workers
                     _eventStore,
                     _geoDatabaseSetting,
                     _commandDispatcher,
-                    _queryDispatcher).Run();
+                    _queryDispatcher,
+                    _routeNetworkState).Run();
 
                 // Catchup external events
                 _logger.LogInformation("Start catching up external events...");

@@ -3,6 +3,7 @@ using Npgsql;
 using OpenFTTH.APIGateway.Settings;
 using OpenFTTH.CQRS;
 using OpenFTTH.EventSourcing;
+using OpenFTTH.RouteNetwork.Business.RouteElements.StateHandling;
 using OpenFTTH.TestData;
 using System;
 using System.Data;
@@ -18,16 +19,18 @@ namespace OpenFTTH.APIGateway.Conversion
         private GeoDatabaseSetting _geoDatabaseSetting;
         private ICommandDispatcher _commandDispatcher;
         private IQueryDispatcher _queryDispatcher;
+        private IRouteNetworkState _routeNetworkState;
 
         private ILogger<ConversionRunner> _logger;
 
-        public ConversionRunner(ILoggerFactory loggerFactory, IEventStore eventSTore, GeoDatabaseSetting geoDatabaseSettings, ICommandDispatcher commandDispatcher, IQueryDispatcher queryDispatcher)
+        public ConversionRunner(ILoggerFactory loggerFactory, IEventStore eventSTore, GeoDatabaseSetting geoDatabaseSettings, ICommandDispatcher commandDispatcher, IQueryDispatcher queryDispatcher, IRouteNetworkState routeNetworkState)
         {
             _loggerFactory = loggerFactory;
             _eventStore = eventSTore;
             _geoDatabaseSetting = geoDatabaseSettings;
             _commandDispatcher = commandDispatcher;
             _queryDispatcher = queryDispatcher;
+            _routeNetworkState = routeNetworkState;
 
             _logger = loggerFactory.CreateLogger<ConversionRunner>();
         }
@@ -43,7 +46,7 @@ namespace OpenFTTH.APIGateway.Conversion
                 //var result = new TestSpecifications(_loggerFactory, _commandDispatcher, _queryDispatcher).Run();
                 _logger.LogInformation("Finish seeding database with test specifications.");
 
-                var result = new TestSpecifications(_loggerFactory, _commandDispatcher, _queryDispatcher).Run();
+                //var result = new TestSpecifications(_loggerFactory, _commandDispatcher, _queryDispatcher).Run();
 
 
                 var localDb = new Settings.GeoDatabaseSetting()
@@ -57,7 +60,7 @@ namespace OpenFTTH.APIGateway.Conversion
 
                 var dbToReadConversionDataFrom = _geoDatabaseSetting;
 
-                new CableSpanEquipmentImporter(_loggerFactory.CreateLogger<ConduitSpanEquipmentImporter>(), _eventStore, dbToReadConversionDataFrom, _commandDispatcher, _queryDispatcher).Run();
+                new CableSpanEquipmentImporter(_loggerFactory.CreateLogger<ConduitSpanEquipmentImporter>(), _eventStore, dbToReadConversionDataFrom, _commandDispatcher, _queryDispatcher, _routeNetworkState).Run();
 
                 new NodeContainerImporter(_loggerFactory.CreateLogger<NodeContainerImporter>(), _workTaskId, _eventStore, dbToReadConversionDataFrom, _commandDispatcher, _queryDispatcher).Run();
 

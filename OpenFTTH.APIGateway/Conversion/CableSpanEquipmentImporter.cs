@@ -20,6 +20,9 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using OpenFTTH.RouteNetwork.Business.RouteElements.StateHandling;
+using OpenFTTH.RouteNetwork.Business.RouteElements.Model;
+using OpenFTTH.RouteNetwork.API.Queries;
 
 namespace OpenFTTH.APIGateway.Conversion
 {
@@ -33,12 +36,13 @@ namespace OpenFTTH.APIGateway.Conversion
         private IEventStore _eventStore;
         private UtilityNetworkProjection _utilityNetwork;
         private LookupCollection<SpanEquipmentSpecification> _spanEquipmentSpecifications;
+        private IRouteNetworkState _routeNetworkState;
 
         private string _tableName = "conversion.fibercables";
 
         private string _directInRouteTableName = "conversion.cable_in_route_segment_rels";
 
-        public CableSpanEquipmentImporter(ILogger<ConduitSpanEquipmentImporter> logger, IEventStore eventSTore, GeoDatabaseSetting geoDatabaseSettings, ICommandDispatcher commandDispatcher, IQueryDispatcher queryDispatcher) : base(geoDatabaseSettings)
+        public CableSpanEquipmentImporter(ILogger<ConduitSpanEquipmentImporter> logger, IEventStore eventSTore, GeoDatabaseSetting geoDatabaseSettings, ICommandDispatcher commandDispatcher, IQueryDispatcher queryDispatcher, IRouteNetworkState routeNetworkState) : base(geoDatabaseSettings)
         {
             _logger = logger;
             _eventStore = eventSTore;
@@ -46,6 +50,7 @@ namespace OpenFTTH.APIGateway.Conversion
             _queryDispatcher = queryDispatcher;
             _utilityNetwork = _eventStore.Projections.Get<UtilityNetworkProjection>();
             _spanEquipmentSpecifications = _eventStore.Projections.Get<SpanEquipmentSpecificationsProjection>().Specifications;
+            _routeNetworkState = routeNetworkState;
         }
 
         public void Run()
@@ -143,17 +148,69 @@ namespace OpenFTTH.APIGateway.Conversion
             System.Diagnostics.Debug.WriteLine($"*** Place cable: {externalId} ***");
             System.Diagnostics.Debug.WriteLine("---------------------------------------------------------------------------------------------------------------------------------------");
 
+
+            ValidatedRouteNetworkWalk validatedWalk = null;
+
+            var version = _routeNetworkState.GetLatestCommitedVersion();
+
+
             // Get validated walk of interest
-            var walk = new RouteNetworkElementIdList();
-            walk.AddRange(routeSegmentIds);
+            if (routeSegmentIds.Count != 2)
+            {
 
-            var validateInterestCommand = new ValidateWalkOfInterest(correlationId, new UserContext("conversion", _workTaskId), walk);
+                var walk = new RouteNetworkElementIdList();
+                walk.AddRange(routeSegmentIds);
 
-            var validateInterestResult = _commandDispatcher.HandleAsync<ValidateWalkOfInterest, Result<ValidatedRouteNetworkWalk>>(validateInterestCommand).Result;
+                var validateInterestCommand = new ValidateWalkOfInterest(correlationId, new UserContext("conversion", _workTaskId), walk);
 
-            if (validateInterestResult.IsFailed)
-                return Result.Fail(validateInterestResult.Errors.First());
+                var validateInterestResult = _commandDispatcher.HandleAsync<ValidateWalkOfInterest, Result<ValidatedRouteNetworkWalk>>(validateInterestCommand).Result;
 
+                if (validateInterestResult.IsFailed)
+                    return Result.Fail(validateInterestResult.Errors.First());
+
+                validatedWalk = validateInterestResult.Value;
+            }
+            else
+            {
+                // Try find direct neighbor to save time on shortest path
+                Guid fromNodeId = routeSegmentIds.First();
+                Guid toNodeId = routeSegmentIds.Last();
+
+                var fromNode = _routeNetworkState.GetRouteNetworkElement(fromNodeId) as RouteNode;
+
+            
+                foreach (var neighborElement in fromNode.NeighborElements(version))
+                {
+                    if (neighborElement.NeighborElements(version).Exists(n => n.Id == toNodeId))
+                    {
+                        RouteNetworkElementIdList elementList = new();
+
+                        elementList.Add(fromNodeId);
+                        elementList.Add(neighborElement.Id);
+                        elementList.Add(toNodeId);
+
+                        validatedWalk = new ValidatedRouteNetworkWalk(elementList);
+                    }
+                }
+
+                if (validatedWalk == null)
+                {
+                    // Ok, lets try shortest path
+                    var shortestPathQuery = new ShortestPathBetweenRouteNodes(fromNodeId, toNodeId);
+
+                    // Act
+                    var nearestNodeQueryResult = _queryDispatcher.HandleAsync<ShortestPathBetweenRouteNodes, Result<ShortestPathBetweenRouteNodesResult>>(shortestPathQuery).Result;
+
+                    if (nearestNodeQueryResult.IsFailed)
+                        return Result.Fail(nearestNodeQueryResult.Errors.First());
+
+                    RouteNetworkElementIdList elementList = new();
+                    elementList.AddRange(nearestNodeQueryResult.Value.RouteNetworkElementIds);
+                    validatedWalk = new ValidatedRouteNetworkWalk(elementList);
+                }
+            }
+
+            /*
             // trace all conduits
             var conduitsTraceResult = TraceAllConduits(conduitRels);
 
@@ -162,14 +219,18 @@ namespace OpenFTTH.APIGateway.Conversion
                 System.Diagnostics.Debug.WriteLine($"NE conduit path found starting in {conduitTrace.ConduitName} node {conduitTrace.OriginalTrace.FromRouteNodeName} ({conduitTrace.OriginalTrace.FromRouteNodeId}) <-> {conduitTrace.OriginalTrace.ToRouteNodeName} ({conduitTrace.OriginalTrace.ToRouteNodeId}) span segment id: {conduitTrace.SpanSegmentId}");
             }
 
-            var routingHops = BuildRouteHops(validateInterestResult.Value, conduitsTraceResult, externalId);
+            var routingHops = BuildRouteHops(validatedWalk, conduitsTraceResult, externalId);
+            */
 
-            System.Diagnostics.Debug.WriteLine("---------------------------------------------------------------------------------------------------------------------------------------");
-
-            foreach (var hop in routingHops)
+            var routingHops = new List<RoutingHop>()
             {
-                System.Diagnostics.Debug.WriteLine($"Routing hop: start route node id: {hop.StartRouteNode} span equipment id: {hop.StartSpanSegmentId}");
-            }
+                new RoutingHop(validatedWalk.RouteNetworkElementRefs.ToArray())
+            };
+
+            var deletedSegment = _routeNetworkState.GetRouteNetworkElement(Guid.Parse("edea3d7c-0732-46d5-a163-a51c8afdb9f4"), version);
+
+            var nonDeletedElement = _routeNetworkState.GetRouteNetworkElement(Guid.Parse("f53b29c2-01f2-4d1b-92d3-e030ebc565e5"), version);
+
 
             // Place cable
             var placeSpanEquipmentCommand = new PlaceSpanEquipmentInUtilityNetwork(correlationId, new UserContext("conversion", _workTaskId), spanEquipmentId, specificationId, routingHops.ToArray())
@@ -191,7 +252,7 @@ namespace OpenFTTH.APIGateway.Conversion
 
                 // Try place cable directly in route network
                 var placeSpanEquipmentDirectlyInRouteNetworkCmd = new PlaceSpanEquipmentInUtilityNetwork(correlationId, new UserContext("conversion", _workTaskId), spanEquipmentId, specificationId,
-                    new RoutingHop[] { new RoutingHop(validateInterestResult.Value.RouteNetworkElementRefs.ToArray()) }
+                    new RoutingHop[] { new RoutingHop(validatedWalk.RouteNetworkElementRefs.ToArray()) }
                     )
                 {
                     NamingInfo = namingInfo,
@@ -532,19 +593,23 @@ namespace OpenFTTH.APIGateway.Conversion
                 }
 
                 // conduit rels
-                var parentConduitsSplit = parentConduits.Split(',');
 
-                foreach (var parentConduit in parentConduitsSplit)
+                if (!String.IsNullOrEmpty(parentConduits))
                 {
-                    var conduitRelSplit = parentConduit.Split('#');
+                    var parentConduitsSplit = parentConduits.Split(',');
 
-                    ConduitRels.Add(
-                        new CableConduitRel()
-                        {
-                            SpanEquipmentId = Guid.Parse(conduitRelSplit[0]),
-                            InnerConduitNumber = Int32.Parse(conduitRelSplit[1]),
-                        }
-                    );
+                    foreach (var parentConduit in parentConduitsSplit)
+                    {
+                        var conduitRelSplit = parentConduit.Split('#');
+
+                        ConduitRels.Add(
+                            new CableConduitRel()
+                            {
+                                SpanEquipmentId = Guid.Parse(conduitRelSplit[0]),
+                                InnerConduitNumber = Int32.Parse(conduitRelSplit[1]),
+                            }
+                        );
+                    }
                 }
 
 
@@ -553,16 +618,20 @@ namespace OpenFTTH.APIGateway.Conversion
 
             private Guid MapToSpanEquipmentSpecification(string externalSpec)
             {
-                if (externalSpec.Contains("24sm tkf"))
+                if (externalSpec.ToLower() == "24 fiber")
                     return TestSpecifications.FiberCable_24Fiber;
-                else if (externalSpec.StartsWith("12sm"))
+                else if (externalSpec.ToLower() == "12 fiber")
                     return TestSpecifications.FiberCable_12Fiber;
-                else if (externalSpec.StartsWith("4smdraka"))
+                else if (externalSpec.ToLower() == "4 fiber")
                     return TestSpecifications.FiberCable_4Fiber;
-                else if (externalSpec.StartsWith("2smdraka"))
+                else if (externalSpec.ToLower() == "2 fiber")
                     return TestSpecifications.FiberCable_2Fiber;
-                else if (externalSpec.StartsWith("72smdraka"))
+                else if (externalSpec.ToLower() == "72 fiber")
                     return TestSpecifications.FiberCable_72Fiber;
+                else if (externalSpec.ToLower() == "48 fiber")
+                    return TestSpecifications.FiberCable_72Fiber;
+                else if (externalSpec.ToLower() == "96 fiber")
+                    return TestSpecifications.FiberCable_96Fiber;
 
 
                 throw new ApplicationException($"Cannot find spec name from external id: {externalSpec}");
