@@ -177,8 +177,18 @@ namespace OpenFTTH.APIGateway.Conversion
                 Guid toNodeId = routeSegmentIds.Last();
 
                 var fromNode = _routeNetworkState.GetRouteNetworkElement(fromNodeId) as RouteNode;
+                var toNode = _routeNetworkState.GetRouteNetworkElement(toNodeId) as RouteNode;
 
-            
+                if (fromNode == null)
+                {
+                    return Result.Fail(new Error($"Can't find fromNode: {fromNodeId} in route network"));
+                }
+
+                if (toNode == null)
+                {
+                    return Result.Fail(new Error($"Can't find toNode: {toNodeId} in route network"));
+                }
+
                 foreach (var neighborElement in fromNode.NeighborElements(version))
                 {
                     if (neighborElement.NeighborElements(version).Exists(n => n.Id == toNodeId))
