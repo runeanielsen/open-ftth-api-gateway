@@ -210,7 +210,7 @@ namespace OpenFTTH.APIGateway.Conversion
                 }
             }
 
-            /*
+            
             // trace all conduits
             var conduitsTraceResult = TraceAllConduits(conduitRels);
 
@@ -220,12 +220,15 @@ namespace OpenFTTH.APIGateway.Conversion
             }
 
             var routingHops = BuildRouteHops(validatedWalk, conduitsTraceResult, externalId);
-            */
 
-            var routingHops = new List<RoutingHop>()
+
+            if (conduitRels.Count == 0)
             {
-                new RoutingHop(validatedWalk.RouteNetworkElementRefs.ToArray())
-            };
+                routingHops = new List<RoutingHop>()
+                {
+                    new RoutingHop(validatedWalk.RouteNetworkElementRefs.ToArray())
+                };
+            }
 
             var deletedSegment = _routeNetworkState.GetRouteNetworkElement(Guid.Parse("edea3d7c-0732-46d5-a163-a51c8afdb9f4"), version);
 

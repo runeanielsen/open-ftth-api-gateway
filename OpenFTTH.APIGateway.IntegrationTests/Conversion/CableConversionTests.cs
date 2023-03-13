@@ -7,6 +7,7 @@ using OpenFTTH.CQRS;
 using OpenFTTH.EventSourcing;
 using OpenFTTH.RouteNetwork.API.Model;
 using OpenFTTH.RouteNetwork.API.Queries;
+using OpenFTTH.RouteNetwork.Business.RouteElements.StateHandling;
 using OpenFTTH.TestData;
 using OpenFTTH.UtilityGraphService.API.Model.UtilityNetwork;
 using OpenFTTH.UtilityGraphService.API.Queries;
@@ -28,15 +29,17 @@ namespace OpenFTTH.APIGateway.IntegrationTests.Conversion
         private IEventStore _eventStore;
         private ICommandDispatcher _commandDispatcher;
         private IQueryDispatcher _queryDispatcher;
+        private IRouteNetworkState _routeNetworkState;
 
         private static TestSpecifications _specs;
 
-        public CableConversionTests(ILoggerFactory loggerFactory, IEventStore eventStore, ICommandDispatcher commandDispatcher, IQueryDispatcher queryDispatcher)
+        public CableConversionTests(ILoggerFactory loggerFactory, IEventStore eventStore, ICommandDispatcher commandDispatcher, IQueryDispatcher queryDispatcher, IRouteNetworkState routeNetworkState)
         {
             _loggerFactory = loggerFactory;
             _eventStore = eventStore;
             _commandDispatcher = commandDispatcher;
             _queryDispatcher = queryDispatcher;
+            _routeNetworkState = routeNetworkState;
         }
 
 
@@ -45,7 +48,7 @@ namespace OpenFTTH.APIGateway.IntegrationTests.Conversion
         {
             var utilityNetwork = _eventStore.Projections.Get<UtilityNetworkProjection>();
 
-            var importer = new CableSpanEquipmentImporter(_loggerFactory.CreateLogger<ConduitSpanEquipmentImporter>(), _eventStore, new Settings.GeoDatabaseSetting(), _commandDispatcher, _queryDispatcher);
+            var importer = new CableSpanEquipmentImporter(_loggerFactory.CreateLogger<ConduitSpanEquipmentImporter>(), _eventStore, new Settings.GeoDatabaseSetting(), _commandDispatcher, _queryDispatcher, _routeNetworkState);
 
             Guid cableId = Guid.NewGuid();
 
@@ -111,7 +114,7 @@ namespace OpenFTTH.APIGateway.IntegrationTests.Conversion
         {
             var utilityNetwork = _eventStore.Projections.Get<UtilityNetworkProjection>();
 
-            var importer = new CableSpanEquipmentImporter(_loggerFactory.CreateLogger<ConduitSpanEquipmentImporter>(), _eventStore, new Settings.GeoDatabaseSetting(), _commandDispatcher, _queryDispatcher);
+            var importer = new CableSpanEquipmentImporter(_loggerFactory.CreateLogger<ConduitSpanEquipmentImporter>(), _eventStore, new Settings.GeoDatabaseSetting(), _commandDispatcher, _queryDispatcher, _routeNetworkState);
 
             Guid cableId = Guid.NewGuid();
 
@@ -178,7 +181,7 @@ namespace OpenFTTH.APIGateway.IntegrationTests.Conversion
         {
             var utilityNetwork = _eventStore.Projections.Get<UtilityNetworkProjection>();
 
-            var importer = new CableSpanEquipmentImporter(_loggerFactory.CreateLogger<ConduitSpanEquipmentImporter>(), _eventStore, new Settings.GeoDatabaseSetting(), _commandDispatcher, _queryDispatcher);
+            var importer = new CableSpanEquipmentImporter(_loggerFactory.CreateLogger<ConduitSpanEquipmentImporter>(), _eventStore, new Settings.GeoDatabaseSetting(), _commandDispatcher, _queryDispatcher, _routeNetworkState);
 
             Guid cableId = Guid.NewGuid();
 
@@ -257,7 +260,7 @@ namespace OpenFTTH.APIGateway.IntegrationTests.Conversion
                 Port = "5432"
             };
 
-            var importer = new CableSpanEquipmentImporter(_loggerFactory.CreateLogger<ConduitSpanEquipmentImporter>(), _eventStore, dbSettings, _commandDispatcher, _queryDispatcher);
+            var importer = new CableSpanEquipmentImporter(_loggerFactory.CreateLogger<ConduitSpanEquipmentImporter>(), _eventStore, dbSettings, _commandDispatcher, _queryDispatcher, _routeNetworkState);
 
             //importer.Run();
         }
