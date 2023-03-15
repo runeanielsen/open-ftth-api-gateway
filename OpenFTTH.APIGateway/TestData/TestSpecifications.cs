@@ -1,10 +1,14 @@
 ﻿using FluentResults;
 using Microsoft.Extensions.Logging;
 using OpenFTTH.CQRS;
+using OpenFTTH.EventSourcing;
 using OpenFTTH.Util;
 using OpenFTTH.UtilityGraphService.API.Commands;
 using OpenFTTH.UtilityGraphService.API.Model.UtilityNetwork;
 using OpenFTTH.UtilityGraphService.API.Queries;
+using OpenFTTH.UtilityGraphService.Business.NodeContainers.Projections;
+using OpenFTTH.UtilityGraphService.Business.SpanEquipments.Projections;
+using OpenFTTH.UtilityGraphService.Business.TerminalEquipments.Projections;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,14 +23,16 @@ namespace OpenFTTH.TestData
 
         private ICommandDispatcher _commandDispatcher;
         private IQueryDispatcher _queryDispatcher;
+        private IEventStore _eventStore;
 
         private ILogger<TestSpecifications> _logger;
 
-        public TestSpecifications(ILoggerFactory loggerFactory, ICommandDispatcher commandDispatcher, IQueryDispatcher queryDispatcher)
+        public TestSpecifications(ILoggerFactory loggerFactory, ICommandDispatcher commandDispatcher, IQueryDispatcher queryDispatcher, IEventStore eventStore)
         {
+            _logger = loggerFactory.CreateLogger<TestSpecifications>();
             _commandDispatcher = commandDispatcher;
             _queryDispatcher = queryDispatcher;
-            _logger = loggerFactory.CreateLogger<TestSpecifications>();
+            _eventStore = eventStore;
         }
 
         public static Guid Manu_GMPlast = Guid.Parse("47e87d16-a1f0-488a-8c3e-cb3a4f3e8926");
@@ -196,6 +202,8 @@ namespace OpenFTTH.TestData
         public static Guid SpliceTray_SC12Pin = Guid.Parse("4a15dcc1-4477-4c9d-bf5e-e530480ce822");
 
         public static Guid SpliceTray_GSS_With6Trays = Guid.Parse("6351d851-4062-40c3-8fce-d52e9685144f");
+        public static Guid SpliceTray_GSS_With34Trays = Guid.Parse("fd9343f4-9727-4e4a-896c-5078454621f6");
+        public static Guid SpliceTray_GSS_With36Trays = Guid.Parse("bd56c253-2e64-4ab8-bcfc-281a6c099073");
 
         public static Guid SplicePatchTray_LX12UPC12APC = Guid.Parse("adabaab0-24bd-4ecf-b703-932c407cfba8");
         public static Guid SplicePatchTray_LC_APC = Guid.Parse("b4575860-189a-4a88-b033-08087de616d9");
@@ -210,6 +218,9 @@ namespace OpenFTTH.TestData
         public static Guid OCM8_1_32_Splitter_BRAKIR = Guid.Parse("244d8b07-b00c-404c-8a7f-a15b92b8cde9");
         public static Guid OCM5_1_32_Splitter_LC = Guid.Parse("1d8f37d8-14e1-40ca-b56a-fab88b9ac640");
         public static Guid OCM5_1_32_Splitter_SC = Guid.Parse("b8463700-da4f-4b7e-bb7f-5e96d2d8d90c");
+
+        public static Guid Splitter_LZ_1_4 = Guid.Parse("6022567c-c6b8-49c7-a037-ff87162ebe15");
+        public static Guid Splitter_LZ_1_8 = Guid.Parse("8df40e49-d53a-41f4-84c5-192539823131");
 
 
         public static Guid OLT_LineCard8Port = Guid.Parse("79e5653e-a06a-4921-8b43-2dbec1e0e914");
@@ -229,7 +240,7 @@ namespace OpenFTTH.TestData
         public static Guid SpliceClosure_VMC_24Tray = Guid.Parse("420cdc14-5eaf-4d28-ade2-1cb5a940d818");
         public static Guid SpliceClosure_VMC_LZ = Guid.Parse("6ed9bc08-51b7-4c0c-a286-16f27f2f3ffb");
         public static Guid SpliceClosure_3M_72Fiber = Guid.Parse("c20fb96a-18c7-4730-aae2-e2e5882006d9");
-        public static Guid SpliceClosure_Uknown = Guid.Parse("803401a2-45b2-4958-81ee-4944833fc98f");
+        public static Guid SpliceClosure_Uknown16Trays = Guid.Parse("803401a2-45b2-4958-81ee-4944833fc98f");
         public static Guid SpliceClosure_Uknown12Fiber = Guid.Parse("a3de806d-8e3b-4280-8e12-ff875bf87469");
         public static Guid SpliceClosure_Uknown72Fiber = Guid.Parse("411b565b-2704-4416-bfaa-09e1faa62f8b");
         public static Guid SpliceClosure_BUDI1S_16SCTrays = Guid.Parse("b982398f-d546-41ab-a5d1-10048d5b9db6");
@@ -263,8 +274,6 @@ namespace OpenFTTH.TestData
         public static Guid FP_SplitterPanel = Guid.Parse("f36dd9ff-338a-456e-9435-d43f40d0b452");
         
         public static Guid FP_SplitterSkuffe = Guid.Parse("52266e8e-94bb-43e3-a176-a38fae650bb9");
-            
-        public static Guid FP_GSS = Guid.Parse("44970d3c-bc3a-45ba-8229-d18124b4cfbc");
 
         public static Guid Subrack_EMCoupler32 = Guid.Parse("15954f7c-b4d7-48d8-87bb-f12e5e23719b");
         public static Guid Subrack_EMCoupler48 = Guid.Parse("4a61883e-5d0c-44c7-a692-29fbc05c8827");
@@ -1746,14 +1755,60 @@ namespace OpenFTTH.TestData
             AddSpecification(new TerminalStructureSpecification(SpliceTray_EMCoupler48, "Couplers", "EM48 Coupler", "EM48 Coupler", em48terminals.ToArray()));
 
 
+            // LZ Splitter 1:4
+            AddSpecification(new TerminalStructureSpecification(Splitter_LZ_1_4, "Splitters", "1:4 Landzonesplitter", "1:4 Split",
+                new TerminalTemplate[]
+                {
+                    new TerminalTemplate("IND", TerminalDirectionEnum.IN, true, true) {  InternalConnectivityNode = "spl1" },
+                    new TerminalTemplate("UD 1", TerminalDirectionEnum.OUT, true, true) {  InternalConnectivityNode = "spl1" },
+                    new TerminalTemplate("UD 2", TerminalDirectionEnum.OUT, true, true) {  InternalConnectivityNode = "spl1" },
+                    new TerminalTemplate("UD 3", TerminalDirectionEnum.OUT, true, true) { InternalConnectivityNode = "spl1" },
+                    new TerminalTemplate("UD 4", TerminalDirectionEnum.OUT, true, true) {  InternalConnectivityNode = "spl1" },
+                 }
+            ));
+
+            // LZ Splitter 1:8
+            AddSpecification(new TerminalStructureSpecification(Splitter_LZ_1_8, "Splitters", "1:8 Landzonesplitter", "1:8 Split",
+                new TerminalTemplate[]
+                {
+                    new TerminalTemplate("IND", TerminalDirectionEnum.IN, true, true) {  InternalConnectivityNode = "spl1" },
+                    new TerminalTemplate("UD 1", TerminalDirectionEnum.OUT, true, true) {  InternalConnectivityNode = "spl1" },
+                    new TerminalTemplate("UD 2", TerminalDirectionEnum.OUT, true, true) {  InternalConnectivityNode = "spl1" },
+                    new TerminalTemplate("UD 3", TerminalDirectionEnum.OUT, true, true) { InternalConnectivityNode = "spl1" },
+                    new TerminalTemplate("UD 4", TerminalDirectionEnum.OUT, true, true) {  InternalConnectivityNode = "spl1" },
+                    new TerminalTemplate("UD 5", TerminalDirectionEnum.OUT, true, true) {  InternalConnectivityNode = "spl1" },
+                    new TerminalTemplate("UD 6", TerminalDirectionEnum.OUT, true, true) {  InternalConnectivityNode = "spl1" },
+                    new TerminalTemplate("UD 7", TerminalDirectionEnum.OUT, true, true) { InternalConnectivityNode = "spl1" },
+                    new TerminalTemplate("UD 8", TerminalDirectionEnum.OUT, true, true) {  InternalConnectivityNode = "spl1" },
+                 }
+            ));
+
 
         }
 
         private void AddTerminalEquipmentSpecifications()
         {
-            // Ukend Splidseboks
-            AddSpecification(new TerminalEquipmentSpecification(SpliceClosure_Uknown, "SpliceClosure", "Ukendt Splidseboks", "Splidseboks", false, 0,
-                Array.Empty<TerminalStructureTemplate>()
+            // Ukend Splidseboks , 16 bakker
+            AddSpecification(new TerminalEquipmentSpecification(SpliceClosure_Uknown16Trays, "SpliceClosure", "Ukendt Splidseboks m. 16 bakker", "Splidseboks", false, 0,
+               new TerminalStructureTemplate[]
+                {
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 1),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 2),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 3),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 4),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 5),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 6),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 7),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 8),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 9),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 10),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 11),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 12),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 13),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 14),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 15),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 16)
+               }
             ));
 
             // 12 Fiber Tray Uknown Type
@@ -2066,11 +2121,93 @@ namespace OpenFTTH.TestData
             )
             { ManufacturerRefs = new Guid[] { Manu_CommScope } });
 
-            // FP GSS skuffe   
-            AddSpecification(new TerminalEquipmentSpecification(FP_GSS, "Subrack", "Splidseskuffe GSS2 19\" 4x10mm Flex", "GSS Skuffe FP", true, 4,
-                Array.Empty<TerminalStructureTemplate>()
+
+            // FP GSS subrack with 34 trays
+            AddSpecification(new TerminalEquipmentSpecification(SpliceTray_GSS_With34Trays, "Subrack", "GSS m. 34 bakker", "GSS", true, 4,
+                new TerminalStructureTemplate[]
+                {
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 1),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 2),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 3),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 4),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 5),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 6),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 7),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 8),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 9),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 10),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 11),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 12),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 13),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 14),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 15),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 16),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 17),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 18),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 19),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 20),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 21),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 22),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 23),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 24),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 25),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 26),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 27),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 28),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 29),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 30),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 31),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 32),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 33),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 34),
+                 }
             )
             { ManufacturerRefs = new Guid[] { Manu_CommScope } });
+
+            // FP GSS subrack with 36 trays
+            AddSpecification(new TerminalEquipmentSpecification(SpliceTray_GSS_With36Trays, "Subrack", "GSS m. 36 bakker", "GSS", true, 4,
+                new TerminalStructureTemplate[]
+                {
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 1),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 2),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 3),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 4),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 5),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 6),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 7),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 8),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 9),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 10),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 11),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 12),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 13),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 14),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 15),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 16),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 17),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 18),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 19),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 20),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 21),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 22),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 23),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 24),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 25),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 26),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 27),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 28),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 29),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 30),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 31),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 32),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 33),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 34),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 35),
+                    new TerminalStructureTemplate(SpliceTray_Uknown12Pin, 36),
+                 }
+            )
+            { ManufacturerRefs = new Guid[] { Manu_CommScope } });
+
 
             // GSS subrack EM32 Coupler hylde
             AddSpecification(new TerminalEquipmentSpecification(Subrack_EMCoupler32, "Subrack", "EM32 Coupler hylde", "GSS", true, 4,
@@ -2093,6 +2230,11 @@ namespace OpenFTTH.TestData
 
         private void AddSpecification(SpanEquipmentSpecification spec)
         {
+            var specifications = _eventStore.Projections.Get<SpanEquipmentSpecificationsProjection>().Specifications;
+
+            if (specifications.ContainsKey(spec.Id))
+                return;
+
             var cmd = new AddSpanEquipmentSpecification(Guid.NewGuid(), new UserContext("specification seeder", _specSeederId), spec);
 
             var cmdResult = _commandDispatcher.HandleAsync<AddSpanEquipmentSpecification, Result>(cmd).Result;
@@ -2103,6 +2245,11 @@ namespace OpenFTTH.TestData
 
         private void AddSpecification(SpanStructureSpecification spec)
         {
+            var specifications = _eventStore.Projections.Get<SpanStructureSpecificationsProjection>().Specifications;
+
+            if (specifications.ContainsKey(spec.Id))
+                return;
+
             var cmd = new AddSpanStructureSpecification(Guid.NewGuid(), new UserContext("specification seeder", _specSeederId), spec);
 
             var cmdResult = _commandDispatcher.HandleAsync<AddSpanStructureSpecification, Result>(cmd).Result;
@@ -2114,6 +2261,11 @@ namespace OpenFTTH.TestData
 
         private void AddSpecification(NodeContainerSpecification spec)
         {
+            var specifications = _eventStore.Projections.Get<NodeContainerSpecificationsProjection>().Specifications;
+
+            if (specifications.ContainsKey(spec.Id))
+                return;
+
             var cmd = new AddNodeContainerSpecification(Guid.NewGuid(), new UserContext("specification seeder", _specSeederId), spec);
 
             var cmdResult = _commandDispatcher.HandleAsync<AddNodeContainerSpecification, Result>(cmd).Result;
@@ -2124,6 +2276,11 @@ namespace OpenFTTH.TestData
 
         private void AddSpecification(RackSpecification spec)
         {
+            var specifications = _eventStore.Projections.Get<RackSpecificationsProjection>().Specifications;
+
+            if (specifications.ContainsKey(spec.Id))
+                return;
+
             var cmd = new AddRackSpecification(Guid.NewGuid(), new UserContext("test", Guid.Empty), spec);
             var cmdResult = _commandDispatcher.HandleAsync<AddRackSpecification, Result>(cmd).Result;
 
@@ -2133,6 +2290,11 @@ namespace OpenFTTH.TestData
 
         private void AddManufacturer(Manufacturer manufacturer)
         {
+            var specifications = _eventStore.Projections.Get<ManufacturerProjection>().Manufacturer;
+
+            if (specifications.ContainsKey(manufacturer.Id))
+                return;
+
             var cmd = new AddManufacturer(Guid.NewGuid(), new UserContext("specification seeder", _specSeederId), manufacturer);
 
             var cmdResult = _commandDispatcher.HandleAsync<AddManufacturer, Result>(cmd).Result;
@@ -2143,6 +2305,11 @@ namespace OpenFTTH.TestData
 
         private void AddSpecification(TerminalEquipmentSpecification spec)
         {
+            var specifications = _eventStore.Projections.Get<TerminalEquipmentSpecificationsProjection>().Specifications;
+
+            if (specifications.ContainsKey(spec.Id))
+                return;
+
             var cmd = new AddTerminalEquipmentSpecification(Guid.NewGuid(), new UserContext("test", Guid.Empty), spec);
             var cmdResult = _commandDispatcher.HandleAsync<AddTerminalEquipmentSpecification, Result>(cmd).Result;
 
@@ -2152,6 +2319,11 @@ namespace OpenFTTH.TestData
 
         private void AddSpecification(TerminalStructureSpecification spec)
         {
+            var specifications = _eventStore.Projections.Get<TerminalStructureSpecificationsProjection>().Specifications;
+
+            if (specifications.ContainsKey(spec.Id))
+                return;
+
             var cmd = new AddTerminalStructureSpecification(Guid.NewGuid(), new UserContext("test", Guid.Empty), spec);
             var cmdResult = _commandDispatcher.HandleAsync<AddTerminalStructureSpecification, Result>(cmd).Result;
 

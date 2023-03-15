@@ -49,7 +49,7 @@ namespace OpenFTTH.APIGateway.IntegrationTests.SpanEquipments
         public void CreateSpanEquipmentSpecifications()
         {
             // Add conduit specifications
-            _specs = new TestSpecifications(_loggerFactory, _commandDispatcher, _queryDispatcher).Run().Value;
+            _specs = new TestSpecifications(_loggerFactory, _commandDispatcher, _queryDispatcher, _eventStore).Run().Value;
         }
 
 

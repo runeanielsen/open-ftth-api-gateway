@@ -55,7 +55,7 @@ namespace OpenFTTH.APIGateway.TestData
                 }
 
                 _logger.LogInformation("Creating specifications...");
-                new TestSpecifications(_loggerFactory, _commandDispatcher, _queryDispatcher).Run();
+                new TestSpecifications(_loggerFactory, _commandDispatcher, _queryDispatcher, _eventStore).Run();
 
                 _logger.LogInformation("Adding span equipments...");
                 var conduits = LoadConduitsFromConversionDatabase();
