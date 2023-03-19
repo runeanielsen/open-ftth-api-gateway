@@ -259,30 +259,39 @@ namespace OpenFTTH.APIGateway.Conversion
         {
             if (relatedInfo.NodeContainer == null)
                 return null;
-
-            if (relatedInfo.NodeContainer.Racks == null)
-                return null;
-
-            if (!relatedInfo.NodeContainer.Racks.Any(r => r.Name == rackName))
-                return null;
-
-            var rack = relatedInfo.NodeContainer.Racks.First(r => r.Name == rackName);
-
-
+          
             // Find terminal equipment
             TerminalEquipment? te = null;
 
-            foreach (var subRack in rack.SubrackMounts)
+            if (!String.IsNullOrEmpty(rackName))
             {
-                if (_utilityNetwork.TryGetEquipment<TerminalEquipment>(subRack.TerminalEquipmentId, out var terminalEquipment))
+                if (relatedInfo.NodeContainer.Racks == null)
+                    return null;
+
+                if (relatedInfo.NodeContainer.Racks.Any(r => r.Name == rackName))
+                    return null;
+
+                var rack = relatedInfo.NodeContainer.Racks.First(r => r.Name == rackName);
+
+                foreach (var subRack in rack.SubrackMounts)
                 {
-                    if (terminalEquipment.NamingInfo != null && terminalEquipment.NamingInfo.Name == equipmentName)
-                        te = terminalEquipment;
+                    if (_utilityNetwork.TryGetEquipment<TerminalEquipment>(subRack.TerminalEquipmentId, out var terminalEquipment))
+                    {
+                        if (terminalEquipment.NamingInfo != null && terminalEquipment.NamingInfo.Name == equipmentName)
+                            te = terminalEquipment;
+                    }
                 }
             }
+            else
+            {
+                if (relatedInfo.TerminalEquipmentByName.ContainsKey(equipmentName))
+                    te = relatedInfo.TerminalEquipmentByName[equipmentName];
+            }
+
 
             if (te == null)
                 return null;
+
 
             // Find terminal structure
             if (!te.TerminalStructures.Any(s => s.Position == structurePosition))
@@ -291,38 +300,49 @@ namespace OpenFTTH.APIGateway.Conversion
             var terminalStructure = te.TerminalStructures.First(s => s.Position == structurePosition);
 
             // Find terminal
-            if (!terminalStructure.Terminals.Any(t => t.Name == portName))
+            if (terminalStructure.Terminals.Any(t => t.Name == portName))
+                return terminalStructure.Terminals.First(t => t.Name == portName).Id;
+            else if (terminalStructure.Terminals.Any(t => t.Name == portName.ToLower()))
+                return terminalStructure.Terminals.First(t => t.Name == portName.ToLower()).Id;
+            else if (terminalStructure.Terminals.Any(t => t.Name == portName.ToLower().Replace(" ", "")))
+                return terminalStructure.Terminals.First(t => t.Name == portName.ToLower().Replace(" ", "")).Id;
+            else
                 return null;
 
-            var terminal = terminalStructure.Terminals.First(t => t.Name == portName);
-
-            return terminal.Id;
         }
 
         private Guid? FindTerminalByFiber(RelatedEquipmentInfo relatedInfo, string rackName, string equipmentName, int structurePosition, int fiberNo)
         {
             if (relatedInfo.NodeContainer == null)
                 return null;
-
-            if (relatedInfo.NodeContainer.Racks == null)
-                return null;
-
-            if (!relatedInfo.NodeContainer.Racks.Any(r => r.Name == rackName))
-                return null;
-
-            var rack = relatedInfo.NodeContainer.Racks.First(r => r.Name == rackName);
-
-
+                   
             // Find terminal equipment
             TerminalEquipment? te = null;
 
-            foreach (var subRack in rack.SubrackMounts)
+
+            if (!String.IsNullOrEmpty(rackName))
             {
-                if (_utilityNetwork.TryGetEquipment<TerminalEquipment>(subRack.TerminalEquipmentId, out var terminalEquipment))
+                if (relatedInfo.NodeContainer.Racks == null)
+                    return null;
+
+                if (relatedInfo.NodeContainer.Racks.Any(r => r.Name == rackName))
+                    return null;
+
+                var rack = relatedInfo.NodeContainer.Racks.First(r => r.Name == rackName);
+
+                foreach (var subRack in rack.SubrackMounts)
                 {
-                    if (terminalEquipment.NamingInfo != null && terminalEquipment.NamingInfo.Name == equipmentName)
-                        te = terminalEquipment;
+                    if (_utilityNetwork.TryGetEquipment<TerminalEquipment>(subRack.TerminalEquipmentId, out var terminalEquipment))
+                    {
+                        if (terminalEquipment.NamingInfo != null && terminalEquipment.NamingInfo.Name == equipmentName)
+                            te = terminalEquipment;
+                    }
                 }
+            }
+            else
+            {
+                if (relatedInfo.TerminalEquipmentByName.ContainsKey(equipmentName))
+                    te = relatedInfo.TerminalEquipmentByName[equipmentName];
             }
 
             if (te == null)
@@ -422,7 +442,23 @@ namespace OpenFTTH.APIGateway.Conversion
                     Dictionary<Guid, SpanEquipmentWithRelatedInfo> spanEquipmentByInterestId = equipmentQueryResult.Value.SpanEquipment.ToDictionary(s => s.WalkOfInterestId);
 
                     if (equipmentQueryResult.Value.NodeContainers != null && equipmentQueryResult.Value.NodeContainers.Count > 0)
+                    {
                         result.NodeContainer = equipmentQueryResult.Value.NodeContainers.First();
+
+                        if (result.NodeContainer.TerminalEquipmentReferences != null)
+                        {
+                            foreach (var teId in result.NodeContainer.TerminalEquipmentReferences)
+                            {
+                                if (_utilityNetwork.TryGetEquipment<TerminalEquipment>(teId, out var te))
+                                {
+                                    if (!result.TerminalEquipmentByName.ContainsKey(te.Name))
+                                    {
+                                        result.TerminalEquipmentByName.Add(te.Name, te);
+                                    }
+                                }
+                            }
+                        }
+                    }
 
                     foreach (var interestRel in interestQueryResult.Value.RouteNetworkElements.First().InterestRelations)
                     {
@@ -439,6 +475,9 @@ namespace OpenFTTH.APIGateway.Conversion
                             result.SpanEquipmentById.Add(spanEq.Id, spanEq);
                         }
                     }
+
+                    
+
                 }
                 else
                     _logger.LogError($"Error querying equipment details in route node with id: {routeNodeId} " + equipmentQueryResult.Errors.First().Message);
@@ -463,6 +502,7 @@ namespace OpenFTTH.APIGateway.Conversion
             public List<SpanEquipment> IngoingSpanEquipments = new();
             public List<SpanEquipment> OutgoingSpanEquipments = new();
             public Dictionary<Guid, SpanEquipment> SpanEquipmentById = new();
+            public Dictionary<string, TerminalEquipment> TerminalEquipmentByName = new();
 
             public bool SingleConduitsOnly
             {
