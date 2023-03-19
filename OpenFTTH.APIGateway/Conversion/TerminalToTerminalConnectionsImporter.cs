@@ -207,7 +207,7 @@ namespace OpenFTTH.APIGateway.Conversion
                 else // normal connection
                 {
                     // Find from terminal
-                    string[] fromSplit = connection.From.Split('-');
+                    string[] fromSplit = connection.From.Split(';');
                     var fromRackName = fromSplit[0];
                     var fromEquipmentName = fromSplit[1];
                     var fromStructurePosition = Int32.Parse(fromSplit[2]);
@@ -219,7 +219,7 @@ namespace OpenFTTH.APIGateway.Conversion
                         return Result.Fail(new Error($"Cannot find to terminal from information: '{connection.From}"));
 
                     // Find to terminal
-                    string[] toSplit = connection.To.Split('-');
+                    string[] toSplit = connection.To.Split(';');
                     var toRackName = toSplit[0];
                     var toEquipmentName = toSplit[1];
                     var toStructurePosition = Int32.Parse(toSplit[2]);
@@ -268,7 +268,7 @@ namespace OpenFTTH.APIGateway.Conversion
                 if (relatedInfo.NodeContainer.Racks == null)
                     return null;
 
-                if (relatedInfo.NodeContainer.Racks.Any(r => r.Name == rackName))
+                if (!relatedInfo.NodeContainer.Racks.Any(r => r.Name == rackName))
                     return null;
 
                 var rack = relatedInfo.NodeContainer.Racks.First(r => r.Name == rackName);
@@ -325,7 +325,7 @@ namespace OpenFTTH.APIGateway.Conversion
                 if (relatedInfo.NodeContainer.Racks == null)
                     return null;
 
-                if (relatedInfo.NodeContainer.Racks.Any(r => r.Name == rackName))
+                if (!relatedInfo.NodeContainer.Racks.Any(r => r.Name == rackName))
                     return null;
 
                 var rack = relatedInfo.NodeContainer.Racks.First(r => r.Name == rackName);
