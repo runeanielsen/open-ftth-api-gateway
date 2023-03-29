@@ -642,7 +642,7 @@ namespace OpenFTTH.APIGateway.Conversion
                 else if (externalSpec.ToLower() == "72 fiber")
                     return TestSpecifications.FiberCable_72Fiber;
                 else if (externalSpec.ToLower() == "48 fiber")
-                    return TestSpecifications.FiberCable_72Fiber;
+                    return TestSpecifications.FiberCable_48Fiber;
                 else if (externalSpec.ToLower() == "96 fiber")
                     return TestSpecifications.FiberCable_96Fiber;
 

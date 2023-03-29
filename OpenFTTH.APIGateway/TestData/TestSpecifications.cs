@@ -56,6 +56,8 @@ namespace OpenFTTH.TestData
         public static Guid Building_Teknikhus = Guid.Parse("0e2aac87-909b-47b4-8021-6fd1345dada9");
         public static Guid Building_Flexhus = Guid.Parse("f9a5d838-a9c4-409a-9b4b-a01f7042f830");
         public static Guid Building_Customer = Guid.Parse("11ec46f6-7b88-4117-80a0-7d410ad31a6a");
+        public static Guid Splidseboks_Indvendig = Guid.Parse("17225914-bbe9-4b4f-a558-95b4d065fe23");
+        public static Guid Splidseboks_Udvendig = Guid.Parse("6bd38bc0-f133-44b2-968b-972736b0fcc1");
 
         public static Guid Cabinet_Uknown = Guid.Parse("ab0aeb35-f35a-4618-bcb0-1f28a279f665");
         public static Guid Cabinet_PK20 = Guid.Parse("bff6d247-5888-4657-952a-b66de67757a9");
@@ -218,6 +220,7 @@ namespace OpenFTTH.TestData
         public static Guid OCM8_1_32_Splitter_BRAKIR = Guid.Parse("244d8b07-b00c-404c-8a7f-a15b92b8cde9");
         public static Guid OCM5_1_32_Splitter_LC = Guid.Parse("1d8f37d8-14e1-40ca-b56a-fab88b9ac640");
         public static Guid OCM5_1_32_Splitter_SC = Guid.Parse("b8463700-da4f-4b7e-bb7f-5e96d2d8d90c");
+        public static Guid OCM5_2x1_16_Splitter_SC = Guid.Parse("e5d2c885-5b4d-4c00-a8bb-e767195d1b66");
 
         public static Guid Splitter_LZ_1_4 = Guid.Parse("6022567c-c6b8-49c7-a037-ff87162ebe15");
         public static Guid Splitter_LZ_1_8 = Guid.Parse("8df40e49-d53a-41f4-84c5-192539823131");
@@ -430,6 +433,19 @@ namespace OpenFTTH.TestData
             AddSpecification(new NodeContainerSpecification(Building_Customer, "Buildings", "Bygningsenhed")
             {
                 Description = "Bygningsenhed"
+            });
+
+            // Indvendig splidseboks
+            AddSpecification(new NodeContainerSpecification(Splidseboks_Indvendig, "SpliceClosure", "Indvendig splidseboks")
+            {
+                Description = "Indvendig splidseboks"
+            });
+
+
+            // Udvendig splidseboks
+            AddSpecification(new NodeContainerSpecification(Splidseboks_Udvendig, "SpliceClosure", "Udvendig splidseboks")
+            {
+                Description = "Udvendig splidseboks"
             });
 
         }
@@ -1576,6 +1592,51 @@ namespace OpenFTTH.TestData
             ));
 
 
+            // Splittermodul OCM5 2 x 1:16 3m SC / APC
+            // OCM5 SC/APC 1:32 splitter 
+            AddSpecification(new TerminalStructureSpecification(OCM5_2x1_16_Splitter_SC, "Splitters", "Splittermodul OCM5 2 x 1:16 3m SC / APC", "1:16 Split",
+                new TerminalTemplate[]
+                {
+                    new TerminalTemplate("ind1", TerminalDirectionEnum.IN, true, false) { ConnectorType = "SC/APC", InternalConnectivityNode = "spl1" },
+                    new TerminalTemplate("ud1-1", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "SC/APC", InternalConnectivityNode = "spl1" },
+                    new TerminalTemplate("ud1-2", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "SC/APC", InternalConnectivityNode = "spl1" },
+                    new TerminalTemplate("ud1-3", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "SC/APC", InternalConnectivityNode = "spl1" },
+                    new TerminalTemplate("ud1-4", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "SC/APC", InternalConnectivityNode = "spl1" },
+                    new TerminalTemplate("ud1-5", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "SC/APC", InternalConnectivityNode = "spl1" },
+                    new TerminalTemplate("ud1-6", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "SC/APC", InternalConnectivityNode = "spl1" },
+                    new TerminalTemplate("ud1-7", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "SC/APC", InternalConnectivityNode = "spl1" },
+                    new TerminalTemplate("ud1-8", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "SC/APC", InternalConnectivityNode = "spl1" },
+                    new TerminalTemplate("ud1-9", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "SC/APC", InternalConnectivityNode = "spl1" },
+                    new TerminalTemplate("ud1-10", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "SC/APC", InternalConnectivityNode = "spl1" },
+                    new TerminalTemplate("ud1-11", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "SC/APC", InternalConnectivityNode = "spl1" },
+                    new TerminalTemplate("ud1-12", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "SC/APC", InternalConnectivityNode = "spl1" },
+                    new TerminalTemplate("ud1-13", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "SC/APC", InternalConnectivityNode = "spl1" },
+                    new TerminalTemplate("ud1-14", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "SC/APC", InternalConnectivityNode = "spl1" },
+                    new TerminalTemplate("ud1-15", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "SC/APC", InternalConnectivityNode = "spl1" },
+                    new TerminalTemplate("ud1-16", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "SC/APC", InternalConnectivityNode = "spl1" },
+
+                    new TerminalTemplate("ind2", TerminalDirectionEnum.IN, true, false) { ConnectorType = "SC/APC", InternalConnectivityNode = "spl2" },
+                    new TerminalTemplate("ud2-1", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "SC/APC", InternalConnectivityNode = "spl2" },
+                    new TerminalTemplate("ud2-2", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "SC/APC", InternalConnectivityNode = "spl2" },
+                    new TerminalTemplate("ud2-3", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "SC/APC", InternalConnectivityNode = "spl2" },
+                    new TerminalTemplate("ud2-4", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "SC/APC", InternalConnectivityNode = "spl2" },
+                    new TerminalTemplate("ud2-5", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "SC/APC", InternalConnectivityNode = "spl2" },
+                    new TerminalTemplate("ud2-6", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "SC/APC", InternalConnectivityNode = "spl2" },
+                    new TerminalTemplate("ud2-7", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "SC/APC", InternalConnectivityNode = "spl2" },
+                    new TerminalTemplate("ud2-8", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "SC/APC", InternalConnectivityNode = "spl2" },
+                    new TerminalTemplate("ud2-9", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "SC/APC", InternalConnectivityNode = "spl2" },
+                    new TerminalTemplate("ud2-10", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "SC/APC", InternalConnectivityNode = "spl2" },
+                    new TerminalTemplate("ud2-11", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "SC/APC", InternalConnectivityNode = "spl2" },
+                    new TerminalTemplate("ud2-12", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "SC/APC", InternalConnectivityNode = "spl2" },
+                    new TerminalTemplate("ud2-13", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "SC/APC", InternalConnectivityNode = "spl2" },
+                    new TerminalTemplate("ud2-14", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "SC/APC", InternalConnectivityNode = "spl2" },
+                    new TerminalTemplate("ud2-15", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "SC/APC", InternalConnectivityNode = "spl2" },
+                    new TerminalTemplate("ud2-16", TerminalDirectionEnum.OUT, true, false) { ConnectorType = "SC/APC", InternalConnectivityNode = "spl2" }
+                }
+            ));
+
+
+
             // 8 Port Line Card
             AddSpecification(new TerminalStructureSpecification(OLT_LineCard8Port, "LineCards", "ISAM FD/FX 8port GPON Line board", "8 ports LT kort",
                 new TerminalTemplate[]
@@ -1664,8 +1725,8 @@ namespace OpenFTTH.TestData
             AddSpecification(new TerminalStructureSpecification(LGX_WDMTypeKina, "Couplers", "WDM Coupler Type KINA (LGX Modul)", "WDM type KINA",
                 new TerminalTemplate[]
                 {
-                    new TerminalTemplate("IP 1", TerminalDirectionEnum.IN, false, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "tv" },
-                    new TerminalTemplate("RF 2", TerminalDirectionEnum.IN, false, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "spl1" },
+                    new TerminalTemplate("IP 1", TerminalDirectionEnum.IN, false, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "spl1" },
+                    new TerminalTemplate("RF 2", TerminalDirectionEnum.IN, false, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "tv" },
                     new TerminalTemplate("RF 3", TerminalDirectionEnum.IN, false, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "tv" },
 
                     new TerminalTemplate("UD 4", TerminalDirectionEnum.OUT, false, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "spl1" },
