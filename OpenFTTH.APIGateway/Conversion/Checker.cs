@@ -100,7 +100,7 @@ namespace OpenFTTH.APIGateway.Conversion
                         }
 
                         // try another port if we have not reaced olt
-                        if (!eqName.ToLower().Contains("olt") && i < 3)
+                        if (!(eqName.ToLower().Contains("olt") || eqName.ToLower().Contains("pon02")) && i < 3)
                             continue;
 
 

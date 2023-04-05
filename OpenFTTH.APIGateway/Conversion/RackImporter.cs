@@ -227,19 +227,19 @@ namespace OpenFTTH.APIGateway.Conversion
             using var nodeContainerSelectCmd = dbConn.CreateCommand();
             nodeContainerSelectCmd.CommandText = "SELECT external_id, external_spec, route_node_id, rack_id, specification,name, number_of_units FROM " + _rackTableName + " WHERE status is null ORDER BY external_id";
 
-            using var nodeContainerReader = nodeContainerSelectCmd.ExecuteReader();
+            using var rackReader = nodeContainerSelectCmd.ExecuteReader();
 
-            while (nodeContainerReader.Read())
+            while (rackReader.Read())
             {
                 var rack = new RackForConversion();
 
-                var externalId = nodeContainerReader.GetString(0).Trim();
-                var externalSpec = nodeContainerReader.GetString(1).Trim();
-                rack.NodeId = Guid.Parse(nodeContainerReader.GetString(2));
-                rack.RackId = Guid.Parse(nodeContainerReader.GetString(3));
-                rack.Specification = nodeContainerReader.GetString(4).Trim();
-                rack.Name = nodeContainerReader.GetString(5).Trim();
-                rack.HeightInUnits = Int32.Parse(nodeContainerReader.GetString(6).Trim());
+                rack.ExternalId = rackReader.GetString(0).Trim();
+                var externalSpec = rackReader.GetString(1).Trim();
+                rack.NodeId = Guid.Parse(rackReader.GetString(2));
+                rack.RackId = Guid.Parse(rackReader.GetString(3));
+                rack.Specification = rackReader.GetString(4).Trim();
+                rack.Name = rackReader.GetString(5).Trim();
+                rack.HeightInUnits = Int32.Parse(rackReader.GetString(6).Trim());
 
                 nodeContainersForConversions.Add(rack.RackId, rack);
             }
