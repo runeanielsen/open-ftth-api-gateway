@@ -140,9 +140,10 @@ namespace OpenFTTH.APIGateway.Conversion
             var conduitName = "K" + nextConduitSeqStr.PadLeft(6, '0');
             var namingInfo = new NamingInfo(conduitName, null);
 
+
             // HACK use NE id
-            var neIdSplit = externalId.Split(':');
-            namingInfo = new NamingInfo("K" + neIdSplit.Last(), null);
+            //var neIdSplit = externalId.Split(':');
+            //namingInfo = new NamingInfo("K" + neIdSplit.Last(), null);
 
             System.Diagnostics.Debug.WriteLine("---------------------------------------------------------------------------------------------------------------------------------------");
             System.Diagnostics.Debug.WriteLine($"*** Place cable: {externalId} ***");
