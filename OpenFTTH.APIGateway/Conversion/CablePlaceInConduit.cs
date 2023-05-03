@@ -82,7 +82,7 @@ namespace OpenFTTH.APIGateway.Conversion
             using var dbConn = GetConnection();
 
             using var dbCmd = dbConn.CreateCommand();
-            dbCmd.CommandText = "SELECT external_id, span_equipment_id, span_equipment_spec_name, segment_ids, parent_span_equipment_ids, status FROM " + tableName + " WHERE external_id like 'CustomerTerminationFiberCable%' or external_id like 'TerminationDistributionPointFiberCable%'  ORDER BY external_id";
+            dbCmd.CommandText = "SELECT external_id, span_equipment_id, span_equipment_spec_name, segment_ids, parent_span_equipment_ids, status FROM " + tableName + " WHERE external_id like 'xCustomerTerminationFiberCable%' or external_id like 'TerminationDistributionPointFiberCable%'  ORDER BY external_id";
 
             using var dbReader = dbCmd.ExecuteReader();
 
@@ -154,34 +154,31 @@ namespace OpenFTTH.APIGateway.Conversion
 
             var nodeQueryResult = _queryDispatcher.HandleAsync<GetRouteNetworkDetails, Result<GetRouteNetworkDetailsResult>>(routeNodeQuery).Result;
 
-            if (nodeQueryResult.Value.RouteNetworkElements[endNodeId].InterestRelations.Where(i => i.RelationKind != RouteNetworkInterestRelationKindEnum.InsideNode).Count() == 2)
+
+            List<SpanEquipment> conduitCandidates = new List<SpanEquipment>();
+
+            foreach (var interest in nodeQueryResult.Value.RouteNetworkElements[endNodeId].InterestRelations)
             {
-                List<SpanEquipment> conduitCandidates = new List<SpanEquipment>();
-                
-                foreach (var interest in nodeQueryResult.Value.RouteNetworkElements[endNodeId].InterestRelations)
+                if (interest.RefId != cableWalkOfInterest.Id && interest.RelationKind == RouteNetworkInterestRelationKindEnum.Start || interest.RelationKind == RouteNetworkInterestRelationKindEnum.End)
                 {
-                    if (interest.RefId != cableWalkOfInterest.Id && interest.RelationKind == RouteNetworkInterestRelationKindEnum.Start || interest.RelationKind == RouteNetworkInterestRelationKindEnum.End)
+                    // Get the conduit
+                    if (_utilityNetwork.TryGetEquipment<SpanEquipment>(interest.RefId, out var conduitCandidate))
                     {
-                        // Get the conduit
-                        if (_utilityNetwork.TryGetEquipment<SpanEquipment>(interest.RefId, out var conduitCandidate))
-                        {
-                            if (!conduitCandidate.IsCable)
-                                conduitCandidates.Add(conduitCandidate);
-                        }
+                        if (!conduitCandidate.IsCable)
+                            conduitCandidates.Add(conduitCandidate);
                     }
                 }
+            }
 
 
-                if (conduitCandidates.Count() == 1)
-                {
-                    var conduitCandidate = conduitCandidates.First();
+            if (conduitCandidates.Count() == 1)
+            {
+                var conduitCandidate = conduitCandidates.First();
 
-                    var affixCommand = new AffixSpanEquipmentToParent(Guid.NewGuid(), new UserContext("conversion", _workTaskId), endNodeId, cable.SpanStructures[0].SpanSegments[0].Id, conduitCandidate.SpanStructures[0].SpanSegments[0].Id);
-                    var affixCommandResult = _commandDispatcher.HandleAsync<AffixSpanEquipmentToParent, Result>(affixCommand).Result;
+                var affixCommand = new AffixSpanEquipmentToParent(Guid.NewGuid(), new UserContext("conversion", _workTaskId), endNodeId, cable.SpanStructures[0].SpanSegments[0].Id, conduitCandidate.SpanStructures[0].SpanSegments[0].Id);
+                var affixCommandResult = _commandDispatcher.HandleAsync<AffixSpanEquipmentToParent, Result>(affixCommand).Result;
 
-                    return affixCommandResult;
-                }
-
+                return affixCommandResult;
             }
 
             return Result.Ok();
