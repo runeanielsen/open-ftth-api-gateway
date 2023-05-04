@@ -61,7 +61,6 @@ namespace OpenFTTH.APIGateway.Conversion
                 var dbToReadConversionDataFrom = _geoDatabaseSetting;
 
                 //new Checker(_loggerFactory.CreateLogger<Checker>(), _workTaskId, _eventStore, dbToReadConversionDataFrom, _commandDispatcher, _queryDispatcher).Run();
-
                
 
                 new CableSpanEquipmentImporter(_loggerFactory.CreateLogger<ConduitSpanEquipmentImporter>(), _eventStore, dbToReadConversionDataFrom, _commandDispatcher, _queryDispatcher, _routeNetworkState).Run();

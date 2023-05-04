@@ -82,7 +82,7 @@ namespace OpenFTTH.APIGateway.Conversion
             using var dbConn = GetConnection();
 
             using var dbCmd = dbConn.CreateCommand();
-            dbCmd.CommandText = "SELECT external_id, span_equipment_id, span_equipment_spec_name, segment_ids, parent_span_equipment_ids, status FROM " + tableName + " WHERE external_id like 'xCustomerTerminationFiberCable%' or external_id like 'TerminationDistributionPointFiberCable%'  ORDER BY external_id";
+            dbCmd.CommandText = "SELECT external_id, span_equipment_id, span_equipment_spec_name, segment_ids, parent_span_equipment_ids, status FROM " + tableName + " WHERE external_id like 'CustomerTerminationFiberCable%' or external_id like 'TerminationDistributionPointFiberCable%'  ORDER BY external_id";
 
             using var dbReader = dbCmd.ExecuteReader();
 
