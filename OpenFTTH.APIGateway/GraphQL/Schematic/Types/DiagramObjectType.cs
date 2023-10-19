@@ -3,7 +3,10 @@ using GraphQL.Types;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using OpenFTTH.APIGateway.CoreTypes;
+using OpenFTTH.APIGateway.DynamicProperties;
+using OpenFTTH.APIGateway.GraphQL.DynamicProperties.Types;
 using OpenFTTH.Schematic.API.Model.DiagramLayout;
+using System.Collections.Generic;
 
 namespace OpenFTTH.APIGateway.GraphQL.Schematic.Types
 {
@@ -41,6 +44,28 @@ namespace OpenFTTH.APIGateway.GraphQL.Schematic.Types
                     return context.Source.IdentifiedObject.RefClass;
                 return null;
             });
+
+            Field<ListGraphType<DynamicPropertyType>>(
+              name: "properties",
+              description: "eventually extra dynamic properties defined on this object",
+              resolve: context =>
+              {
+                  if (context.Source.Properties != null)
+                  {
+                      List<DynamicProperty> dynamicProperties = new List<DynamicProperty>();
+
+                      foreach (var property in context.Source.Properties)
+                      {
+                          dynamicProperties.Add(new DynamicProperty() { Name = property.Key, Value = property.Value });
+                      }
+
+                      return dynamicProperties;
+                  }
+
+                  return null;
+                  
+              }
+          );
 
         }
 
