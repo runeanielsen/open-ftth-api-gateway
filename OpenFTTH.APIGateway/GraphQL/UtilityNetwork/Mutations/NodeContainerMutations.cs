@@ -396,6 +396,82 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                    return new CommandResult(updateResult);
                }
             );
+
+            FieldAsync<CommandResultType>(
+                "moveRackEquipment",
+                description: "Mutation that moves a terminal equipment within or between racks",
+                arguments: new QueryArguments(
+                    new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "nodeContainerId" },
+                    new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "terminalEquipmentId" },
+                    new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "moveToRackId" },
+                    new QueryArgument<IntGraphType> { Name = "moveToRackPosition" }
+                ),
+                resolve: async context =>
+                {
+                    var nodeContainerId = context.GetArgument<Guid>("nodeContainerId");
+                    var terminalEquipmentId = context.GetArgument<Guid>("terminalEquipmentId");
+                    var moveToRackId = context.GetArgument<Guid>("moveToRackId");
+                    int moveToRackPosition = context.GetArgument<int>("moveToRackPosition");
+
+                    var correlationId = Guid.NewGuid();
+
+                    var userContext = context.UserContext as GraphQLUserContext;
+                    var userName = userContext.Username;
+
+                    // Get the users current work task (will fail, if user has not selected a work task)
+                    var currentWorkTaskIdResult = WorkQueryHelper.GetUserCurrentWorkId(userName, queryDispatcher);
+
+                    if (currentWorkTaskIdResult.IsFailed)
+                        return new CommandResult(currentWorkTaskIdResult);
+
+                    var commandUserContext = new UserContext(userName, currentWorkTaskIdResult.Value);
+
+                    var cmd = new MoveRackEquipmentInNodeContainer(correlationId, commandUserContext, nodeContainerId, terminalEquipmentId, moveToRackId, moveToRackPosition);
+
+                    var cmdResult = await commandDispatcher.HandleAsync<MoveRackEquipmentInNodeContainer, Result>(cmd);
+
+                    return new CommandResult(cmdResult);
+                }
+            );
+
+            FieldAsync<CommandResultType>(
+                "arrangeRackEquipment",
+                description: "Mutation that can move terminal equipments up/down in a rack",
+                arguments: new QueryArguments(
+                    new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "nodeContainerId" },
+                    new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "terminalEquipmentId" },
+                    new QueryArgument<NonNullGraphType<RackEquipmentArrangeMethodEnumType>> { Name = "arrangeMethod" },
+                    new QueryArgument<IntGraphType> { Name = "numberOfRackPositions" }
+                ),
+                resolve: async context =>
+                {
+                    var nodeContainerId = context.GetArgument<Guid>("nodeContainerId");
+                    var terminalEquipmentId = context.GetArgument<Guid>("terminalEquipmentId");
+                    var arrangeMethod = context.GetArgument<RackEquipmentArrangeMethodEnum>("moveToRackId");
+                    int numberOfRackPositions = context.GetArgument<int>("numberOfRackPositions");
+
+                    var correlationId = Guid.NewGuid();
+
+                    var userContext = context.UserContext as GraphQLUserContext;
+                    var userName = userContext.Username;
+
+                    // Get the users current work task (will fail, if user has not selected a work task)
+                    var currentWorkTaskIdResult = WorkQueryHelper.GetUserCurrentWorkId(userName, queryDispatcher);
+
+                    if (currentWorkTaskIdResult.IsFailed)
+                        return new CommandResult(currentWorkTaskIdResult);
+
+                    var commandUserContext = new UserContext(userName, currentWorkTaskIdResult.Value);
+
+                    var cmd = new ArrangeRackEquipmentInNodeContainer(correlationId, commandUserContext, nodeContainerId, terminalEquipmentId, arrangeMethod, numberOfRackPositions);
+
+                    var cmdResult = await commandDispatcher.HandleAsync<ArrangeRackEquipmentInNodeContainer, Result>(cmd);
+
+                    return new CommandResult(cmdResult);
+                }
+            );
+
+
         }
     }
 }
