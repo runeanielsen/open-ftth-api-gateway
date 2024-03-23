@@ -419,6 +419,7 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                  new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "spanEquipmentOrSegmentId" },
                  new QueryArgument<IdGraphType> { Name = "spanEquipmentSpecificationId" },
                  new QueryArgument<IdGraphType> { Name = "manufacturerId" },
+                 new QueryArgument<NamingInfoInputType> { Name = "namingInfo" },
                  new QueryArgument<MarkingInfoInputType> { Name = "markingInfo" },
                  new QueryArgument<AddressInfoInputType> { Name = "addressInfo" }
              ),
@@ -443,6 +444,7 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                  {
                      SpecificationId = context.HasArgument("spanEquipmentSpecificationId") ? context.GetArgument<Guid>("spanEquipmentSpecificationId") : null,
                      ManufacturerId = context.HasArgument("manufacturerId") ? context.GetArgument<Guid>("manufacturerId") : null,
+                     NamingInfo = context.HasArgument("namingInfo") ? context.GetArgument<NamingInfo>("namingInfo") : null,
                      MarkingInfo = context.HasArgument("markingInfo") ? context.GetArgument<MarkingInfo>("markingInfo") : null,
                      AddressInfo = context.HasArgument("addressInfo") ? context.GetArgument<AddressInfo>("addressInfo") : null
                  };
