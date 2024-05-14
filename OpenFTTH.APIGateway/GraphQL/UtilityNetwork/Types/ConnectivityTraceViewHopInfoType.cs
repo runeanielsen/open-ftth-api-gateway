@@ -30,6 +30,9 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Types
                 .Resolve(context => coordinateConverter.ConvertGeoJsonLineStringsToWgs84(context.Source.RouteSegmentGeometries).WGS84GeoJsonStrings);
 
             Field(x => x.HopSeqNo, type: typeof(IntGraphType)).Description("Sequence number of the hop");
+
+            Field(x => x.IsLineTermination, type: typeof(BooleanGraphType)).Description("Whether the hop is a line termination (OLT)");
+            Field(x => x.IsCustomerSplitter, type: typeof(BooleanGraphType)).Description("Whether the hop is a customer splitter");
         }
     }
 }
