@@ -56,43 +56,37 @@ namespace OpenFTTH.APIGateway.GraphQL.Outage.Queries
 
                     if (equipmentId != null)
                     {
-                        // TODO: Replace test data with call to utility network query
-                        var rootNode = new OutageViewNode(Guid.NewGuid(), "root node", "root node eq: " + equipmentId.ToString());
 
-                        // leaf 1
-                        var leaf1 = new OutageViewNode(Guid.NewGuid(), "leaf 1 (expanded)");
-                        leaf1.Expanded = true;
-                        rootNode.AddNode(leaf1);
+                        var getOutageViewQuery = new GetOutageView(routeNetworkElementId, equipmentId);
 
-                        leaf1.AddNode(new OutageViewNode(Guid.NewGuid(), "child 1"));
-                        leaf1.AddNode(new OutageViewNode(Guid.NewGuid(), "child 2"));
+                        var queryResult = await queryDispatcher.HandleAsync<GetOutageView, Result<OutageViewNode>>(getOutageViewQuery);
 
+                        if (queryResult.IsFailed)
+                        {
+                            foreach (var error in queryResult.Errors)
+                                context.Errors.Add(new ExecutionError(error.Message));
 
-                        // leaf 2
-                        var leaf2 = new OutageViewNode(Guid.NewGuid(), "leaf 1 (not expanded)");
-                        rootNode.AddNode(leaf2);
+                            return null;
+                        }
 
-                        leaf2.AddNode(new OutageViewNode(Guid.NewGuid(), "child 1"));
-                        leaf2.AddNode(new OutageViewNode(Guid.NewGuid(), "child 2"));
-
-                        return rootNode;
-
+                        return queryResult.Value;
                     }
-
-
-                    var getOutageViewQuery = new GetOutageView(routeNetworkElementId);
-
-                    var queryResult = await queryDispatcher.HandleAsync<GetOutageView, Result<OutageViewNode>>(getOutageViewQuery);
-
-                    if (queryResult.IsFailed)
+                    else
                     {
-                        foreach (var error in queryResult.Errors)
-                            context.Errors.Add(new ExecutionError(error.Message));
+                        var getOutageViewQuery = new GetOutageView(routeNetworkElementId);
 
-                        return null;
+                        var queryResult = await queryDispatcher.HandleAsync<GetOutageView, Result<OutageViewNode>>(getOutageViewQuery);
+
+                        if (queryResult.IsFailed)
+                        {
+                            foreach (var error in queryResult.Errors)
+                                context.Errors.Add(new ExecutionError(error.Message));
+
+                            return null;
+                        }
+
+                        return queryResult.Value;
                     }
-
-                    return queryResult.Value;
                 }
              );
         }
