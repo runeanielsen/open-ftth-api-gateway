@@ -51,9 +51,9 @@ namespace OpenFTTH.APIGateway.GraphQL.Outage.Queries
                 ),
                 resolve: async context =>
                 {
-                    var routeNetworkElementId = context.GetArgument<Guid>("routeNetworkElementId");
+                    var routeNetworkElementId = context.GetArgument<Guid?>("routeNetworkElementId");
 
-                    if (context.HasArgument("equipmentId"))
+                    if (routeNetworkElementId != null)
                     {
                         var equipmentId = context.GetArgument<Guid>("equipmentId");
 
@@ -81,7 +81,7 @@ namespace OpenFTTH.APIGateway.GraphQL.Outage.Queries
                     }
 
 
-                    var getOutageViewQuery = new GetOutageView(routeNetworkElementId);
+                    var getOutageViewQuery = new GetOutageView(routeNetworkElementId.Value);
 
                     var queryResult = await queryDispatcher.HandleAsync<GetOutageView, Result<OutageViewNode>>(getOutageViewQuery);
 
