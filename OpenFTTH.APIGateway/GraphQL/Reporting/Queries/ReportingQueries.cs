@@ -1,16 +1,8 @@
 ﻿using GraphQL;
 using GraphQL.Types;
-using Marten.Events;
 using Microsoft.Extensions.Logging;
 using OpenFTTH.APIGateway.Reporting;
-using OpenFTTH.APIGateway.Search;
-using OpenFTTH.APIGateway.Settings;
-using OpenFTTH.APIGateway.Util;
-using OpenFTTH.CQRS;
-using OpenFTTH.EventSourcing;
 using OpenFTTH.RouteNetwork.Business.RouteElements.StateHandling;
-using Topos.Logging;
-using Typesense;
 
 namespace OpenFTTH.APIGateway.GraphQL.Search.Queries
 {
