@@ -64,17 +64,17 @@ namespace OpenFTTH.APIGateway.Auth
             {
                 // In case the security token is expired, we do nothing.
                 // The `HttpContext.User` won't be set so the user won't be authorized.
-                _logger.LogDebug("ex", ex.Message);
+                _logger.LogDebug("{ExceptionMessage}", ex.Message);
             }
             catch (ArgumentException ex)
             {
                 // This can happen if no token was sent with the request.
                 // This is not a critical error, we just do not log them in.
-                _logger.LogDebug("ex", ex.Message);
+                _logger.LogDebug("{ExceptionMessage}", ex.Message);
             }
             catch (Exception ex)
             {
-                _logger.LogWarning("{Exception}", ex.Message);
+                _logger.LogWarning("{ExceptionMessage}", ex.Message);
             }
         }
 
