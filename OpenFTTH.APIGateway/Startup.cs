@@ -218,7 +218,7 @@ namespace OpenFTTH.APIGateway
             services.AddHostedService<RouteNetworkEventConsumer>();
 
             // Utility network updated
-            //services.AddHostedService<UtilityNetworkUpdatedEventConsumer>();
+            services.AddHostedService<UtilityNetworkUpdatedEventConsumer>();
 
             // Important that it is scoped, we want a new instance for each injection.
             services.AddScoped<OpenFTTH.NotificationClient.Client>(x =>
