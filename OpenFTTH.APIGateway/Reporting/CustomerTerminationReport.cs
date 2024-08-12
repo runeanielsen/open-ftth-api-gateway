@@ -392,7 +392,6 @@ namespace OpenFTTH.APIGateway.Reporting
 
         public TraceHopContext(UtilityGraphConnectedTerminal hopTerminalRef, UtilityNetworkProjection utilityNetworkProjection, InterestsProjection interestsProjection, IRouteNetworkState routeNetworkState, IEventStore eventStore)
         {
-
             _utilityNetworkProjection = utilityNetworkProjection;
 
             if (_nodeContainerSpecifications == null)
