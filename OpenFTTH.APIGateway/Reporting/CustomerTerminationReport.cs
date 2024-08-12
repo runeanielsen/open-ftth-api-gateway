@@ -35,26 +35,6 @@ namespace OpenFTTH.APIGateway.Reporting
             _routeNetworkState = routeNetworkState;
         }
 
-        public void Run()
-        {
-            while (true)
-            {
-                try
-                {
-                    var traceLines = TraceAllCustomerTerminations();
-
-                    TestWriteTracesToFile(traceLines);
-
-                }
-                catch (Exception ex)
-                {
-                    // shit happend
-                }
-            }
-
-        }
-
-
         public List<string> TraceAllCustomerTerminations()
         {
             _logger.LogInformation("Service terminations trace started...");
@@ -64,7 +44,7 @@ namespace OpenFTTH.APIGateway.Reporting
 
             var terminalEquipments = _utilityNetwork.TerminalEquipmentByEquipmentId.Values;
 
-            List<InstallationTraceResultLine> traces = new List<InstallationTraceResultLine>();
+            var traces = new List<InstallationTraceResultLine>();
 
             foreach (var terminalEquipment in terminalEquipments)
             {
@@ -87,21 +67,17 @@ namespace OpenFTTH.APIGateway.Reporting
                         traceLine.inst_port = sourceTerminal.Name;
                         traceLine.inst_spec = equipmentSpec.Name;
 
-
-
-                        TraceState traceState = new TraceState();
-
+                        var traceState = new TraceState();
 
                         if (traceResult.Upstream != null && traceResult.Upstream.Length > 0)
                         {
-                            Guid currentRouteNodeId = Guid.Empty;
+                            var currentRouteNodeId = Guid.Empty;
 
                             TraceHopContext previousHopContext = null;
                             TraceHopContext currentHopContext = null;
                             TraceHopContext firstHopInNodeContext = null;
 
                             int nodeCount = 0;
-
 
                             foreach (var hop in traceResult.Upstream)
                             {
@@ -217,7 +193,6 @@ namespace OpenFTTH.APIGateway.Reporting
             return GetCsvLinesFromTraceResult(traces);
         }
 
-
         private string GetNodeType(TraceState traceState, RouteNode routeNode, NodeContainer nodeContainer, TerminalEquipment hopEquipment, TerminalStructure hopTerminalStructure, Terminal hopTerminal)
         {
             throw new NotImplementedException();
@@ -236,7 +211,6 @@ namespace OpenFTTH.APIGateway.Reporting
                     AddStageIfNotPreviouslyAdded(traceState.TraceStagesReached, "FP");
                 }
             }
-
 
             // Check if we found PON equipment
             if (terminalEquipment.Name.ToLower().StartsWith("pon"))
@@ -288,8 +262,6 @@ namespace OpenFTTH.APIGateway.Reporting
             }
 
             traceState.PreviousNodeContainer = nodeContainer;
-
-
         }
 
         private static void AddStageIfNotPreviouslyAdded(List<string> currentTraceStage, string stage)
@@ -355,13 +327,12 @@ namespace OpenFTTH.APIGateway.Reporting
             if (traces.Count == 0)
                 return new List<string>() { "no installations found" };
 
-            List<string> resultCsvLines = new List<string>();
+            var resultCsvLines = new List<string>();
 
-            // Create header
             var firstObject = traces.First();
 
-            Type myType = firstObject.GetType();
-            IList<PropertyInfo> props = new List<PropertyInfo>(myType.GetProperties().Reverse());
+            var myType = firstObject.GetType();
+            var props = new List<PropertyInfo>(myType.GetProperties().Reverse());
 
             var csvHeader = "";
 
@@ -375,8 +346,6 @@ namespace OpenFTTH.APIGateway.Reporting
 
             resultCsvLines.Add(csvHeader);
 
-
-            // Write values
             foreach (var line in traces)
             {
                 string csvLine = "";
@@ -403,22 +372,7 @@ namespace OpenFTTH.APIGateway.Reporting
 
             return resultCsvLines;
         }
-
-        private void TestWriteTracesToFile(List<string> traceLines)
-        {
-            using StreamWriter csvFile = new("c:/temp/openftth_ny_trace.csv");
-
-            // Write values
-            foreach (var line in traceLines)
-            {
-                csvFile.WriteLine(line);
-            }
-
-            csvFile.Close();
-        }
-
     }
-
 
     public class TraceHopContext
     {
@@ -449,7 +403,6 @@ namespace OpenFTTH.APIGateway.Reporting
 
             if (_terminalStructureSpecifications == null)
                 _terminalStructureSpecifications = eventStore.Projections.Get<TerminalStructureSpecificationsProjection>().Specifications;
-
 
             this.hopTerminal = hopTerminalRef.Terminal(utilityNetworkProjection);
             this.hopTerminalStructure = hopTerminalRef.TerminalStructure(utilityNetworkProjection);
@@ -593,7 +546,6 @@ namespace OpenFTTH.APIGateway.Reporting
     public class TraceState
     {
         public TraceLevel TraceLevel { get; set; }
-
         public List<string> TraceStagesReached = new();
         public NodeContainer PreviousNodeContainer { get; set; }
 
@@ -618,14 +570,14 @@ namespace OpenFTTH.APIGateway.Reporting
 
     public class InstallationTraceResultLine
     {
-        //Hvis trace rammer OLT udfyldes følgende
+        // Hvis trace rammer OLT udfyldes følgende
         public string co_olt_port { get; set; }
         public string co_olt_card { get; set; }
         public string co_olt_name { get; set; }
         public string co_olt_spec { get; set; }
         public string co_olt_rack { get; set; }
 
-        //Første splidse/patch punkt som trace ramme i teknikhuset
+        // Første splidse/patch punkt som trace ramme i teknikhuset
         public string co_1sp_port { get; set; }
         public string co_1sp_card { get; set; }
         public string co_1sp_spec { get; set; }
@@ -635,7 +587,6 @@ namespace OpenFTTH.APIGateway.Reporting
         public string co_node_spec { get; set; }
         public string co_node_name { get; set; }
 
-
         // Flekspunkt information
         // Hvis trace rammer flekspunkt:
         public string fp_splitter_port { get; set; }
@@ -643,7 +594,7 @@ namespace OpenFTTH.APIGateway.Reporting
         public string fp_splitter_rack { get; set; }
         public string fp_splitter_spec { get; set; }
 
-        //Første splidse/patch punkt som trace ramme i flekspunktet
+        // Første splidse/patch punkt som trace ramme i flekspunktet
         public string fp_1sp_port { get; set; }
         public string fp_1sp_card { get; set; }
         public string fp_1sp_spec { get; set; }
@@ -651,7 +602,6 @@ namespace OpenFTTH.APIGateway.Reporting
         public string fp_1sp_rack { get; set; }
         public string fp_node_spec { get; set; }
         public string fp_node_name { get; set; }
-
 
         // Primær distributionspunkt/gadeskab information
         public string pd_1sp_port { get; set; }
@@ -661,8 +611,7 @@ namespace OpenFTTH.APIGateway.Reporting
         public string pd_node_spec { get; set; }
         public string pd_node_name { get; set; }
 
-
-        // Secundær splidsepunkt 1
+        // Sekundær splidsepunkt 1
         public string sd1_1sp_port { get; set; }
         public string sd1_1sp_card { get; set; }
         public string sd1_1sp_name { get; set; }
@@ -670,15 +619,12 @@ namespace OpenFTTH.APIGateway.Reporting
         public string sd1_node_spec { get; set; }
         public string sd1_node_name { get; set; }
 
-
         // Kundeterminering
         // Tracen starter ved kundertermineringen(port 1 til 4)
         public string inst_port { get; set; }
         public string inst_card { get; set; }
         public string inst_spec { get; set; }
         public string inst_name { get; set; }
-
-
     }
 }
 
