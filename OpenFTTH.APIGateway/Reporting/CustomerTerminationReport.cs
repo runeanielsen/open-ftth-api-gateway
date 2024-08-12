@@ -570,14 +570,14 @@ namespace OpenFTTH.APIGateway.Reporting
 
     public class InstallationTraceResultLine
     {
-        // Hvis trace rammer OLT udfyldes følgende
+        // If trace hits OLT, fill in the following
         public string co_olt_port { get; set; }
         public string co_olt_card { get; set; }
         public string co_olt_name { get; set; }
         public string co_olt_spec { get; set; }
         public string co_olt_rack { get; set; }
 
-        // Første splidse/patch punkt som trace ramme i teknikhuset
+        // First splice/patch point as trace frame in the technical house
         public string co_1sp_port { get; set; }
         public string co_1sp_card { get; set; }
         public string co_1sp_spec { get; set; }
@@ -587,14 +587,14 @@ namespace OpenFTTH.APIGateway.Reporting
         public string co_node_spec { get; set; }
         public string co_node_name { get; set; }
 
-        // Flekspunkt information
-        // Hvis trace rammer flekspunkt:
+        // Flex point information
+        // If trace hits flex point:
         public string fp_splitter_port { get; set; }
         public string fp_splitter_name { get; set; }
         public string fp_splitter_rack { get; set; }
         public string fp_splitter_spec { get; set; }
 
-        // Første splidse/patch punkt som trace ramme i flekspunktet
+        // First splice/patch point as trace frame in the flex point
         public string fp_1sp_port { get; set; }
         public string fp_1sp_card { get; set; }
         public string fp_1sp_spec { get; set; }
@@ -603,7 +603,7 @@ namespace OpenFTTH.APIGateway.Reporting
         public string fp_node_spec { get; set; }
         public string fp_node_name { get; set; }
 
-        // Primær distributionspunkt/gadeskab information
+        // Primary distribution point/street cabinet information
         public string pd_1sp_port { get; set; }
         public string pd_1sp_card { get; set; }
         public string pd_1sp_name { get; set; }
@@ -611,7 +611,7 @@ namespace OpenFTTH.APIGateway.Reporting
         public string pd_node_spec { get; set; }
         public string pd_node_name { get; set; }
 
-        // Sekundær splidsepunkt 1
+        // Secondary splice point 1
         public string sd1_1sp_port { get; set; }
         public string sd1_1sp_card { get; set; }
         public string sd1_1sp_name { get; set; }
@@ -619,8 +619,8 @@ namespace OpenFTTH.APIGateway.Reporting
         public string sd1_node_spec { get; set; }
         public string sd1_node_name { get; set; }
 
-        // Kundeterminering
-        // Tracen starter ved kundertermineringen(port 1 til 4)
+        // Customer termination
+        // The trace starts at the customer termination (port 1 to 4)
         public string inst_port { get; set; }
         public string inst_card { get; set; }
         public string inst_spec { get; set; }
