@@ -5,11 +5,13 @@ using OpenFTTH.APIGateway.CoreTypes;
 using OpenFTTH.APIGateway.GraphQL.Addresses.Types;
 using OpenFTTH.APIGateway.GraphQL.Core.Model;
 using OpenFTTH.APIGateway.GraphQL.RouteNetwork.Types;
+using OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Types;
 using OpenFTTH.APIGateway.GraphQL.Work;
 using OpenFTTH.CQRS;
 using OpenFTTH.Events.Core.Infos;
 using OpenFTTH.EventSourcing;
 using OpenFTTH.UtilityGraphService.API.Commands;
+using OpenFTTH.UtilityGraphService.API.Model.UtilityNetwork;
 using System;
 
 namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
@@ -189,8 +191,54 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
              }
            );
 
+            FieldAsync<CommandResultType>(
+             "addInterface",
+             description: "Add interface to optical line terminal equipment",
+             arguments: new QueryArguments(
+                 new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "routeNodeId" },
+                 new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "terminalEquipmentId" },
+                 new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "structureSpecificationId" },
+                 new QueryArgument<InterfaceInfoInputType> { Name = "interfaceInfo" }
+             ),
+             resolve: async context =>
+             {
+                 var routeNodeId = context.GetArgument<Guid>("routeNodeId");
+                 var terminalEquipmentId = context.GetArgument<Guid>("terminalEquipmentId");
+                 var structureSpecificationId = context.GetArgument<Guid>("structureSpecificationId");
 
-           FieldAsync<CommandResultType>(
+                 var correlationId = Guid.NewGuid();
+
+                 var userContext = context.UserContext as GraphQLUserContext;
+                 var userName = userContext.Username;
+
+                 // Get the users current work task (will fail, if user has not selected a work task)
+                 var currentWorkTaskIdResult = WorkQueryHelper.GetUserCurrentWorkId(userName, queryDispatcher);
+
+                 if (currentWorkTaskIdResult.IsFailed)
+                     return new CommandResult(currentWorkTaskIdResult);
+
+                 var commandUserContext = new UserContext(userName, currentWorkTaskIdResult.Value);
+
+                 var addStructure = new PlaceAdditionalStructuresInTerminalEquipment(
+                   correlationId: correlationId,
+                   userContext: commandUserContext,
+                   routeNodeId: routeNodeId,
+                   terminalEquipmentId: terminalEquipmentId,
+                   structureSpecificationId: structureSpecificationId,
+                   numberOfStructures: 0,
+                   position: 0
+                 )
+                 {
+                     InterfaceInfo = context.HasArgument("interfaceInfo") ? context.GetArgument<InterfaceInfo>("interfaceInfo") : null
+                 };
+
+                 var addStructureResult = await commandDispatcher.HandleAsync<PlaceAdditionalStructuresInTerminalEquipment, Result>(addStructure);
+
+                 return new CommandResult(addStructureResult);
+             }
+           );
+
+            FieldAsync<CommandResultType>(
             "removeStructure",
             description: "Remove terminal structure from equipment",
             arguments: new QueryArguments(
