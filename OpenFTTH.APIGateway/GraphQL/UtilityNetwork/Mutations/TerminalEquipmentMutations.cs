@@ -68,6 +68,48 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
              }
            );
 
+            Field<CommandResultType>(
+           "updateTerminalStructureProperties",
+           description: "Mutation that can be used to change a terminal structure (card, tray etc) that sits a terminal equipment",
+           arguments: new QueryArguments(
+               new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "terminalEquipmentId" },
+               new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "terminalStructureId" },
+               new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "terminalStructureSpecificationId" },
+               new QueryArgument<IntGraphType> { Name = "position" },
+               new QueryArgument<InterfaceInfoType> { Name = "interfaceInfo" }
+           ),
+           resolve: context =>
+           {
+               var terminalEquipmentId = context.GetArgument<Guid>("terminalEquipmentId");
+               var terminalStructureId = context.GetArgument<Guid>("terminalStructureId");
+
+               var correlationId = Guid.NewGuid();
+
+               var userContext = context.UserContext as GraphQLUserContext;
+               var userName = userContext.Username;
+
+               // Get the users current work task (will fail, if user has not selected a work task)
+               var currentWorkTaskIdResult = WorkQueryHelper.GetUserCurrentWorkId(userName, queryDispatcher);
+
+               if (currentWorkTaskIdResult.IsFailed)
+                   return new CommandResult(currentWorkTaskIdResult);
+
+               var commandUserContext = new UserContext(userName, currentWorkTaskIdResult.Value);
+
+
+               var updateCmd = new UpdateTerminalStructureProperties(correlationId, commandUserContext, terminalEquipmentId: terminalEquipmentId, terminalStructureId: terminalStructureId)
+               {
+                   StructureSpecificationId = context.GetArgument<Guid>("terminalStructureSpecificationId"),
+                   Position = context.GetArgument<int>("position"),
+                   InterfaceInfo = context.GetArgument<InterfaceInfo>("interfaceInfo")
+               };
+
+               var updateResult = commandDispatcher.HandleAsync<UpdateTerminalStructureProperties, Result>(updateCmd).Result;
+
+               return new CommandResult(updateResult);
+           }
+         );
+
             FieldAsync<CommandResultType>(
              "remove",
              description: "Remove the terminal equipment",
