@@ -185,6 +185,51 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Queries
                     return terminalEquipment;
                 });
 
+                Field<TerminalStructureType>("terminalSructure")
+                .Description("Query information related to a specific terminal structure")
+                .Arguments(new QueryArguments(
+                    new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "terminalEquipmentOrTerminalId" },
+                    new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "terminalStructureId" })
+                 )
+                .ResolveAsync(async context =>
+                {
+                    var terminalEquipmentOrTerminalId = context.GetArgument<Guid>("terminalEquipmentOrTerminalId");
+                    var terminalStructureId = context.GetArgument<Guid>("terminalStructureId");
+
+                    // Get equipment information
+                    var equipmentQueryResult = await queryDispatcher.HandleAsync<GetEquipmentDetails, FluentResults.Result<GetEquipmentDetailsResult>>(
+                        new GetEquipmentDetails(new EquipmentIdList() { terminalEquipmentOrTerminalId })
+                    );
+
+                    if (equipmentQueryResult.IsFailed)
+                    {
+                        foreach (var error in equipmentQueryResult.Errors)
+                            context.Errors.Add(new ExecutionError(error.Message));
+
+                        return null;
+                    }
+
+                    if (equipmentQueryResult.Value.TerminalEquipment == null || equipmentQueryResult.Value.TerminalEquipment.Count == 0)
+                    {
+                        context.Errors.Add(new ExecutionError($"Cannot find any terminal equipment or terminal with id: {terminalEquipmentOrTerminalId}"));
+
+                        return null;
+                    }
+
+                    var terminalEquipment = equipmentQueryResult.Value.TerminalEquipment.First();
+
+                    if (!terminalEquipment.TerminalStructures.Any(t => t.Id == terminalStructureId))
+                    {
+                        context.Errors.Add(new ExecutionError($"Cannot find any terminal structure with id: {terminalStructureId} in terminal equipment with id: {terminalEquipmentOrTerminalId}"));
+
+                        return null;
+                    }
+
+
+                    return terminalEquipment.TerminalStructures.First(t => t.Id == terminalStructureId);
+                 });
+
+
             Field<SpanEquipmentType>("spanEquipment")
                 .Description("Query information related to a specific span equipment")
                 .Arguments(new QueryArguments(new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "spanEquipmentOrSegmentId" }))
