@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Types;
 using OpenFTTH.APIGateway.Util;
 using OpenFTTH.CQRS;
+using OpenFTTH.EventSourcing;
 using OpenFTTH.RouteNetwork.API.Model;
 using OpenFTTH.Util;
 using OpenFTTH.UtilityGraphService.API.Model.UtilityNetwork;
@@ -18,7 +19,7 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Queries
 {
     public class UtilityNetworkServiceQueries : ObjectGraphType
     {
-        public UtilityNetworkServiceQueries(ILogger<UtilityNetworkServiceQueries> logger, IQueryDispatcher queryDispatcher, UTM32WGS84Converter coordinateConverter)
+        public UtilityNetworkServiceQueries(ILogger<UtilityNetworkServiceQueries> logger, IQueryDispatcher queryDispatcher, UTM32WGS84Converter coordinateConverter, IEventStore eventStore)
         {
             Description = "GraphQL API for querying data owned by utility network service";
 
@@ -539,6 +540,16 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Queries
 
                     return queryResult.Value;
                 });
+
+            Field<StringGraphType>("getNextPhysicalCircuitId")
+            .Description("Get the next circuit id")
+            .ResolveAsync(async context =>
+            {
+                var nextConduitSeqStr = eventStore.Sequences.GetNextVal("physicalCircuit").ToString();
+
+                return "AFK" + nextConduitSeqStr.PadLeft(6, '0');
+            });
+
         }
     }
 }
