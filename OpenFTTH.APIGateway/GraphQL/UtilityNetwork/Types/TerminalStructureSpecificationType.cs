@@ -15,6 +15,8 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Types
             Field(x => x.Description, type: typeof(StringGraphType)).Description("Long description");
             Field(x => x.Deprecated, type: typeof(BooleanGraphType)).Description("Whereas the type of terminal equipment is still in use");
             Field(x => x.ManufacturerRefs, type: typeof(ListGraphType<IdGraphType>)).Description("Manufacturer providing products of the the specification");
+            Field(x => x.IsCustomerSplitter, type: typeof(BooleanGraphType)).Description("Is POM splitter used to connect customers");
+            Field(x => x.IsInterfaceModule, type: typeof(BooleanGraphType)).Description("Is interface module");
         }
     }
 }
