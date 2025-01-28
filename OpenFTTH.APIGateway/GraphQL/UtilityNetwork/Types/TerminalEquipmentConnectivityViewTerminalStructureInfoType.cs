@@ -14,6 +14,7 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Types
             Field(x => x.Info, type: typeof(StringGraphType)).Description("Additional information (remark)");
             Field(x => x.SpecName, type: typeof(StringGraphType)).Description("Specification name");
             Field(x => x.Lines, type: typeof(ListGraphType<TerminalEquipmentAZConnectivityViewLineInfoType>)).Description("Connectivity lines");
+            Field(x => x.IsInterfaceModule, type: typeof(BooleanGraphType)).Description("True if an interface module/adapter");
         }
     }
 }
