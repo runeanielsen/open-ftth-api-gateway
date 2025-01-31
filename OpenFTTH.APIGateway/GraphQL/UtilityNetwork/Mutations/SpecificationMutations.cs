@@ -16,6 +16,8 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
         {
             Description = "Specification mutations";
 
+            var logger = loggerFactory.CreateLogger(nameof(SpecificationMutations));
+
             FieldAsync<CommandResultType>(
                 "importFromJsonString",
                 description: "Import specifications from json string",
@@ -24,15 +26,12 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                 ),
                 resolve: async context =>
                 {
-                    var specificationJson = context.GetArgument<string>("json");
-
-                    var userContext = context.UserContext as GraphQLUserContext;
-                    var userName = userContext.Username;
-
-                    Guid correlationId = Guid.NewGuid();
-
                     try
                     {
+                        var specificationJson = context.GetArgument<string>("json");
+
+                        logger.LogInformation("Received the following JSON input: {Json} to be inserted as a specification.", specificationJson);
+
                         new SpecificationImporter(loggerFactory, commandDispatcher, queryDispatcher, eventStore).ImportFromJsonString(specificationJson);
                         return new CommandResult();
                     }
@@ -42,8 +41,6 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                     }
                 }
             );
-
-        
         }
     }
 }
