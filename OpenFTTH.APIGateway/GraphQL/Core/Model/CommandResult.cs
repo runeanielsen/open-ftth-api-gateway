@@ -29,5 +29,15 @@ namespace OpenFTTH.APIGateway.GraphQL.Core.Model
                 IsSuccess = true;
             }
         }
+
+        public CommandResult()
+        {
+           IsSuccess = true;
+        }
+        public CommandResult(string errorMsg)
+        {
+            IsSuccess = false;
+            ErrorMessage = errorMsg;
+        }
     }
 }

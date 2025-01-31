@@ -17,6 +17,8 @@ namespace OpenFTTH.APIGateway.GraphQL.Root
 
             Field<NodeContainerMutations>("nodeContainer").Resolve(_ => new { });
 
+            Field<SpecificationMutations>("specifications").Resolve(_ => new { });
+
             Field<UserWorkContextMutations>("userContext").Resolve(_ => new { });
 
             Field<SchematicMutations>("schematic").Resolve(_ => new { });
