@@ -18,13 +18,13 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
 
             var logger = loggerFactory.CreateLogger(nameof(SpecificationMutations));
 
-            FieldAsync<CommandResultType>(
+            Field<CommandResultType>(
                 "importFromJsonString",
                 description: "Import specifications from json string",
                 arguments: new QueryArguments(
                     new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "json" }
                 ),
-                resolve: async context =>
+                resolve: context =>
                 {
                     try
                     {
