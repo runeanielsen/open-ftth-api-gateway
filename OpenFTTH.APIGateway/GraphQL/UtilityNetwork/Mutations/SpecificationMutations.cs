@@ -7,6 +7,7 @@ using OpenFTTH.APIGateway.Specifications;
 using OpenFTTH.CQRS;
 using OpenFTTH.EventSourcing;
 using System;
+using System.Text.RegularExpressions;
 
 namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
 {
@@ -28,7 +29,7 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                 {
                     try
                     {
-                        var specificationJson = context.GetArgument<string>("json");
+                        var specificationJson = Regex.Unescape(context.GetArgument<string>("json"));
 
                         logger.LogInformation("Received the following JSON input: {Json} to be inserted as a specification.", specificationJson);
 
