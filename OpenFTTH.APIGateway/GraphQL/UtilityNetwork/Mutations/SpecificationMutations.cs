@@ -29,7 +29,7 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                 {
                     try
                     {
-                        var specificationJson = Regex.Unescape(context.GetArgument<string>("json"));
+                        var specificationJson = context.GetArgument<string>("json");
 
                         logger.LogInformation("Received the following JSON input: {Json} to be inserted as a specification.", specificationJson);
 
