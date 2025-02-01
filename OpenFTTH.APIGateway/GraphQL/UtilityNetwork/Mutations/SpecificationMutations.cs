@@ -38,6 +38,7 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                     }
                     catch (Exception ex)
                     {
+                        logger.LogError("{Exception}", ex);
                         return new CommandResult(ex.Message);
                     }
                 }
