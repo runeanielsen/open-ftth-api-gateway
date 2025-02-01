@@ -37,6 +37,12 @@ namespace OpenFTTH.APIGateway.Specifications
         public void ImportFromJsonString(string json)
         {
             var specificationData = JsonConvert.DeserializeObject<Specifications>(json);
+
+            if (specificationData is null)
+            {
+                throw new ArgumentNullException($"Could not deserialize specification data: '{json}'.");
+            }
+
             Import(specificationData, false);
         }
 
