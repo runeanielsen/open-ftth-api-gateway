@@ -81,51 +81,78 @@ namespace OpenFTTH.APIGateway.Specifications
 
         private void Import(Specifications specifications, bool terminalStructuresOnly)
         {
+
+            // Create dict with manufacture specs
             var manufacturerSpecs = _eventStore.Projections.Get<ManufacturerProjection>().Manufacturer;
 
             Dictionary<string, Manufacturer> manufacturerSpecByName = new();
 
             foreach (var manufacturer in manufacturerSpecs)
-                manufacturerSpecByName.Add(manufacturer.Name.ToLower(), manufacturer);
+            {
+                if (!manufacturerSpecByName.ContainsKey(manufacturer.Name.ToLower()))
+                    manufacturerSpecByName.Add(manufacturer.Name.ToLower(), manufacturer);
+            }
 
 
+            // Create dict with node container specs
             var nodeContainerSpecs = _eventStore.Projections.Get<NodeContainerSpecificationsProjection>().Specifications;
 
             Dictionary<string, NodeContainerSpecification> nodeContainerSpecByName = new();
 
             foreach (var nodeContainerSpec in nodeContainerSpecs)
-                nodeContainerSpecByName.Add(nodeContainerSpec.Description.ToLower(), nodeContainerSpec);
+            {
+                if (!nodeContainerSpecByName.ContainsKey(nodeContainerSpec.Name.ToLower()))
+                    nodeContainerSpecByName.Add(nodeContainerSpec.Description.ToLower(), nodeContainerSpec);
+            }
 
 
+            // Create dict with terminal equipment specs
             var terminalEquipmentSpecs = _eventStore.Projections.Get<TerminalEquipmentSpecificationsProjection>().Specifications;
 
             Dictionary<string, TerminalEquipmentSpecification> terminalEquipmentSpecByName = new();
 
             foreach (var terminalEquipmentSpec in terminalEquipmentSpecs)
-                terminalEquipmentSpecByName.Add(terminalEquipmentSpec.Name.ToLower(), terminalEquipmentSpec);
+            {
+                if (!terminalEquipmentSpecByName.ContainsKey(terminalEquipmentSpec.Name.ToLower()))
+                    terminalEquipmentSpecByName.Add(terminalEquipmentSpec.Name.ToLower(), terminalEquipmentSpec);
+            }
 
 
+            // Create dict with terminal structure specs
             var terminalStructureSpecs = _eventStore.Projections.Get<TerminalStructureSpecificationsProjection>().Specifications;
 
             Dictionary<string, TerminalStructureSpecification> terminalStructureSpecByName = new();
 
             foreach (var terminalStructureSpec in terminalStructureSpecs)
-                terminalStructureSpecByName.Add(terminalStructureSpec.Name.ToLower(), terminalStructureSpec);
+            {
+                if (!terminalStructureSpecByName.ContainsKey(terminalStructureSpec.Name.ToLower()))
+                    terminalStructureSpecByName.Add(terminalStructureSpec.Name.ToLower(), terminalStructureSpec);
+            }
 
+
+            // Create dict with span equipment specs
             var spanEquipmentSpecs = _eventStore.Projections.Get<SpanEquipmentSpecificationsProjection>().Specifications;
 
             Dictionary<string, SpanEquipmentSpecification> spanEquipmentSpecByName = new();
 
             foreach (var spanEquipmentSpec in spanEquipmentSpecs)
-                spanEquipmentSpecByName.Add(spanEquipmentSpec.Name.ToLower(), spanEquipmentSpec);
+            {
+                if (!spanEquipmentSpecByName.ContainsKey(spanEquipmentSpec.Name.ToLower()))
+                    spanEquipmentSpecByName.Add(spanEquipmentSpec.Name.ToLower(), spanEquipmentSpec);
+            }
 
 
+            // Create dict with span structure specs
             var spanStructureSpecs = _eventStore.Projections.Get<SpanStructureSpecificationsProjection>().Specifications;
 
             Dictionary<string, SpanStructureSpecification> spanStructureSpecByName = new();
 
             foreach (var spanStructureSpec in spanStructureSpecs)
-                spanStructureSpecByName.Add(spanStructureSpec.Name.ToLower(), spanStructureSpec);
+            {
+                if (!spanStructureSpecByName.ContainsKey(spanStructureSpec.Name.ToLower()))
+                    spanStructureSpecByName.Add(spanStructureSpec.Name.ToLower(), spanStructureSpec);
+            }
+
 
             // Create manufactures that don't exist
             if (specifications.Manufacturers != null)

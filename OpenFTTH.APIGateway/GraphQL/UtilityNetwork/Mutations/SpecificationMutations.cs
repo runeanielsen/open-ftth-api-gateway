@@ -34,12 +34,12 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                         logger.LogInformation("Received the following JSON input: {Json} to be inserted as a specification.", specificationJson);
 
                         new SpecificationImporter(loggerFactory, commandDispatcher, queryDispatcher, eventStore).ImportFromJsonString(specificationJson);
-                        return new CommandResult();
+                        return new CommandResult(true, null, null);
                     }
                     catch (Exception ex)
                     {
                         logger.LogError("{Exception}", ex);
-                        return new CommandResult(ex.Message);
+                        return new CommandResult(false, "ERROR_IMPORTING_SPECIFICATIONS", ex.Message);
                     }
                 }
             );
