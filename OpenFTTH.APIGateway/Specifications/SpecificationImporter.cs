@@ -24,11 +24,11 @@ namespace OpenFTTH.APIGateway.Specifications
         private IQueryDispatcher _queryDispatcher;
         private IEventStore _eventStore;
 
-        private ILogger<SpecificationExporter> _logger;
+        private ILogger<SpecificationImporter> _logger;
 
         public SpecificationImporter(ILoggerFactory loggerFactory, ICommandDispatcher commandDispatcher, IQueryDispatcher queryDispatcher, IEventStore eventStore)
         {
-            _logger = loggerFactory.CreateLogger<SpecificationExporter>();
+            _logger = loggerFactory.CreateLogger<SpecificationImporter>();
             _commandDispatcher = commandDispatcher;
             _queryDispatcher = queryDispatcher;
             _eventStore = eventStore;
@@ -73,13 +73,13 @@ namespace OpenFTTH.APIGateway.Specifications
             }
         }
 
-        private void ImportFromFile(string fileName, bool terminalStructuresOnly)
+        public void ImportFromFile(string fileName, bool terminalStructuresOnly)
         {
             var specificationData = JsonConvert.DeserializeObject<Specifications>(File.ReadAllText(fileName));
             Import(specificationData, false);
         }
 
-        private void Import(Specifications specifications, bool terminalStructuresOnly)
+        private void Import(Specifications specifications, bool terminalAndSpanStructuresOnly)
         {
 
             // Create dict with manufacture specs
@@ -101,8 +101,19 @@ namespace OpenFTTH.APIGateway.Specifications
 
             foreach (var nodeContainerSpec in nodeContainerSpecs)
             {
-                if (!nodeContainerSpecByName.ContainsKey(nodeContainerSpec.Name.ToLower()))
+                if (!nodeContainerSpecByName.ContainsKey(nodeContainerSpec.Description.ToLower()))
                     nodeContainerSpecByName.Add(nodeContainerSpec.Description.ToLower(), nodeContainerSpec);
+            }
+
+            // Create dict with rack specs specs
+            var rackSpecs = _eventStore.Projections.Get<RackSpecificationsProjection>().Specifications;
+
+            Dictionary<string, RackSpecification> rackSpecByName = new();
+
+            foreach (var rackSpec in rackSpecs)
+            {
+                if (!rackSpecByName.ContainsKey(rackSpec.Name.ToLower()))
+                    rackSpecByName.Add(rackSpec.Name.ToLower(), rackSpec);
             }
 
 
@@ -202,6 +213,30 @@ namespace OpenFTTH.APIGateway.Specifications
                 }
             }
 
+            // Create node containers that don't exist
+            if (specifications.Racks != null)
+            {
+                foreach (var rackSpec in specifications.Racks)
+                {
+                    if (!rackSpecByName.ContainsKey(rackSpec.Name.ToLower()))
+                    {
+                        _logger.LogInformation($"Creating rack specification: " + rackSpec.Name);
+
+                        AddSpecification(
+                            new RackSpecification(
+                                Guid.NewGuid(),
+                                rackSpec.Name,
+                                rackSpec.ShortName
+                            )
+                            {
+                                Description = rackSpec.Name,
+                                Deprecated = rackSpec.Deprecated,
+                            }
+                        );
+                    }
+                }
+            }
+
             // Create terminal structure specs that don't exist
             if (specifications.TerminalStructures != null)
             {
@@ -230,7 +265,36 @@ namespace OpenFTTH.APIGateway.Specifications
                 }
             }
 
-            // reload terminal structures
+            // Create span structure specs that don't exist
+            if (specifications.SpanStructures != null)
+            {
+                foreach (var spanStructureSpec in specifications.SpanStructures)
+                {
+                    if (!spanStructureSpecByName.ContainsKey(spanStructureSpec.Name.ToLower()))
+                    {
+                        _logger.LogInformation($"Creating span structure: " + spanStructureSpec.Name);
+
+                        AddSpecification(
+                            new SpanStructureSpecification(
+                                Guid.NewGuid(),
+                                spanStructureSpec.SpanClassType,
+                                spanStructureSpec.Name,
+                                spanStructureSpec.Color
+                            )
+                            {
+                                Description = spanStructureSpec.Description,
+                                Deprecated = spanStructureSpec.Deprecated,
+                                InnerDiameter = spanStructureSpec.InnerDiameter,
+                                OuterDiameter = spanStructureSpec.OuterDiameter,
+                             }
+                        );
+                    }
+                }
+            }
+
+
+
+            // Reload terminal structures
             terminalStructureSpecs = _eventStore.Projections.Get<TerminalStructureSpecificationsProjection>().Specifications;
 
             terminalStructureSpecByName = new();
@@ -238,8 +302,18 @@ namespace OpenFTTH.APIGateway.Specifications
             foreach (var terminalStructureSpec in terminalStructureSpecs)
                 terminalStructureSpecByName.Add(terminalStructureSpec.Name.ToLower(), terminalStructureSpec);
 
+            // Reload span structures
+            spanStructureSpecs = _eventStore.Projections.Get<SpanStructureSpecificationsProjection>().Specifications;
 
-            if (!terminalStructuresOnly)
+            spanStructureSpecByName = new();
+
+            foreach (var spanStructureSpec in spanStructureSpecs)
+            {
+                if (!spanStructureSpecByName.ContainsKey(spanStructureSpec.Name.ToLower()))
+                    spanStructureSpecByName.Add(spanStructureSpec.Name.ToLower(), spanStructureSpec);
+            }
+
+            if (!terminalAndSpanStructuresOnly)
             {
 
                 // Create terminal equipment specs that don't exist
@@ -285,7 +359,7 @@ namespace OpenFTTH.APIGateway.Specifications
                 {
                     foreach (var spanEquipmentSpec in specifications.SpanEquipments)
                     {
-                        if (!terminalEquipmentSpecByName.ContainsKey(spanEquipmentSpec.Name.ToLower()))
+                        if (!spanEquipmentSpecByName.ContainsKey(spanEquipmentSpec.Name.ToLower()))
                         {
                             _logger.LogInformation($"Creating span equipment: " + spanEquipmentSpec.Name);
 
@@ -295,7 +369,7 @@ namespace OpenFTTH.APIGateway.Specifications
                                     Guid.NewGuid(),
                                     spanEquipmentSpec.Category,
                                     spanEquipmentSpec.Name,
-                                    CreateSpanStructureTemplates(spanEquipmentSpec.RootStructure, spanStructureSpecByName)
+                                    CreateSpanStructureTemplates(spanEquipmentSpec.OuterStructure, spanStructureSpecByName)
                                 )
                                 {
                                     Description = spanEquipmentSpec.Description,
@@ -309,7 +383,7 @@ namespace OpenFTTH.APIGateway.Specifications
                         }
                         else
                         {
-                            _logger.LogInformation($"Terminal equipment already exists: " + spanEquipmentSpec.Name);
+                            _logger.LogInformation($"Span equipment already exists: " + spanEquipmentSpec.Name);
                         }
                     }
                 }
@@ -499,6 +573,26 @@ namespace OpenFTTH.APIGateway.Specifications
             }
             else
                 _logger.LogInformation("Node container specification created OK");
+        }
+
+        private void AddSpecification(RackSpecification spec)
+        {
+            var specifications = _eventStore.Projections.Get<RackSpecificationsProjection>().Specifications;
+
+            if (specifications.ContainsKey(spec.Id))
+                return;
+
+            var cmd = new AddRackSpecification(Guid.NewGuid(), new UserContext("specification seeder", _specSeederId), spec);
+            var cmdResult = _commandDispatcher.HandleAsync<AddRackSpecification, Result>(cmd).Result;
+
+            if (cmdResult.IsFailed)
+            {
+                var errorMsg = cmdResult.Errors.First().Message;
+                _logger.LogError(errorMsg);
+                throw new ApplicationException(errorMsg);
+            }
+            else
+                _logger.LogInformation("Rack specification created OK");
         }
 
         private void AddSpecification(TerminalStructureSpecification spec)

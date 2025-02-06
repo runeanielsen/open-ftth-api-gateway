@@ -1,5 +1,4 @@
-﻿using OpenFTTH.UtilityGraphService.API.Model.UtilityNetwork;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace OpenFTTH.APIGateway.Specifications
@@ -10,8 +9,9 @@ namespace OpenFTTH.APIGateway.Specifications
         public List<TerminalStructureSpec> TerminalStructures { get; set; }
         public List<TerminalEquipmentSpec> TerminalEquipments { get; set; }
         public List<SpanEquipmentSpec> SpanEquipments { get; set; }
-        public List<SpanStructureSpec> SpanStructure { get; set; }
+        public List<SpanStructureSpec> SpanStructures { get; set; }
         public List<NodeContainerSpec> NodeContainers { get; set; }
+        public List<RackSpec> Racks { get; set; }
     }
 
     public record ManufacturerSpec
@@ -29,13 +29,13 @@ namespace OpenFTTH.APIGateway.Specifications
         public string Category { get; set; }
         public string ShortName { get; set; }
         public string? Description { get; set; }
-        public List<string>? Manufacturers { get; init; }
+        public List<string>? Manufacturers { get; set; }
         public bool IsRackEquipment { get; set; }
         public int HeightInRackUnits { get; set; }
         public bool IsFixed { get; set; }
-        public bool IsAddressable { get; init; }
-        public bool IsCustomerTermination { get; init; }
-        public bool IsLineTermination { get; init; }
+        public bool IsAddressable { get; set; }
+        public bool IsCustomerTermination { get; set; }
+        public bool IsLineTermination { get; set; }
         public bool Deprecated { get; set; }
         public List<TerminalStructureTemplateSpec> Structures { get; set; }
     }
@@ -54,7 +54,7 @@ namespace OpenFTTH.APIGateway.Specifications
         public string? Description { get; set; }
         public List<string>? Manufacturers { get; set; }
         public List<TerminalTemplateSpec> Terminals { get; set; }
-        public bool Deprecated { get; init; }
+        public bool Deprecated { get; set; }
     }
 
     public record TerminalTemplateSpec
@@ -68,7 +68,6 @@ namespace OpenFTTH.APIGateway.Specifications
     }
 
 
-
     public record NodeContainerSpec
     {
         public string Name { get; set; }
@@ -76,12 +75,20 @@ namespace OpenFTTH.APIGateway.Specifications
         public string ShortName { get; set; }
         public string? Description { get; set; }
         public List<string>? Manufacturers { get; set; }
+        public bool Deprecated { get; set; }
+    }
+
+    public record RackSpec
+    {
+        public string Name { get; set; }
+        public string Category { get; set; }
+        public string ShortName { get; set; }
+        public string? Description { get; set; }
         public bool Deprecated { get; init; }
     }
 
     public record SpanEquipmentSpec
     {
-        //public Guid Id { get; }
         public string Category { get; set; }
         public string Name { get; set; }
         public bool Deprecated { get; set; }
@@ -91,7 +98,7 @@ namespace OpenFTTH.APIGateway.Specifications
         public List<string>? Manufacturers { get; set; }
         public bool IsCable { get; set; }
 
-        public SpanStructureTemplateSpec RootStructure { get; set; }
+        public SpanStructureTemplateSpec OuterStructure { get; set; }
     }
 
     public class SpanStructureTemplateSpec
@@ -105,13 +112,12 @@ namespace OpenFTTH.APIGateway.Specifications
 
     public record SpanStructureSpec
     {
-        //public Guid Id { get; }
-        public string SpanClassType { get; }
-        public string Name { get; }
-        public string Color { get; }
-        public int? InnerDiameter { get; init; }
-        public int? OuterDiameter { get; init; }
-        public bool Deprecated { get; init; }
-        public string? Description { get; init; }
+        public string SpanClassType { get; set; }
+        public string Name { get; set; }
+        public string Color { get; set; }
+        public int? InnerDiameter { get; set; }
+        public int? OuterDiameter { get; set; }
+        public bool Deprecated { get; set; }
+        public string? Description { get; set; }
     }
 }
