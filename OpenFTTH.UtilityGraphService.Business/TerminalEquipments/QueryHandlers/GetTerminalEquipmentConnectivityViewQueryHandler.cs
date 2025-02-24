@@ -226,7 +226,7 @@ namespace OpenFTTH.UtilityGraphService.Business.TerminalEquipments.QueryHandling
 
         private static string GetInterfaceName(TerminalStructure terminalStructure)
         {
-            if (terminalStructure.interfaceInfo == null)
+            if (terminalStructure.interfaceInfo != null)
                 return terminalStructure.interfaceInfo.GetName();
             else
                 return null;
