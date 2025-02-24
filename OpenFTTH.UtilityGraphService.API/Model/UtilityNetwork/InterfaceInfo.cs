@@ -34,5 +34,19 @@ namespace OpenFTTH.UtilityGraphService.API.Model.UtilityNetwork
 
             return false;
         }
+
+        public string GetName(bool withCircuitName = true)
+        {
+            string interfaceName = InterfaceType + "-" + SlotNumber;
+
+            interfaceName += ("/" + SubSlotNumber);
+
+            interfaceName += ("/" + PortNumber);
+
+            if (CircuitName != null && withCircuitName)
+                interfaceName += (" (" + CircuitName + ")");
+
+            return interfaceName;
+        }
     }
 }

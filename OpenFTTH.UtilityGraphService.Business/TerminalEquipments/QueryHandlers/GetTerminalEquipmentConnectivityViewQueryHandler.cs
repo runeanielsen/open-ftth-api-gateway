@@ -226,17 +226,10 @@ namespace OpenFTTH.UtilityGraphService.Business.TerminalEquipments.QueryHandling
 
         private static string GetInterfaceName(TerminalStructure terminalStructure)
         {
-            string interfaceName = terminalStructure.interfaceInfo.InterfaceType + "-" + terminalStructure.interfaceInfo.SlotNumber;
-
-            if (terminalStructure.interfaceInfo.SubSlotNumber > 0)
-                interfaceName += ("/" + terminalStructure.interfaceInfo.SubSlotNumber);
-
-            interfaceName += ("/" + terminalStructure.interfaceInfo.PortNumber);
-
-            if (terminalStructure.interfaceInfo.CircuitName != null)
-                interfaceName += (" (" + terminalStructure.interfaceInfo.CircuitName + ")");
-
-            return interfaceName;
+            if (terminalStructure.interfaceInfo == null)
+                return terminalStructure.interfaceInfo.GetName();
+            else
+                return null;
         }
 
         private List<TerminalEquipmentAZConnectivityViewLineInfo> CompactLines(List<TerminalEquipmentAZConnectivityViewLineInfo> lineInfos)

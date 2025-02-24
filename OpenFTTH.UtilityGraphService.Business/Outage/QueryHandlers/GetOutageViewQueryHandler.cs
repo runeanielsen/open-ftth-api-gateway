@@ -2,6 +2,7 @@
 using Baseline.ImTools;
 using FluentResults;
 using Marten;
+using Microsoft.CodeAnalysis.VisualBasic.Syntax;
 using OpenFTTH.Address.API.Model;
 using OpenFTTH.Address.API.Queries;
 using OpenFTTH.CQRS;
@@ -150,7 +151,7 @@ namespace OpenFTTH.UtilityGraphService.Business.Outage.QueryHandlers
                         // Now add all circuits
                         foreach (var circuitName in terminalLevelResult.UniqueCircuitNamesFound)
                         {
-                            var circuitNode = new OutageViewNode(Guid.NewGuid(), circuitName == null ? "NA" : circuitName);
+                            var circuitNode = new OutageViewNode(Guid.NewGuid(), circuitName == null ? "NA" : circuitName, GetCircuitDescription(terminalLevelResult));
                             terminalNode.AddNode(circuitNode);
                         }
                     }
@@ -168,6 +169,36 @@ namespace OpenFTTH.UtilityGraphService.Business.Outage.QueryHandlers
             rootNode.AddNode(terminalEquipmentNode);
 
             terminalEquipmentNode.Description = $"{equipmentLevelResult.UniqueInstallationNamesFound} {{OutageInstallationsFound}} {{And}} {equipmentLevelResult.UniqueCircuitNamesFound.Count} {{OutageCircuitsFound}}";
+        }
+
+        private string? GetCircuitDescription(OutageSearchResult outageSearchResult)
+        {
+            if (outageSearchResult.CircuitsFound.Count == 1)
+            {
+                var circuit = outageSearchResult.CircuitsFound.First();
+
+                if (outageSearchResult.CustomerTerminationsFound.Count > 0)
+                {
+                    var customerTermination = outageSearchResult.CustomerTerminationsFound.First();
+
+                    return circuit.TerminalEquipment.Name + " - " + circuit.InterfaceInfo.GetName(false) + " <-> " + customerTermination.Name;
+                }
+                else
+                {
+                    return circuit.TerminalEquipment.Name + " - " + circuit.InterfaceInfo.GetName(false);
+                }
+            }
+            else if (outageSearchResult.CircuitsFound.Count == 2)
+            {
+                var firstCircuit = outageSearchResult.CircuitsFound.First();
+                var secondCircuit = outageSearchResult.CircuitsFound.Last();
+
+                return firstCircuit.TerminalEquipment.Name + " - " + firstCircuit.InterfaceInfo.GetName(false) + "<-> " + secondCircuit.TerminalEquipment.Name + " - " + secondCircuit.InterfaceInfo.GetName(false);
+            }
+            else
+            {
+                return $"Error: Did not expect to find {outageSearchResult.CircuitsFound.Count} interfaces in circuit";
+            }
         }
 
         private static int CountUniqueInstallationNames(List<TerminalEquipment> installationEquipments)
@@ -486,7 +517,7 @@ namespace OpenFTTH.UtilityGraphService.Business.Outage.QueryHandlers
                     // Now add all circuits
                     foreach (var circuitName in fiberLevelResult.UniqueCircuitNamesFound)
                     {
-                        var circuitNode = new OutageViewNode(Guid.NewGuid(), circuitName == null ? "NA" : circuitName);
+                        var circuitNode = new OutageViewNode(Guid.NewGuid(), circuitName == null ? "NA" : circuitName, GetCircuitDescription(fiberLevelResult));
                         fiberNode.AddNode(circuitNode);
                     }
                 }
@@ -527,7 +558,9 @@ namespace OpenFTTH.UtilityGraphService.Business.Outage.QueryHandlers
 
                             if (terminalStructure.interfaceInfo != null)
                             {
-                                result.CircuitsFound.Add(terminalStructure.interfaceInfo);
+                                result.CircuitsFound.Add(
+                                    new CircuitInfo(terminalStructure.interfaceInfo, terminalEquipment, terminalStructure)
+                                );
 
                                 result.UniqueCircuitNamesFound.Add(terminalStructure.interfaceInfo.CircuitName ?? Guid.NewGuid().ToString());
                             }
@@ -725,14 +758,14 @@ namespace OpenFTTH.UtilityGraphService.Business.Outage.QueryHandlers
         {
             public List<TerminalEquipment> CustomerTerminationsFound { get; set; }
 
-            public List<InterfaceInfo> CircuitsFound { get; set; }
+            public List<CircuitInfo> CircuitsFound { get; set; }
 
             public HashSet<string> UniqueCircuitNamesFound { get; set; }
 
             public OutageSearchResult()
             {
                 CustomerTerminationsFound = new List<TerminalEquipment>();
-                CircuitsFound = new List<InterfaceInfo>();
+                CircuitsFound = new List<CircuitInfo>();
                 UniqueCircuitNamesFound = new HashSet<string>();
             }
 
@@ -764,5 +797,19 @@ namespace OpenFTTH.UtilityGraphService.Business.Outage.QueryHandlers
             }
         }
 
+
+        public class CircuitInfo
+        {
+            public CircuitInfo(InterfaceInfo interfaceInto, TerminalEquipment terminalEquipment, TerminalStructure terminalStructure)
+            {
+                InterfaceInfo = interfaceInto;
+                TerminalEquipment = terminalEquipment;
+                TerminalStructure = terminalStructure;
+            }
+
+            public InterfaceInfo InterfaceInfo { get;}
+            public TerminalEquipment TerminalEquipment { get;  }
+            public TerminalStructure TerminalStructure { get;}
+        }
     }
 }
