@@ -1,5 +1,6 @@
 ﻿using Baseline;
 using Baseline.ImTools;
+using DAX.ObjectVersioning.Graph;
 using FluentResults;
 using Marten;
 using Microsoft.CodeAnalysis.VisualBasic.Syntax;
@@ -15,10 +16,12 @@ using OpenFTTH.UtilityGraphService.API.Model.UtilityNetwork;
 using OpenFTTH.UtilityGraphService.API.Queries;
 using OpenFTTH.UtilityGraphService.Business.Graph;
 using OpenFTTH.UtilityGraphService.Business.SpanEquipments.Projections;
+using OpenFTTH.UtilityGraphService.Business.TerminalEquipments;
 using OpenFTTH.UtilityGraphService.Business.TerminalEquipments.Projections;
 using OpenFTTH.UtilityGraphService.Business.Trace;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -537,7 +540,9 @@ namespace OpenFTTH.UtilityGraphService.Business.Outage.QueryHandlers
 
             if (traceResult != null && traceResult.All.Count > 0)
             {
-                foreach (var trace in traceResult.All)
+                ArgumentNullException.ThrowIfNull(traceResult.Source);
+
+                foreach (var trace in traceResult.All.Union(new List<IGraphObject>() { traceResult.Source }))
                 {
                     if (trace is IUtilityGraphTerminalRef)
                     {
