@@ -151,7 +151,7 @@ namespace OpenFTTH.UtilityGraphService.Business.Outage.QueryHandlers
                         // Now add all circuits
                         foreach (var circuitName in terminalLevelResult.UniqueCircuitNamesFound)
                         {
-                            var circuitNode = new OutageViewNode(Guid.NewGuid(), circuitName == null ? "NA" : circuitName, GetCircuitDescription(terminalLevelResult));
+                            var circuitNode = new OutageViewNode(Guid.NewGuid(), circuitName == null ? "NA" : circuitName, GetCircuitDescription(terminalLevelResult), circuitName);
                             terminalNode.AddNode(circuitNode);
                         }
                     }
@@ -517,7 +517,7 @@ namespace OpenFTTH.UtilityGraphService.Business.Outage.QueryHandlers
                     // Now add all circuits
                     foreach (var circuitName in fiberLevelResult.UniqueCircuitNamesFound)
                     {
-                        var circuitNode = new OutageViewNode(Guid.NewGuid(), circuitName == null ? "NA" : circuitName, GetCircuitDescription(fiberLevelResult));
+                        var circuitNode = new OutageViewNode(Guid.NewGuid(), circuitName == null ? "NA" : circuitName, GetCircuitDescription(fiberLevelResult), circuitName);
                         fiberNode.AddNode(circuitNode);
                     }
                 }
