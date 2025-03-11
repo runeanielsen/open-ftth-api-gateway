@@ -306,6 +306,10 @@ namespace OpenFTTH.UtilityGraphService.Business.TerminalEquipments.QueryHandling
 
             var traceInfo = relevantEquipmentData.TracedTerminals[terminal.Id].Z;
 
+            // if we found nothing in z end, try a end
+            if (traceInfo == null)
+                traceInfo = relevantEquipmentData.TracedTerminals[terminal.Id].A;
+
             FaceKindEnum faceKind = GetZEndFaceKind(relevantEquipmentData, terminal);
 
             return new TerminalEquipmentAZConnectivityViewEndInfo(terminalInfo, faceKind)
