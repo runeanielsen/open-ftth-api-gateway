@@ -1951,7 +1951,32 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments
 
         }
 
-        public Result Move(CommandContext cmdContext, ValidatedRouteNetworkWalk newWalk, ValidatedRouteNetworkWalk existingWalk)
+        public Result Shrink(CommandContext cmdContext, ValidatedRouteNetworkWalk newWalk, ValidatedRouteNetworkWalk existingWalk, UtilityNetworkHop[]? newUtilityNetworkHops)
+        {
+            var moveResult = Move(cmdContext, newWalk, existingWalk, false);
+
+            if (moveResult.IsSuccess)
+            {
+                if (!(newUtilityNetworkHops == null && this._spanEquipment.UtilityNetworkHops == null))
+                {
+                    RaiseEvent(
+                            new SpanEquipmentAffixedToParent(this.Id, newUtilityNetworkHops)
+                            {
+                                CorrelationId = cmdContext.CorrelationId,
+                                IncitingCmdId = cmdContext.CmdId,
+                                UserName = cmdContext.UserContext?.UserName,
+                                WorkTaskId = cmdContext.UserContext?.WorkTaskId
+                            }
+                        );
+                }
+
+                return Result.Ok();
+            }
+
+            return moveResult;
+        }
+
+        public Result Move(CommandContext cmdContext, ValidatedRouteNetworkWalk newWalk, ValidatedRouteNetworkWalk existingWalk, bool checkTerminalsAndParents = true)
         {
             if (_spanEquipment == null)
                 throw new ApplicationException($"Invalid internal state. Span equipment property cannot be null. Seems that span equipment has never been placed. Please check command handler logic.");
@@ -1969,7 +1994,7 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments
             if (newWalk.FromNodeId != existingWalk.FromNodeId)
             {
                 // There cannot be any connection in the node moved away from
-                if (IsAnySpanSegmentsConnectedInNode(existingWalk.FromNodeId))
+                if (checkTerminalsAndParents && IsAnySpanSegmentsConnectedInNode(existingWalk.FromNodeId))
                 {
                     return Result.Fail(new MoveSpanEquipmentError(
                        MoveSpanEquipmentErrorCodes.CANNOT_MOVE_FROM_END_BECAUSE_SEGMENTS_ARE_CONNECTED_THERE,
@@ -1991,7 +2016,7 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments
             if (newWalk.ToNodeId != existingWalk.ToNodeId)
             {
                 // There cannot be any connection in the node moved away from
-                if (IsAnySpanSegmentsConnectedInNode(existingWalk.ToNodeId))
+                if (checkTerminalsAndParents && IsAnySpanSegmentsConnectedInNode(existingWalk.ToNodeId))
                 {
                     return Result.Fail(new MoveSpanEquipmentError(
                        MoveSpanEquipmentErrorCodes.CANNOT_MOVE_TO_END_BECAUSE_SEGMENTS_ARE_CONNECTED_THERE,
@@ -2037,7 +2062,7 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments
             }
                         
             // Check that span equipment is not moved where affixed to parents conduits
-            if (IsAnyParentSubwalksMoved(existingWalk, newWalk))
+            if (checkTerminalsAndParents && IsAnyParentSubwalksMoved(existingWalk, newWalk))
             {
                 return Result.Fail(new MoveSpanEquipmentError(
                    MoveSpanEquipmentErrorCodes.CANNOT_MOVE_SEGMENTS_AFFIXED_TO_PARENTS,
@@ -3098,8 +3123,7 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments
 
             return result;
         }
-
-     
+             
         private class ExistingRouteHop
         {
             public int SequenceNumber { get; set; }
@@ -3112,6 +3136,11 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments
 
             public bool IsFirst;
             public bool IsLast;
+        }
+
+        public SpanEquipment SpanEquipment
+        {
+            get { return _spanEquipment; }
         }
     }
 }

@@ -11,6 +11,12 @@ namespace OpenFTTH.APIGateway.GraphQL.Work
     {
         public static Result<Guid> GetUserCurrentWorkId(string userName, IQueryDispatcher queryDispatcher)
         {
+            // If debug accept that no work task is selected
+            #if DEBUG
+            if (userName == null)
+                return Result.Ok(Guid.Empty);
+            #endif
+
             var queryRequest = new GetUserWorkContext(userName);
 
             var queryResult = queryDispatcher.HandleAsync<GetUserWorkContext, Result<UserWorkContext>>(queryRequest).Result;

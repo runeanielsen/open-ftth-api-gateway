@@ -71,6 +71,11 @@ namespace OpenFTTH.RouteNetwork.API.Model
             return new ValidatedRouteNetworkWalk(newRouteNetworkElementRefs);
         }
 
+        public RouteNetworkInterest GetRouteNetworkInterest(Guid walkOfInterestId)
+        {
+            return new RouteNetworkInterest(walkOfInterestId, RouteNetworkInterestKindEnum.WalkOfInterest, RouteNetworkElementRefs);
+        }
+
         public override bool Equals(object? obj)
         {
             if (obj == null)
