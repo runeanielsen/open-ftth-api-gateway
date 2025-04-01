@@ -190,7 +190,7 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments.CommandHandlers
                     var connectResult = newCableEquipmentAR.ConnectCableSpanSegmentsWithTerminals(
                            cmdContext: utilityCmdContext,
                            spanEquipmentSpecifications[newCableEquipmentAR.SpanEquipment.SpecificationId],
-                           command.RouteNodeId,
+                           newCableWalk.ToNodeId,
                            connects.ToArray()
                     );
 
@@ -200,11 +200,11 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments.CommandHandlers
                     }
                 }
 
-                _eventStore.Aggregates.Store(spanEquipmentAR);
                 _eventStore.Aggregates.Store(spanEquipmentInterestAR);
+                _eventStore.Aggregates.Store(spanEquipmentAR);
 
-                _eventStore.Aggregates.Store(newCableEquipmentAR);
                 _eventStore.Aggregates.Store(newCableInterestAR);
+                _eventStore.Aggregates.Store(newCableEquipmentAR);
             }
 
             return Task.FromResult(Result.Ok());
