@@ -430,6 +430,9 @@ namespace OpenFTTH.UtilityGraphService.Business.Trace.Util
 
         public string GetCircuitName(IUtilityGraphTerminalRef terminalRef)
         {
+            if (terminalRef.IsDummyEnd)
+                return null;
+
             var terminalStructure = terminalRef.TerminalStructure(_utilityNetwork);
 
             if (terminalStructure.interfaceInfo != null && terminalStructure.interfaceInfo.CircuitName != null)
@@ -440,6 +443,9 @@ namespace OpenFTTH.UtilityGraphService.Business.Trace.Util
 
         public bool IsCustomerSplitter(IUtilityGraphTerminalRef terminalRef)
         {
+            if (terminalRef.IsDummyEnd)
+                return false;
+
             // Check if equipment is marked as customer spitter
             var terminalEquipment = terminalRef.TerminalEquipment(_utilityNetwork);
 
@@ -462,6 +468,9 @@ namespace OpenFTTH.UtilityGraphService.Business.Trace.Util
 
         public bool IsLineTermination(IUtilityGraphTerminalRef terminalRef)
         {
+            if (terminalRef.IsDummyEnd)
+                return false;
+
             var terminalEquipment = terminalRef.TerminalEquipment(_utilityNetwork);
 
             var terminalEquipmentSpecification = _terminalEquipmentSpecifications[terminalEquipment.SpecificationId];
