@@ -20,6 +20,7 @@ using OpenFTTH.RouteNetwork.Business.RouteElements.StateHandling;
 using Baseline;
 using OpenFTTH.UtilityGraphService.Business.SpanEquipments.Projections;
 using OpenFTTH.UtilityGraphService.Business.SpanEquipments.Events;
+using OpenFTTH.RouteNetwork.Business.RouteElements.Model;
 
 namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments.CommandHandlers
 {
@@ -99,12 +100,12 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments.CommandHandlers
                 // Disconnect eventually to terminals
                 var disconnects = FindCableEndDisconnects(utilityNetwork, cableToBeCut);
 
-                var spanEquipmentAR = _eventStore.Aggregates.Load<SpanEquipmentAR>(cableToBeCut.Id);
+                var existingCableEquipmentAR = _eventStore.Aggregates.Load<SpanEquipmentAR>(cableToBeCut.Id);
 
                 if (disconnects.Count > 0)
                 {
                     // Disconnect the segments
-                    var disconnectResult = spanEquipmentAR.DisconnectSegmentsFromTerminals(
+                    var disconnectResult = existingCableEquipmentAR.DisconnectSegmentsFromTerminals(
                            cmdContext: utilityCmdContext,
                            disconnects.Values.ToArray()
                     );
@@ -118,20 +119,27 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments.CommandHandlers
                 ////////////////////////////
                 // Shrink existing cable
 
-                var newWalk = GetWalkBeforeNode(existingWalk.RouteNetworkElementRefs, command.RouteNodeId);
+                var existingCableWalkAfterShrink = GetWalkBeforeNode(existingWalk.RouteNetworkElementRefs, command.RouteNodeId);
 
-                var newUtilityNetworkHops = GetUtilityHopsBeforeNode(cableToBeCut.UtilityNetworkHops, command.RouteNodeId);
+                var newCableWalk = GetWalkAfterNode(existingWalk.RouteNetworkElementRefs, command.RouteNodeId);
+
+                if (CheckIfUtilityHopsIsCutInWalk(cableToBeCut.UtilityNetworkHops, command.RouteNodeId, existingCableWalkAfterShrink, newCableWalk))
+                    throw new ApplicationException($"Cutting of span equipment: {cableToBeCut.Id} failed. A utility hop span the node where to cut. The cut logic cannot handle that situation.");
+
+                var existingCableNewUtilityNetworkHops = GetUtilityHopsRelatedToWalk(cableToBeCut.UtilityNetworkHops, existingCableWalkAfterShrink);
+
+
 
                 // Shrink cable and update update utility hops
-                var moveSpanEquipmentResult = spanEquipmentAR.Shrink(utilityCmdContext, newWalk, existingWalk, newUtilityNetworkHops);
+                var moveSpanEquipmentResult = existingCableEquipmentAR.Shrink(utilityCmdContext, existingCableWalkAfterShrink, existingWalk, existingCableNewUtilityNetworkHops);
 
                 if (moveSpanEquipmentResult.IsFailed)
                     return Task.FromResult(Result.Fail(moveSpanEquipmentResult.Errors.First()));
 
                 // Update interest
-                var spanEquipmentInterestAR = _eventStore.Aggregates.Load<InterestAR>(cableToBeCut.WalkOfInterestId);
+                var existingCableInterestAR = _eventStore.Aggregates.Load<InterestAR>(cableToBeCut.WalkOfInterestId);
 
-                var updateInterestResult = spanEquipmentInterestAR.UpdateRouteNetworkElements(networkCmdContext, newWalk.GetRouteNetworkInterest(cableToBeCut.WalkOfInterestId), interestsProjection, new WalkValidator(_routeNetworkRepository));
+                var updateInterestResult = existingCableInterestAR.UpdateRouteNetworkElements(networkCmdContext, existingCableWalkAfterShrink.GetRouteNetworkInterest(cableToBeCut.WalkOfInterestId), interestsProjection, new WalkValidator(_routeNetworkRepository));
 
                 if (updateInterestResult.IsFailed)
                     throw new ApplicationException($"Failed to update interest: {cableToBeCut.WalkOfInterestId} of span equipment: {cableToBeCut.Id} in RemoveSpanStructureFromSpanEquipmentCommandHandler Error: {updateInterestResult.Errors.First().Message}");
@@ -140,10 +148,8 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments.CommandHandlers
                 // Create new cable
 
                 var newCableWalkOfInterestId = Guid.NewGuid();
-
-                var newCableWalk = GetWalkAfterNode(existingWalk.RouteNetworkElementRefs, command.RouteNodeId);
-
-                var newCableUtilityNetworkHops = GetUtilityHopsAfterNode(cableToBeCut.UtilityNetworkHops, command.RouteNodeId);
+                              
+                var newCableUtilityNetworkHops = GetUtilityHopsRelatedToWalk(cableToBeCut.UtilityNetworkHops, newCableWalk);
 
                 var newCableEquipmentAR = new SpanEquipmentAR();
 
@@ -200,58 +206,67 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments.CommandHandlers
                     }
                 }
 
-                _eventStore.Aggregates.Store(spanEquipmentInterestAR);
-                _eventStore.Aggregates.Store(spanEquipmentAR);
+                _eventStore.Aggregates.Store(existingCableInterestAR);
+                _eventStore.Aggregates.Store(existingCableEquipmentAR);
 
                 _eventStore.Aggregates.Store(newCableInterestAR);
                 _eventStore.Aggregates.Store(newCableEquipmentAR);
+
+                NotifyExternalServicesAboutChange(cableToBeCut.Id, command.RouteNodeId);
             }
 
             return Task.FromResult(Result.Ok());
         }
 
-      
-
-        private UtilityNetworkHop[]? GetUtilityHopsAfterNode(UtilityNetworkHop[]? utilityNetworkHops, Guid routeNodeId)
+        private UtilityNetworkHop[]? GetUtilityHopsRelatedToWalk(UtilityNetworkHop[]? utilityNetworkHops, ValidatedRouteNetworkWalk walk)
         {
-            if (utilityNetworkHops == null)
-                return null;
-
-            bool midHopFound = false;
-
             List<UtilityNetworkHop> newHopList = new List<UtilityNetworkHop>();
 
             foreach (var existingHop in utilityNetworkHops)
             {
-                if (existingHop.FromNodeId == routeNodeId)
-                    midHopFound = true;
+                int relCount = 0;
 
-                if (midHopFound)
+                if (walk.NodeIds.Contains(existingHop.FromNodeId))
+                    relCount++;
+
+                if (walk.NodeIds.Contains(existingHop.ToNodeId))
+                    relCount++;
+
+                if (relCount == 2)
                     newHopList.Add(existingHop);
             }
 
             return newHopList.ToArray();
         }
 
-        private UtilityNetworkHop[]? GetUtilityHopsBeforeNode(UtilityNetworkHop[]? utilityNetworkHops, Guid routeNodeId)
+        private bool CheckIfUtilityHopsIsCutInWalk(UtilityNetworkHop[]? utilityNetworkHops, Guid splitNode, ValidatedRouteNetworkWalk walk1, ValidatedRouteNetworkWalk walk2)
         {
-            if (utilityNetworkHops == null)
-                return null;
-
-            bool midHopFound = false;
-
             List<UtilityNetworkHop> newHopList = new List<UtilityNetworkHop>();
 
             foreach (var existingHop in utilityNetworkHops)
             {
-                if (existingHop.FromNodeId == routeNodeId)
-                    midHopFound = true;
+                int walk1RelCount = 0;
 
-                if (!midHopFound)
-                    newHopList.Add(existingHop);
+                if (existingHop.FromNodeId != splitNode && walk1.NodeIds.Contains(existingHop.FromNodeId))
+                    walk1RelCount++;
+
+                if (existingHop.ToNodeId != splitNode && walk1.NodeIds.Contains(existingHop.ToNodeId))
+                    walk1RelCount++;
+
+                int walk2RelCount = 0;
+
+                if (existingHop.FromNodeId != splitNode && walk2.NodeIds.Contains(existingHop.FromNodeId))
+                    walk2RelCount++;
+
+                if (existingHop.ToNodeId != splitNode && walk2.NodeIds.Contains(existingHop.ToNodeId))
+                    walk2RelCount++;
+
+
+                if (walk1RelCount > 0 && walk2RelCount > 0)
+                    return true;
             }
 
-            return newHopList.ToArray();
+            return false;
         }
 
         private static ValidatedRouteNetworkWalk GetWalkAfterNode(RouteNetworkElementIdList existingWalk, Guid routeNodeId)
