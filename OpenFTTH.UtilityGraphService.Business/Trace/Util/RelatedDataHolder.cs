@@ -13,6 +13,7 @@ using OpenFTTH.UtilityGraphService.Business.Util;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using OpenFTTH.UtilityGraphService.Business.SpanEquipments.Projections;
 
 namespace OpenFTTH.UtilityGraphService.Business.Trace.Util
 {
@@ -23,6 +24,8 @@ namespace OpenFTTH.UtilityGraphService.Business.Trace.Util
         private readonly UtilityNetworkProjection _utilityNetwork;
         private LookupCollection<TerminalEquipmentSpecification> _terminalEquipmentSpecifications;
         private LookupCollection<TerminalStructureSpecification> _terminalStructureSpecifications;
+        private LookupCollection<SpanEquipmentSpecification> _spanEquipmentSpecifications;
+        private LookupCollection<SpanStructureSpecification> _spanStructureSpecifications;
 
         public Dictionary<Guid, RouteNetworkElement> RouteNetworkElementById { get; }
         public Dictionary<Guid, NodeContainer> NodeContainerById  { get; }
@@ -37,6 +40,9 @@ namespace OpenFTTH.UtilityGraphService.Business.Trace.Util
 
             _terminalEquipmentSpecifications = _eventStore.Projections.Get<TerminalEquipmentSpecificationsProjection>().Specifications;
             _terminalStructureSpecifications = _eventStore.Projections.Get<TerminalStructureSpecificationsProjection>().Specifications;
+            _spanEquipmentSpecifications = _eventStore.Projections.Get<SpanEquipmentSpecificationsProjection>().Specifications;
+            _spanStructureSpecifications = _eventStore.Projections.Get<SpanStructureSpecificationsProjection>().Specifications;
+
 
             RouteNetworkElementById = GatherRouteNetworkElementInformation(nodeOfInterestIds);
 
@@ -505,6 +511,13 @@ namespace OpenFTTH.UtilityGraphService.Business.Trace.Util
 
         public string GetSpanEquipmentFullFiberCableString(SpanEquipment spanEquipment, int fiberNo)
         {
+            var spanEquipmentSpecification = _spanEquipmentSpecifications[spanEquipment.SpecificationId];
+
+            var formattedText = spanEquipmentSpecification.GetFormattedCableString(spanEquipment.Name, fiberNo, true, _spanStructureSpecifications);
+
+            if (formattedText != null)
+                return formattedText;
+
             int fiber = ((fiberNo - 1) % 12) + 1;
             int tube = ((fiberNo - 1) / 12) + 1;
 
@@ -513,6 +526,13 @@ namespace OpenFTTH.UtilityGraphService.Business.Trace.Util
 
         public string GetSpanEquipmentTubeFiberString(SpanEquipment spanEquipment, int fiberNo)
         {
+            var spanEquipmentSpecification = _spanEquipmentSpecifications[spanEquipment.SpecificationId];
+
+            var formattedText = spanEquipmentSpecification.GetFormattedCableString(spanEquipment.Name, fiberNo, false, _spanStructureSpecifications);
+
+            if (formattedText != null)
+                return formattedText;
+
             int fiber = ((fiberNo - 1) % 12) + 1;
             int tube = ((fiberNo - 1) / 12) + 1;
 

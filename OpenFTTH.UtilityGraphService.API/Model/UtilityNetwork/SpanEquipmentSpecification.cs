@@ -1,5 +1,8 @@
 ﻿using OpenFTTH.Core;
+using OpenFTTH.Util;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace OpenFTTH.UtilityGraphService.API.Model.UtilityNetwork
 {
@@ -15,6 +18,7 @@ namespace OpenFTTH.UtilityGraphService.API.Model.UtilityNetwork
         public string? Description { get; init; }
         public Guid[]? ManufacturerRefs { get; init; }
         public bool IsCable { get; init; }
+        public CableTubeSpecification[] CableTubes { get; init; }
 
         /// <summary>
         /// </summary>
@@ -28,6 +32,107 @@ namespace OpenFTTH.UtilityGraphService.API.Model.UtilityNetwork
             this.Category = category;
             this.Name = name;
             this.RootTemplate = rootTemplate;
+        }
+
+        /// <summary>
+        /// Get formatted text - e.g. [K232323 (2)] [1 #{RD} RD 2 #{BL} BL (2)].
+        /// If not possible to create formatted text, the function returns null.
+        /// </summary>
+        /// <param name="cableName"></param>
+        /// <param name="fiberPosition"></param>
+        /// <param name="spanStructureSpecifications"></param>
+        /// <returns></returns>
+        public string? GetFormattedCableString(string cableName, int fiberPosition, bool includeCableName, LookupCollection<SpanStructureSpecification> spanStructureSpecifications)
+        {
+            HashSet<string> colorCodes = new HashSet<string> { "RD", "GR", "BL", "YL", "WH", "SL", "BR", "VI", "TQ", "BK", "OR", "PK" };
+
+            if (RootTemplate.ChildTemplates.Length > 1)
+            {
+                var firstFiberSpec = spanStructureSpecifications[RootTemplate.ChildTemplates.First().SpanStructureSpecificationId];
+
+                // Only try to create formatted cable string if the specification is using two-letter color codes
+                if (!colorCodes.Contains(firstFiberSpec.Color))
+                    return null;
+
+                string line1 = "[" + cableName + "(" + RootTemplate.ChildTemplates.Count() + ")] ";
+
+                string line2 = "[";
+
+                // Tube info
+                if (CableTubes != null)
+                {
+                    var tubeNo = GetTubeNumber(fiberPosition);
+
+                    var tubeColor = GetTubeColor(tubeNo);
+
+                    line2 += tubeNo;
+
+                    line2 += $" #{{{tubeColor}}} {tubeColor} ";
+                }
+
+                // Fiber info
+                var fiberNo = GetFiberNumber(fiberPosition);
+
+                var fiberColor = GetFiberColor(fiberPosition, spanStructureSpecifications);
+
+                line2 += fiberNo;
+
+                line2 += $" #{{{fiberColor}}} {fiberColor} ({fiberPosition})]";
+
+                if (includeCableName)
+                    return (line1 + line2);
+                else
+                    return line2;
+            }
+
+            return null;
+        }
+
+        private int GetTubeNumber(int fiberPosition)
+        {
+            if (CableTubes == null)
+                return 0;
+
+            int numberOfFibersPerTube = RootTemplate.ChildTemplates.Count() / CableTubes.Count();
+
+            int tubeNo = ((fiberPosition - 1) / numberOfFibersPerTube) + 1;
+
+            return tubeNo;
+        }
+
+        private int GetFiberNumber(int fiberPosition)
+        {
+            if (CableTubes == null)
+                return fiberPosition;
+
+            int numberOfFibersPerTube = RootTemplate.ChildTemplates.Count() / CableTubes.Count();
+
+            int fiberNo = ((fiberPosition - 1) % 12) + 1;
+
+            return fiberNo;
+        }
+
+        private string? GetTubeColor(int tubeNo)
+        {
+            if (CableTubes == null)
+                return null;
+         
+            if (CableTubes.Count() <= tubeNo)
+                return null;
+
+            return CableTubes[tubeNo - 1].Color;
+        }
+
+        private string? GetFiberColor(int fiberPosition, LookupCollection<SpanStructureSpecification> spanStructureSpecifications)
+        {
+            if (RootTemplate.ChildTemplates.Count() <= fiberPosition)
+                return null;
+
+            var specId = RootTemplate.ChildTemplates[fiberPosition].SpanStructureSpecificationId;
+
+            var color = spanStructureSpecifications[specId].Color;
+
+            return color;
         }
     }
 }

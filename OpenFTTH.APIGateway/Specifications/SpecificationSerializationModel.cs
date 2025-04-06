@@ -99,6 +99,8 @@ namespace OpenFTTH.APIGateway.Specifications
         public bool IsCable { get; set; }
 
         public SpanStructureTemplateSpec OuterStructure { get; set; }
+
+        public List<CableTubeSpec>? CableTubes { get; set; }
     }
 
     public class SpanStructureTemplateSpec
@@ -118,6 +120,13 @@ namespace OpenFTTH.APIGateway.Specifications
         public int? InnerDiameter { get; set; }
         public int? OuterDiameter { get; set; }
         public bool Deprecated { get; set; }
+        public string? Description { get; set; }
+    }
+
+    public record CableTubeSpec
+    {
+        public UInt16 Position { get; set; }
+        public string Color { get; set; }
         public string? Description { get; set; }
     }
 }

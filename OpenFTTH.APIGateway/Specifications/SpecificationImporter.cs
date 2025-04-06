@@ -76,7 +76,7 @@ namespace OpenFTTH.APIGateway.Specifications
         public void ImportFromFile(string fileName, bool terminalStructuresOnly)
         {
             var specificationData = JsonConvert.DeserializeObject<Specifications>(File.ReadAllText(fileName));
-            Import(specificationData, false);
+            Import(specificationData, terminalStructuresOnly);
         }
 
         private void Import(Specifications specifications, bool terminalAndSpanStructuresOnly)
@@ -377,7 +377,8 @@ namespace OpenFTTH.APIGateway.Specifications
                                     IsFixed = spanEquipmentSpec.IsFixed,
                                     IsCable = spanEquipmentSpec.IsCable,
                                     IsMultiLevel = spanEquipmentSpec.IsMultiLevel,
-                                    ManufacturerRefs = GetManufactureIdsFromNames(manufacturerSpecByName, spanEquipmentSpec.Manufacturers)
+                                    ManufacturerRefs = GetManufactureIdsFromNames(manufacturerSpecByName, spanEquipmentSpec.Manufacturers),
+                                    CableTubes = GetCableTubesFromSpecs(spanEquipmentSpec.CableTubes)
                                 }
                             );
                         }
@@ -388,6 +389,21 @@ namespace OpenFTTH.APIGateway.Specifications
                     }
                 }
             }
+        }
+
+        private CableTubeSpecification[] GetCableTubesFromSpecs(List<CableTubeSpec> cableTubes)
+        {
+            if (cableTubes == null || cableTubes.Count == 0)
+                return null;
+
+            List<CableTubeSpecification> specs = new();
+
+            foreach (var tube in cableTubes)
+            {
+                specs.Add(new CableTubeSpecification(tube.Position, tube.Color, tube.Description));
+            }
+
+            return specs.ToArray();
         }
 
         private Guid[] GetManufactureIdsFromNames(Dictionary<string, Manufacturer> manufacturerSpecByName, List<string> manufacturerNames)
