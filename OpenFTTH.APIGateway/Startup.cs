@@ -44,6 +44,7 @@ using System.Net.Sockets;
 using System.Reflection;
 using System.Threading.Tasks;
 using Typesense.Setup;
+using Microsoft.AspNetCore.ResponseCompression;
 
 namespace OpenFTTH.APIGateway
 {
@@ -269,6 +270,14 @@ namespace OpenFTTH.APIGateway
 
             // Dynamic properties reader
             services.AddSingleton<DynamicPropertiesClient>();
+
+            // Enable response compression
+            services.AddResponseCompression(options =>
+            {
+                options.EnableForHttps = true;
+                options.Providers.Add<BrotliCompressionProvider>();
+                options.Providers.Add<GzipCompressionProvider>();
+            });
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -285,6 +294,8 @@ namespace OpenFTTH.APIGateway
             app.UseGraphQLPlayground();
 
             app.UseRouting();
+
+            app.UseResponseCompression();
 
             app.UseAuthorization();
 
