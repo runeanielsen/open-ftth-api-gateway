@@ -1,6 +1,9 @@
 ﻿using Microsoft.Extensions.Logging;
+using NetTopologySuite.Geometries;
+using Newtonsoft.Json.Linq;
 using OpenFTTH.Events.RouteNetwork.Infos;
 using OpenFTTH.EventSourcing;
+using OpenFTTH.RouteNetwork.API.Model;
 using OpenFTTH.RouteNetwork.Business.Interest.Projections;
 using OpenFTTH.RouteNetwork.Business.RouteElements.Model;
 using OpenFTTH.RouteNetwork.Business.RouteElements.StateHandling;
@@ -11,6 +14,7 @@ using OpenFTTH.UtilityGraphService.Business.NodeContainers.Projections;
 using OpenFTTH.UtilityGraphService.Business.TerminalEquipments.Projections;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 
@@ -74,6 +78,8 @@ namespace OpenFTTH.APIGateway.Reporting
                             TraceHopContext firstHopInNodeContext = null;
 
                             int nodeCount = 0;
+
+                            double totalLength = 0;
 
                             foreach (var hop in traceResult.Upstream)
                             {
@@ -176,6 +182,14 @@ namespace OpenFTTH.APIGateway.Reporting
 
                                     previousHopContext = currentHopContext;
                                 }
+                                else if (hop is UtilityGraphConnectedSegment)
+                                {
+                                    var segment = hop as UtilityGraphConnectedSegment;
+                                    var spanEquipment = segment.SpanEquipment(_utilityNetwork);
+
+                                    double length = GetSpanEquipmentLength(interestsProjection, spanEquipment);
+                                    totalLength += length;
+                                }
                             }
 
                             // We do this to make sure that the CSV header is written first.
@@ -185,7 +199,8 @@ namespace OpenFTTH.APIGateway.Reporting
                                 firstLineTrace = false;
                             }
 
-                            yield return GetCsvLineFromTrace(traceLine);
+
+                            yield return GetCsvLineFromTrace(traceLine, totalLength);
                         }
                     }
                 }
@@ -193,6 +208,38 @@ namespace OpenFTTH.APIGateway.Reporting
 
             _logger.LogInformation("Service terminations trace finish!");
         }
+
+        private double GetSpanEquipmentLength(InterestsProjection interestProjection, SpanEquipment spanEquipment)
+        {
+            double length = 0;
+
+            var routeNetworkElements = new ValidatedRouteNetworkWalk(interestProjection.GetInterest(spanEquipment.WalkOfInterestId).Value.RouteNetworkElementRefs);
+
+            foreach (var segmentId in routeNetworkElements.SegmentIds)
+            {
+                var routeSegment = _routeNetworkState.GetRouteNetworkElement(segmentId);
+
+                if (routeSegment.Coordinates != null)
+                    length += GetLineStringLength(routeSegment.Coordinates);
+
+            }
+
+            return length;
+        }
+
+        protected static double GetLineStringLength(string lineStringJson)
+        {
+            List<Coordinate> coordinates = new();
+
+            var coordPairs = JArray.Parse(lineStringJson);
+            foreach (var coordPair in coordPairs)
+            {
+                coordinates.Add(new Coordinate(((JArray)coordPair)[0].Value<double>(), ((JArray)coordPair)[1].Value<double>()));
+            }
+
+            return new LineString(coordinates.ToArray()).Length;
+        }
+
 
         private string GetCsvHeaderFromTrace(InstallationTraceResultLine line)
         {
@@ -208,10 +255,12 @@ namespace OpenFTTH.APIGateway.Reporting
                 csvHeader += $"\"{prop.Name}\"";
             }
 
+            csvHeader += ";\"length\"";
+
             return csvHeader;
         }
 
-        private string GetCsvLineFromTrace(InstallationTraceResultLine line)
+        private string GetCsvLineFromTrace(InstallationTraceResultLine line, double totalLength)
         {
             var myType = line.GetType();
 
@@ -233,6 +282,8 @@ namespace OpenFTTH.APIGateway.Reporting
 
                 first = false;
             }
+
+            csvLine += $";{Math.Round(totalLength).ToString("F0")}";
 
             return csvLine;
         }
