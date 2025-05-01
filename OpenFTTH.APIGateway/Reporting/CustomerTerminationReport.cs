@@ -1,7 +1,4 @@
-﻿using DAX.ObjectVersioning.Graph;
-using Microsoft.Extensions.Logging;
-using OpenFTTH.APIGateway.Settings;
-using OpenFTTH.CQRS;
+﻿using Microsoft.Extensions.Logging;
 using OpenFTTH.Events.RouteNetwork.Infos;
 using OpenFTTH.EventSourcing;
 using OpenFTTH.RouteNetwork.Business.Interest.Projections;
@@ -14,7 +11,6 @@ using OpenFTTH.UtilityGraphService.Business.NodeContainers.Projections;
 using OpenFTTH.UtilityGraphService.Business.TerminalEquipments.Projections;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 
@@ -196,137 +192,6 @@ namespace OpenFTTH.APIGateway.Reporting
             }
 
             _logger.LogInformation("Service terminations trace finish!");
-        }
-
-        private string GetNodeType(TraceState traceState, RouteNode routeNode, NodeContainer nodeContainer, TerminalEquipment hopEquipment, TerminalStructure hopTerminalStructure, Terminal hopTerminal)
-        {
-            throw new NotImplementedException();
-        }
-
-        private void GetNextTraceStage(TraceState traceState, RouteNode routeNode, NodeContainer nodeContainer, TerminalEquipment terminalEquipment, TerminalStructure terminalStructure, Terminal terminal)
-        {
-            // Check if we'ere indside co
-            if (routeNode.RouteNodeInfo != null && (routeNode.RouteNodeInfo.Kind == RouteNodeKindEnum.CentralOfficeSmall || routeNode.RouteNodeInfo.Kind == RouteNodeKindEnum.CentralOfficeMedium || routeNode.RouteNodeInfo.Kind == RouteNodeKindEnum.CentralOfficeBig))
-            {
-                AddStageIfNotPreviouslyAdded(traceState.TraceStagesReached, "CO");
-                RemoveStageExcept(traceState.TraceStagesReached, "CO");
-
-                if (routeNode.RouteNodeInfo != null && routeNode.RouteNodeInfo.Function == RouteNodeFunctionEnum.FlexPoint)
-                {
-                    AddStageIfNotPreviouslyAdded(traceState.TraceStagesReached, "FP");
-                }
-            }
-
-            // Check if we found PON equipment
-            if (terminalEquipment.Name.ToLower().StartsWith("pon"))
-            {
-                AddStageIfNotPreviouslyAdded(traceState.TraceStagesReached, "OLT");
-                RemoveStageExcept(traceState.TraceStagesReached, "OLT");
-            }
-
-            // Check if we're inside a flexpoint
-            else if (routeNode.RouteNodeInfo != null && routeNode.RouteNodeInfo.Function == RouteNodeFunctionEnum.FlexPoint)
-            {
-                // If we moved past first flex point
-                if (traceState.TraceLevel == TraceLevel.FlexPoint && nodeContainer != traceState.PreviousNodeContainer)
-                {
-                    RemoveStageExcept(traceState.TraceStagesReached, "HEST");
-                }
-                else
-                {
-                    traceState.TraceLevel = TraceLevel.FlexPoint;
-                    AddStageIfNotPreviouslyAdded(traceState.TraceStagesReached, "FP");
-                    RemoveStageExcept(traceState.TraceStagesReached, "FP");
-                }
-            }
-
-            // Check if we're inside a primary distribution point
-            else if (traceState.TraceLevel < TraceLevel.FlexPoint && routeNode.RouteNodeInfo != null && routeNode.RouteNodeInfo.Function == RouteNodeFunctionEnum.SplicePoint && routeNode.RouteNodeInfo.Kind == RouteNodeKindEnum.CabinetSmall)
-            {
-                // If we moved past first primary splice point
-                if (traceState.TraceLevel == TraceLevel.PrimarySplicePoint && nodeContainer != traceState.PreviousNodeContainer)
-                {
-                    RemoveStageExcept(traceState.TraceStagesReached, "HEST");
-                }
-                else
-                {
-                    traceState.TraceLevel = TraceLevel.PrimarySplicePoint;
-                    AddStageIfNotPreviouslyAdded(traceState.TraceStagesReached, "PD");
-                    RemoveStageExcept(traceState.TraceStagesReached, "PD");
-                }
-            }
-            // Check if we're inside a secondary distribution point
-            else if (traceState.TraceLevel < TraceLevel.PrimarySplicePoint && (routeNode.RouteNodeInfo == null || (routeNode.RouteNodeInfo != null && routeNode.RouteNodeInfo.Function == RouteNodeFunctionEnum.SplicePoint && routeNode.RouteNodeInfo.Kind != RouteNodeKindEnum.CabinetSmall)))
-            {
-                // Are we reacibg SD 1
-                if (!traceState.TraceStagesReached.Contains("SD1") && !traceState.TraceStagesReached.Contains("SD1-"))
-                {
-                    AddStageIfNotPreviouslyAdded(traceState.TraceStagesReached, "SD1");
-                    RemoveStageExcept(traceState.TraceStagesReached, "SD1");
-                }
-            }
-
-            traceState.PreviousNodeContainer = nodeContainer;
-        }
-
-        private static void AddStageIfNotPreviouslyAdded(List<string> currentTraceStage, string stage)
-        {
-            if (!currentTraceStage.Contains(stage + "-"))
-            {
-                if (!currentTraceStage.Contains(stage))
-                {
-                    currentTraceStage.Add(stage);
-                }
-            }
-        }
-
-        private void RemoveStageExcept(List<string> currentTraceStage, string stage)
-        {
-            List<string> entriesToRemove = new();
-
-            foreach (var entry in currentTraceStage)
-            {
-                if (entry != stage && !entry.EndsWith("-"))
-                {
-                    entriesToRemove.Add(entry);
-                }
-            }
-
-            foreach (var entrytoRemove in entriesToRemove)
-            {
-                currentTraceStage.Remove(entrytoRemove);
-
-                if (!currentTraceStage.Contains(entrytoRemove + "-"))
-                    currentTraceStage.Add(entrytoRemove + "-");
-            }
-        }
-
-        private bool CheckIfEndTerminalIsWithinRackEquipment(
-            LookupCollection<TerminalEquipmentSpecification> terminalEquipmentSpecifications,
-            IGraphObject[] graphObjects)
-        {
-            if (graphObjects.Length > 0)
-            {
-                var upstreamTerminal = graphObjects.Last();
-
-                if (upstreamTerminal != null)
-                {
-                    if (_utilityNetwork.Graph.TryGetGraphElement<IUtilityGraphTerminalRef>(upstreamTerminal.Id, out var terminalRef))
-                    {
-                        if (!terminalRef.IsDummyEnd)
-                        {
-                            var terminalEquipment = terminalRef.TerminalEquipment(_utilityNetwork);
-
-                            var spec = terminalEquipmentSpecifications[terminalEquipment.SpecificationId];
-
-                            if (spec.IsRackEquipment)
-                                return true;
-                        }
-                    }
-                }
-            }
-
-            return false;
         }
 
         private string GetCsvHeaderFromTrace(InstallationTraceResultLine line)
