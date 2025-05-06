@@ -55,6 +55,7 @@ namespace OpenFTTH.APIGateway.Specifications
         public List<string>? Manufacturers { get; set; }
         public List<TerminalTemplateSpec> Terminals { get; set; }
         public bool Deprecated { get; set; }
+        public bool IsInterfaceModule { get; set; }
     }
 
     public record TerminalTemplateSpec

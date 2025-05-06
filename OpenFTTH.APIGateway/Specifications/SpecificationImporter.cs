@@ -258,7 +258,8 @@ namespace OpenFTTH.APIGateway.Specifications
                             {
                                 Description = terminalStructureSpec.Description,
                                 Deprecated = terminalStructureSpec.Deprecated,
-                                ManufacturerRefs = GetManufactureIdsFromNames(manufacturerSpecByName, terminalStructureSpec.Manufacturers)
+                                ManufacturerRefs = GetManufactureIdsFromNames(manufacturerSpecByName, terminalStructureSpec.Manufacturers),
+                                IsInterfaceModule = terminalStructureSpec.IsInterfaceModule
                             }
                         );
                     }
