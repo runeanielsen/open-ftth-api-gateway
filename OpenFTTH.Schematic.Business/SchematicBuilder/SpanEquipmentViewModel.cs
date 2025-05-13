@@ -173,32 +173,79 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
             return spanDiagramInfo;
         }
 
-        public string GetFromRouteNodeName(Guid spanSegmentId)
+        public string GetFromRouteNodeName(Guid conduitSpanSegmentId)
         {
-            if (_traceByBySpanId.TryGetValue(spanSegmentId, out var routeNetworkTraceBySegment))
+            var trace = GetTraceInfo(conduitSpanSegmentId);
+
+            // If node type i address, always return the the adresse 
+            if (trace.FromNodeNameType == NodeNameType.ADDRESS)
+                return trace.FromRouteNodeName;
+
+            if (_data.ConduitSegmentToCableChildRelations.ContainsKey(conduitSpanSegmentId))
             {
-                return routeNetworkTraceBySegment.FromRouteNodeName;
+                var cables = _data.ConduitSegmentToCableChildRelations[conduitSpanSegmentId];
+
+                if (cables.Count > 0)
+                {
+                    var cable = _data.SpanEquipments[cables.First()];
+                                  
+                    bool fromNodeInConduitSameAsCable = IsFromNodeInCableSameDirectionAsFromNodeInConduit(trace, cable);
+
+                    if (fromNodeInConduitSameAsCable)
+                        return _data.RouteNetworkElements[cable.NodesOfInterestIds.First()].Name;
+                    else
+                        return _data.RouteNetworkElements[cable.NodesOfInterestIds.Last()].Name;
+                }
             }
-            else if (_traceByBySpanId.TryGetValue(_spanEquipment.Id, out var routeNetworkTraceByEquipment))
-            {
-                return routeNetworkTraceByEquipment.FromRouteNodeName;
-            }
-            else
-                throw new ApplicationException("Can't find from route node name in route network traces.");
+
+            return trace.FromRouteNodeName;
         }
 
-        public string GetToRouteNodeName(Guid spanSegmentId)
+        private bool IsFromNodeInCableSameDirectionAsFromNodeInConduit(RouteNetworkTraceResult conduitTrace, SpanEquipmentWithRelatedInfo cable)
         {
-            if (_traceByBySpanId.TryGetValue(spanSegmentId, out var routeNetworkTraceBySegment))
+            bool fromNodeInConduitIsFromNodeInCable = false;
+
+            var cableInterest = _data.RouteNetworkInterests[cable.WalkOfInterestId];
+
+            foreach (var cableRouteNetworkElement in cableInterest.RouteNetworkElementRefs)
             {
-                return routeNetworkTraceBySegment.ToRouteNodeName;
+                if (cableRouteNetworkElement == conduitTrace.FromRouteNodeId)
+                    fromNodeInConduitIsFromNodeInCable = true;
+
+                // Break when we meet route segment the view is viewing
+                if (cableRouteNetworkElement == _data.RouteNetworkElementId)
+                    break;
             }
-            else if (_traceByBySpanId.TryGetValue(_spanEquipment.Id, out var routeNetworkTraceByEquipment))
+
+            return fromNodeInConduitIsFromNodeInCable;
+        }
+
+        public string GetToRouteNodeName(Guid conduitSpanSegmentId)
+        {
+            var trace = GetTraceInfo(conduitSpanSegmentId);
+
+            // If node type i address, always return the the adresse 
+            if (trace.FromNodeNameType == NodeNameType.ADDRESS)
+                return trace.FromRouteNodeName;
+
+            if (_data.ConduitSegmentToCableChildRelations.ContainsKey(conduitSpanSegmentId))
             {
-                return routeNetworkTraceByEquipment.ToRouteNodeName;
+                var cables = _data.ConduitSegmentToCableChildRelations[conduitSpanSegmentId];
+
+                if (cables.Count > 0)
+                {
+                    var cable = _data.SpanEquipments[cables.First()];
+
+                    bool fromNodeInConduitSameAsCable = IsFromNodeInCableSameDirectionAsFromNodeInConduit(trace, cable);
+
+                    if (fromNodeInConduitSameAsCable)
+                        return _data.RouteNetworkElements[cable.NodesOfInterestIds.Last()].Name;
+                    else
+                        return _data.RouteNetworkElements[cable.NodesOfInterestIds.First()].Name;
+                }
             }
-            else
-                throw new ApplicationException("Can't find to route node name in route network traces.");
+
+            return trace.ToRouteNodeName;
         }
 
         public string GetOutgoingLabel(Guid spanSegmentId)
@@ -309,6 +356,20 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
                 return BlockSideEnum.West;
             else
                 return BlockSideEnum.North;
+        }
+
+        private RouteNetworkTraceResult GetTraceInfo(Guid spanSegmentId)
+        {
+            if (_traceByBySpanId.TryGetValue(spanSegmentId, out var routeNetworkTraceBySegment))
+            {
+                return routeNetworkTraceBySegment;
+            }
+            else if (_traceByBySpanId.TryGetValue(_spanEquipment.Id, out var routeNetworkTraceByEquipment))
+            {
+                return routeNetworkTraceByEquipment;
+            }
+            else
+                throw new ApplicationException("Can't find from route node name in route network traces.");
         }
 
     }

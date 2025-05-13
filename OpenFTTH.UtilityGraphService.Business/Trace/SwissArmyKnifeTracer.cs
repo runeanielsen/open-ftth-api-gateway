@@ -91,6 +91,8 @@ namespace OpenFTTH.UtilityGraphService.Business.Trace
 
 
                         // Find from node id and name/description
+                        var fromNodeNameType = NodeNameType.NODE_NAME;
+
                         var firstHop = segmentWalk.Hops.First();
 
                         Guid fromNodeId = firstHop.FromNodeId;
@@ -100,10 +102,17 @@ namespace OpenFTTH.UtilityGraphService.Business.Trace
                         if (String.IsNullOrEmpty(fromNodeName))
                         {
                             fromNodeName = GetAddressInfoForHop(addressInformation, firstHop);
+
+                            if (fromNodeName != null)
+                            {
+                                fromNodeNameType = NodeNameType.ADDRESS;
+                            }
                         }
 
 
                         // Find to node id and name
+                        var toNodeNameType = NodeNameType.NODE_NAME;
+
                         var lastHop = segmentWalk.Hops.Last();
 
                         Guid toNodeId = lastHop.ToNodeId;
@@ -113,11 +122,16 @@ namespace OpenFTTH.UtilityGraphService.Business.Trace
                         if (String.IsNullOrEmpty(toNodeName))
                         {
                             toNodeName = GetAddressInfoForHop(addressInformation, lastHop);
+
+                            if (toNodeName != null)
+                            {
+                                toNodeNameType = NodeNameType.ADDRESS;
+                            }
                         }
 
 
                         // Add route network trace (route segments)
-                        Guid traceId = FindOrCreateRouteNetworkTrace(routeNetworkTraces, routeSegmentIds, segmentGeometries, fromNodeId, toNodeId, fromNodeName, toNodeName);
+                        Guid traceId = FindOrCreateRouteNetworkTrace(routeNetworkTraces, routeSegmentIds, segmentGeometries, fromNodeId, toNodeId, fromNodeName, toNodeName, fromNodeNameType, toNodeNameType);
 
                         SpanSegmentRouteNetworkTraceRef traceRef = new SpanSegmentRouteNetworkTraceRef(segmentWalk.SpanEquipmentOrSegmentId, traceId);
 
@@ -165,7 +179,7 @@ namespace OpenFTTH.UtilityGraphService.Business.Trace
             return null;
         }
 
-        private Guid FindOrCreateRouteNetworkTrace(List<RouteNetworkTraceResult> routeNetworkTraces, List<Guid> segmentIds, List<string> segmentGeometries, Guid fromNodeId, Guid toNodeId, string? fromNodeName, string? toNodeName)
+        private Guid FindOrCreateRouteNetworkTrace(List<RouteNetworkTraceResult> routeNetworkTraces, List<Guid> segmentIds, List<string> segmentGeometries, Guid fromNodeId, Guid toNodeId, string? fromNodeName, string? toNodeName, NodeNameType fromNodeNameType, NodeNameType toNodeNameType)
         {
             foreach (var routeNetworkTrace in routeNetworkTraces)
             {
@@ -173,7 +187,7 @@ namespace OpenFTTH.UtilityGraphService.Business.Trace
                     return routeNetworkTrace.Id;
             }
 
-            var newRouteNetworkTrace = new API.Model.Trace.RouteNetworkTraceResult(Guid.NewGuid(), fromNodeId, toNodeId, segmentIds.ToArray(), fromNodeName, toNodeName, segmentGeometries.ToArray());
+            var newRouteNetworkTrace = new API.Model.Trace.RouteNetworkTraceResult(Guid.NewGuid(), fromNodeId, toNodeId, segmentIds.ToArray(), fromNodeName, toNodeName, fromNodeNameType, toNodeNameType, segmentGeometries.ToArray());
 
             routeNetworkTraces.Add(newRouteNetworkTrace);
 

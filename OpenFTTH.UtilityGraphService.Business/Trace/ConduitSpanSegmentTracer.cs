@@ -101,13 +101,6 @@ namespace OpenFTTH.UtilityGraphService.Business.Trace
             return walk;
         }
 
-        private RouteNetworkTraceResult CreateRouteNetworkTrace(List<Guid> segmentIds, List<string> segmentGeometries, Guid fromNodeId, Guid toNodeId, string? fromNodeName, string? toNodeName)
-        {
-            var newRouteNetworkTrace = new API.Model.Trace.RouteNetworkTraceResult(Guid.NewGuid(), fromNodeId, toNodeId, segmentIds.ToArray(), fromNodeName, toNodeName, segmentGeometries.ToArray());
-
-            return newRouteNetworkTrace;
-        }
-
         private List<Guid> GetRouteElementsBetweenNodes(RouteNetworkElementIdList walkIds, Guid startNodeId, Guid endNodeId)
         {
             List<Guid> result = new();
