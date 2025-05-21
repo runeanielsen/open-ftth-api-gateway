@@ -67,7 +67,7 @@ namespace OpenFTTH.UtilityGraphService.API.Model.UtilityNetwork
 
                     line2 += tubeNo;
 
-                    line2 += $" #{{{tubeColor}}} {tubeColor} ";
+                    line2 += $" #{{{tubeColor}}} {{{tubeColor}}} ";
                 }
 
                 // Fiber info
@@ -77,7 +77,7 @@ namespace OpenFTTH.UtilityGraphService.API.Model.UtilityNetwork
 
                 line2 += fiberNo;
 
-                line2 += $" #{{{fiberColor}}} {fiberColor} ({fiberPosition})]";
+                line2 += $" #{{{fiberColor}}} {{{fiberColor}}} ({fiberPosition})]";
 
                 if (includeCableName)
                     return (line1 + line2);
