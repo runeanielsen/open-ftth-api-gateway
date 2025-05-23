@@ -125,11 +125,10 @@ namespace OpenFTTH.UtilityGraphService.API.Model.UtilityNetwork
 
         private string? GetFiberColor(int fiberPosition, LookupCollection<SpanStructureSpecification> spanStructureSpecifications)
         {
-            if (RootTemplate.ChildTemplates.Count() <= fiberPosition)
+            if (RootTemplate.ChildTemplates.Count() < fiberPosition)
                 return null;
 
-            var specId = RootTemplate.ChildTemplates[fiberPosition].SpanStructureSpecificationId;
-
+            var specId = RootTemplate.ChildTemplates[fiberPosition - 1].SpanStructureSpecificationId;
             var color = spanStructureSpecifications[specId].Color;
 
             return color;
