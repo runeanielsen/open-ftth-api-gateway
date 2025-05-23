@@ -117,7 +117,7 @@ namespace OpenFTTH.UtilityGraphService.API.Model.UtilityNetwork
             if (CableTubes == null)
                 return null;
          
-            if (CableTubes.Count() <= tubeNo)
+            if (CableTubes.Count() < tubeNo)
                 return null;
 
             return CableTubes[tubeNo - 1].Color;
