@@ -7,6 +7,8 @@ namespace OpenFTTH.UtilityGraphService.API.Model.UtilityNetwork
     {
         public Guid TerminalStructureSpecificationId { get; }
         public UInt16 Position { get; }
+        public string? Name { get; init; }
+
         public TerminalStructureTemplate(Guid terminalStructureSpecificationId, UInt16 position)
         {
             TerminalStructureSpecificationId = terminalStructureSpecificationId;

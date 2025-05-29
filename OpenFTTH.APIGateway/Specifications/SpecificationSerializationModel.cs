@@ -44,6 +44,7 @@ namespace OpenFTTH.APIGateway.Specifications
     {
         public UInt16 Position { get; set; }
         public string RefName { get; set; }
+        public string Name { get; set; }
     }
 
     public record TerminalStructureSpec

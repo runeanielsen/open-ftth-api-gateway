@@ -202,6 +202,7 @@ namespace OpenFTTH.APIGateway.Specifications
                     new TerminalStructureTemplateSpec()
                     {
                         Position = template.Position,
+                        Name = template.Name,
                         RefName = terminalStructureSpecs[template.TerminalStructureSpecificationId].Name
                     }
                 );

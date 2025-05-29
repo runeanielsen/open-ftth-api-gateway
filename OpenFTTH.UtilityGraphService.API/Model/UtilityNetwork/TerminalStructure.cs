@@ -13,14 +13,29 @@ namespace OpenFTTH.UtilityGraphService.API.Model.UtilityNetwork
         public Guid SpecificationId { get; }
         public UInt16 Position { get; }
         public Terminal[] Terminals { get; }
-        public string Name => Position.ToString();
         public string? Description => null;
         public bool Deleted { get; init; }
         public InterfaceInfo? interfaceInfo { get; init; }
 
-        public TerminalStructure(Guid id, Guid specificationId, ushort position, Terminal[] terminals)
+        private string? _name;
+
+        public string? Name { 
+            get {
+                if (_name != null)
+                    return Name;
+                else
+                    return Position.ToString();
+            }
+            set
+            {
+                _name = value;
+            }
+        }
+
+        public TerminalStructure(Guid id, string name, Guid specificationId, ushort position, Terminal[] terminals)
         {
             Id = id;
+            Name = name;
             SpecificationId = specificationId;
             Position = position;
             Terminals = terminals;

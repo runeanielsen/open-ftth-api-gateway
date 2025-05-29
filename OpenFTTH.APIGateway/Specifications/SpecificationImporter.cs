@@ -478,7 +478,10 @@ namespace OpenFTTH.APIGateway.Specifications
                 positionAlreadyUsed.Add(template.Position);
 
                 templates.Add(
-                    new TerminalStructureTemplate(terminalStructureSpec.Id, template.Position)
+                   new TerminalStructureTemplate(terminalStructureSpec.Id, template.Position)
+                   {
+                       Name = template.Name
+                   }
                 );
             }
 
