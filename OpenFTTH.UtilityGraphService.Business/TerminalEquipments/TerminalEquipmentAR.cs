@@ -10,6 +10,7 @@ using OpenFTTH.UtilityGraphService.Business.TerminalEquipments.Events;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Baseline;
 
 namespace OpenFTTH.UtilityGraphService.Business.TerminalEquipments
 {
@@ -513,7 +514,13 @@ namespace OpenFTTH.UtilityGraphService.Business.TerminalEquipments
                 );
             }
 
-            return new TerminalStructure(Guid.NewGuid(), terminalStructureSpecification.Id, (ushort)position, terminals.ToArray())
+            // Used position as name per default
+            string terminalName = position.ToString();
+
+            if (terminalStructureSpecification.Name != null && terminalStructureSpecification.Name.IsNotEmpty())
+                terminalName = terminalStructureSpecification.Name;
+
+            return new TerminalStructure(Guid.NewGuid(), terminalName, terminalStructureSpecification.Id, (ushort)position, terminals.ToArray())
             { 
                 interfaceInfo = interfaceInfo
             };
