@@ -150,7 +150,7 @@ namespace OpenFTTH.UtilityGraphService.Business.TerminalEquipments
                 }
                     //throw new ApplicationException($"A structure already exists at position: {position} in terminal equipment: {_terminalEquipment.Id}");
 
-                additionalStructures.Add(CreateTerminalStructureFromSpecification(terminalStructureSpecification, position));
+                additionalStructures.Add(CreateTerminalStructureFromSpecification(terminalStructureSpecification, position, null));
             }
 
             var terminalEquipmentAdditionalStructuresAddedEvent = new AdditionalStructuresAddedToTerminalEquipment(this.Id, additionalStructures.ToArray())
@@ -179,7 +179,7 @@ namespace OpenFTTH.UtilityGraphService.Business.TerminalEquipments
             if (_terminalEquipment.TerminalStructures.Count() > 0)
                 nextUnusedPosition = _terminalEquipment.TerminalStructures.Max(s => s.Position) + 1;
         
-            additionalStructures.Add(CreateTerminalStructureFromSpecification(terminalStructureSpecification, nextUnusedPosition, interfaceInfo));
+            additionalStructures.Add(CreateTerminalStructureFromSpecification(terminalStructureSpecification, nextUnusedPosition, null, interfaceInfo));
 
             var terminalEquipmentAdditionalStructuresAddedEvent = new AdditionalStructuresAddedToTerminalEquipment(this.Id, additionalStructures.ToArray())
             {
@@ -470,7 +470,7 @@ namespace OpenFTTH.UtilityGraphService.Business.TerminalEquipments
                 if (terminalStructureSpecifications.TryGetValue(structureTemplate.TerminalStructureSpecificationId, out var terminalStructureSpecification))
                 {
                     terminalStructures.Add(
-                        CreateTerminalStructureFromSpecification(terminalStructureSpecification, structureTemplate.Position)
+                        CreateTerminalStructureFromSpecification(terminalStructureSpecification, structureTemplate.Position, structureTemplate.Name)
                     );
                 }
                 else
@@ -482,7 +482,7 @@ namespace OpenFTTH.UtilityGraphService.Business.TerminalEquipments
             return terminalStructures.ToArray();
         }
 
-        private TerminalStructure CreateTerminalStructureFromSpecification(TerminalStructureSpecification terminalStructureSpecification, int position, InterfaceInfo? interfaceInfo = null)
+        private TerminalStructure CreateTerminalStructureFromSpecification(TerminalStructureSpecification terminalStructureSpecification, int position, string? name, InterfaceInfo? interfaceInfo = null)
         {
             if (_terminalEquipment != null && _terminalEquipment.TerminalStructures.Any(s => s.Position == position && !s.Deleted))
                 throw new ApplicationException($"A structure already exists at position: {position} in terminal equipment: {_terminalEquipment.Id}");
@@ -517,8 +517,8 @@ namespace OpenFTTH.UtilityGraphService.Business.TerminalEquipments
             // Used position as name per default
             string terminalName = position.ToString();
 
-            if (terminalStructureSpecification.Name != null && terminalStructureSpecification.Name.IsNotEmpty())
-                terminalName = terminalStructureSpecification.Name;
+            if (name != null && name.IsNotEmpty())
+                terminalName = name;
 
             return new TerminalStructure(Guid.NewGuid(), terminalName, terminalStructureSpecification.Id, (ushort)position, terminals.ToArray())
             { 

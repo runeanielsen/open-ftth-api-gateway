@@ -22,7 +22,7 @@ namespace OpenFTTH.UtilityGraphService.API.Model.UtilityNetwork
         public string? Name { 
             get {
                 if (_name != null)
-                    return Name;
+                    return _name;
                 else
                     return Position.ToString();
             }
