@@ -81,7 +81,6 @@ namespace OpenFTTH.APIGateway.Specifications
 
         private void Import(Specifications specifications, bool terminalAndSpanStructuresOnly)
         {
-
             // Create dict with manufacture specs
             var manufacturerSpecs = _eventStore.Projections.Get<ManufacturerProjection>().Manufacturer;
 
@@ -174,7 +173,15 @@ namespace OpenFTTH.APIGateway.Specifications
                     {
                         _logger.LogInformation($"Creating manufacturer: " + manufacturerSpec.Name);
 
-                        AddManufacturer(new Manufacturer(Guid.NewGuid(), manufacturerSpec.Name));
+                        try
+                        {
+                            AddManufacturer(new Manufacturer(Guid.NewGuid(), manufacturerSpec.Name));
+
+                        }
+                        catch (Exception ex)
+                        {
+                            throw new Exception($"Got exception processing container specification: '{manufacturerSpec.Name}'", ex);
+                        }
                     }
                 }
             }
@@ -197,18 +204,25 @@ namespace OpenFTTH.APIGateway.Specifications
                     {
                         _logger.LogInformation($"Creating node container specification: " + nodeContainerSpec.Name);
 
-                        AddSpecification(
-                            new NodeContainerSpecification(
-                                Guid.NewGuid(),
-                                nodeContainerSpec.Category,
-                                nodeContainerSpec.ShortName
-                            )
-                            {
-                                Description = nodeContainerSpec.Name,
-                                Deprecated = nodeContainerSpec.Deprecated,
-                                ManufacturerRefs = GetManufactureIdsFromNames(manufacturerSpecByName, nodeContainerSpec.Manufacturers)
-                            }
-                        );
+                        try
+                        {
+                            AddSpecification(
+                                new NodeContainerSpecification(
+                                    Guid.NewGuid(),
+                                    nodeContainerSpec.Category,
+                                    nodeContainerSpec.ShortName
+                                )
+                                {
+                                    Description = nodeContainerSpec.Name,
+                                    Deprecated = nodeContainerSpec.Deprecated,
+                                    ManufacturerRefs = GetManufactureIdsFromNames(manufacturerSpecByName, nodeContainerSpec.Manufacturers)
+                                }
+                            );
+                        }
+                        catch (Exception ex)
+                        {
+                            throw new Exception($"Got exception processing container specification: '{nodeContainerSpec.Name}'", ex);
+                        }
                     }
                 }
             }
@@ -222,17 +236,24 @@ namespace OpenFTTH.APIGateway.Specifications
                     {
                         _logger.LogInformation($"Creating rack specification: " + rackSpec.Name);
 
-                        AddSpecification(
-                            new RackSpecification(
-                                Guid.NewGuid(),
-                                rackSpec.Name,
-                                rackSpec.ShortName
-                            )
-                            {
-                                Description = rackSpec.Name,
-                                Deprecated = rackSpec.Deprecated,
-                            }
-                        );
+                        try
+                        {
+                            AddSpecification(
+                                new RackSpecification(
+                                    Guid.NewGuid(),
+                                    rackSpec.Name,
+                                    rackSpec.ShortName
+                                )
+                                {
+                                    Description = rackSpec.Name,
+                                    Deprecated = rackSpec.Deprecated,
+                                }
+                            );
+                        }
+                        catch (Exception ex)
+                        {
+                            throw new Exception($"Got exception processing track specification: '{rackSpec.Name}'", ex);
+                        }
                     }
                 }
             }
@@ -246,22 +267,29 @@ namespace OpenFTTH.APIGateway.Specifications
                     {
                         _logger.LogInformation($"Creating terminal structure: " + terminalStructureSpec.Name);
 
+                        try
+                        {
 
-                        AddSpecification(
-                            new TerminalStructureSpecification(
-                                Guid.NewGuid(),
-                                terminalStructureSpec.Category,
-                                terminalStructureSpec.Name,
-                                terminalStructureSpec.ShortName,
-                                CreateTerminals(terminalStructureSpec.Terminals)
-                            )
-                            {
-                                Description = terminalStructureSpec.Description,
-                                Deprecated = terminalStructureSpec.Deprecated,
-                                ManufacturerRefs = GetManufactureIdsFromNames(manufacturerSpecByName, terminalStructureSpec.Manufacturers),
-                                IsInterfaceModule = terminalStructureSpec.IsInterfaceModule
-                            }
-                        );
+                            AddSpecification(
+                                new TerminalStructureSpecification(
+                                    Guid.NewGuid(),
+                                    terminalStructureSpec.Category,
+                                    terminalStructureSpec.Name,
+                                    terminalStructureSpec.ShortName,
+                                    CreateTerminals(terminalStructureSpec.Terminals)
+                                )
+                                {
+                                    Description = terminalStructureSpec.Description,
+                                    Deprecated = terminalStructureSpec.Deprecated,
+                                    ManufacturerRefs = GetManufactureIdsFromNames(manufacturerSpecByName, terminalStructureSpec.Manufacturers),
+                                    IsInterfaceModule = terminalStructureSpec.IsInterfaceModule
+                                }
+                            );
+                        }
+                        catch (Exception ex)
+                        {
+                            throw new Exception($"Got exception processing terminal structure specification: '{terminalStructureSpec.Name}'", ex);
+                        }
                     }
                 }
             }
@@ -275,7 +303,10 @@ namespace OpenFTTH.APIGateway.Specifications
                     {
                         _logger.LogInformation($"Creating span structure: " + spanStructureSpec.Name);
 
-                        AddSpecification(
+                        try
+                        {
+
+                            AddSpecification(
                             new SpanStructureSpecification(
                                 Guid.NewGuid(),
                                 spanStructureSpec.SpanClassType,
@@ -287,8 +318,13 @@ namespace OpenFTTH.APIGateway.Specifications
                                 Deprecated = spanStructureSpec.Deprecated,
                                 InnerDiameter = spanStructureSpec.InnerDiameter,
                                 OuterDiameter = spanStructureSpec.OuterDiameter,
-                             }
+                            }
                         );
+                        }
+                        catch (Exception ex)
+                        {
+                            throw new Exception($"Got exception processing span structure specification: '{spanStructureSpec.Name}'", ex);
+                        }
                     }
                 }
             }
@@ -325,9 +361,10 @@ namespace OpenFTTH.APIGateway.Specifications
                         if (!terminalEquipmentSpecByName.ContainsKey(terminalEquipmentSpec.Name.ToLower()))
                         {
                             _logger.LogInformation($"Creating terminal equipment: " + terminalEquipmentSpec.Name);
+                            try
+                            {
 
-
-                            AddSpecification(
+                                AddSpecification(
                                 new TerminalEquipmentSpecification(
                                     Guid.NewGuid(),
                                     terminalEquipmentSpec.Category,
@@ -347,6 +384,13 @@ namespace OpenFTTH.APIGateway.Specifications
                                     ManufacturerRefs = GetManufactureIdsFromNames(manufacturerSpecByName, terminalEquipmentSpec.Manufacturers)
                                 }
                             );
+
+                            }
+                            catch (Exception ex)
+                            {
+                                throw new Exception($"Got exception processing terminal equipment specification: '{terminalEquipmentSpec.Name}'", ex);
+                            }
+
                         }
                         else
                         {
@@ -364,24 +408,29 @@ namespace OpenFTTH.APIGateway.Specifications
                         {
                             _logger.LogInformation($"Creating span equipment: " + spanEquipmentSpec.Name);
 
-
-                            AddSpecification(
-                                new SpanEquipmentSpecification(
-                                    Guid.NewGuid(),
-                                    spanEquipmentSpec.Category,
-                                    spanEquipmentSpec.Name,
-                                    CreateSpanStructureTemplates(spanEquipmentSpec.OuterStructure, spanStructureSpecByName)
-                                )
-                                {
-                                    Description = spanEquipmentSpec.Description,
-                                    Deprecated = spanEquipmentSpec.Deprecated,
-                                    IsFixed = spanEquipmentSpec.IsFixed,
-                                    IsCable = spanEquipmentSpec.IsCable,
-                                    IsMultiLevel = spanEquipmentSpec.IsMultiLevel,
-                                    ManufacturerRefs = GetManufactureIdsFromNames(manufacturerSpecByName, spanEquipmentSpec.Manufacturers),
-                                    CableTubes = GetCableTubesFromSpecs(spanEquipmentSpec.CableTubes)
-                                }
-                            );
+                            try
+                            {
+                                AddSpecification(
+                                    new SpanEquipmentSpecification(
+                                        Guid.NewGuid(),
+                                        spanEquipmentSpec.Category,
+                                        spanEquipmentSpec.Name,
+                                        CreateSpanStructureTemplates(spanEquipmentSpec.OuterStructure, spanStructureSpecByName)
+                                    )
+                                    {
+                                        Description = spanEquipmentSpec.Description,
+                                        Deprecated = spanEquipmentSpec.Deprecated,
+                                        IsFixed = spanEquipmentSpec.IsFixed,
+                                        IsCable = spanEquipmentSpec.IsCable,
+                                        IsMultiLevel = spanEquipmentSpec.IsMultiLevel,
+                                        ManufacturerRefs = GetManufactureIdsFromNames(manufacturerSpecByName, spanEquipmentSpec.Manufacturers),
+                                        CableTubes = GetCableTubesFromSpecs(spanEquipmentSpec.CableTubes)
+                                    }
+                                );
+                            } catch (Exception ex)
+                            {
+                                throw new Exception($"Got exception processing span equipment specification: '{spanEquipmentSpec.Name}'", ex);
+                            }
                         }
                         else
                         {
