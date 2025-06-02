@@ -180,7 +180,7 @@ namespace OpenFTTH.APIGateway.Specifications
                         }
                         catch (Exception ex)
                         {
-                            throw new Exception($"Got exception processing container specification: '{manufacturerSpec.Name}'", ex);
+                            throw new Exception($"Got exception processing manufacturer specification: '{manufacturerSpec.Name}'", ex);
                         }
                     }
                 }
@@ -252,7 +252,7 @@ namespace OpenFTTH.APIGateway.Specifications
                         }
                         catch (Exception ex)
                         {
-                            throw new Exception($"Got exception processing track specification: '{rackSpec.Name}'", ex);
+                            throw new Exception($"Got exception processing rack specification: '{rackSpec.Name}'", ex);
                         }
                     }
                 }
@@ -384,7 +384,6 @@ namespace OpenFTTH.APIGateway.Specifications
                                     ManufacturerRefs = GetManufactureIdsFromNames(manufacturerSpecByName, terminalEquipmentSpec.Manufacturers)
                                 }
                             );
-
                             }
                             catch (Exception ex)
                             {
