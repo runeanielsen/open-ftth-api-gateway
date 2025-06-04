@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+﻿using AwesomeAssertions;
 using OpenFTTH.APIGateway.Util;
 using System;
 using Xunit;

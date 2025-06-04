@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+﻿using AwesomeAssertions;
 using OpenFTTH.Results;
 using OpenFTTH.CQRS;
 using OpenFTTH.RouteNetwork.API.Commands;

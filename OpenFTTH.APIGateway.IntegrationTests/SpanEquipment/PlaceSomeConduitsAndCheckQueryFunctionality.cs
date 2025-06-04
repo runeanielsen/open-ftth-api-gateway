@@ -1,4 +1,4 @@
-using FluentAssertions;
+using AwesomeAssertions;
 using OpenFTTH.Results;
 using Microsoft.Extensions.Logging;
 using OpenFTTH.APIGateway.IntegrationTests.TestData;

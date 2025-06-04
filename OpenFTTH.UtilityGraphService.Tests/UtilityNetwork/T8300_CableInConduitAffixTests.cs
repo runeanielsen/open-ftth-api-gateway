@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+﻿using AwesomeAssertions;
 using OpenFTTH.Results;
 using OpenFTTH.CQRS;
 using OpenFTTH.Events.Core.Infos;
@@ -195,7 +195,7 @@ namespace OpenFTTH.UtilityGraphService.Tests.UtilityNetwork
         }
 
         [Fact, Order(3)]
-        public void AffixCableRemoveCableAffixAnotherCableToSingleConduit_ShouldSucceed()
+        public async Task AffixCableRemoveCableAffixAnotherCableToSingleConduit_ShouldSucceed()
         {
             // Create cable 1
             var sutCable1 = _conduitTestUtilityNetwork.PlaceCableDirectlyInRouteNetwork("K1_to_be_removed", TestSpecifications.FiberCable_12Fiber,
@@ -211,7 +211,7 @@ namespace OpenFTTH.UtilityGraphService.Tests.UtilityNetwork
             // Remove cable 1
             var removeStructureCmd = new RemoveSpanStructureFromSpanEquipment(Guid.NewGuid(), new UserContext("test", Guid.Empty), cable1AfterFirstAffix.SpanStructures[0].SpanSegments[0].Id);
 
-            var removeStructureCmdResult = _commandDispatcher.HandleAsync<RemoveSpanStructureFromSpanEquipment, Result>(removeStructureCmd).Result;
+            var removeStructureCmdResult = await _commandDispatcher.HandleAsync<RemoveSpanStructureFromSpanEquipment, Result>(removeStructureCmd);
 
             removeStructureCmdResult.IsSuccess.Should().BeTrue();
 
@@ -231,14 +231,10 @@ namespace OpenFTTH.UtilityGraphService.Tests.UtilityNetwork
             // Remove cable 2
             var removeStructureCmd2 = new RemoveSpanStructureFromSpanEquipment(Guid.NewGuid(), new UserContext("test", Guid.Empty), cableAfterFirstAffix2.SpanStructures[0].SpanSegments[0].Id);
 
-            var removeStructureCmdResult2 = _commandDispatcher.HandleAsync<RemoveSpanStructureFromSpanEquipment, Result>(removeStructureCmd2).Result;
+            var removeStructureCmdResult2 = await _commandDispatcher.HandleAsync<RemoveSpanStructureFromSpanEquipment, Result>(removeStructureCmd2);
 
             removeStructureCmdResult2.IsSuccess.Should().BeTrue();
-
-
         }
-
-
 
         [Fact, Order(100)]
         public void AffixCableToConduitThatDoesNotAllignWithCableWoi_ShouldFail()

@@ -1,5 +1,5 @@
 ﻿using DAX.EventProcessing;
-using FluentAssertions;
+using AwesomeAssertions;
 using OpenFTTH.Results;
 using OpenFTTH.CQRS;
 using OpenFTTH.Events.Core.Infos;

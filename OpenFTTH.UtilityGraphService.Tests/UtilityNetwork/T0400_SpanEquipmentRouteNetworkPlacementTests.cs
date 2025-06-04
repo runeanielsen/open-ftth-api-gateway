@@ -1,6 +1,6 @@
 ﻿using OpenFTTH.CQRS;
 using Xunit;
-using FluentAssertions;
+using AwesomeAssertions;
 using OpenFTTH.Results;
 using OpenFTTH.RouteNetwork.API.Model;
 using System;
@@ -44,7 +44,7 @@ namespace OpenFTTH.UtilityGraphService.Tests.UtilityNetwork
 
             var walkOfInterestId = Guid.NewGuid();
             var registerWalkOfInterestCommand = new RegisterWalkOfInterest(Guid.NewGuid(), new UserContext("test", Guid.Empty), walkOfInterestId, new RouteNetworkElementIdList() { TestRouteNetwork.S1 });
-            var registerWalkOfInterestCommandResult = _commandDispatcher.HandleAsync<RegisterWalkOfInterest, Result<RouteNetworkInterest>>(registerWalkOfInterestCommand).Result;
+            var registerWalkOfInterestCommandResult = await _commandDispatcher.HandleAsync<RegisterWalkOfInterest, Result<RouteNetworkInterest>>(registerWalkOfInterestCommand);
 
             var placeSpanEquipmentCommand = new PlaceSpanEquipmentInRouteNetwork(Guid.NewGuid(), new UserContext("test", Guid.Empty), Guid.NewGuid(), TestSpecifications.Multi_Ø32_3x10, registerWalkOfInterestCommandResult.Value)
             {

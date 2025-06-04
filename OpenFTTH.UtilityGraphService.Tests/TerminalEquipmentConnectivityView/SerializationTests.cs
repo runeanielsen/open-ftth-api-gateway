@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+﻿using AwesomeAssertions;
 using OpenFTTH.Results;
 using Newtonsoft.Json;
 using OpenFTTH.CQRS;
