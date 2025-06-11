@@ -1,10 +1,10 @@
-﻿using OpenFTTH.Results;
-using GraphQL;
+﻿using GraphQL;
 using GraphQL.Types;
 using Microsoft.Extensions.Logging;
 using OpenFTTH.APIGateway.GraphQL.RouteNetwork.Types;
 using OpenFTTH.CQRS;
 using OpenFTTH.Events.RouteNetwork.Infos;
+using OpenFTTH.Results;
 using OpenFTTH.RouteNetwork.API.Model;
 using OpenFTTH.RouteNetwork.API.Queries;
 using System;
@@ -47,6 +47,33 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Queries
                 }
             );
 
+            Field<ListGraphType<IdGraphType>>("shortestPathBetweenNodes")
+                .Description("Returns the shortest path between two nodes.")
+                .Arguments(
+                    new QueryArguments(
+                        new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "fromNodeId" },
+                        new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "toNodeId" }
+                    )
+                )
+                .ResolveAsync(async context =>
+                {
+                    var fromNodeId = context.GetArgument<Guid>("fromNodeId");
+                    var toNodeId = context.GetArgument<Guid>("toNodeId");
+
+                    var shortestPathQuery = new ShortestPathBetweenRouteNodes(fromNodeId, toNodeId);
+
+                    var nearestNodeQueryResult = await queryDispatcher
+                        .HandleAsync<ShortestPathBetweenRouteNodes, Result<ShortestPathBetweenRouteNodesResult>>(shortestPathQuery)
+                        .ConfigureAwait(false);
+
+                    if (nearestNodeQueryResult.IsFailed)
+                    {
+                        context.Errors.Add(new ExecutionError(nearestNodeQueryResult.Errors.First().Message));
+                        return null;
+                    }
+                    return nearestNodeQueryResult.Value.RouteNetworkElementIds;
+                });
+
             FieldAsync<ListGraphType<RouteNetworkTraceType>>(
                  "nearestNeighborNodes",
                  arguments: new QueryArguments(
@@ -78,8 +105,6 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Queries
                      return nearestNodeQueryResult.Value.RouteNetworkTraces;
                  }
             );
-
         }
-
     }
 }
