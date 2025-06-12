@@ -7,6 +7,7 @@ using OpenFTTH.Events.RouteNetwork.Infos;
 using OpenFTTH.Results;
 using OpenFTTH.RouteNetwork.API.Model;
 using OpenFTTH.RouteNetwork.API.Queries;
+using OpenFTTH.RouteNetwork.Business.RouteElements.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -47,6 +48,34 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Queries
                 }
             );
 
+            Field<ListGraphType<IdGraphType>>("shortestPathBetweenSegments")
+                .Description("Returns the shortest path between two nodes.")
+                .Arguments(
+                    new QueryArguments(
+                        new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "fromSegmentId" },
+                        new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "toSegmentId" }
+                    )
+                )
+                .ResolveAsync(async context =>
+                {
+                    var fromSegmentId = context.GetArgument<Guid>("fromSegmentId");
+                    var toSegmentId = context.GetArgument<Guid>("toSegmentId");
+
+                    var shortestPathQuery = new ShortestPathBetweenRouteSegments(fromSegmentId, toSegmentId);
+
+                    var shortestPathBetweenSegmentsResult = await queryDispatcher
+                        .HandleAsync<ShortestPathBetweenRouteSegments, Result<ShortestPathBetweenRouteSegmentsResult>>(shortestPathQuery)
+                        .ConfigureAwait(false);
+
+                    if (shortestPathBetweenSegmentsResult.IsFailed)
+                    {
+                        context.Errors.Add(new ExecutionError(shortestPathBetweenSegmentsResult.Errors.First().Message));
+                        return null;
+                    }
+
+                    return shortestPathBetweenSegmentsResult.Value.RouteNetworkElementIds;
+                });
+
             Field<ListGraphType<IdGraphType>>("shortestPathBetweenNodes")
                 .Description("Returns the shortest path between two nodes.")
                 .Arguments(
@@ -62,16 +91,17 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Queries
 
                     var shortestPathQuery = new ShortestPathBetweenRouteNodes(fromNodeId, toNodeId);
 
-                    var nearestNodeQueryResult = await queryDispatcher
+                    var shortestPathBetweenRouteNodesResult = await queryDispatcher
                         .HandleAsync<ShortestPathBetweenRouteNodes, Result<ShortestPathBetweenRouteNodesResult>>(shortestPathQuery)
                         .ConfigureAwait(false);
 
-                    if (nearestNodeQueryResult.IsFailed)
+                    if (shortestPathBetweenRouteNodesResult.IsFailed)
                     {
-                        context.Errors.Add(new ExecutionError(nearestNodeQueryResult.Errors.First().Message));
+                        context.Errors.Add(new ExecutionError(shortestPathBetweenRouteNodesResult.Errors.First().Message));
                         return null;
                     }
-                    return nearestNodeQueryResult.Value.RouteNetworkElementIds;
+
+                    return shortestPathBetweenRouteNodesResult.Value.RouteNetworkElementIds;
                 });
 
             FieldAsync<ListGraphType<RouteNetworkTraceType>>(
