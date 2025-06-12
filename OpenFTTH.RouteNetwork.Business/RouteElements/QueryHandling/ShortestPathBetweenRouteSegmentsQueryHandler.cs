@@ -91,7 +91,21 @@ namespace OpenFTTH.RouteNetwork.Business.RouteElements.QueryHandlers
 
                 if (result.RouteNetworkElementIds.Count > 1 && result.RouteNetworkElementIds.First() == sourceNode.Id && result.RouteNetworkElementIds.Last() == destNode.Id)
                 {
-                    return Task.FromResult(
+                    // This is to always include the source segment, we cannot be sure of start or end node, so it might get removed.
+                    if (!result.RouteNetworkElementIds.Contains(sourceSegment.Id))
+                    {
+                        result.RouteNetworkElementIds.Insert(0, sourceSegment.Id);
+                        result.RouteSegmentElementIds.Insert(0, sourceSegment.Id);
+                    }
+
+                    // This is to always include the dest segment, we cannot be sure of start or end node, so it might get removed.
+                    if (!result.RouteNetworkElementIds.Contains(destSegment.Id))
+                    {
+                        result.RouteNetworkElementIds.Add(destSegment.Id);
+                        result.RouteSegmentElementIds.Add(destSegment.Id);
+                    }
+
+                   return Task.FromResult(
                        Result.Ok<ShortestPathBetweenRouteSegmentsResult>(
                            result
                        )
