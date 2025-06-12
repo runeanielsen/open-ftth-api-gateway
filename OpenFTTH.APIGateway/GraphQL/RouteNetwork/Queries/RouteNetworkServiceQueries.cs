@@ -49,7 +49,7 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Queries
             );
 
             Field<ListGraphType<IdGraphType>>("shortestPathBetweenSegments")
-                .Description("Returns the shortest path between two nodes.")
+                .Description("Returns the shortest path (route segment ids) between two segments, including those segments.")
                 .Arguments(
                     new QueryArguments(
                         new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "fromSegmentId" },
@@ -73,35 +73,7 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Queries
                         return null;
                     }
 
-                    return shortestPathBetweenSegmentsResult.Value.RouteNetworkElementIds;
-                });
-
-            Field<ListGraphType<IdGraphType>>("shortestPathBetweenNodes")
-                .Description("Returns the shortest path between two nodes.")
-                .Arguments(
-                    new QueryArguments(
-                        new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "fromNodeId" },
-                        new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "toNodeId" }
-                    )
-                )
-                .ResolveAsync(async context =>
-                {
-                    var fromNodeId = context.GetArgument<Guid>("fromNodeId");
-                    var toNodeId = context.GetArgument<Guid>("toNodeId");
-
-                    var shortestPathQuery = new ShortestPathBetweenRouteNodes(fromNodeId, toNodeId);
-
-                    var shortestPathBetweenRouteNodesResult = await queryDispatcher
-                        .HandleAsync<ShortestPathBetweenRouteNodes, Result<ShortestPathBetweenRouteNodesResult>>(shortestPathQuery)
-                        .ConfigureAwait(false);
-
-                    if (shortestPathBetweenRouteNodesResult.IsFailed)
-                    {
-                        context.Errors.Add(new ExecutionError(shortestPathBetweenRouteNodesResult.Errors.First().Message));
-                        return null;
-                    }
-
-                    return shortestPathBetweenRouteNodesResult.Value.RouteNetworkElementIds;
+                    return shortestPathBetweenSegmentsResult.Value.RouteSegmentElementIds;
                 });
 
             FieldAsync<ListGraphType<RouteNetworkTraceType>>(

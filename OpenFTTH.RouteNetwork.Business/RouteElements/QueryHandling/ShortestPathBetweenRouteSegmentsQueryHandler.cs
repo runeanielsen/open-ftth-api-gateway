@@ -115,9 +115,13 @@ namespace OpenFTTH.RouteNetwork.Business.RouteElements.QueryHandlers
 
             var shortestPathResult = graph.ShortestPath(sourceRouteNodeId, destRouteNodeId);
 
+            var routeElementIdList = new RouteNetworkElementIdList();
+            routeElementIdList.AddRange(shortestPathResult);
+            var validateWalk = new ValidatedRouteNetworkWalk(routeElementIdList);
+
             st.Stop();
 
-            return new ShortestPathBetweenRouteSegmentsResult(shortestPathResult, st.ElapsedMilliseconds);
+            return new ShortestPathBetweenRouteSegmentsResult(shortestPathResult, validateWalk.SegmentIds, st.ElapsedMilliseconds);
         }
 
 
