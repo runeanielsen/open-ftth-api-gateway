@@ -67,7 +67,6 @@ namespace OpenFTTH.RouteNetwork.Business.RouteElements.QueryHandlers
             }
 
             var destSegment = _routeNetworkState.GetRouteNetworkElement(query.DestRouteSegmentId) as RouteSegment;
-
             if (destSegment == null)
             {
                 return Task.FromResult(
@@ -75,7 +74,7 @@ namespace OpenFTTH.RouteNetwork.Business.RouteElements.QueryHandlers
                  );
             }
 
-            var destNode = sourceSegment.NeighborElements(latestVersion).Last() as RouteNode;
+            var destNode = destSegment.NeighborElements(latestVersion).Last() as RouteNode;
 
             if (destNode == null)
             {
