@@ -58,7 +58,9 @@ namespace OpenFTTH.RouteNetwork.Business.RouteElements.QueryHandlers
                  );
             }
 
-            var sourceNode = sourceSegment.NeighborElements(latestVersion).First() as RouteNode;
+            var sourceSegmentNeighborElements = sourceSegment.NeighborElements(latestVersion);
+            var sourceNode = sourceSegmentNeighborElements.First() as RouteNode;
+
             if (sourceNode == null)
             {
                 return Task.FromResult(
@@ -74,13 +76,24 @@ namespace OpenFTTH.RouteNetwork.Business.RouteElements.QueryHandlers
                  );
             }
 
-            var destNode = destSegment.NeighborElements(latestVersion).Last() as RouteNode;
+            var destSegmentNeighborElements = destSegment.NeighborElements(latestVersion);
+            var destNode = destSegmentNeighborElements.Last() as RouteNode;
 
             if (destNode == null)
             {
                 return Task.FromResult(
                      Result.Fail<ShortestPathBetweenRouteSegmentsResult>(new FindNearestRouteSegmentsError(FindNearestRouteSegmentsErrorCodes.INVALID_QUERY_ARGUMENT_ERROR_LOOKING_UP_SPECIFIED_ROUTE_NETWORK_ELEMENT_BY_ID, $"Error looking up route network node with id: {destNode.Id}"))
                  );
+            }
+
+            // If nodes are shared they're next to each other so no reason to do a trace.
+            if (sourceSegmentNeighborElements.Select(x => x.Id).ToHashSet().Overlaps(destSegmentNeighborElements.Select(x => x.Id)))
+            {
+                return Task.FromResult(
+                    Result.Ok<ShortestPathBetweenRouteSegmentsResult>(
+                        new ShortestPathBetweenRouteSegmentsResult(new List<Guid> { sourceNode.Id, sourceSegment.Id, destSegment.Id, destNode.Id }, new List<Guid> { sourceSegment.Id, destSegment.Id }, 0)
+                    )
+                );
             }
 
             double expandPercent = 20;
