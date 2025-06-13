@@ -52,7 +52,7 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                   // Name conduit span equipment
                   // TODO: Refactor into som class responsible for span equipment naming
                   var spec = eventStore.Projections.Get<SpanEquipmentSpecificationsProjection>().Specifications[spanEquipmentSpecificationId];
-                  namingInfo = CalculateName(eventStore, namingInfo, spec);
+                  namingInfo = CalculateSpanEquipmentName(eventStore, namingInfo, spec);
 
                   var correlationId = Guid.NewGuid();
 
@@ -563,20 +563,20 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
             );
         }
 
-        private static NamingInfo CalculateName(IEventStore eventStore, NamingInfo namingInfo, SpanEquipmentSpecification spec)
+        private static NamingInfo CalculateSpanEquipmentName(IEventStore eventStore, NamingInfo namingInfo, SpanEquipmentSpecification spec)
         {
-            if (spec.Category != null && spec.Category.ToLower().Contains("conduit"))
-            {
-                var nextConduitSeqStr = eventStore.Sequences.GetNextVal("conduit").ToString();
-
-                var conduitName = "R" + nextConduitSeqStr.PadLeft(6, '0');
-                namingInfo = new NamingInfo(conduitName, null);
-            }
-            else if (spec.Category != null && spec.Category.ToLower().Contains("cable"))
+            if (spec.IsCable)
             {
                 var nextCableSeqStr = eventStore.Sequences.GetNextVal("cable").ToString();
 
                 var conduitName = "K" + nextCableSeqStr.PadLeft(6, '0');
+                namingInfo = new NamingInfo(conduitName, null);
+            }
+            else
+            {
+                var nextConduitSeqStr = eventStore.Sequences.GetNextVal("conduit").ToString();
+
+                var conduitName = "R" + nextConduitSeqStr.PadLeft(6, '0');
                 namingInfo = new NamingInfo(conduitName, null);
             }
 
