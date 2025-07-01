@@ -107,7 +107,7 @@ namespace OpenFTTH.UtilityGraphService.API.Model.UtilityNetwork
 
             int numberOfFibersPerTube = RootTemplate.ChildTemplates.Count() / CableTubes.Count();
 
-            int fiberNo = ((fiberPosition - 1) % 12) + 1;
+            int fiberNo = ((fiberPosition - 1) % numberOfFibersPerTube) + 1;
 
             return fiberNo;
         }
