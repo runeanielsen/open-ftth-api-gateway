@@ -177,6 +177,10 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
         {
             var trace = GetTraceInfo(conduitSpanSegmentId);
 
+            return trace.FromRouteNodeName;
+
+            // TODO: Include when the installation and adresse model is available
+
             // If node type i address, always return the the adresse 
             if (trace.FromNodeNameType == NodeNameType.ADDRESS)
                 return trace.FromRouteNodeName;
@@ -223,6 +227,10 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
         public string GetToRouteNodeName(Guid conduitSpanSegmentId)
         {
             var trace = GetTraceInfo(conduitSpanSegmentId);
+
+            return trace.ToRouteNodeName;
+
+            // TODO: Include when the installation and adresse model is available
 
             // If node type i address, always return the the adresse 
             if (trace.FromNodeNameType == NodeNameType.ADDRESS)
