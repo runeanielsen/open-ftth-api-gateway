@@ -17,6 +17,8 @@ namespace OpenFTTH.UtilityGraphService.API.Model.UtilityNetwork
         public bool Deprecated { get; init; }
         public string? Description { get; init; }
 
+        public string RefName { get { return Name + "_" + Color; } }
+
         public SpanStructureSpecification(Guid id, string spanClassType, string name, string color)
         {
             this.Id = id;

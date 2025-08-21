@@ -40,7 +40,13 @@ namespace OpenFTTH.APIGateway.Specifications
 
             var terminalStructureSpecs = _eventStore.Projections.Get<TerminalStructureSpecificationsProjection>().Specifications;
 
+            var spanEquipmentSpecs = _eventStore.Projections.Get<SpanEquipmentSpecificationsProjection>().Specifications;
+
+            var spanStructureSpecs = _eventStore.Projections.Get<SpanStructureSpecificationsProjection>().Specifications;
+
             var nodeContainerSpecs = _eventStore.Projections.Get<NodeContainerSpecificationsProjection>().Specifications;
+
+            var rackSpecs = _eventStore.Projections.Get<RackSpecificationsProjection>().Specifications;
 
             var specificationData = new Specifications();
 
@@ -77,6 +83,22 @@ namespace OpenFTTH.APIGateway.Specifications
                 );
             }
 
+            // Rack specs
+            specificationData.Racks = new List<RackSpec>();
+
+            foreach (var rackSpec in rackSpecs)
+            {
+                specificationData.Racks.Add(
+                    new RackSpec()
+                    {
+                        Name = rackSpec.Name,
+                        Description = rackSpec.Description,
+                        ShortName = rackSpec.Name,
+                        Deprecated = rackSpec.Deprecated,
+                    }
+                );
+            }
+
 
             // Terminal structure specs
             specificationData.TerminalStructures = new List<TerminalStructureSpec>();
@@ -92,7 +114,8 @@ namespace OpenFTTH.APIGateway.Specifications
                         Description = terminalStructureSpec.Description,
                         Manufacturers = GetManufacturesFromIds(manufacturerSpecs, terminalStructureSpec.ManufacturerRefs),
                         Deprecated = terminalStructureSpec.Deprecated,
-                        Terminals = GetTerminals(terminalStructureSpec.TerminalTemplates)
+                        Terminals = GetTerminals(terminalStructureSpec.TerminalTemplates),
+                        IsInterfaceModule = terminalStructureSpec.IsInterfaceModule
                     }
                 );
             }
@@ -122,6 +145,56 @@ namespace OpenFTTH.APIGateway.Specifications
                         Structures = GetTerminalStructures(terminalEquipmentSpec.StructureTemplates, terminalStructureSpecs)
                     }
                 );
+            }
+
+
+            // Span structure specs
+            specificationData.SpanStructures = new List<SpanStructureSpec>();
+
+            foreach (var spanStructureSpec in spanStructureSpecs)
+            {
+
+                if (spanStructureSpec.SpanClassType.ToLower() != "fibercable")
+                {
+                    specificationData.SpanStructures.Add(
+                        new SpanStructureSpec()
+                        {
+                            SpanClassType = spanStructureSpec.SpanClassType,
+                            Name = spanStructureSpec.RefName,
+                            Color = spanStructureSpec.Color,
+                            InnerDiameter = spanStructureSpec.InnerDiameter,
+                            OuterDiameter = spanStructureSpec.OuterDiameter,
+                            Description = spanStructureSpec.Description,
+                            Deprecated = spanStructureSpec.Deprecated,
+                        }
+                    );
+                }
+            }
+
+
+            // Span equipment specs
+            specificationData.SpanEquipments = new List<SpanEquipmentSpec>();
+
+            foreach (var spanEquipmentSpec in spanEquipmentSpecs)
+            {
+                if (spanEquipmentSpec.Category.ToLower() != "fibercable")
+                {
+                    specificationData.SpanEquipments.Add(
+                    new SpanEquipmentSpec()
+                    {
+                        //Id = terminalEquipment.Id,
+                        Category = spanEquipmentSpec.Category,
+                        Name = spanEquipmentSpec.Name,
+                        Description = spanEquipmentSpec.Description,
+                        Deprecated = spanEquipmentSpec.Deprecated,
+                        Manufacturers = GetManufacturesFromIds(manufacturerSpecs, spanEquipmentSpec.ManufacturerRefs),
+                        IsFixed = spanEquipmentSpec.IsFixed,
+                        IsCable = spanEquipmentSpec.IsCable,
+                        IsMultiLevel = spanEquipmentSpec.IsMultiLevel,
+                        OuterStructure = GetSpanStructures(spanEquipmentSpec.RootTemplate, spanStructureSpecs)
+                    }
+                );
+                }
             }
 
 
@@ -209,6 +282,39 @@ namespace OpenFTTH.APIGateway.Specifications
             }
 
             return specs;
+        }
+
+        private SpanStructureTemplateSpec GetSpanStructures(SpanStructureTemplate rootTemplate, LookupCollection<SpanStructureSpecification> spanStructureSpecs)
+        {
+            if (rootTemplate == null)
+                return null;
+
+            List<SpanStructureTemplateSpec> childrenSpecs = new();
+
+            if (rootTemplate.ChildTemplates != null)
+            {
+                foreach (var childTemplate in rootTemplate.ChildTemplates)
+                {
+                    var childSpec = new SpanStructureTemplateSpec()
+                    {
+                        RefName = spanStructureSpecs[childTemplate.SpanStructureSpecificationId].RefName,
+                        Level = childTemplate.Level,
+                        Position = childTemplate.Position,
+                    };
+
+                    childrenSpecs.Add(childSpec);
+                }
+            }
+
+            var rootSpec = new SpanStructureTemplateSpec()
+            {
+                RefName = spanStructureSpecs[rootTemplate.SpanStructureSpecificationId].RefName,
+                Level = rootTemplate.Level,
+                Position = rootTemplate.Position,
+                Children = childrenSpecs
+            };
+
+            return rootSpec;
         }
 
         private List<string> GetManufacturesFromIds(LookupCollection<UtilityGraphService.API.Model.UtilityNetwork.Manufacturer> manufactures, Guid[] manufacturerRefs)
