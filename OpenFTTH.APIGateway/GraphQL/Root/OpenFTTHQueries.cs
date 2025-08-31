@@ -7,6 +7,7 @@ using OpenFTTH.APIGateway.GraphQL.Search.Queries;
 using OpenFTTH.APIGateway.GraphQL.Location.Queries;
 using OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Queries;
 using OpenFTTH.APIGateway.GraphQL.Work.Queries;
+using OpenFTTH.APIGateway.GraphQL.Installation.Queries;
 
 namespace OpenFTTH.APIGateway.GraphQL.Root
 {
@@ -33,6 +34,8 @@ namespace OpenFTTH.APIGateway.GraphQL.Root
             Field<AddressServiceQueries>("addressService").Resolve(_ => new { });
 
             Field<OutageServiceQueries>("outage").Resolve(_ => new { });
+
+            Field<InstallationQueries>("installation").Resolve(_ => new { });
         }
     }
 }
