@@ -19,7 +19,7 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Types
             Field(x => x.IsRackEquipment, type: typeof(BooleanGraphType)).Description("True is the terminal equipment can only be inserted in a rack.");
             Field(x => x.HeightInRackUnits, type: typeof(IntGraphType)).Description("Height in rack units. Only provided if a rack equipment.");
             Field(x => x.IsAddressable, type: typeof(BooleanGraphType)).Description("Can be related to an address");
-            Field(x => x.IsCustomerTermination, type: typeof(IntGraphType)).Description("Is customer termination");
+            Field(x => x.IsCustomerTermination, type: typeof(BooleanGraphType)).Description("Is customer termination");
         }
     }
 }
