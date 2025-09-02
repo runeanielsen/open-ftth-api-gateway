@@ -12,13 +12,16 @@ public sealed class InstallaionSearchResponseType : ObjectGraphType<Installation
     {
         Description = "Installation search result";
 
-        Field("envelope", x => x.Envelope, type: typeof(EnvelopeType))
-            .Description("The extent of the location.");
+        Field("installationId", x => x.InstallationId, type: typeof(StringGraphType))
+            .Description("Unique installation name maintained by the customer system.");
 
-        Field("routeElementId", x => x.RouteElementId, type: typeof(IdGraphType))
-            .Description("The route element id.");
+        Field("addressString", x => x.InstallationId, type: typeof(StringGraphType))
+              .Description("Installation address");
 
-        Field("coordinate", x => x.Coordinate, type: typeof(PointType))
-            .Description("The coordinate for the point.");
+        Field("additionalAddressInformation", x => x.InstallationId, type: typeof(StringGraphType))
+               .Description("Installation additional address information");
+
+        Field("distance", x => x.Distance, type: typeof(FloatGraphType))
+            .Description("Distance from node");
     }
 }
