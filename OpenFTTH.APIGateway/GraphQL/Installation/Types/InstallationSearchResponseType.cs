@@ -1,5 +1,4 @@
 using GraphQL.Types;
-using OpenFTTH.APIGateway.GraphQL.Core.Types;
 
 namespace OpenFTTH.APIGateway.GraphQL.Installation.Types;
 
@@ -15,10 +14,10 @@ public sealed class InstallaionSearchResponseType : ObjectGraphType<Installation
         Field("installationId", x => x.InstallationId, type: typeof(StringGraphType))
             .Description("Unique installation name maintained by the customer system.");
 
-        Field("addressString", x => x.InstallationId, type: typeof(StringGraphType))
+        Field("displayAddress", x => x.DisplayAddress, type: typeof(StringGraphType))
               .Description("Installation address");
 
-        Field("additionalAddressInformation", x => x.InstallationId, type: typeof(StringGraphType))
+        Field("additionalAddressInformation", x => x.AdditionalAddressInformation, type: typeof(StringGraphType))
                .Description("Installation additional address information");
 
         Field("distance", x => x.Distance, type: typeof(FloatGraphType))

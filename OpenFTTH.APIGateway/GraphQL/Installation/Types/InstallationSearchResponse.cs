@@ -3,7 +3,7 @@ namespace OpenFTTH.APIGateway.GraphQL.Installation.Types;
 public sealed record InstallationSearchResponse
 {
     public string InstallationId { get; init; }
-    public string AddressString { get; init; }
+    public string DisplayAddress { get; init; }
     public string AdditionalAddressInformation { get; init; }
     public double Distance { get; init; }
 
@@ -14,7 +14,7 @@ public sealed record InstallationSearchResponse
         double distance)
     {
         InstallationId = installationId;
-        AddressString = addressString;
+        DisplayAddress = addressString;
         AdditionalAddressInformation = additionalAddressInformation;
         Distance = distance;
     }
