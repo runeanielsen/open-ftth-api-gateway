@@ -18,7 +18,8 @@ public class InstallationQueries : ObjectGraphType
         Field<ListGraphType<InstallaionSearchResponseType>>("nearestUndocumentedInstallations")
                 .Arguments(new QueryArguments(
                     new QueryArgument<IdGraphType> { Name = "routeNodeId" },
-                    new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "maxHits" }
+                    new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "maxHits" },
+                    new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "searchRadiusMeter" }
                 ))
                 .ResolveAsync(async (context) =>
                 {
