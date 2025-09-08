@@ -10,17 +10,20 @@ using OpenFTTH.UtilityGraphService.API.Model.UtilityNetwork;
 using OpenFTTH.UtilityGraphService.API.Queries;
 using System;
 using System.Linq;
+using OpenFTTH.EventSourcing;
+using OpenFTTH.UtilityGraphService.Business.Graph.Projections;
+using OpenFTTH.UtilityGraphService.Business.Graph;
+using OpenFTTH.Events.Core.Infos;
 
 namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Types
 {
     public class TerminalEquipmentType : ObjectGraphType<TerminalEquipment>
     {
-        public TerminalEquipmentType(ILogger<TerminalEquipmentType> logger, IQueryDispatcher queryDispatcher, DynamicPropertiesClient dynamicPropertiesReader)
+        public TerminalEquipmentType(ILogger<TerminalEquipmentType> logger, IQueryDispatcher queryDispatcher, DynamicPropertiesClient dynamicPropertiesReader, IEventStore eventStore)
         {
             Field(x => x.Id, type: typeof(IdGraphType)).Description("Master Resource Identifier UUID Property");
             Field(x => x.Name, type: typeof(StringGraphType)).Description("Short name");
             Field(x => x.Description, type: typeof(StringGraphType)).Description("Long description");
-            Field(x => x.AddressInfo, type: typeof(AddressInfoType)).Description("Address information such as access and unit address id");
             Field(x => x.SpecificationId, type: typeof(IdGraphType)).Description("Terminal equipment specification id");
             Field(x => x.ManufacturerId, type: typeof(IdGraphType)).Description("Terminal equipment manufacturer id");
 
@@ -80,6 +83,50 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Types
                {
                    return dynamicPropertiesReader.ReadProperties(context.Source.Id);
                });
+
+            Field<AddressInfoType>("addressInfo")
+              .Description("Address information such as access and unit address id")
+              .Resolve(context =>
+              {
+                  // Try lookup via installation via name (installation id string) first
+                  var installations = eventStore.Projections.Get<InstallationProjection>();
+               
+                  var installationInfo = installations.GetInstallationInfo(context.Source.Name, eventStore.Projections.Get<UtilityNetworkProjection>());
+
+                  if (installationInfo != null && installationInfo.UnitAddressId != null)
+                  {
+                      var addresses = eventStore.Projections.Get<AddressProjection>();
+
+                      AddressInfo addrInfo = addresses.GetAddressInfo((Guid)installationInfo.UnitAddressId);
+
+                      if (addrInfo != null) 
+                      {
+                          addrInfo.Remark = installationInfo.LocationRemark;
+
+                          return addrInfo;
+                      }
+                  }
+
+                  // Revert to use the address set on the terminal equipment
+                  return context.Source.AddressInfo;
+              });
+
+            Field<InstallationInfoType>("installationInfo")
+           .Description("Installation info - only returnd if the object is a customer termination")
+           .Resolve(context =>
+           {
+               // Try lookup via installation via name (installation id string) first
+               var installations = eventStore.Projections.Get<InstallationProjection>();
+
+               var installationInfo = installations.GetInstallationInfo(context.Source.Name, eventStore.Projections.Get<UtilityNetworkProjection>());
+
+               if (installationInfo != null )
+               {
+                    return installationInfo;
+               }
+
+               return null;
+           });
         }
     }
 }
