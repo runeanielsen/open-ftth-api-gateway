@@ -50,12 +50,13 @@ namespace OpenFTTH.APIGateway.Reporting
             {
                 var equipmentSpec = terminalEquipmentSpecifications[terminalEquipment.SpecificationId];
 
-                if (equipmentSpec.IsCustomerTermination)
+                if (equipmentSpec.IsCustomerTermination && terminalEquipment.TerminalStructures.Count() > 0)
                 {
-                    for (int i = 0; i < 4; i++)
+                    var sourceTerminalStructure = terminalEquipment.TerminalStructures[0];
+
+                    for (int i = 0; i < sourceTerminalStructure.Terminals.Count(); i++)
                     {
                         // trace terminal
-                        var sourceTerminalStructure = terminalEquipment.TerminalStructures[0];
                         var sourceTerminal = terminalEquipment.TerminalStructures[0].Terminals[i];
 
                         var traceResult = _utilityNetwork.Graph.SimpleTrace(terminalEquipment.TerminalStructures[0].Terminals[i].Id);
