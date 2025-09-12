@@ -47,6 +47,21 @@ namespace OpenFTTH.UtilityGraphService.Business.Graph.Projections
 
         }
 
+        public IReadOnlyDictionary<Guid, AccessAddressRecord> AccessAddressesById
+        {
+            get { return _accessAddressById; }
+        }
+
+        public IReadOnlyDictionary<Guid, UnitAddressRecord> UnitAddressesById
+        {
+            get { return _unitAddressById; }
+        }
+
+        public IReadOnlyDictionary<Guid, RoadRecord> RoadsById
+        {
+            get { return _roadById; }
+        }
+
         public AddressInfo? GetAddressInfo(Guid unitAddressId)
         {
             if (_unitAddressById.TryGetValue(unitAddressId, out UnitAddressRecord unitAddressRecord))
@@ -210,6 +225,11 @@ namespace OpenFTTH.UtilityGraphService.Business.Graph.Projections
 
     public record AccessAddressRecord
     {
+        public AccessAddressRecord(Guid id)
+        {
+            Id = id;
+            UnitAddressIds = [];
+        }
 
         public Guid Id { get; }
         public string? ExternalId { get; set; }
@@ -225,16 +245,15 @@ namespace OpenFTTH.UtilityGraphService.Business.Graph.Projections
         public string? TownName { get; set; }
         public string? MunicipalCode { get; set; }
         public List<Guid> UnitAddressIds { get; set; }
-
-        public AccessAddressRecord(Guid id)
-        {
-            Id = id;
-            UnitAddressIds = [];
-        }
     }
 
     public record UnitAddressRecord
     {
+        public UnitAddressRecord(Guid id)
+        {
+            Id = id;
+        }
+
         public Guid Id { get; }
         public string? ExternalId { get; set; }
         public bool PendingOfficial { get; set; }
@@ -242,27 +261,20 @@ namespace OpenFTTH.UtilityGraphService.Business.Graph.Projections
         public Guid AccessAddressId { get; set; }
         public string? FloorName { get; set; }
         public string? SuitName { get; set; }
-
-        public UnitAddressRecord(Guid id)
-        {
-            Id = id;
-        }
     }
 
     public record RoadRecord
     {
-        public Guid Id { get; init; }
-        public string? ExternalId { get; set; }
-        public string? Name { get; set; }
-        public RoadStatus Status { get; set; }
-
         public RoadRecord(Guid id)
         {
             Id = Id;
         }
+
+        public Guid Id { get; init; }
+        public string? ExternalId { get; set; }
+        public string? Name { get; set; }
+        public RoadStatus Status { get; set; }
     }
-
-
 }
 
 

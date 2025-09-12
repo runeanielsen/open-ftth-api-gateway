@@ -60,6 +60,10 @@ namespace OpenFTTH.RouteNetwork.Business.RouteElements.Model
             return coordArray;
         }
 
+        public double Distance(double northCoordinateOrX, double eastCoordinateOrY)
+        {
+            return Math.Sqrt(Math.Pow(X - northCoordinateOrX, 2) + Math.Pow(Y - eastCoordinateOrY, 2));
+        }
 
         public RouteNode(Guid id, string coordinates) : base(id)
         {

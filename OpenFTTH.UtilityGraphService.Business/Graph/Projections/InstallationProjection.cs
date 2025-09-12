@@ -26,6 +26,11 @@ namespace OpenFTTH.UtilityGraphService.Business.Graph.Projections
             ProjectEventAsync<InstallationRemarkChanged>(ProjectAsync);
         }
 
+        public IReadOnlyDictionary<Guid, InstallationRecord> InstallationsById
+        {
+            get { return _installationById; }
+        }
+
         public InstallationRecord? GetInstallationInfo(string name, UtilityNetworkProjection utilityNetwork)
         {
             if (String.IsNullOrEmpty(name))

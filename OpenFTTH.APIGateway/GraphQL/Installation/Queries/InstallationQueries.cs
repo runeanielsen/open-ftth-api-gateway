@@ -4,14 +4,20 @@ using OpenFTTH.APIGateway.GraphQL.Addresses.Types;
 using OpenFTTH.APIGateway.GraphQL.Installation.Types;
 using OpenFTTH.APIGateway.GraphQL.Location.Types;
 using OpenFTTH.CQRS;
+using OpenFTTH.EventSourcing;
+using OpenFTTH.RouteNetwork.Business.RouteElements.Model;
+using OpenFTTH.RouteNetwork.Business.RouteElements.StateHandling;
+using OpenFTTH.UtilityGraphService.Business.Graph;
+using OpenFTTH.UtilityGraphService.Business.Graph.Projections;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace OpenFTTH.APIGateway.GraphQL.Installation.Queries;
 
 public class InstallationQueries : ObjectGraphType
 {
-    public InstallationQueries(IQueryDispatcher queryDispatcher)
+    public InstallationQueries(IQueryDispatcher queryDispatcher, IEventStore eventStore, IRouteNetworkState routeNetworkState)
     {
         Description = "GraphQL API for querying installation information";
 
@@ -25,16 +31,51 @@ public class InstallationQueries : ObjectGraphType
                 {
                     Guid routeNodeId = context.GetArgument<Guid>("routeNodeId");
                     int maxHits = context.GetArgument<int>("maxHits");
+                    int searchRadiusMeter = context.GetArgument<int>("searchRadiusMeter");
 
-                    List<InstallationSearchResponse> result = new List<InstallationSearchResponse>();
+                    var utilityNetworkProjection = eventStore.Projections.Get<UtilityNetworkProjection>();
+                    var addressProjection = eventStore.Projections.Get<AddressProjection>();
+                    var installationProjection = eventStore.Projections.Get<InstallationProjection>();
+                    
+                    // Find installations that has not yet been added to the utility network
+                    List<InstallationRecord> installationsNotRegisteredInNetwork = [];
 
-                    // TODO: Lookup via installation projection
-                    result.Add(new InstallationSearchResponse("12345678", "Engumvej 3", "Skur", 2.34));
-                    result.Add(new InstallationSearchResponse("23233678", "Engumvej 3", null, 2));
-                    result.Add(new InstallationSearchResponse("32343444", "Engumvej 6", null, 7));
-                    result.Add(new InstallationSearchResponse("34344344", "Engumvej 5", null, 13.7));
+                    foreach (var inst in installationProjection.InstallationsById.Values)
+                    {
+                        if (!utilityNetworkProjection.TerminalEquipmentIdByName.ContainsKey(inst.InstallationId))
+                            installationsNotRegisteredInNetwork.Add(inst);
+                    }
 
-                    return result;
+                    // Find installations within search radius
+                    List<InstallationSearchResponse> installationsWithinSearchRadius = new List<InstallationSearchResponse>();
+
+                    RouteNode routeNode = (RouteNode)routeNetworkState.GetRouteNetworkElement(routeNodeId);
+
+                    if (routeNode == null)
+                        throw new ApplicationException($"Cannot find route node with id: " + routeNodeId);
+
+                    foreach (var unregisteredInst in installationsNotRegisteredInNetwork)
+                    {
+                        if (unregisteredInst.UnitAddressId != null && addressProjection.UnitAddressesById.ContainsKey((Guid)unregisteredInst.UnitAddressId))
+                        {
+                            var addressInfo = addressProjection.GetAddressInfo((Guid)unregisteredInst.UnitAddressId);
+                            var unitAddress = addressProjection.UnitAddressesById[(Guid)unregisteredInst.UnitAddressId];
+                            var accessAddress = addressProjection.AccessAddressesById[(Guid)addressInfo.AccessAddressId];
+
+                            double distanceToInst = routeNode.Distance(accessAddress.EastCoordinate, accessAddress.NorthCoordinate);
+
+                            if (distanceToInst < searchRadiusMeter)
+                            {
+                                var road = addressProjection.RoadsById[(Guid)accessAddress.RoadId];
+
+                                var addressString = (road.Name + " " + accessAddress.HouseNumber + " " + unitAddress.FloorName + " " + unitAddress.SuitName).Trim();
+
+                                installationsWithinSearchRadius.Add(new InstallationSearchResponse(unregisteredInst.InstallationId, addressString, unregisteredInst.LocationRemark, distanceToInst));
+                            }
+                        }
+                    }
+
+                    return installationsWithinSearchRadius.OrderBy(o => o.Distance).ThenBy(o => o.DisplayAddress);
                 });
     }
 }
