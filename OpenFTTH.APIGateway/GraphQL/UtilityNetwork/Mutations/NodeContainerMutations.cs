@@ -16,6 +16,9 @@ using OpenFTTH.UtilityGraphService.API.Commands;
 using OpenFTTH.UtilityGraphService.API.Model.UtilityNetwork;
 using System;
 using OpenFTTH.APIGateway.GraphQL.Work;
+using OpenFTTH.UtilityGraphService.Business.TerminalEquipments.Projections;
+using OpenFTTH.UtilityGraphService.Business.NodeContainers.Projections;
+using System.Linq;
 
 namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
 {
@@ -295,18 +298,6 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                     var subrackPlacementInfo = context.GetArgument<SubrackPlacementInfo>("subrackPlacementInfo");
                     var addressInfo = context.GetArgument<AddressInfo>("addressInfo");
 
-                    var getNodeContainerResult = QueryHelper.GetNodeContainerFromRouteNodeId(queryDispatcher, routeNodeId);
-
-                    if (getNodeContainerResult.IsFailed)
-                    {
-                        foreach (var error in getNodeContainerResult.Errors)
-                            context.Errors.Add(new ExecutionError(error.Message));
-
-                        return null;
-                    }
-
-                    var nodeContainer = getNodeContainerResult.Value;
-
                     var correlationId = Guid.NewGuid();
 
                     var userContext = context.UserContext as GraphQLUserContext;
@@ -320,10 +311,79 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
 
                     var commandUserContext = new UserContext(userName, currentWorkTaskIdResult.Value);
 
+                    Guid nodeContainerId = Guid.NewGuid();
+
+                    var getNodeContainerResult = QueryHelper.GetNodeContainerFromRouteNodeId(queryDispatcher, routeNodeId);
+
+                    if (getNodeContainerResult.IsFailed)
+                    {
+                        // If terminal equipment create node container
+                        var terminalEquipmentSpecifications = eventStore.Projections.Get<TerminalEquipmentSpecificationsProjection>();
+
+                        var spec = terminalEquipmentSpecifications.Specifications[terminalEquipmentSpecificationId];
+
+                        if (!spec.IsCustomerTermination)
+                        {
+                            // Fail if request is not to create a customer termination
+                            foreach (var error in getNodeContainerResult.Errors)
+                                context.Errors.Add(new ExecutionError(error.Message));
+
+                            return null;
+                        }
+                        else
+                        {
+                            // Automatically create container
+
+                            var specName = "Bygningsenhed"; // TODO: Should be configurable
+
+                            var nodeContainerSpecifications = eventStore.Projections.Get<NodeContainerSpecificationsProjection>();
+
+                            if (terminalEquipmentSpecifications.Specifications.Any(s => s.Name == specName))
+                            {
+                                Guid nodeContainerSpecificationId = terminalEquipmentSpecifications.Specifications.First(s => s.Name == specName).Id;
+
+                                // First register the walk in the route network where the client want to place the node container
+                                var nodeOfInterestId = Guid.NewGuid();
+                                var walk = new RouteNetworkElementIdList();
+                                var registerNodeOfInterestCommand = new RegisterNodeOfInterest(correlationId, commandUserContext, nodeOfInterestId, routeNodeId);
+
+                                var registerNodeOfInterestCommandResult = await commandDispatcher.HandleAsync<RegisterNodeOfInterest, Result<RouteNetworkInterest>>(registerNodeOfInterestCommand);
+
+                                if (registerNodeOfInterestCommandResult.IsFailed)
+                                {
+                                    return new CommandResult(registerNodeOfInterestCommandResult);
+                                }
+
+                                // Now place the container
+                                var placeNodeContainerCommand = new PlaceNodeContainerInRouteNetwork(correlationId, commandUserContext, nodeContainerId, nodeContainerSpecificationId, registerNodeOfInterestCommandResult.Value)
+                                {
+                                    ManufacturerId = manufacturerId,
+                                    LifecycleInfo = new LifecycleInfo(DeploymentStateEnum.InService, null, null)
+                                };
+
+                                var placeNodeContainerResult = await commandDispatcher.HandleAsync<PlaceNodeContainerInRouteNetwork, Result>(placeNodeContainerCommand);
+
+                                // Unregister interest if place node container failed
+                                if (placeNodeContainerResult.IsFailed)
+                                {
+                                    var unregisterCommandResult = await commandDispatcher.HandleAsync<UnregisterInterest,
+                                        Result>(new UnregisterInterest(correlationId, commandUserContext, nodeOfInterestId));
+
+                                    if (unregisterCommandResult.IsFailed)
+                                        return new CommandResult(unregisterCommandResult);
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        nodeContainerId = getNodeContainerResult.Value.Id;
+                    }
+                 
                     var placeEquipmentInNodeContainer = new PlaceTerminalEquipmentInNodeContainer(
                       correlationId: correlationId,
                       userContext: commandUserContext,
-                      nodeContainerId: nodeContainer.Id,
+                      nodeContainerId: nodeContainerId,
                       terminalEquipmentSpecificationId: terminalEquipmentSpecificationId,
                       terminalEquipmentId: Guid.NewGuid(),
                       numberOfEquipments: numberOfEquipments,
