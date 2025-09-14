@@ -10,6 +10,8 @@ namespace OpenFTTH.UtilityGraphService.API.Model.Trace
         public Guid? FromTerminalId { get; }
         public Guid? ToTerminalId { get; }
         public Guid[] SpanSegmentIds { get; }
+        public string? FromLabel { get; set; }
+        public string? ToLabel { get; set; }
 
         public string? Name => null;
         public string? Description => null;

@@ -184,7 +184,7 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments.QueryHandlers
 
         private LookupCollection<API.Model.Trace.RouteNetworkTraceResult> AddTraceRefsToSpanEquipments(List<SpanEquipment> spanEquipmentsToTrace, List<SpanEquipmentWithRelatedInfo> spanEquipmentsToReturn, Guid? traceThisSpanSegmentIdOnly)
         {
-            var traceBuilder = new SwissArmyKnifeTracer(_queryDispatcher, _utilityNetwork);
+            var traceBuilder = new SwissArmyKnifeTracer(_queryDispatcher, _eventStore);
 
             var traceInfo = traceBuilder.Trace(spanEquipmentsToTrace, traceThisSpanSegmentIdOnly);
 
@@ -193,6 +193,16 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments.QueryHandlers
                 foreach (var spanEquipment in spanEquipmentsToReturn)
                 {
                     spanEquipment.RouteNetworkTraceRefs = traceInfo.SpanSegmentRouteNetworkTraceRefsBySpanEquipmentId[spanEquipment.Id].ToArray();
+
+                    if (traceInfo.CableUpstreamLabels.TryGetValue(spanEquipment.Id, out var upLabel))
+                    {
+                        spanEquipment.UpstreamLabel = upLabel;
+                    }
+
+                    if (traceInfo.CableDownstreamLabels.TryGetValue(spanEquipment.Id, out var downLabel))
+                    {
+                        spanEquipment.DownstreamLabel = downLabel;
+                    }
                 }
 
                 return new LookupCollection<API.Model.Trace.RouteNetworkTraceResult>(traceInfo.RouteNetworkTraces);

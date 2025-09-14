@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace OpenFTTH.UtilityGraphService.Business.Graph.Projections
 {
-    public class AddressProjection : ProjectionBase
+    public class AddressInfoProjection : ProjectionBase
     {
         private readonly ConcurrentDictionary<Guid, AccessAddressRecord> _accessAddressById = new();
 
@@ -17,7 +17,7 @@ namespace OpenFTTH.UtilityGraphService.Business.Graph.Projections
 
         private readonly ConcurrentDictionary<Guid, RoadRecord> _roadById = new();
 
-        public AddressProjection()
+        public AddressInfoProjection()
         {
             ProjectEventAsync<AccessAddressCreated>(ProjectAsync);
             ProjectEventAsync<AccessAddressPendingOfficialChanged>(ProjectAsync);

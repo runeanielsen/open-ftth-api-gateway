@@ -34,7 +34,7 @@ public class InstallationQueries : ObjectGraphType
                     int searchRadiusMeter = context.GetArgument<int>("searchRadiusMeter");
 
                     var utilityNetworkProjection = eventStore.Projections.Get<UtilityNetworkProjection>();
-                    var addressProjection = eventStore.Projections.Get<AddressProjection>();
+                    var addressProjection = eventStore.Projections.Get<AddressInfoProjection>();
                     var installationProjection = eventStore.Projections.Get<InstallationProjection>();
                     
                     // Find installations that has not yet been added to the utility network

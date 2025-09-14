@@ -463,7 +463,7 @@ namespace OpenFTTH.APIGateway.Conversion
                         // we only have one conduit (the outer)
                         var spanSegmentIdToTrace = conduit.SpanStructures[0].SpanSegments[0].Id;
 
-                        var traceBuilder = new SwissArmyKnifeTracer(_queryDispatcher, _utilityNetwork);
+                        var traceBuilder = new SwissArmyKnifeTracer(_queryDispatcher, _eventStore);
 
                         var traceInfo = traceBuilder.Trace(new List<SpanEquipment> { conduit }, spanSegmentIdToTrace);
 
@@ -490,7 +490,7 @@ namespace OpenFTTH.APIGateway.Conversion
                     {
                         var spanSegmentIdToTrace = conduit.SpanStructures[conduitRel.InnerConduitNumber].SpanSegments[0].Id;
 
-                        var traceBuilder = new SwissArmyKnifeTracer(_queryDispatcher, _utilityNetwork);
+                        var traceBuilder = new SwissArmyKnifeTracer(_queryDispatcher, _eventStore);
 
                         var traceInfo = traceBuilder.Trace(new List<SpanEquipment> { conduit }, spanSegmentIdToTrace);
 
@@ -517,7 +517,7 @@ namespace OpenFTTH.APIGateway.Conversion
                     {
                         var spanSegmentIdToTrace = conduit.SpanStructures[0].SpanSegments[0].Id;
 
-                        var traceBuilder = new SwissArmyKnifeTracer(_queryDispatcher, _utilityNetwork);
+                        var traceBuilder = new SwissArmyKnifeTracer(_queryDispatcher, _eventStore);
 
                         var traceInfo = traceBuilder.Trace(new List<SpanEquipment> { conduit }, spanSegmentIdToTrace);
 

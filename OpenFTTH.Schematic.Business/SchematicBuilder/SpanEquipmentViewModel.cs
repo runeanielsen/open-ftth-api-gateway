@@ -175,34 +175,48 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
 
         public string GetFromRouteNodeName(Guid conduitSpanSegmentId)
         {
+            if (_spanEquipment.IsCable)
+            {
+                if (_data.SpanEquipments[_spanEquipment.Id].UpstreamLabel != null)
+                    return _data.SpanEquipments[_spanEquipment.Id].UpstreamLabel;
+                else
+                    return _data.RouteNetworkElements[_spanEquipment.NodesOfInterestIds.First()].Name;
+            }
+
             var trace = GetTraceInfo(conduitSpanSegmentId);
-
-            return trace.FromRouteNodeName;
-
-            // TODO: Include when the installation and adresse model is available
-
-            // If node type i address, always return the the adresse 
-            if (trace.FromNodeNameType == NodeNameType.ADDRESS)
-                return trace.FromRouteNodeName;
 
             if (_data.ConduitSegmentToCableChildRelations.ContainsKey(conduitSpanSegmentId))
             {
-                var cables = _data.ConduitSegmentToCableChildRelations[conduitSpanSegmentId];
+                var cableEndLabel = GetCableEndLabel(conduitSpanSegmentId, trace, true);
 
-                if (cables.Count > 0)
-                {
-                    var cable = _data.SpanEquipments[cables.First()];
-                                  
-                    bool fromNodeInConduitSameAsCable = IsFromNodeInCableSameDirectionAsFromNodeInConduit(trace, cable);
-
-                    if (fromNodeInConduitSameAsCable)
-                        return _data.RouteNetworkElements[cable.NodesOfInterestIds.First()].Name;
-                    else
-                        return _data.RouteNetworkElements[cable.NodesOfInterestIds.Last()].Name;
-                }
+                if (cableEndLabel != null)
+                    return cableEndLabel;
             }
 
             return trace.FromRouteNodeName;
+        }
+
+        public string GetToRouteNodeName(Guid conduitSpanSegmentId)
+        {
+            var trace = GetTraceInfo(conduitSpanSegmentId);
+
+            if (_spanEquipment.IsCable)
+            {
+                if (_data.SpanEquipments[_spanEquipment.Id].DownstreamLabel != null)
+                    return _data.SpanEquipments[_spanEquipment.Id].DownstreamLabel;
+                else
+                    return _data.RouteNetworkElements[_spanEquipment.NodesOfInterestIds.Last()].Name;
+            }
+
+            if (_data.ConduitSegmentToCableChildRelations.ContainsKey(conduitSpanSegmentId))
+            {
+                var cableEndLabel = GetCableEndLabel(conduitSpanSegmentId, trace, false);
+
+                if (cableEndLabel != null)
+                    return cableEndLabel;
+            }
+
+            return trace.ToRouteNodeName;
         }
 
         private bool IsFromNodeInCableSameDirectionAsFromNodeInConduit(RouteNetworkTraceResult conduitTrace, SpanEquipmentWithRelatedInfo cable)
@@ -224,36 +238,33 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
             return fromNodeInConduitIsFromNodeInCable;
         }
 
-        public string GetToRouteNodeName(Guid conduitSpanSegmentId)
+        private string? GetCableEndLabel(Guid conduitSpanSegmentId, RouteNetworkTraceResult trace, bool upstream)
         {
-            var trace = GetTraceInfo(conduitSpanSegmentId);
+            var cables = _data.ConduitSegmentToCableChildRelations[conduitSpanSegmentId];
 
-            return trace.ToRouteNodeName;
-
-            // TODO: Include when the installation and adresse model is available
-
-            // If node type i address, always return the the adresse 
-            if (trace.FromNodeNameType == NodeNameType.ADDRESS)
-                return trace.FromRouteNodeName;
-
-            if (_data.ConduitSegmentToCableChildRelations.ContainsKey(conduitSpanSegmentId))
+            if (cables.Count > 0)
             {
-                var cables = _data.ConduitSegmentToCableChildRelations[conduitSpanSegmentId];
+                var cable = _data.SpanEquipments[cables.First()];
 
-                if (cables.Count > 0)
+                bool fromNodeInConduitSameAsCable = IsFromNodeInCableSameDirectionAsFromNodeInConduit(trace, cable);
+
+                if ((fromNodeInConduitSameAsCable && upstream) || (!fromNodeInConduitSameAsCable && !upstream))
                 {
-                    var cable = _data.SpanEquipments[cables.First()];
-
-                    bool fromNodeInConduitSameAsCable = IsFromNodeInCableSameDirectionAsFromNodeInConduit(trace, cable);
-
-                    if (fromNodeInConduitSameAsCable)
-                        return _data.RouteNetworkElements[cable.NodesOfInterestIds.Last()].Name;
+                    if (_data.SpanEquipments[cable.Id].UpstreamLabel != null)
+                        return _data.SpanEquipments[cable.Id].UpstreamLabel;
                     else
                         return _data.RouteNetworkElements[cable.NodesOfInterestIds.First()].Name;
                 }
+                else
+                {
+                    if (_data.SpanEquipments[cable.Id].DownstreamLabel != null)
+                        return _data.SpanEquipments[cable.Id].DownstreamLabel;
+                    else
+                        return _data.RouteNetworkElements[cable.NodesOfInterestIds.Last()].Name;
+                }
             }
 
-            return trace.ToRouteNodeName;
+            return null;
         }
 
         public string GetOutgoingLabel(Guid spanSegmentId)

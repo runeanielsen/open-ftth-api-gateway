@@ -47,6 +47,11 @@ namespace OpenFTTH.RouteNetwork.Business.RouteElements.Projection
             ProjectEventAsync<RouteNetworkEditOperationOccuredEvent>(ProjectAsync);
         }
 
+        public IRouteNetworkState NetworkState
+        {
+            get { return _networkState; }
+        }
+
         private Task ProjectAsync(IEventEnvelope eventEnvelope)
         {
             switch (eventEnvelope.Data)

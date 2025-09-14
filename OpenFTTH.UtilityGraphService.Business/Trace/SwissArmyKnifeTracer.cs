@@ -11,6 +11,14 @@ using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using OpenFTTH.EventSourcing;
+using OpenFTTH.RouteNetwork.Business.RouteElements.Projection;
+using OpenFTTH.Core.Address;
+using OpenFTTH.UtilityGraphService.Business.Graph.Projections;
+using OpenFTTH.UtilityGraphService.Business.TerminalEquipments.Projections;
+using OpenFTTH.UtilityGraphService.API.Commands;
+using OpenFTTH.RouteNetwork.Business.RouteElements.Model;
+using OpenFTTH.Events.RouteNetwork.Infos;
 
 namespace OpenFTTH.UtilityGraphService.Business.Trace
 {
@@ -20,12 +28,20 @@ namespace OpenFTTH.UtilityGraphService.Business.Trace
     public class SwissArmyKnifeTracer
     {
         private readonly IQueryDispatcher _queryDispatcher;
+        private readonly RouteNetworkProjection _routeNetwork;
         private readonly UtilityNetworkProjection _utilityNetwork;
+        private readonly TerminalEquipmentSpecificationsProjection _terminalEquipmentSpecifications;
+        private readonly AddressInfoProjection _addressInfo;
+        private readonly InstallationProjection _installationInfo;
 
-        public SwissArmyKnifeTracer(IQueryDispatcher queryDispatcher, UtilityNetworkProjection utilityNetwork)
+        public SwissArmyKnifeTracer(IQueryDispatcher queryDispatcher, IEventStore eventStore)
         {
             _queryDispatcher = queryDispatcher;
-            _utilityNetwork = utilityNetwork;
+            _utilityNetwork = eventStore.Projections.Get<UtilityNetworkProjection>();
+            _routeNetwork = eventStore.Projections.Get<RouteNetworkProjection>();
+            _addressInfo = eventStore.Projections.Get<AddressInfoProjection>();
+            _installationInfo = eventStore.Projections.Get<InstallationProjection>();
+            _terminalEquipmentSpecifications = eventStore.Projections.Get<TerminalEquipmentSpecificationsProjection>();
         }
 
         public SwissArmyKnifeTraceResult? Trace(List<SpanEquipment> spanEquipmentsToTrace, Guid? traceThisSpanSegmentIdOnly)
@@ -35,9 +51,15 @@ namespace OpenFTTH.UtilityGraphService.Business.Trace
 
             var intermidiateTraceResult = GatherNetworkGraphTraceInformation(spanEquipmentsToTrace, traceThisSpanSegmentIdOnly);
 
+            Dictionary<Guid, string> cableDownstreamLabels = new();
+            Dictionary<Guid, string> cableUpstreamLabels = new();
+
+            GatherCableEndInformation(spanEquipmentsToTrace, ref cableDownstreamLabels, ref cableUpstreamLabels, traceThisSpanSegmentIdOnly);
 
             if (intermidiateTraceResult.InterestList.Count > 0)
             {
+                List<RouteNetworkTraceResult> routeNetworkTraces = new();
+
                 var routeNetworkInformation = GatherRouteNetworkInformation(_queryDispatcher, intermidiateTraceResult.InterestList);
 
                 var addressInformation = GatherAddressInformation(intermidiateTraceResult);
@@ -48,7 +70,6 @@ namespace OpenFTTH.UtilityGraphService.Business.Trace
                 Dictionary<Guid, List<SpanSegmentRouteNetworkTraceRef>> traceIdRefBySpanEquipmentId = new();
 
 
-                List<RouteNetworkTraceResult> routeNetworkTraces = new();
 
                 Dictionary<Guid, UtilityNetworkTraceResult> utilityTraceBySpanSegmentId = new();
 
@@ -154,7 +175,7 @@ namespace OpenFTTH.UtilityGraphService.Business.Trace
                     }
                 }
 
-                return new SwissArmyKnifeTraceResult(routeNetworkTraces, traceIdRefBySpanEquipmentId, utilityTraceBySpanSegmentId);
+                return new SwissArmyKnifeTraceResult(routeNetworkTraces, traceIdRefBySpanEquipmentId, utilityTraceBySpanSegmentId, cableDownstreamLabels, cableUpstreamLabels);
             }
             else
                 return null;
@@ -318,7 +339,6 @@ namespace OpenFTTH.UtilityGraphService.Business.Trace
             return result;
         }
 
-
         private IntermidiateTraceResult GatherNetworkGraphTraceInformation(List<SpanEquipment> spanEquipmentsToTrace, Guid? traceThisSpanSegmentIdOnly)
         {
             IntermidiateTraceResult result = new();
@@ -467,6 +487,155 @@ namespace OpenFTTH.UtilityGraphService.Business.Trace
             }
 
             return result;
+        }
+
+        private void GatherCableEndInformation(List<SpanEquipment> spanEquipmentsToTrace, ref Dictionary<Guid, string> cableDownstreamLabels, ref Dictionary<Guid, string> cableUpstreamLabels,  Guid? traceThisSpanSegmentIdOnly)
+        {
+            if (traceThisSpanSegmentIdOnly != null)
+                return;
+
+            // Trace all fiber segments in all cables
+            foreach (var spanEquipment in spanEquipmentsToTrace.Where(s => s.IsCable))
+            {
+                var upstreamNode = (RouteNode)_routeNetwork.NetworkState.GetRouteNetworkElement(spanEquipment.NodesOfInterestIds.First());
+                var downstreamNode = (RouteNode)_routeNetwork.NetworkState.GetRouteNetworkElement(spanEquipment.NodesOfInterestIds.Last());
+
+                HashSet<RouteNodeKindEnum> dontTraceCablesConnectedToTheseNodeKinds = new HashSet<RouteNodeKindEnum>()
+                    {
+                        RouteNodeKindEnum.CentralOfficeBig,
+                        RouteNodeKindEnum.CentralOfficeMedium,
+                        RouteNodeKindEnum.CentralOfficeSmall,
+                        RouteNodeKindEnum.CabinetBig
+                    };
+
+                if (upstreamNode != null && upstreamNode.RouteNodeInfo != null && upstreamNode.RouteNodeInfo.Kind != null && dontTraceCablesConnectedToTheseNodeKinds.Contains((RouteNodeKindEnum)upstreamNode.RouteNodeInfo.Kind))
+                    return;
+
+                if (downstreamNode != null && downstreamNode.RouteNodeInfo != null && downstreamNode.RouteNodeInfo.Kind != null && dontTraceCablesConnectedToTheseNodeKinds.Contains((RouteNodeKindEnum)downstreamNode.RouteNodeInfo.Kind))
+                    return;
+
+                HashSet<TerminalEquipment> upstreamEquipmentsFound = [];
+                HashSet<TerminalEquipment> downstreamEquipmentsFound = [];
+
+                for (int i = 1; i < spanEquipment.SpanStructures.Count(); i++)
+                {
+                    var spanStructure = spanEquipment.SpanStructures[i];
+
+                    foreach (var spanSegment in spanStructure.SpanSegments)
+                    {
+                        var spanTraceResult = _utilityNetwork.Graph.SimpleTrace(spanSegment.Id);
+
+                        // We're dealing with a connected segment if non-empty trace result is returned
+                        if (spanTraceResult.Upstream.Length > 0)
+                        {
+                            var segmentWalk = new SegmentWalk(spanSegment.Id);
+
+                            bool downStreamCableNodeFound = false;
+
+                            for (int downstreamIndex = spanTraceResult.Downstream.Length - 1; downstreamIndex > 0; downstreamIndex--)
+                            {
+                                var item = spanTraceResult.Downstream[downstreamIndex];
+
+                                if (item is UtilityGraphConnectedTerminal connectedTerminal)
+                                {
+                                    var terminalEq = connectedTerminal.TerminalEquipment(_utilityNetwork);
+
+                                    if (connectedTerminal.RouteNodeId == downstreamNode.Id)
+                                        downStreamCableNodeFound = true;
+
+                                    if (downStreamCableNodeFound)
+                                        AddCustomerTermination(downstreamEquipmentsFound, terminalEq);
+                                    else
+                                        AddCustomerTermination(upstreamEquipmentsFound, terminalEq);
+                                }
+                            }
+
+                            for (int upstreamIndex = 0; upstreamIndex < spanTraceResult.Upstream.Length; upstreamIndex++)
+                            {
+                                var item = spanTraceResult.Upstream[upstreamIndex];
+
+                                if (item is UtilityGraphConnectedTerminal connectedTerminal)
+                                {
+                                    var terminalEq = connectedTerminal.TerminalEquipment(_utilityNetwork);
+
+                                    if (connectedTerminal.RouteNodeId == downstreamNode.Id)
+                                        downStreamCableNodeFound = true;
+
+                                    if (downStreamCableNodeFound)
+                                        AddCustomerTermination(downstreamEquipmentsFound, terminalEq);
+                                    else
+                                        AddCustomerTermination(upstreamEquipmentsFound, terminalEq);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (upstreamEquipmentsFound.Count == 1)
+                {
+                    var label = GetCableEndLabel(upstreamEquipmentsFound.First());
+
+                    if (label != null)
+                        cableUpstreamLabels.Add(spanEquipment.Id, label);
+                }
+
+                if (downstreamEquipmentsFound.Count == 1)
+                {
+                    var label = GetCableEndLabel(downstreamEquipmentsFound.First());
+
+                    if (label != null)
+                        cableDownstreamLabels.Add(spanEquipment.Id, label);
+                }
+
+            }
+        }
+
+        private string? GetCableEndLabel(TerminalEquipment terminalEquipment)
+        {
+            var installationInfo = _installationInfo.GetInstallationInfo(terminalEquipment.Name, _utilityNetwork);
+
+            if (installationInfo != null)
+            {
+                if (installationInfo.UnitAddressId != null)
+                {
+                    var addressInfo = _addressInfo.GetAddressInfo((Guid)installationInfo.UnitAddressId);
+
+                    var label = GetAddressLabel((Guid)installationInfo.UnitAddressId);
+
+                    if (installationInfo.Remark != null)
+                        label += (" " + installationInfo.Remark);
+
+                    label += (" (" + terminalEquipment.Name + ")");
+
+                    return label;
+                }
+            }
+
+            return null;
+        }
+
+        private string GetAddressLabel(Guid unitAddressId)
+        {
+            if (_addressInfo.UnitAddressesById.TryGetValue(unitAddressId, out var unitAddress))
+            {
+                if (_addressInfo.AccessAddressesById.TryGetValue(unitAddress.AccessAddressId, out var accessAddress))
+                {
+                    if (accessAddress.RoadId != null && _addressInfo.RoadsById.TryGetValue((Guid)accessAddress.RoadId, out var road))
+                    {
+                        return (road.Name + " " + accessAddress.HouseNumber + " " + unitAddress.FloorName + " " + unitAddress.SuitName).Trim();
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        private void AddCustomerTermination(HashSet<TerminalEquipment> customerTerminations, TerminalEquipment terminalEquipment)
+        {
+            var terminalEqSpec = _terminalEquipmentSpecifications.Specifications[terminalEquipment.SpecificationId];
+
+            if (terminalEqSpec.IsCustomerTermination)
+                customerTerminations.Add(terminalEquipment);
         }
 
         private static void AddWalkToResult(IntermidiateTraceResult result, SpanEquipment spanEquipment, SegmentWalk segmentWalk)
