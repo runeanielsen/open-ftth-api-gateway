@@ -536,7 +536,7 @@ namespace OpenFTTH.UtilityGraphService.Business.Trace
                             {
                                 var item = spanTraceResult.Downstream[downstreamIndex];
 
-                                if (item is UtilityGraphConnectedTerminal connectedTerminal)
+                                if (item is UtilityGraphConnectedTerminal connectedTerminal && !((UtilityGraphConnectedTerminal)item).IsDummyEnd)
                                 {
                                     var terminalEq = connectedTerminal.TerminalEquipment(_utilityNetwork);
 
@@ -554,7 +554,7 @@ namespace OpenFTTH.UtilityGraphService.Business.Trace
                             {
                                 var item = spanTraceResult.Upstream[upstreamIndex];
 
-                                if (item is UtilityGraphConnectedTerminal connectedTerminal)
+                                if (item is UtilityGraphConnectedTerminal connectedTerminal && !((UtilityGraphConnectedTerminal)item).IsDummyEnd)
                                 {
                                     var terminalEq = connectedTerminal.TerminalEquipment(_utilityNetwork);
 
