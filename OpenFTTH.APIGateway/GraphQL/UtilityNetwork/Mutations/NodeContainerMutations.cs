@@ -338,9 +338,9 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
 
                             var nodeContainerSpecifications = eventStore.Projections.Get<NodeContainerSpecificationsProjection>();
 
-                            if (terminalEquipmentSpecifications.Specifications.Any(s => s.Name == specName))
+                            if (nodeContainerSpecifications.Specifications.Any(s => s.Name == specName))
                             {
-                                Guid nodeContainerSpecificationId = terminalEquipmentSpecifications.Specifications.First(s => s.Name == specName).Id;
+                                Guid nodeContainerSpecificationId = nodeContainerSpecifications.Specifications.First(s => s.Name == specName).Id;
 
                                 // First register the walk in the route network where the client want to place the node container
                                 var nodeOfInterestId = Guid.NewGuid();
