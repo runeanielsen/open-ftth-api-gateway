@@ -509,10 +509,10 @@ namespace OpenFTTH.UtilityGraphService.Business.Trace
                     };
 
                 if (upstreamNode != null && upstreamNode.RouteNodeInfo != null && upstreamNode.RouteNodeInfo.Kind != null && dontTraceCablesConnectedToTheseNodeKinds.Contains((RouteNodeKindEnum)upstreamNode.RouteNodeInfo.Kind))
-                    return;
+                    continue;
 
                 if (downstreamNode != null && downstreamNode.RouteNodeInfo != null && downstreamNode.RouteNodeInfo.Kind != null && dontTraceCablesConnectedToTheseNodeKinds.Contains((RouteNodeKindEnum)downstreamNode.RouteNodeInfo.Kind))
-                    return;
+                    continue;
 
                 HashSet<TerminalEquipment> upstreamEquipmentsFound = [];
                 HashSet<TerminalEquipment> downstreamEquipmentsFound = [];
