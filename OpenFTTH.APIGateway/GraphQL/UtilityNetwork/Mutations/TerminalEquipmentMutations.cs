@@ -223,6 +223,51 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                     return new CommandResult(addStructureResult);
                 });
 
+            Field<CommandResultType>("addAdditionalStructure")
+               .Description("Add additional terminal structure to terminal equipment - i.e. trays, cards etc.")
+               .Arguments(new QueryArguments(
+                   new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "routeNodeId" },
+                   new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "terminalEquipmentId" },
+                   new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "structureSpecificationId" },
+                   new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "name" },
+                   new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "position" }
+               ))
+               .ResolveAsync(async context =>
+               {
+                   var routeNodeId = context.GetArgument<Guid>("routeNodeId");
+                   var terminalEquipmentId = context.GetArgument<Guid>("terminalEquipmentId");
+                   var structureSpecificationId = context.GetArgument<Guid>("structureSpecificationId");
+                   var name = context.GetArgument<string>("name");
+                   var position = context.GetArgument<int>("position");
+
+                   var correlationId = Guid.NewGuid();
+
+                   var userContext = context.UserContext as GraphQLUserContext;
+                   var userName = userContext.Username;
+
+                   // Get the users current work task (will fail, if user has not selected a work task)
+                   var currentWorkTaskIdResult = WorkQueryHelper.GetUserCurrentWorkId(userName, queryDispatcher);
+
+                   if (currentWorkTaskIdResult.IsFailed)
+                       return new CommandResult(currentWorkTaskIdResult);
+
+                   var commandUserContext = new UserContext(userName, currentWorkTaskIdResult.Value);
+
+                   var addStructure = new PlaceAdditionalStructureInTerminalEquipment(
+                       correlationId: correlationId,
+                       userContext: commandUserContext,
+                       routeNodeId: routeNodeId,
+                       terminalEquipmentId: terminalEquipmentId,
+                       structureSpecificationId: structureSpecificationId,
+                       name: name,
+                       position: position
+                   );
+
+                   var addStructureResult = await commandDispatcher.HandleAsync<PlaceAdditionalStructureInTerminalEquipment, Result>(addStructure);
+
+                   return new CommandResult(addStructureResult);
+               });
+
             Field<CommandResultType>("addInterface")
                 .Description("Add interface to optical line terminal equipment")
                 .Arguments(new QueryArguments(

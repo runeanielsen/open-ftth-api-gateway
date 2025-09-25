@@ -166,6 +166,25 @@ namespace OpenFTTH.UtilityGraphService.Business.TerminalEquipments
             return Result.Ok();
         }
 
+        public Result AddAdditionalStructure(CommandContext cmdContext, TerminalStructureSpecification terminalStructureSpecification, int startPosition, string name)
+        {
+            List<TerminalStructure> additionalStructures = new();
+         
+            additionalStructures.Add(CreateTerminalStructureFromSpecification(terminalStructureSpecification, startPosition, name));
+         
+            var terminalEquipmentAdditionalStructuresAddedEvent = new AdditionalStructuresAddedToTerminalEquipment(this.Id, additionalStructures.ToArray())
+            {
+                CorrelationId = cmdContext.CorrelationId,
+                IncitingCmdId = cmdContext.CmdId,
+                UserName = cmdContext.UserContext?.UserName,
+                WorkTaskId = cmdContext.UserContext?.WorkTaskId
+            };
+
+            RaiseEvent(terminalEquipmentAdditionalStructuresAddedEvent);
+
+            return Result.Ok();
+        }
+
         public Result AddInterface(CommandContext cmdContext, TerminalStructureSpecification terminalStructureSpecification, InterfaceInfo interfaceInfo)
         {
             if (_terminalEquipment == null)
