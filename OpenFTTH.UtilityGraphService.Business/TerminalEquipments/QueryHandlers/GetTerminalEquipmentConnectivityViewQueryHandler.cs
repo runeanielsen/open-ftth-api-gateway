@@ -192,7 +192,8 @@ namespace OpenFTTH.UtilityGraphService.Business.TerminalEquipments.QueryHandling
                        name: equipmentData.GetFullEquipmentString(query.routeNodeId, terminalEquipment, true, true),
                        specName: terminalEquipmentSpecification.Name,
                        terminalStructures: terminalStructureInfos.ToArray(),
-                       isLineTermination: terminalEquipmentSpecification.IsLineTermination
+                       isLineTermination: terminalEquipmentSpecification.IsLineTermination,
+                       terminalStructuresIsNameable: terminalEquipmentSpecification.TerminalStructuresIsNameable
                    )
                 {
                     ParentNodeStructureId = parentStructureId

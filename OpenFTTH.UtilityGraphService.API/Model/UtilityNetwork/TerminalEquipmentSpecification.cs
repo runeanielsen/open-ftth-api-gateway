@@ -21,6 +21,10 @@ namespace OpenFTTH.UtilityGraphService.API.Model.UtilityNetwork
         public bool IsLineTermination { get; init; }
         public bool IsCustomerSplitter { get; init; }
 
+        /// <summary>
+        /// Set to true if cards/trays should be individually nameable by the user when inserted into the terminal equipment
+        /// </summary>
+        public bool TerminalStructuresIsNameable { get; init; }
 
         public TerminalEquipmentSpecification(Guid id, string category, string name, string shortName, bool isRackEquipment, int heightInRackUnits, TerminalStructureTemplate[] structureTemplates)
         {

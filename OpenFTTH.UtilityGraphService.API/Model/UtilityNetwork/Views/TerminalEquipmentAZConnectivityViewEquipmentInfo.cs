@@ -13,12 +13,12 @@ namespace OpenFTTH.UtilityGraphService.API.Model.UtilityNetwork.Views
         public string Name { get; init; }
         public string SpecName { get; init; }
         public string? Info { get; init; }
-
         public bool IsLineTermination { get; init; }
+        public bool TerminalStructuresIsNameable { get; init; }
 
         public TerminalEquipmentAZConnectivityViewTerminalStructureInfo[] TerminalStructures { get; init; }
 
-        public TerminalEquipmentAZConnectivityViewEquipmentInfo(Guid id, string category, string name, string specName, TerminalEquipmentAZConnectivityViewTerminalStructureInfo[] terminalStructures, bool isLineTermination)
+        public TerminalEquipmentAZConnectivityViewEquipmentInfo(Guid id, string category, string name, string specName, TerminalEquipmentAZConnectivityViewTerminalStructureInfo[] terminalStructures, bool isLineTermination, bool terminalStructuresIsNameable)
         {
             Id = id;
             Category = category;
@@ -26,6 +26,7 @@ namespace OpenFTTH.UtilityGraphService.API.Model.UtilityNetwork.Views
             SpecName = specName;
             TerminalStructures = terminalStructures;
             IsLineTermination = isLineTermination;
+            TerminalStructuresIsNameable = terminalStructuresIsNameable;
         }
     }
 }
