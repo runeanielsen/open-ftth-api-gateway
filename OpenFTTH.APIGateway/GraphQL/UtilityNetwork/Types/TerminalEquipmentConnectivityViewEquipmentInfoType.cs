@@ -16,6 +16,7 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Types
             Field(x => x.SpecName, type: typeof(StringGraphType)).Description("Specification name");
             Field(x => x.TerminalStructures, type: typeof(ListGraphType<TerminalEquipmentConnectivityViewTerminalStructureInfoType>)).Description("The terminal structures(s) - i.e. cards, trays etc.");
             Field(x => x.IsLineTermination, type: typeof(BooleanGraphType)).Description("Whether equipment is a line termination (OLT)");
+            Field(x => x.TerminalStructuresIsNameable, type: typeof(BooleanGraphType)).Description("Whether the terminal structures (cards, trays etc) contained by the equipment are nameable");
         }
     }
 }
