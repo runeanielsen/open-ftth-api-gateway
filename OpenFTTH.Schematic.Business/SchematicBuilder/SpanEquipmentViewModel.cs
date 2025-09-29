@@ -227,12 +227,17 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
 
             foreach (var cableRouteNetworkElement in cableInterest.RouteNetworkElementRefs)
             {
+                // If we hit from node first, then we're sure that we are same direction as conduit
                 if (cableRouteNetworkElement == conduitTrace.FromRouteNodeId)
-                    fromNodeInConduitIsFromNodeInCable = true;
+                {
+                    return true;
+                }
 
-                // Break when we meet route segment the view is viewing
-                if (cableRouteNetworkElement == _data.RouteNetworkElementId)
-                    break;
+                // If we hit to node first, then we're sure that we are opposite direction as conduit
+                if (cableRouteNetworkElement == conduitTrace.ToRouteNodeId)
+                {
+                    return false;
+                }
             }
 
             return fromNodeInConduitIsFromNodeInCable;

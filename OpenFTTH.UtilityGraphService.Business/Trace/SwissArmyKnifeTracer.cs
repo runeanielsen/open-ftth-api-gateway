@@ -497,6 +497,13 @@ namespace OpenFTTH.UtilityGraphService.Business.Trace
             // Trace all fiber segments in all cables
             foreach (var spanEquipment in spanEquipmentsToTrace.Where(s => s.IsCable))
             {
+
+                // TODO: slet
+                if (spanEquipment.Name == "K1398160")
+                {
+
+                }
+
                 var upstreamNode = (RouteNode)_routeNetwork.NetworkState.GetRouteNetworkElement(spanEquipment.NodesOfInterestIds.First());
                 var downstreamNode = (RouteNode)_routeNetwork.NetworkState.GetRouteNetworkElement(spanEquipment.NodesOfInterestIds.Last());
 
