@@ -480,11 +480,34 @@ namespace OpenFTTH.UtilityGraphService.Business.TerminalEquipments
         #endregion
 
         #region Update Tags
-        public Result UpdateTags(CommandContext cmdContext, EquipmentTag[] tags)
+        public Result UpdateTags(CommandContext cmdContext, EquipmentTag[] updatedTags)
         {
+            if (_terminalEquipment == null)
+                throw new ApplicationException($"Invalid internal state. Terminal equipment property cannot be null. Seems that terminal equipment has never been placed. Please check command handler logic.");
+
+            List<EquipmentTag> newTagList = new List<EquipmentTag>();
+
+            // Add existing tags that is not included in updatedTags
+            if (_terminalEquipment.EquipmentTags != null)
+            {
+                foreach (var existingTag in _terminalEquipment.EquipmentTags)
+                {
+                    if (!updatedTags.Any(t => t.TerminalOrSpanId == existingTag.TerminalOrSpanId))
+                    {
+                        newTagList.Add(existingTag);
+                    }
+                }
+            }
+
+            // Add updated tags
+            foreach (var updatedTag in updatedTags)
+            {
+                newTagList.Add(updatedTag);
+            }
+
             var @event = new TagsUpdated(
                    terminalOrSpanEquipmentId: this.Id,
-                   tags: tags
+                   tags: newTagList.ToArray()
                  )
             {
                 CorrelationId = cmdContext.CorrelationId,

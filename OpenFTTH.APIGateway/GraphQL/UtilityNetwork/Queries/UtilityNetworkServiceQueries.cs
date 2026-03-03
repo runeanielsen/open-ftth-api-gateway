@@ -558,15 +558,15 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Queries
               .Resolve(context =>
               {
                   var terminalOrSpanEquipmentIds = context.GetArgument<List<Guid>>("terminalOrSpanEquipmentIds");
-                  return terminalOrSpanEquipmentIds.SelectMany(terminalOrSpanEquipmentId => CreateDisplayTags(eventStore, terminalOrSpanEquipmentId)).ToArray();
+                  return CreateDisplayTags(eventStore, terminalOrSpanEquipmentIds).ToArray();
               });
         }
 
-        private static EquipmentDisplayTag[] CreateDisplayTags(IEventStore eventStore, Guid terminalOrSpanEquipmentId)
+        private static EquipmentDisplayTag[] CreateDisplayTags(IEventStore eventStore, List<Guid> terminalOrSpanEquipmentIds)
         {
             var utilityNetwork = eventStore.Projections.Get<UtilityNetworkProjection>();
 
-            if (utilityNetwork.TryGetEquipment<TerminalEquipment>(terminalOrSpanEquipmentId, out var terminalEquipment))
+            if (terminalOrSpanEquipmentIds.Count > 0 && utilityNetwork.TryGetEquipment<TerminalEquipment>(terminalOrSpanEquipmentIds[0], out var terminalEquipment))
             {
                 Dictionary<Guid, EquipmentTag> tagByTerminalIdDict = terminalEquipment.EquipmentTags == null ? [] : terminalEquipment.EquipmentTags.ToDictionary(tag => tag.TerminalOrSpanId);
 
@@ -578,23 +578,26 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Queries
                     {
                         foreach (var terminal in structure.Terminals)
                         {
-                            var equipmentTag = !tagByTerminalIdDict.TryGetValue(terminal.Id, out EquipmentTag value) ? null : value;
+                            if (terminalOrSpanEquipmentIds.Contains(terminal.Id))
+                            {
+                                var equipmentTag = !tagByTerminalIdDict.TryGetValue(terminal.Id, out EquipmentTag value) ? null : value;
 
-                            var displayName = "Kassette/bakke " + structure.Name + " Søm/Port " + terminal.Name;
+                                var displayName = "Kassette/bakke " + structure.Name + " Søm/Port " + terminal.Name;
 
-                            if (equipmentTag != null)
-                                displayTags.Add(new EquipmentDisplayTag(terminal.Id, displayName, equipmentTag.Tags, equipmentTag.Comment));
-                            else
-                                displayTags.Add(new EquipmentDisplayTag(terminal.Id, displayName, null, null));
+                                if (equipmentTag != null)
+                                    displayTags.Add(new EquipmentDisplayTag(terminal.Id, displayName, equipmentTag.Tags, equipmentTag.Comment));
+                                else
+                                    displayTags.Add(new EquipmentDisplayTag(terminal.Id, displayName, null, null));
+                            }
                         }
                     }
                 }
 
                 return displayTags.ToArray();
             }
-            else if (utilityNetwork.TryGetEquipment<SpanEquipment>(terminalOrSpanEquipmentId, out var spanEquipment))
+            else if (terminalOrSpanEquipmentIds.Count > 0 && utilityNetwork.TryGetEquipment<SpanEquipment>(terminalOrSpanEquipmentIds[0], out var spanEquipment))
             {
-                Dictionary<Guid, EquipmentTag> tagByTerminalIdDict = spanEquipment.EquipmentTags == null ? [] : terminalEquipment.EquipmentTags.ToDictionary(tag => tag.TerminalOrSpanId);
+                Dictionary<Guid, EquipmentTag> tagByTerminalIdDict = spanEquipment.EquipmentTags == null ? [] : spanEquipment.EquipmentTags.ToDictionary(tag => tag.TerminalOrSpanId);
 
                 List<EquipmentDisplayTag> displayTags = new();
 
@@ -602,14 +605,20 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Queries
                 {
                     if (!structure.Deleted)
                     {
-                        var equipmentTag = !tagByTerminalIdDict.TryGetValue(structure.Id, out EquipmentTag value) ? null : value;
+                        foreach (var spanSegment in structure.SpanSegments)
+                        {
+                            if (terminalOrSpanEquipmentIds.Contains(spanSegment.Id))
+                            {
+                                var equipmentTag = !tagByTerminalIdDict.TryGetValue(spanSegment.Id, out EquipmentTag value) ? null : value;
 
-                        var displayName = "Rør/fiber " + structure.Name;
+                                var displayName = "Rør/fiber " + structure.Name;
 
-                        if (equipmentTag != null)
-                            displayTags.Add(new EquipmentDisplayTag(structure.Id, displayName, equipmentTag.Tags, equipmentTag.Comment));
-                        else
-                            displayTags.Add(new EquipmentDisplayTag(structure.Id, displayName, null, null));
+                                if (equipmentTag != null)
+                                    displayTags.Add(new EquipmentDisplayTag(spanSegment.Id, displayName, equipmentTag.Tags, equipmentTag.Comment));
+                                else
+                                    displayTags.Add(new EquipmentDisplayTag(spanSegment.Id, displayName, null, null));
+                            }
+                        }
                     }
                 }
 
