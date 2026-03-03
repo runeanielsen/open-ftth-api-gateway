@@ -554,19 +554,26 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Queries
 
             Field<ListGraphType<EquipmentDisplayTagType>>("tags")
               .Description("Query all tags belonging to a set of terminals or span equipments.")
-              .Arguments(new QueryArguments(new QueryArgument<NonNullGraphType<ListGraphType<IdGraphType>>> { Name = "terminalOrSpanEquipmentIds" }))
+              .Arguments(
+                new QueryArguments(
+                    new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "equipmentId" },
+                    new QueryArgument<NonNullGraphType<ListGraphType<IdGraphType>>> { Name = "terminalOrSpanSegmentIds" })
+                )
               .Resolve(context =>
               {
-                  var terminalOrSpanEquipmentIds = context.GetArgument<List<Guid>>("terminalOrSpanEquipmentIds");
-                  return CreateDisplayTags(eventStore, terminalOrSpanEquipmentIds).ToArray();
+                  var equipmentId = context.GetArgument<Guid>("equipmentId");
+
+                  var terminalOrSpanSegmentIds = context.GetArgument<List<Guid>>("terminalOrSpanSegmentIds");
+
+                  return CreateDisplayTags(eventStore, equipmentId, terminalOrSpanSegmentIds).ToArray();
               });
         }
 
-        private static EquipmentDisplayTag[] CreateDisplayTags(IEventStore eventStore, List<Guid> terminalOrSpanEquipmentIds)
+        private static EquipmentDisplayTag[] CreateDisplayTags(IEventStore eventStore, Guid equipmentId, List<Guid> terminalOrSpanEquipmentIds)
         {
             var utilityNetwork = eventStore.Projections.Get<UtilityNetworkProjection>();
 
-            if (terminalOrSpanEquipmentIds.Count > 0 && utilityNetwork.TryGetEquipment<TerminalEquipment>(terminalOrSpanEquipmentIds[0], out var terminalEquipment))
+            if (terminalOrSpanEquipmentIds.Count > 0 && utilityNetwork.TryGetEquipment<TerminalEquipment>(equipmentId, out var terminalEquipment))
             {
                 Dictionary<Guid, EquipmentTag> tagByTerminalIdDict = terminalEquipment.EquipmentTags == null ? [] : terminalEquipment.EquipmentTags.ToDictionary(tag => tag.TerminalOrSpanId);
 
@@ -595,7 +602,7 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Queries
 
                 return displayTags.ToArray();
             }
-            else if (terminalOrSpanEquipmentIds.Count > 0 && utilityNetwork.TryGetEquipment<SpanEquipment>(terminalOrSpanEquipmentIds[0], out var spanEquipment))
+            else if (terminalOrSpanEquipmentIds.Count > 0 && utilityNetwork.TryGetEquipment<SpanEquipment>(equipmentId, out var spanEquipment))
             {
                 Dictionary<Guid, EquipmentTag> tagByTerminalIdDict = spanEquipment.EquipmentTags == null ? [] : spanEquipment.EquipmentTags.ToDictionary(tag => tag.TerminalOrSpanId);
 
