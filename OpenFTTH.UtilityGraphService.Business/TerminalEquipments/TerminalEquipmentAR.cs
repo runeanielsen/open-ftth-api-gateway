@@ -502,7 +502,10 @@ namespace OpenFTTH.UtilityGraphService.Business.TerminalEquipments
             // Add updated tags
             foreach (var updatedTag in updatedTags)
             {
-                newTagList.Add(updatedTag);
+                if (updatedTag.Tags == null && String.IsNullOrEmpty(updatedTag.Comment))
+                {
+                    newTagList.Add(updatedTag);
+                }
             }
 
             var @event = new TagsUpdated(
