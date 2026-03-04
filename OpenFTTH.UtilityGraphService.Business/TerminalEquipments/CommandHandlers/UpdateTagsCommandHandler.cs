@@ -36,7 +36,7 @@ namespace OpenFTTH.UtilityGraphService.Business.TerminalEquipments.CommandHandle
             var utilityNetwork = _eventStore.Projections.Get<UtilityNetworkProjection>();
 
             // Because the client is allowed to provide either a span equipment or segment id, we need look it up via the utility network graph
-            if (!utilityNetwork.TryGetEquipment<TerminalEquipment>(command.TerminalOrSpanEquipmentId, out TerminalEquipment terminalEquipment))
+            if (utilityNetwork.TryGetEquipment<TerminalEquipment>(command.TerminalOrSpanEquipmentId, out var terminalEquipment))
             {
                 if (!utilityNetwork.TryGetEquipment<NodeContainer>(terminalEquipment.NodeContainerId, out NodeContainer nodeContainer))
                     return Task.FromResult(Result.Fail(new UpdateEquipmentPropertiesError(UpdateEquipmentPropertiesErrorCodes.NODE_CONTAINER_NOT_FOUND, $"Cannot find any node container with id: {terminalEquipment.NodeContainerId}")));
