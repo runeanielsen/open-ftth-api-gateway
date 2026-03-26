@@ -9,9 +9,12 @@ namespace OpenFTTH.UtilityGraphService.Business.Trace
 
         public List<SegmentWalkHop> Hops = new();
 
-        public SegmentWalk(Guid spanEquipmentOrSegmentId)
+        public string[]? Tags;
+
+        public SegmentWalk(Guid spanEquipmentOrSegmentId, string[]? tags)
         {
             SpanEquipmentOrSegmentId = spanEquipmentOrSegmentId;
+            Tags = tags;
         }
     }
 }

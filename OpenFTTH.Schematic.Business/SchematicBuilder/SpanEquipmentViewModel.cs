@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using DAX.ObjectVersioning.Graph.Traversal;
+using Microsoft.Extensions.Logging;
 using OpenFTTH.RouteNetwork.API.Model;
 using OpenFTTH.Schematic.Business.Lines;
 using OpenFTTH.Schematic.Business.QueryHandler;
@@ -26,8 +27,8 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
         private readonly RouteNetworkInterestRelationKindEnum _relationKind;
 
         private readonly Dictionary<Guid, RouteNetworkTraceResult> _traceByBySpanId = new();
-
-        public SpanEquipment SpanEquipment => _spanEquipment;
+              
+        public SpanEquipmentWithRelatedInfo SpanEquipment => _spanEquipment;
 
         public Guid RouteNetworkElementIdOfInterest => _data.RouteNetworkElementId;
 
@@ -49,6 +50,7 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
             foreach (var traceRef in _spanEquipment.RouteNetworkTraceRefs)
             {
                 var trace = _data.RouteNetworkTraces[traceRef.TraceId];
+
                 _traceByBySpanId.Add(traceRef.SpanEquipmentOrSegmentId, trace);
             }
         }
@@ -200,6 +202,7 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
 
             return trace.FromRouteNodeName;
         }
+       
 
         public string GetToRouteNodeName(Guid conduitSpanSegmentId, Guid? cableId)
         {

@@ -40,6 +40,7 @@ namespace OpenFTTH.Schematic.Tests.NodeSchematic
         {
             var sutRouteNetworkElement = TestRouteNetwork.CC_1;
 
+
             // Act
             var getDiagramQueryResult = await _queryDispatcher.HandleAsync<GetDiagram, Result<GetDiagramResult>>(new GetDiagram(sutRouteNetworkElement));
 

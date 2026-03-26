@@ -16,6 +16,8 @@ namespace OpenFTTH.Schematic.Business.Lines
         public string PolygonLabel { get; set; }
         public int DrawingOrder { get; set; }
 
+        public List<KeyValuePair<string,string>> Properties { get; set; }
+
         public BlockPortTerminal(BlockPort port)
         {
             this.Port = port;
@@ -104,7 +106,8 @@ namespace OpenFTTH.Schematic.Business.Lines
                             Label = PolygonLabel,
                             Geometry = GeometryBuilder.Rectangle(terminalOffsetX, terminalOffsetY, rectHeight, rectWidth),
                             IdentifiedObject = _refClass != null ? new IdentifiedObjectReference() { RefId = _refId, RefClass = _refClass } : null,
-                            DrawingOrder = DrawingOrder
+                            DrawingOrder = DrawingOrder,
+                            Properties = Properties
                         }
                     );
                 }
@@ -119,7 +122,8 @@ namespace OpenFTTH.Schematic.Business.Lines
                             Label = PointLabel,
                             Geometry = GeometryBuilder.Point(ConnectionPointX, ConnectionPointY),
                             IdentifiedObject = _refClass != null ? new IdentifiedObjectReference() { RefId = _refId, RefClass = _refClass } : null,
-                            DrawingOrder = DrawingOrder
+                            DrawingOrder = DrawingOrder,
+                            Properties = Properties
                         }
                     );
                 }

@@ -10,23 +10,25 @@ namespace OpenFTTH.UtilityGraphService.API.Model.Trace
         public Guid? FromTerminalId { get; }
         public Guid? ToTerminalId { get; }
         public Guid[] SpanSegmentIds { get; }
+        public string[]? Tags { get; }
         public string? FromLabel { get; set; }
         public string? ToLabel { get; set; }
 
         public string? Name => null;
         public string? Description => null;
 
-        public UtilityNetworkTraceResult(Guid spanSegmentId, Guid? fromTerminalId, Guid? toTerminalId, Guid[] spanSegmentIds)
+        public UtilityNetworkTraceResult(Guid spanSegmentId, Guid? fromTerminalId, Guid? toTerminalId, Guid[] spanSegmentIds, string[]? tags)
         {
             Id = spanSegmentId;
             FromTerminalId = fromTerminalId;
             ToTerminalId = toTerminalId;
             SpanSegmentIds = spanSegmentIds;
+            Tags = tags;
         }
 
         public UtilityNetworkTraceResult Reverse()
         {
-            return new UtilityNetworkTraceResult(Id, ToTerminalId, FromTerminalId, SpanSegmentIds.Reverse().ToArray());
+            return new UtilityNetworkTraceResult(Id, ToTerminalId, FromTerminalId, SpanSegmentIds.Reverse().ToArray(), Tags);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Baseline;
+using Microsoft.Extensions.Logging;
 using OpenFTTH.Core.Address;
 using OpenFTTH.RouteNetwork.API.Model;
 using OpenFTTH.Schematic.API.Model.DiagramLayout;
@@ -9,6 +10,7 @@ using OpenFTTH.Schematic.Business.QueryHandler;
 using OpenFTTH.UtilityGraphService.Business.TerminalEquipments.Events;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace OpenFTTH.Schematic.Business.SchematicBuilder
@@ -133,10 +135,12 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
                     ShapeType = TerminalShapeTypeEnum.Point,
                     PointStyle = "WestTerminalLabel",
                     PointLabel = _spanEquipmentViewModel.GetFromRouteNodeName(spanInfo.SegmentId, null),
-                    DrawingOrder = 520
+                    DrawingOrder = 520,
+                    Properties = GetTagsPropertiesFromSpanInfo(spanInfo.SpanSegment.Id)
                 };
 
                 fromTerminal.SetReference(spanInfo.IngoingSegmentId, "SpanSegment");
+                                
 
                 var toTerminal = new BlockPortTerminal(toPort)
                 {
@@ -144,7 +148,8 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
                     ShapeType = TerminalShapeTypeEnum.Point,
                     PointStyle = "EastTerminalLabel",
                     PointLabel = _spanEquipmentViewModel.GetToRouteNodeName(spanInfo.SegmentId, null),
-                    DrawingOrder = 520
+                    DrawingOrder = 520,                    
+                    Properties = GetTagsPropertiesFromSpanInfo(spanInfo.SpanSegment.Id)
                 };
 
                 toTerminal.SetReference(spanInfo.OutgoingSegmentId, "SpanSegment");
@@ -180,7 +185,8 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
                         ShapeType = TerminalShapeTypeEnum.Point,
                         PointStyle = "WestTerminalLabel",
                         PointLabel = _spanEquipmentViewModel.GetFromRouteNodeName(rootSpanInfo.SegmentId, null),
-                        DrawingOrder = 520
+                        DrawingOrder = 520,
+                        Properties = GetTagsPropertiesFromSpanInfo(rootSpanInfo.SegmentId)
                     };
 
                     fromTerminal.SetReference(rootSpanInfo.IngoingSegmentId, "SpanSegment");
@@ -191,7 +197,8 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
                         ShapeType = TerminalShapeTypeEnum.Point,
                         PointStyle = "EastTerminalLabel",
                         PointLabel = _spanEquipmentViewModel.GetToRouteNodeName(rootSpanInfo.SegmentId, null),
-                        DrawingOrder = 520
+                        DrawingOrder = 520,
+                        Properties = GetTagsPropertiesFromSpanInfo(rootSpanInfo.SegmentId)
                     };
 
                     toTerminal.SetReference(rootSpanInfo.OutgoingSegmentId, "SpanSegment");
@@ -280,6 +287,22 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
             }
 
             return spanEquipmentBlock;
+        }
+
+        private List<KeyValuePair<string, string>>? GetTagsPropertiesFromSpanInfo(Guid spanSegmentId)
+        {
+            if (_spanEquipmentViewModel.SpanEquipment.TagsByBySpanSegmentId.ContainsKey(spanSegmentId))
+            {
+                var tags = _spanEquipmentViewModel.SpanEquipment.TagsByBySpanSegmentId[spanSegmentId];
+
+                List<KeyValuePair<string, string>> properties = new List<KeyValuePair<string, string>>();
+
+                properties.Add(new KeyValuePair<string, string>("Tags", String.Join(',', tags)));
+
+                return properties;
+            }
+
+            return null;
         }
 
         private LineBlock CreateConduitEndBlock()

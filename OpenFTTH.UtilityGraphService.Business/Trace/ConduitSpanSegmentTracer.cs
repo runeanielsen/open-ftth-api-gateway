@@ -11,6 +11,7 @@ using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using OpenFTTH.UtilityGraphService.Business.Graph.Trace;
 
 namespace OpenFTTH.UtilityGraphService.Business.Trace
 {
@@ -58,7 +59,8 @@ namespace OpenFTTH.UtilityGraphService.Business.Trace
                         spanSegmentId: intermidiateTraceResult.SegmentWalk.SpanEquipmentOrSegmentId,
                         fromTerminalId: null,
                         toTerminalId: null,
-                        spanSegmentIds: spanSegmentIds.ToArray()
+                        spanSegmentIds: spanSegmentIds.ToArray(),
+                        tags: intermidiateTraceResult.SegmentWalk.Tags
                   );
 
                 return new ConduitSpanSegmentTracerResult(walk, utilityNetworkTrace);
@@ -153,10 +155,12 @@ namespace OpenFTTH.UtilityGraphService.Business.Trace
 
             var spanTraceResult = _utilityNetwork.Graph.SimpleTrace(spanSegmentIdToTrace);
 
+            string[]? tags = ExtractTagsFromTrace(_utilityNetwork, spanTraceResult); 
+
             // We're dealing with a connected segment if non-empty trace result is returned
             if (spanTraceResult.Upstream.Length > 0)
             {
-                var segmentWalk = new SegmentWalk(spanSegmentIdToTrace);
+                var segmentWalk = new SegmentWalk(spanSegmentIdToTrace, tags);
 
                 for (int downstreamIndex = spanTraceResult.Downstream.Length - 1; downstreamIndex > 0; downstreamIndex--)
                 {
@@ -234,7 +238,7 @@ namespace OpenFTTH.UtilityGraphService.Business.Trace
                         addressInfo: spanEquipment.AddressInfo
                     );
 
-                    var segmentWalk = new SegmentWalk(spanSegmentIdToTrace);
+                    var segmentWalk = new SegmentWalk(spanSegmentIdToTrace, tags);
 
                     segmentWalk.Hops.Add(segmentHop);
                     result.SegmentWalk = segmentWalk;
@@ -244,6 +248,66 @@ namespace OpenFTTH.UtilityGraphService.Business.Trace
             }
 
             return result;
+        }
+
+        public static string[]? ExtractTagsFromTrace(UtilityNetworkProjection utilityNetwork, UtilityGraphTraceResult spanTraceResult)
+        {
+            HashSet<string> tags = new HashSet<string>();
+
+            foreach (var segment in spanTraceResult.All)
+            {
+                if (segment is IUtilityGraphSegmentRef traceSegmentRef)
+                {
+                    var spanEquipmentSegmentTags = traceSegmentRef.SpanEquipment(utilityNetwork).EquipmentTags;
+
+                    if (spanEquipmentSegmentTags != null)
+                    {
+                        foreach (var spanEquipmentSegmentTag in spanEquipmentSegmentTags)
+                        {
+                            if (spanEquipmentSegmentTag.TerminalOrSpanId == segment.Id && spanEquipmentSegmentTag.Tags != null)
+                            {
+                                foreach (var spanSegmentTag in spanEquipmentSegmentTag.Tags)
+                                {
+                                    if (!tags.Contains(spanSegmentTag))
+                                        tags.Add(spanSegmentTag);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (tags.Count == 0)
+                return null;
+            else
+                return tags.ToArray();
+        }
+
+        public static string[]? ExtractTagsFromSpanEquipment(SpanEquipment spanEquipment)
+        {
+            HashSet<string> tags = new HashSet<string>();
+
+            var spanEquipmentSegmentTags = spanEquipment.EquipmentTags;
+
+            if (spanEquipmentSegmentTags != null)
+            {
+                foreach (var spanEquipmentSegmentTag in spanEquipmentSegmentTags)
+                {
+                    if (spanEquipmentSegmentTag.Tags != null)
+                    {
+                        foreach (var spanSegmentTag in spanEquipmentSegmentTag.Tags)
+                        {
+                            if (!tags.Contains(spanSegmentTag))
+                                tags.Add(spanSegmentTag);
+                        }
+                    }
+                }
+            }
+
+            if (tags.Count == 0)
+                return null;
+            else
+                return tags.ToArray();
         }
 
         private Guid AddWalkOfInterestToResult(IntermidiateTraceResult result, IUtilityGraphSegmentRef segment)

@@ -161,7 +161,7 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments.QueryHandlers
                 SpanEquipment = new LookupCollection<SpanEquipmentWithRelatedInfo>(spanEquipmentsToReturn),
                 TerminalEquipment = new LookupCollection<TerminalEquipment>(terminalEquipmentsToReturn),
                 NodeContainers = new LookupCollection<NodeContainer>(nodeContainersToReturn),
-                RouteNetworkTraces = query.EquipmentDetailsFilter.IncludeRouteNetworkTrace ? AddTraceRefsToSpanEquipments(spanEquipmentsToTrace, spanEquipmentsToReturn, traceThisSpanSegmentIdOnly) : null
+                RouteNetworkTraces = query.EquipmentDetailsFilter.IncludeRouteNetworkTrace ? AddRelatedInfoToSpanEquipments(spanEquipmentsToTrace, spanEquipmentsToReturn, traceThisSpanSegmentIdOnly) : null
             };
     
             return Task.FromResult(
@@ -182,7 +182,7 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments.QueryHandlers
             return null;
         }
 
-        private LookupCollection<API.Model.Trace.RouteNetworkTraceResult> AddTraceRefsToSpanEquipments(List<SpanEquipment> spanEquipmentsToTrace, List<SpanEquipmentWithRelatedInfo> spanEquipmentsToReturn, Guid? traceThisSpanSegmentIdOnly)
+        private LookupCollection<API.Model.Trace.RouteNetworkTraceResult> AddRelatedInfoToSpanEquipments(List<SpanEquipment> spanEquipmentsToTrace, List<SpanEquipmentWithRelatedInfo> spanEquipmentsToReturn, Guid? traceThisSpanSegmentIdOnly)
         {
             var traceBuilder = new SwissArmyKnifeTracer(_queryDispatcher, _eventStore);
 
@@ -203,12 +203,44 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments.QueryHandlers
                     {
                         spanEquipment.DownstreamLabel = downLabel;
                     }
+
+                    spanEquipment.TagsByBySpanSegmentId = GetTagsBySpanSegmentId(traceInfo);
                 }
 
                 return new LookupCollection<API.Model.Trace.RouteNetworkTraceResult>(traceInfo.RouteNetworkTraces);
             }
             else
                 return new LookupCollection<API.Model.Trace.RouteNetworkTraceResult>();
+        }
+
+        private static Dictionary<Guid, string[]> GetTagsBySpanSegmentId(SwissArmyKnifeTraceResult traceInfo)
+        {
+            Dictionary<Guid, string[]> tagsBySpanId = new();
+
+            foreach (var spanTrace in traceInfo.UtilityNetworkTraceBySpanSegmentId)
+            {
+                if (spanTrace.Value.Tags != null)
+                {
+                    foreach (var tag in spanTrace.Value.Tags)
+                    {
+                        if (tagsBySpanId.ContainsKey(spanTrace.Key))
+                        {
+                            var existingTags = tagsBySpanId[spanTrace.Key];
+
+                            if (!existingTags.Contains(tag))
+                            {
+                                existingTags = existingTags.Append(tag).ToArray();
+                            }
+                        }
+                        else
+                        {
+                            tagsBySpanId[spanTrace.Key] = [tag];
+                        }
+                    }
+                }
+            }
+
+            return tagsBySpanId;
         }
 
         private Result<List<SpanEquipment>> GetSpanEquipmentsById(EquipmentIdList equipmentIdsToFetch)
