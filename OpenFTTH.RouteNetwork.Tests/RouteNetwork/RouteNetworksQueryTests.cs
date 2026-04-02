@@ -216,7 +216,6 @@ namespace OpenFTTH.RouteNetwork.Tests
                 RelatedInterestFilter = RelatedInterestFilterOptions.None
             };
 
-            Console.WriteLine("Was here!");
             // Act
             var queryResult = await _queryDispatcher.HandleAsync<GetRouteNetworkDetails, Result<GetRouteNetworkDetailsResult>>(routeNodeQuery);
 
