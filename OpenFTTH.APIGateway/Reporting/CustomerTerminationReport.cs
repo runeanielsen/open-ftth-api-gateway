@@ -55,8 +55,6 @@ namespace OpenFTTH.APIGateway.Reporting
                 {
                     var sourceTerminalStructure = terminalEquipment.TerminalStructures.First(t => !t.Deleted);
 
-                    Console.Out.WriteLine(terminalEquipment.Name);
-
                     for (int i = 0; i < sourceTerminalStructure.Terminals.Count(); i++)
                     {
                         // trace terminal
