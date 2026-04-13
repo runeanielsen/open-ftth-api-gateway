@@ -558,7 +558,7 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
             var terminalConnection = spanEquipmentBlock.AddTerminalConnection(BlockSideEnum.West, 1, terminalNo, BlockSideEnum.East, 1, terminalNo, fiberCableLineLabel, "FiberCable", LineShapeTypeEnum.Line);
             terminalConnection.DrawingOrder = 600;
             terminalConnection.SetReference(rootSpanInfo.SegmentId, "SpanSegment");
-            terminalConnection.Properties = _spanEquipmentViewModel.GetTagsPropertiesFromCableId(_spanEquipmentViewModel.SpanEquipment.Id)
+            terminalConnection.Properties = _spanEquipmentViewModel.GetTagsPropertiesFromCableId(_spanEquipmentViewModel.SpanEquipment.Id);
 
             return spanEquipmentBlock;
         }
