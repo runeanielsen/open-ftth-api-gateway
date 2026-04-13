@@ -136,7 +136,7 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
                     PointStyle = "WestTerminalLabel",
                     PointLabel = _spanEquipmentViewModel.GetFromRouteNodeName(spanInfo.SegmentId, null),
                     DrawingOrder = 520,
-                    Properties = GetTagsPropertiesFromSpanInfo(spanInfo.SpanSegment.Id)
+                    Properties = _spanEquipmentViewModel.GetTagsPropertiesFromSpanInfo(spanInfo.SpanSegment.Id)
                 };
 
                 fromTerminal.SetReference(spanInfo.IngoingSegmentId, "SpanSegment");
@@ -149,7 +149,7 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
                     PointStyle = "EastTerminalLabel",
                     PointLabel = _spanEquipmentViewModel.GetToRouteNodeName(spanInfo.SegmentId, null),
                     DrawingOrder = 520,                    
-                    Properties = GetTagsPropertiesFromSpanInfo(spanInfo.SpanSegment.Id)
+                    Properties = _spanEquipmentViewModel.GetTagsPropertiesFromSpanInfo(spanInfo.SpanSegment.Id)
                 };
 
                 toTerminal.SetReference(spanInfo.OutgoingSegmentId, "SpanSegment");
@@ -167,6 +167,7 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
                     var cableTerminalConnection = spanEquipmentBlock.AddTerminalConnection(BlockSideEnum.West, 1, terminalNo, BlockSideEnum.East, 1, terminalNo, fiberCableLineLabel, "FiberCable", LineShapeTypeEnum.Line);
                     cableTerminalConnection.DrawingOrder = 600;
                     cableTerminalConnection.SetReference(cableId, "SpanSegment");
+                    cableTerminalConnection.Properties = _spanEquipmentViewModel.GetTagsPropertiesFromCableId(cableId);
                 }
 
                 terminalNo++;
@@ -186,7 +187,7 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
                         PointStyle = "WestTerminalLabel",
                         PointLabel = _spanEquipmentViewModel.GetFromRouteNodeName(rootSpanInfo.SegmentId, null),
                         DrawingOrder = 520,
-                        Properties = GetTagsPropertiesFromSpanInfo(rootSpanInfo.SegmentId)
+                        Properties = _spanEquipmentViewModel.GetTagsPropertiesFromSpanInfo(rootSpanInfo.SegmentId)
                     };
 
                     fromTerminal.SetReference(rootSpanInfo.IngoingSegmentId, "SpanSegment");
@@ -198,7 +199,7 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
                         PointStyle = "EastTerminalLabel",
                         PointLabel = _spanEquipmentViewModel.GetToRouteNodeName(rootSpanInfo.SegmentId, null),
                         DrawingOrder = 520,
-                        Properties = GetTagsPropertiesFromSpanInfo(rootSpanInfo.SegmentId)
+                        Properties = _spanEquipmentViewModel.GetTagsPropertiesFromSpanInfo(rootSpanInfo.SegmentId)
                     };
 
                     toTerminal.SetReference(rootSpanInfo.OutgoingSegmentId, "SpanSegment");
@@ -217,6 +218,7 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
                         var cableTerminalConnection = spanEquipmentBlock.AddTerminalConnection(BlockSideEnum.West, 1, terminalNo, BlockSideEnum.East, 1, terminalNo, fiberCableLineLabel, "FiberCable", LineShapeTypeEnum.Line);
                         cableTerminalConnection.DrawingOrder = 600;
                         cableTerminalConnection.SetReference(cableId, "SpanSegment");
+                        cableTerminalConnection.Properties = _spanEquipmentViewModel.GetTagsPropertiesFromCableId(cableId);
                     }
 
                 }
@@ -226,8 +228,6 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
                     // Check if cables are related to the outer conduit
                     if (_spanEquipmentViewModel.Data.ConduitSegmentToCableChildRelations.ContainsKey(rootSpanInfo.SegmentId))
                     {
-                        //CreateTerminalsForCablesRelatedToSingleConduitEnd(viewModel, outerConduitPort);
-                     
                         var cableRelations = _spanEquipmentViewModel.Data.ConduitSegmentToCableChildRelations[rootSpanInfo.SegmentId];
 
                         foreach (var cableId in cableRelations)
@@ -238,7 +238,8 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
                                 ShapeType = TerminalShapeTypeEnum.Point,
                                 PointStyle = "WestTerminalLabel",
                                 PointLabel = _spanEquipmentViewModel.GetFromRouteNodeName(rootSpanInfo.SegmentId, cableId),
-                                DrawingOrder = 620
+                                DrawingOrder = 620,
+                                Properties = _spanEquipmentViewModel.GetTagsPropertiesFromCableId(cableId)
                             };
 
                             fromTerminal.SetReference(rootSpanInfo.IngoingSegmentId, "SpanSegment");
@@ -249,7 +250,8 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
                                 ShapeType = TerminalShapeTypeEnum.Point,
                                 PointStyle = "EastTerminalLabel",
                                 PointLabel = _spanEquipmentViewModel.GetToRouteNodeName(rootSpanInfo.SegmentId, cableId),
-                                DrawingOrder = 620
+                                DrawingOrder = 620,
+                                Properties = _spanEquipmentViewModel.GetTagsPropertiesFromCableId(cableId)
                             };
 
                             var fiberCableLineLabel = _spanEquipmentViewModel.Data.GetCableEquipmentLineLabel(cableId);
@@ -261,15 +263,14 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
                     // No cables so we create one terminal that shows where the empty multi conduit is heading
                     else
                     {
-                        //CreateTerminalForShowingWhereEmptySingleConduitIsHeading(viewModel, outerConduitPort);
-
                         var fromTerminal = new BlockPortTerminal(fromPort)
                         {
                             IsVisible = true,
                             ShapeType = TerminalShapeTypeEnum.Point,
                             PointStyle = "WestTerminalLabel",
                             PointLabel = _spanEquipmentViewModel.GetFromRouteNodeName(rootSpanInfo.SegmentId, null),
-                            DrawingOrder = 520
+                            DrawingOrder = 520,
+                            Properties = _spanEquipmentViewModel.GetTagsPropertiesFromSpanInfo(rootSpanInfo.SegmentId)
                         };
 
                         fromTerminal.SetReference(rootSpanInfo.IngoingSegmentId, "SpanSegment");
@@ -280,29 +281,14 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
                             ShapeType = TerminalShapeTypeEnum.Point,
                             PointStyle = "EastTerminalLabel",
                             PointLabel = _spanEquipmentViewModel.GetToRouteNodeName(rootSpanInfo.SegmentId, null),
-                            DrawingOrder = 520
+                            DrawingOrder = 520,
+                            Properties = _spanEquipmentViewModel.GetTagsPropertiesFromSpanInfo(rootSpanInfo.SegmentId)
                         };
                     }
                 }
             }
 
             return spanEquipmentBlock;
-        }
-
-        private List<KeyValuePair<string, string>>? GetTagsPropertiesFromSpanInfo(Guid spanSegmentId)
-        {
-            if (_spanEquipmentViewModel.SpanEquipment.TagsByBySpanSegmentId.ContainsKey(spanSegmentId))
-            {
-                var tags = _spanEquipmentViewModel.SpanEquipment.TagsByBySpanSegmentId[spanSegmentId];
-
-                List<KeyValuePair<string, string>> properties = new List<KeyValuePair<string, string>>();
-
-                properties.Add(new KeyValuePair<string, string>("Tags", String.Join(',', tags)));
-
-                return properties;
-            }
-
-            return null;
         }
 
         private LineBlock CreateConduitEndBlock()
@@ -351,7 +337,7 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
                     PointStyle = "WestTerminalLabel",
                     PointLabel = _spanEquipmentViewModel.GetOutgoingLabel(data.SegmentId, null),
                     DrawingOrder = 520,
-                    Properties = GetTagsPropertiesFromSpanInfo(data.SegmentId)
+                    Properties = _spanEquipmentViewModel.GetTagsPropertiesFromSpanInfo(data.SegmentId)
                 };
 
                 fromTerminal.SetReference(data.SegmentId, "SpanSegment");
@@ -381,7 +367,7 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
                         toTerminal.ShapeType = TerminalShapeTypeEnum.Point;
                         toTerminal.PointStyle = "EastTerminalLabel";
                         toTerminal.PointLabel = cableEqLabel;
-                        toTerminal.Properties = GetTagsPropertiesFromSpanInfo(data.SegmentId);
+                        toTerminal.Properties = _spanEquipmentViewModel.GetTagsPropertiesFromSpanInfo(data.SegmentId);
                     }
                                    
                     var cableTerminalConnection = spanEquipmentBlock.AddTerminalConnection(BlockSideEnum.West, 1, terminalNo, BlockSideEnum.East, 1, terminalNo, fiberCableLineLabel, "FiberCable", LineShapeTypeEnum.Line);
@@ -407,7 +393,7 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
                         PointStyle = "WestTerminalLabel",
                         PointLabel = _spanEquipmentViewModel.GetOutgoingLabel(rootSpanInfo.SegmentId, null),
                         DrawingOrder = 520,
-                        Properties = GetTagsPropertiesFromSpanInfo(rootSpanInfo.SegmentId)
+                        Properties = _spanEquipmentViewModel.GetTagsPropertiesFromSpanInfo(rootSpanInfo.SegmentId)
                     };
 
                     fromTerminal.SetReference(rootSpanInfo.IngoingSegmentId, "SpanSegment");
@@ -419,7 +405,7 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
                         PointStyle = "EastTerminalLabel",
                         PointLabel = _spanEquipmentViewModel.GetIngoingLabel(rootSpanInfo.SegmentId, null),
                         DrawingOrder = 520,
-                        Properties = GetTagsPropertiesFromSpanInfo(rootSpanInfo.SegmentId)
+                        Properties = _spanEquipmentViewModel.GetTagsPropertiesFromSpanInfo(rootSpanInfo.SegmentId)
                     };
 
                     var terminalConnection = spanEquipmentBlock.AddTerminalConnection(BlockSideEnum.West, 1, terminalNo, BlockSideEnum.East, 1, terminalNo, null, rootSpanInfo.StyleName, LineShapeTypeEnum.Polygon);
@@ -443,8 +429,6 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
                     // Check if cables are related to the outer conduit
                     if (_spanEquipmentViewModel.Data.ConduitSegmentToCableChildRelations.ContainsKey(rootSpanInfo.SegmentId))
                     {
-                        //CreateTerminalsForCablesRelatedToSingleConduitEnd(viewModel, outerConduitPort);
-
                         var cableRelations = _spanEquipmentViewModel.Data.ConduitSegmentToCableChildRelations[rootSpanInfo.SegmentId];
 
                         foreach (var cableId in cableRelations)
@@ -496,8 +480,6 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
                     // No cables so we create one terminal that shows where the empty multi conduit is heading
                     else
                     {
-                        //CreateTerminalForShowingWhereEmptySingleConduitIsHeading(viewModel, outerConduitPort);
-
                         var fromTerminal = new BlockPortTerminal(fromPort)
                         {
                             IsVisible = true,
@@ -505,7 +487,7 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
                             PointStyle = "WestTerminalLabel",
                             PointLabel = _spanEquipmentViewModel.GetOutgoingLabel(rootSpanInfo.SegmentId, null),
                             DrawingOrder = 520,
-                            Properties = GetTagsPropertiesFromSpanInfo(rootSpanInfo.SegmentId)
+                            Properties = _spanEquipmentViewModel.GetTagsPropertiesFromSpanInfo(rootSpanInfo.SegmentId)
                         };
 
                         fromTerminal.SetReference(rootSpanInfo.IngoingSegmentId, "SpanSegment");
@@ -534,7 +516,7 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
                 IsVisible =  false,
                 Style = rootSpanInfo.StyleName,
                 Margin = _spanEquipmentViewModel.IsSingleSpan ? 0 : _spanEquipmentBlockMargin,
-                DrawingOrder = 400,
+                DrawingOrder = 400
             };
 
             spanEquipmentBlock.SetReference(rootSpanInfo.SegmentId, "SpanSegment");
@@ -559,7 +541,7 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
                 PointStyle = "WestTerminalLabel",
                 PointLabel = _spanEquipmentViewModel.InterestRelationKind() == RouteNetworkInterestRelationKindEnum.End ? _spanEquipmentViewModel.GetFromRouteNodeName(rootSpanInfo.SegmentId, null) : _spanEquipmentViewModel.GetToRouteNodeName(rootSpanInfo.SegmentId, null),
                 DrawingOrder = 520,
-                Properties = GetTagsPropertiesFromSpanInfo(rootSpanInfo.SegmentId)
+                Properties = _spanEquipmentViewModel.GetTagsPropertiesFromCableId(_spanEquipmentViewModel.SpanEquipment.Id)
             };
 
             fromTerminal.SetReference(rootSpanInfo.IngoingSegmentId, "SpanSegment");
@@ -576,6 +558,7 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
             var terminalConnection = spanEquipmentBlock.AddTerminalConnection(BlockSideEnum.West, 1, terminalNo, BlockSideEnum.East, 1, terminalNo, fiberCableLineLabel, "FiberCable", LineShapeTypeEnum.Line);
             terminalConnection.DrawingOrder = 600;
             terminalConnection.SetReference(rootSpanInfo.SegmentId, "SpanSegment");
+            terminalConnection.Properties = _spanEquipmentViewModel.GetTagsPropertiesFromCableId(_spanEquipmentViewModel.SpanEquipment.Id)
 
             return spanEquipmentBlock;
         }
@@ -615,7 +598,7 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
                 PointStyle = "WestTerminalLabel",
                 PointLabel = _spanEquipmentViewModel.GetFromRouteNodeName(rootSpanInfo.SegmentId, null),
                 DrawingOrder = 520,
-                Properties = GetTagsPropertiesFromSpanInfo(rootSpanInfo.SegmentId)
+                Properties = _spanEquipmentViewModel.GetTagsPropertiesFromCableId(_spanEquipmentViewModel.SpanEquipment.Id)
             };
 
             fromTerminal.SetReference(rootSpanInfo.IngoingSegmentId, "SpanSegment");
@@ -627,7 +610,7 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
                 PointStyle = "EastTerminalLabel",
                 PointLabel = _spanEquipmentViewModel.GetToRouteNodeName(rootSpanInfo.SegmentId, null),
                 DrawingOrder = 520,
-                Properties = GetTagsPropertiesFromSpanInfo(rootSpanInfo.SegmentId)
+                Properties = _spanEquipmentViewModel.GetTagsPropertiesFromCableId(_spanEquipmentViewModel.SpanEquipment.Id)
             };
 
             toTerminal.SetReference(rootSpanInfo.OutgoingSegmentId, "SpanSegment");
@@ -637,6 +620,7 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
             var terminalConnection = spanEquipmentBlock.AddTerminalConnection(BlockSideEnum.West, 1, terminalNo, BlockSideEnum.East, 1, terminalNo, fiberCableLineLabel, "FiberCable", LineShapeTypeEnum.Line);
             terminalConnection.DrawingOrder = 600;
             terminalConnection.SetReference(rootSpanInfo.SegmentId, "SpanSegment");
+            terminalConnection.Properties = _spanEquipmentViewModel.GetTagsPropertiesFromCableId(_spanEquipmentViewModel.SpanEquipment.Id);
 
             return spanEquipmentBlock;
         }

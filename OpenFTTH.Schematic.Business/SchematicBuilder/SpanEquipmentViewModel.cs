@@ -390,6 +390,51 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
                 return BlockSideEnum.North;
         }
 
+        public List<KeyValuePair<string, string>>? GetTagsPropertiesFromSpanInfo(Guid spanSegmentId)
+        {
+            if (SpanEquipment.TagsByBySpanSegmentId.ContainsKey(spanSegmentId))
+            {
+                var tags = SpanEquipment.TagsByBySpanSegmentId[spanSegmentId];
+
+                List<KeyValuePair<string, string>> properties = new List<KeyValuePair<string, string>>();
+
+                properties.Add(new KeyValuePair<string, string>("Tags", String.Join(',', tags)));
+
+                return properties;
+            }
+
+            return null;
+        }
+
+        public List<KeyValuePair<string, string>>? GetTagsPropertiesFromCableId(Guid cableId)
+        {
+            List<string> allCableTags = new List<string>();
+
+            if (Data.SpanEquipments.ContainsKey(cableId))
+            {
+                var cable = Data.SpanEquipments[cableId];
+
+                if (cable.TagsByBySpanSegmentId != null)
+                {
+                    foreach (var tags in cable.TagsByBySpanSegmentId.Values)
+                    {
+                        allCableTags.AddRange(tags);
+                    }
+                }
+            }
+
+            if (allCableTags.Count > 0)
+            {
+                List<KeyValuePair<string, string>> properties = new List<KeyValuePair<string, string>>();
+
+                properties.Add(new KeyValuePair<string, string>("Tags", String.Join(',', allCableTags)));
+
+                return properties;
+            }
+
+            return null;
+        }
+
         private RouteNetworkTraceResult GetTraceInfo(Guid spanSegmentId)
         {
             if (_traceByBySpanId.TryGetValue(spanSegmentId, out var routeNetworkTraceBySegment))
@@ -403,6 +448,8 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
             else
                 throw new ApplicationException("Can't find from route node name in route network traces.");
         }
+
+
 
     }
 

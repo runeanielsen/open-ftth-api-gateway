@@ -16,6 +16,9 @@ namespace OpenFTTH.Schematic.Business.Lines
         public string Style { get; set; }
         public int DrawingOrder { get; set; }
 
+        public List<KeyValuePair<string, string>> Properties { get; set; }
+
+
         private Guid _refId;
         private string _refClass;
         private Envelope _canvasEnvelope = null;
@@ -57,7 +60,8 @@ namespace OpenFTTH.Schematic.Business.Lines
                     Style = Style is null ? "Cable" : Style,
                     Label = this.Label,
                     Geometry = poly,
-                    DrawingOrder = DrawingOrder
+                    DrawingOrder = DrawingOrder,
+                    Properties = Properties
                 });
             }
             else
@@ -70,7 +74,8 @@ namespace OpenFTTH.Schematic.Business.Lines
                     Style = Style is null ? "Cable" : Style,
                     Label = this.Label,
                     Geometry = curve,
-                    DrawingOrder = DrawingOrder
+                    DrawingOrder = DrawingOrder,
+                    Properties = Properties
                 });
             }
 
