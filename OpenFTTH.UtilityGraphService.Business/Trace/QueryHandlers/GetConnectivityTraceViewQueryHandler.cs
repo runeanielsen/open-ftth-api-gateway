@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using OpenFTTH.UtilityGraphService.Business.TerminalEquipments.Events;
 
 namespace OpenFTTH.UtilityGraphService.Business.Trace.QueryHandling
 {
@@ -115,7 +116,8 @@ namespace OpenFTTH.UtilityGraphService.Business.Trace.QueryHandling
                             routeSegmentGeometries: routeSegmentGeometries,
                             routeSegmentIds: routeSegmentIds,
                             isCustomerSplitter: relatedData.IsCustomerSplitter(terminalRef),
-                            isLineTermination: relatedData.IsLineTermination(terminalRef)
+                            isLineTermination: relatedData.IsLineTermination(terminalRef),
+                            tags: GetTags(relatedData, traceElements, graphElementIndex)
                         )
                     );
 
@@ -194,7 +196,8 @@ namespace OpenFTTH.UtilityGraphService.Business.Trace.QueryHandling
                             routeSegmentGeometries: routeSegmentGeometries,
                             routeSegmentIds: routeSegmentIds,
                             isCustomerSplitter: relatedData.IsCustomerSplitter(terminalRef),
-                            isLineTermination: relatedData.IsLineTermination(terminalRef)
+                            isLineTermination: relatedData.IsLineTermination(terminalRef),
+                            tags: GetTags(relatedData, traceElements, graphElementIndex)
                         )
                     );
 
@@ -366,7 +369,89 @@ namespace OpenFTTH.UtilityGraphService.Business.Trace.QueryHandling
 
             return "";
         }
-            
+
+        public string? GetTags(RelatedDataHolder relatedData, List<IGraphObject> traceElements, int graphElementIndex)
+        {
+            List<string> tags = new List<string>(); 
+
+            // Collect tags from terminal if any
+            var terminalRef = traceElements[graphElementIndex] as IUtilityGraphTerminalRef;
+
+            if (terminalRef != null && !terminalRef.IsDummyEnd)
+            {
+                var terminalEquipment = terminalRef.TerminalEquipment(_utilityNetwork);
+                var terminal = terminalRef.Terminal(_utilityNetwork);
+
+                tags.AddRange(GetTerminalTags(terminalEquipment, terminal.Id));
+            }
+
+            // If segment follow terminal, then collect tags from segment as well
+            if (graphElementIndex < (traceElements.Count - 1))
+            {
+                var graphElement = traceElements[graphElementIndex + 1];
+
+                if (graphElement is UtilityGraphConnectedSegment utilityGraphSegmentRef)
+                {
+                    var spanEquipment = utilityGraphSegmentRef.SpanEquipment(_utilityNetwork);
+                    var spanSegment = utilityGraphSegmentRef.SpanSegment(_utilityNetwork);
+
+                    tags.AddRange(GetSpanSegmentTags(spanEquipment, spanSegment.Id));
+                }
+            }
+
+            if (tags.Any())
+                return String.Join(',', tags.ToArray());
+            else
+                return null;
+        }
+
+        private List<string> GetTerminalTags(TerminalEquipment terminalEquipment, Guid terminalId)
+        {
+            if (terminalEquipment.EquipmentTags != null && terminalEquipment.EquipmentTags.Count() > 0 && terminalEquipment.EquipmentTags.Any(t => t.TerminalOrSpanId == terminalId))
+            {
+                var terminalTags = terminalEquipment.EquipmentTags.Where(t => t.TerminalOrSpanId == terminalId).ToArray();
+
+                HashSet<string> tags = new HashSet<string>();
+
+                foreach (var terminalTag in terminalEquipment.EquipmentTags)
+                {
+                    if (terminalTag.Tags != null)
+                    {
+                        foreach (var  tag in tags)
+                            tags.Add(tag);
+                    }
+                }
+
+                return tags.ToList<string>();
+            }
+
+            return new List<string>();
+        }
+
+        private List<string> GetSpanSegmentTags(SpanEquipment spanEquipment, Guid spanSegmentId)
+        {
+            if (spanEquipment.EquipmentTags != null && spanEquipment.EquipmentTags.Count() > 0 && spanEquipment.EquipmentTags.Any(t => t.TerminalOrSpanId == spanSegmentId))
+            {
+                var spanTags = spanEquipment.EquipmentTags.Where(t => t.TerminalOrSpanId == spanSegmentId).ToArray();
+
+                HashSet<string> tags = new HashSet<string>();
+
+                foreach (var terminalTag in spanTags)
+                {
+                    if (terminalTag.Tags != null)
+                    {
+                        foreach (var tag in terminalTag.Tags)
+                            tags.Add(tag);
+                    }
+                }
+
+                return tags.ToList<string>();
+            }
+
+            return new List<string>();
+        }
+
+
 
         private string GetSpanConnectionInfo(RelatedDataHolder relatedData, IUtilityGraphSegmentRef? utilityGraphSegmentRef)
         {
@@ -439,6 +524,8 @@ namespace OpenFTTH.UtilityGraphService.Business.Trace.QueryHandling
 
             return trace;
         }
+
+
 
         private Result<ConnectivityTraceView> NotConnected()
         {
