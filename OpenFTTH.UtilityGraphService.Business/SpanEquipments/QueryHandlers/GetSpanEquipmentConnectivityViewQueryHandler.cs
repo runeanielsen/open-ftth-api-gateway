@@ -167,7 +167,8 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments.QueryHandling
             return new SpanEquipmentAZConnectivityViewEndInfo()
             {
                 ConnectedTo = CreateConnectedToString(relevantEquipmentData, spanEquipment, traceInfo),
-                End = CreateEndString(relevantEquipmentData, traceInfo)
+                End = CreateEndString(relevantEquipmentData, traceInfo),
+                Tags = GetTags(spanEquipment, spanSegment, relevantEquipmentData, traceInfo)
             };
         }
 
@@ -178,8 +179,22 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments.QueryHandling
             return new SpanEquipmentAZConnectivityViewEndInfo()
             {
                 ConnectedTo = CreateConnectedToString(relevantEquipmentData, spanEquipment, traceInfo),
-                End = CreateEndString(relevantEquipmentData, traceInfo)
+                End = CreateEndString(relevantEquipmentData, traceInfo),
+                Tags = GetTags(spanEquipment, spanSegment, relevantEquipmentData, traceInfo)
             };
+        }
+
+        private string? GetTags(SpanEquipment spanEquipment, SpanSegment spanSegment, RelevantEquipmentData relevantEquipmentData, TraceEndInfo? traceInfo)
+        {
+            var spanEquipmentTags = GetTagsBySpanSegment(spanEquipment, spanSegment.Id);
+
+            if (spanEquipmentTags.Count > 0)
+            {
+                return String.Join(',', spanEquipmentTags.ToArray());
+            }
+
+            // TODO: Also search trace for tags
+            return null;
         }
 
         private string? CreateConnectedToString(RelevantEquipmentData relevantEquipmentData, SpanEquipment spanEquipment, TraceEndInfo? traceInfo)
@@ -400,6 +415,29 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments.QueryHandling
 
 
             return new TraceEndInfo((UtilityGraphConnectedTerminal)neighborTerminal, (UtilityGraphConnectedTerminal)terminalEnd);
+        }
+
+        private List<string> GetTagsBySpanSegment(SpanEquipment spanEquipment, Guid spanSegmentId)
+        {
+            if (spanEquipment.EquipmentTags != null && spanEquipment.EquipmentTags.Count() > 0 && spanEquipment.EquipmentTags.Any(t => t.TerminalOrSpanId == spanSegmentId))
+            {
+                var spanTags = spanEquipment.EquipmentTags.Where(t => t.TerminalOrSpanId == spanSegmentId).ToArray();
+
+                HashSet<string> tags = new HashSet<string>();
+
+                foreach (var terminalTag in spanTags)
+                {
+                    if (terminalTag.Tags != null)
+                    {
+                        foreach (var tag in terminalTag.Tags)
+                            tags.Add(tag);
+                    }
+                }
+
+                return tags.ToList<string>();
+            }
+
+            return new List<string>();
         }
 
 

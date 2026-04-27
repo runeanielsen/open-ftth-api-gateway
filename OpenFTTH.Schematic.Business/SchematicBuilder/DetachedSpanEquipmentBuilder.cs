@@ -167,7 +167,7 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
                     var cableTerminalConnection = spanEquipmentBlock.AddTerminalConnection(BlockSideEnum.West, 1, terminalNo, BlockSideEnum.East, 1, terminalNo, fiberCableLineLabel, "FiberCable", LineShapeTypeEnum.Line);
                     cableTerminalConnection.DrawingOrder = 600;
                     cableTerminalConnection.SetReference(cableId, "SpanSegment");
-                    cableTerminalConnection.Properties = _spanEquipmentViewModel.GetTagsPropertiesFromCableId(cableId);
+                    cableTerminalConnection.Properties = _spanEquipmentViewModel.GetUniqueTagsBySpanEquipmentId(cableId);
                 }
 
                 terminalNo++;
@@ -218,7 +218,7 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
                         var cableTerminalConnection = spanEquipmentBlock.AddTerminalConnection(BlockSideEnum.West, 1, terminalNo, BlockSideEnum.East, 1, terminalNo, fiberCableLineLabel, "FiberCable", LineShapeTypeEnum.Line);
                         cableTerminalConnection.DrawingOrder = 600;
                         cableTerminalConnection.SetReference(cableId, "SpanSegment");
-                        cableTerminalConnection.Properties = _spanEquipmentViewModel.GetTagsPropertiesFromCableId(cableId);
+                        cableTerminalConnection.Properties = _spanEquipmentViewModel.GetUniqueTagsBySpanEquipmentId(cableId);
                     }
 
                 }
@@ -239,7 +239,7 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
                                 PointStyle = "WestTerminalLabel",
                                 PointLabel = _spanEquipmentViewModel.GetFromRouteNodeName(rootSpanInfo.SegmentId, cableId),
                                 DrawingOrder = 620,
-                                Properties = _spanEquipmentViewModel.GetTagsPropertiesFromCableId(cableId)
+                                Properties = _spanEquipmentViewModel.GetUniqueTagsBySpanEquipmentId(cableId)
                             };
 
                             fromTerminal.SetReference(rootSpanInfo.IngoingSegmentId, "SpanSegment");
@@ -251,7 +251,7 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
                                 PointStyle = "EastTerminalLabel",
                                 PointLabel = _spanEquipmentViewModel.GetToRouteNodeName(rootSpanInfo.SegmentId, cableId),
                                 DrawingOrder = 620,
-                                Properties = _spanEquipmentViewModel.GetTagsPropertiesFromCableId(cableId)
+                                Properties = _spanEquipmentViewModel.GetUniqueTagsBySpanEquipmentId(cableId)
                             };
 
                             var fiberCableLineLabel = _spanEquipmentViewModel.Data.GetCableEquipmentLineLabel(cableId);
@@ -541,7 +541,7 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
                 PointStyle = "WestTerminalLabel",
                 PointLabel = _spanEquipmentViewModel.InterestRelationKind() == RouteNetworkInterestRelationKindEnum.End ? _spanEquipmentViewModel.GetFromRouteNodeName(rootSpanInfo.SegmentId, null) : _spanEquipmentViewModel.GetToRouteNodeName(rootSpanInfo.SegmentId, null),
                 DrawingOrder = 520,
-                Properties = _spanEquipmentViewModel.GetTagsPropertiesFromCableId(_spanEquipmentViewModel.SpanEquipment.Id)
+                Properties = _spanEquipmentViewModel.GetUniqueTagsBySpanEquipmentId(_spanEquipmentViewModel.SpanEquipment.Id)
             };
 
             fromTerminal.SetReference(rootSpanInfo.IngoingSegmentId, "SpanSegment");
@@ -558,7 +558,7 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
             var terminalConnection = spanEquipmentBlock.AddTerminalConnection(BlockSideEnum.West, 1, terminalNo, BlockSideEnum.East, 1, terminalNo, fiberCableLineLabel, "FiberCable", LineShapeTypeEnum.Line);
             terminalConnection.DrawingOrder = 600;
             terminalConnection.SetReference(rootSpanInfo.SegmentId, "SpanSegment");
-            terminalConnection.Properties = _spanEquipmentViewModel.GetTagsPropertiesFromCableId(_spanEquipmentViewModel.SpanEquipment.Id);
+            terminalConnection.Properties = _spanEquipmentViewModel.GetUniqueTagsBySpanEquipmentId(_spanEquipmentViewModel.SpanEquipment.Id);
 
             return spanEquipmentBlock;
         }
@@ -598,7 +598,7 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
                 PointStyle = "WestTerminalLabel",
                 PointLabel = _spanEquipmentViewModel.GetFromRouteNodeName(rootSpanInfo.SegmentId, null),
                 DrawingOrder = 520,
-                Properties = _spanEquipmentViewModel.GetTagsPropertiesFromCableId(_spanEquipmentViewModel.SpanEquipment.Id)
+                Properties = _spanEquipmentViewModel.GetUniqueTagsBySpanEquipmentId(_spanEquipmentViewModel.SpanEquipment.Id)
             };
 
             fromTerminal.SetReference(rootSpanInfo.IngoingSegmentId, "SpanSegment");
@@ -610,7 +610,7 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
                 PointStyle = "EastTerminalLabel",
                 PointLabel = _spanEquipmentViewModel.GetToRouteNodeName(rootSpanInfo.SegmentId, null),
                 DrawingOrder = 520,
-                Properties = _spanEquipmentViewModel.GetTagsPropertiesFromCableId(_spanEquipmentViewModel.SpanEquipment.Id)
+                Properties = _spanEquipmentViewModel.GetUniqueTagsBySpanEquipmentId(_spanEquipmentViewModel.SpanEquipment.Id)
             };
 
             toTerminal.SetReference(rootSpanInfo.OutgoingSegmentId, "SpanSegment");
@@ -620,7 +620,7 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
             var terminalConnection = spanEquipmentBlock.AddTerminalConnection(BlockSideEnum.West, 1, terminalNo, BlockSideEnum.East, 1, terminalNo, fiberCableLineLabel, "FiberCable", LineShapeTypeEnum.Line);
             terminalConnection.DrawingOrder = 600;
             terminalConnection.SetReference(rootSpanInfo.SegmentId, "SpanSegment");
-            terminalConnection.Properties = _spanEquipmentViewModel.GetTagsPropertiesFromCableId(_spanEquipmentViewModel.SpanEquipment.Id);
+            terminalConnection.Properties = _spanEquipmentViewModel.GetUniqueTagsBySpanEquipmentId(_spanEquipmentViewModel.SpanEquipment.Id);
 
             return spanEquipmentBlock;
         }

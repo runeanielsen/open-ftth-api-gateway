@@ -406,28 +406,29 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
             return null;
         }
 
-        public List<KeyValuePair<string, string>>? GetTagsPropertiesFromCableId(Guid cableId)
+        public List<KeyValuePair<string, string>>? GetUniqueTagsBySpanEquipmentId(Guid spanEquipmentId)
         {
-            List<string> allCableTags = new List<string>();
+            HashSet<string> allUniqueTags = new HashSet<string>();
 
-            if (Data.SpanEquipments.ContainsKey(cableId))
+            if (Data.SpanEquipments.ContainsKey(spanEquipmentId))
             {
-                var cable = Data.SpanEquipments[cableId];
+                var cable = Data.SpanEquipments[spanEquipmentId];
 
                 if (cable.TagsByBySpanSegmentId != null)
                 {
                     foreach (var tags in cable.TagsByBySpanSegmentId.Values)
                     {
-                        allCableTags.AddRange(tags);
+                        foreach (var tag in tags)
+                            allUniqueTags.Add(tag);
                     }
                 }
             }
 
-            if (allCableTags.Count > 0)
+            if (allUniqueTags.Count > 0)
             {
                 List<KeyValuePair<string, string>> properties = new List<KeyValuePair<string, string>>();
 
-                properties.Add(new KeyValuePair<string, string>("Tags", String.Join(',', allCableTags)));
+                properties.Add(new KeyValuePair<string, string>("Tags", String.Join(',', allUniqueTags)));
 
                 return properties;
             }

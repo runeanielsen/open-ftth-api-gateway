@@ -10,6 +10,7 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Types
         {
             Field(x => x.ConnectedTo, type: typeof(StringGraphType)).Description("The equipment the terminal is connected to");
             Field(x => x.End, type: typeof(StringGraphType)).Description("Information about the end of the circuit");
+            Field(x => x.Tags, type: typeof(StringGraphType)).Description("Comma seperated list of tags");
         }
     }
 }

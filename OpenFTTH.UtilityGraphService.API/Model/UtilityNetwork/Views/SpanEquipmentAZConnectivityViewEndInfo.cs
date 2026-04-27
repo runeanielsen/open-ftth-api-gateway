@@ -4,6 +4,7 @@
     {
         public string? ConnectedTo { get; init; }
         public string? End { get; init; }
+        public string? Tags { get; init; }
 
         public SpanEquipmentAZConnectivityViewEndInfo()
         {
