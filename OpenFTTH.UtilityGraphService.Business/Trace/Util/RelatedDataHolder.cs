@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using System.Linq;
 using OpenFTTH.UtilityGraphService.Business.SpanEquipments.Projections;
 using OpenFTTH.UtilityGraphService.Business.Graph.Projections;
+using OpenFTTH.UtilityGraphService.Business.Graph.Trace;
 
 namespace OpenFTTH.UtilityGraphService.Business.Trace.Util
 {
@@ -608,6 +609,80 @@ namespace OpenFTTH.UtilityGraphService.Business.Trace.Util
                 return true;
 
             return false;
+        }
+
+        public static List<string> GetTagsBySpanSegment(SpanEquipment spanEquipment, Guid spanSegmentId)
+        {
+            if (spanEquipment.EquipmentTags != null && spanEquipment.EquipmentTags.Count() > 0 && spanEquipment.EquipmentTags.Any(t => t.TerminalOrSpanId == spanSegmentId))
+            {
+                var spanTags = spanEquipment.EquipmentTags.Where(t => t.TerminalOrSpanId == spanSegmentId).ToArray();
+
+                HashSet<string> tags = new HashSet<string>();
+
+                foreach (var terminalTag in spanTags)
+                {
+                    if (terminalTag.Tags != null)
+                    {
+                        foreach (var tag in terminalTag.Tags)
+                            tags.Add(tag);
+                    }
+                }
+
+                return tags.ToList<string>();
+            }
+
+            return new List<string>();
+        }
+
+        public static List<string> GetTagsByTerminal(TerminalEquipment terminalEquipment, Guid terminalId)
+        {
+            List<string> tags = new List<string>();
+
+            if (terminalEquipment.EquipmentTags != null && terminalEquipment.EquipmentTags.Count() > 0 && terminalEquipment.EquipmentTags.Any(t => t.TerminalOrSpanId == terminalId))
+            {
+                var terminalTags = terminalEquipment.EquipmentTags.Where(t => t.TerminalOrSpanId == terminalId).ToArray();
+
+                foreach (var terminalTag in terminalTags)
+                {
+                    if (terminalTag.Tags != null)
+                        tags.AddRange(terminalTag.Tags);
+                }
+            }
+
+            return tags;
+        }
+
+        public static List<string> GetTagsFromTrace(UtilityNetworkProjection utilityNetwork, UtilityGraphTraceResult terminalTraceResult)
+        {
+            HashSet<string> tags = new HashSet<string>();
+
+            foreach (var traceItem in terminalTraceResult.All)
+            {
+                if (traceItem is UtilityGraphConnectedTerminal terminal)
+                {
+                    if (!terminal.IsDummyEnd)
+                    {
+                        var equipment = terminal.TerminalEquipment(utilityNetwork);
+
+                        foreach (var terminalTags in RelatedDataHolder.GetTagsByTerminal(equipment, terminal.Id))
+                        {
+                            tags.Add(terminalTags);
+                        }
+                    }
+                }
+
+                if (traceItem is UtilityGraphConnectedSegment segment)
+                {
+                    var equipment = segment.SpanEquipment(utilityNetwork);
+
+                    foreach (var spanSegmentTags in RelatedDataHolder.GetTagsBySpanSegment(equipment, segment.Id))
+                    {
+                        tags.Add(spanSegmentTags);
+                    }
+                }
+            }
+
+            return tags.ToList<string>();
         }
     }
 }

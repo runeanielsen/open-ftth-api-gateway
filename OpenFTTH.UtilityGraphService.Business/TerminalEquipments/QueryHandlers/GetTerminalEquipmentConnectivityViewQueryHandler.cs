@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Marten.Exceptions;
 
 namespace OpenFTTH.UtilityGraphService.Business.TerminalEquipments.QueryHandling
 {
@@ -270,79 +271,66 @@ namespace OpenFTTH.UtilityGraphService.Business.TerminalEquipments.QueryHandling
 
         private TerminalEquipmentAZConnectivityViewEndInfo GetAEndInfo(RelevantEquipmentData relevantEquipmentData, TerminalEquipment terminalEquipment, Terminal terminal)
         {
-            var tags = GetTerminalTags(terminalEquipment, terminal);
+            var traceInfo = relevantEquipmentData.TracedTerminals[terminal.Id];
+
+            var traceEndInfo = traceInfo.A;
+
+            var tags = traceInfo.Tags != null ? String.Join(',', traceInfo.Tags.ToArray()) : null;
 
             var terminalInfo = new TerminalEquipmentAZConnectivityViewTerminalInfo(terminal.Id, terminal.Name, tags);
-
-            var traceInfo = relevantEquipmentData.TracedTerminals[terminal.Id].A;
 
             FaceKindEnum faceKind = GetAEndFaceKind(relevantEquipmentData, terminal);
 
             return new TerminalEquipmentAZConnectivityViewEndInfo(terminalInfo, faceKind)
             {
-                ConnectedToSpanSegmentId = traceInfo == null ? Guid.Empty : traceInfo.NeighborSegment.Id,
-                ConnectedTo = traceInfo == null ? null : CreateConnectedToString(relevantEquipmentData, traceInfo),
-                End = traceInfo == null ? null : relevantEquipmentData.GetNodeAndEquipmentEndString(traceInfo.EndTerminal)
+                ConnectedToSpanSegmentId = traceEndInfo == null ? Guid.Empty : traceEndInfo.NeighborSegment.Id,
+                ConnectedTo = traceEndInfo == null ? null : CreateConnectedToString(relevantEquipmentData, traceEndInfo),
+                End = traceEndInfo == null ? null : relevantEquipmentData.GetNodeAndEquipmentEndString(traceEndInfo.EndTerminal)
             };
         }
 
         private TerminalEquipmentAZConnectivityViewEndInfo GetZEndInfo(RelevantEquipmentData relevantEquipmentData, TerminalEquipment terminalEquipment, Terminal terminal)
         {
-            var tags = GetTerminalTags(terminalEquipment, terminal);
+            var traceInfo = relevantEquipmentData.TracedTerminals[terminal.Id];
 
+            var traceEndInfo = traceInfo.Z;
+
+            var tags = traceInfo.Tags != null ? String.Join(',', traceInfo.Tags.ToArray()) : null;
+                   
             var terminalInfo = new TerminalEquipmentAZConnectivityViewTerminalInfo(terminal.Id, terminal.Name, tags);
-
-            var traceInfo = relevantEquipmentData.TracedTerminals[terminal.Id].Z;
 
             FaceKindEnum faceKind = GetZEndFaceKind(relevantEquipmentData, terminal);
 
             return new TerminalEquipmentAZConnectivityViewEndInfo(terminalInfo, faceKind)
             {
-                ConnectedToSpanSegmentId = traceInfo == null ? Guid.Empty : traceInfo.NeighborSegment.Id,
-                ConnectedTo = traceInfo == null ? null : CreateConnectedToString(relevantEquipmentData, traceInfo),
-                End = traceInfo == null ? null : relevantEquipmentData.GetNodeAndEquipmentEndString(traceInfo.EndTerminal)
+                ConnectedToSpanSegmentId = traceEndInfo == null ? Guid.Empty : traceEndInfo.NeighborSegment.Id,
+                ConnectedTo = traceEndInfo == null ? null : CreateConnectedToString(relevantEquipmentData, traceEndInfo),
+                End = traceEndInfo == null ? null : relevantEquipmentData.GetNodeAndEquipmentEndString(traceEndInfo.EndTerminal)
             };
-        }
-
-        private string? GetTerminalTags(TerminalEquipment terminalEquipment, Terminal terminal)
-        {
-            if (terminalEquipment.EquipmentTags != null && terminalEquipment.EquipmentTags.Count() > 0 && terminalEquipment.EquipmentTags.Any(t => t.TerminalOrSpanId == terminal.Id))
-            {
-                var terminalTags = terminalEquipment.EquipmentTags.Where(t => t.TerminalOrSpanId == terminal.Id).ToArray();
-
-                List<string> tags = new List<string>();
-
-                foreach (var terminalTag in terminalEquipment.EquipmentTags)
-                {
-                    if (terminalTag.Tags != null)
-                        tags.AddRange(terminalTag.Tags);
-                }
-
-                return String.Join(',',tags.ToArray());
-            }
-
-            return null;
         }
 
         private TerminalEquipmentAZConnectivityViewEndInfo GetOutEndInfo(RelevantEquipmentData relevantEquipmentData, TerminalEquipment terminalEquipment, Terminal terminal)
         {
-            var tags = GetTerminalTags(terminalEquipment, terminal);
+            var traceInfo = relevantEquipmentData.TracedTerminals[terminal.Id];
+
+            var traceEndInfo = traceInfo.Z;
+
+            var tags = traceInfo.Tags != null ? String.Join(',', traceInfo.Tags.ToArray()) : null;
 
             var terminalInfo = new TerminalEquipmentAZConnectivityViewTerminalInfo(terminal.Id, terminal.Name, tags);
 
-            var traceInfo = relevantEquipmentData.TracedTerminals[terminal.Id].Z;
 
             // if we found nothing in z end, try a end
-            if (traceInfo == null)
-                traceInfo = relevantEquipmentData.TracedTerminals[terminal.Id].A;
+            if (traceEndInfo == null)
+                traceEndInfo = relevantEquipmentData.TracedTerminals[terminal.Id].A;
 
             FaceKindEnum faceKind = GetZEndFaceKind(relevantEquipmentData, terminal);
 
             return new TerminalEquipmentAZConnectivityViewEndInfo(terminalInfo, faceKind)
             {
-                ConnectedToSpanSegmentId = traceInfo == null ? Guid.Empty : traceInfo.NeighborSegment.Id,
-                ConnectedTo = traceInfo == null ? null : CreateConnectedToString(relevantEquipmentData, traceInfo),
-                End = traceInfo == null ? null : relevantEquipmentData.GetNodeAndEquipmentEndString(traceInfo.EndTerminal)
+                ConnectedToSpanSegmentId = traceEndInfo == null ? Guid.Empty : traceEndInfo.NeighborSegment.Id,
+                ConnectedTo = traceEndInfo == null ? null : CreateConnectedToString(relevantEquipmentData, traceEndInfo),
+                End = traceEndInfo == null ? null : relevantEquipmentData.GetNodeAndEquipmentEndString(traceEndInfo.EndTerminal)
             };
         }
 
@@ -565,6 +553,8 @@ namespace OpenFTTH.UtilityGraphService.Business.TerminalEquipments.QueryHandling
                         {
                             traceInfo.Downstream = GetEndInfoFromTrace(terminal.Id, terminalTraceResult.Downstream);
                         }
+
+                        traceInfo.Tags = RelatedDataHolder.GetTagsFromTrace(_utilityNetwork, terminalTraceResult);
                     }
 
                     traceInfosByTerminalId.Add(terminal.Id, traceInfo);
@@ -713,12 +703,14 @@ namespace OpenFTTH.UtilityGraphService.Business.TerminalEquipments.QueryHandling
 
 
 
-        private record TraceInfo
+        public record TraceInfo
         {
             public IUtilityGraphTerminalRef SourceTerminal { get; set; }
             public TraceEndInfo? Upstream { get; set; }
             public TraceEndInfo? Downstream { get; set; }
-            public bool UpstreamIsZ {get; set;}
+            public bool UpstreamIsZ { get; set;}
+            public List<string>? Tags { get; set; }
+
             public TraceEndInfo? Z
             {
                 get
@@ -736,10 +728,9 @@ namespace OpenFTTH.UtilityGraphService.Business.TerminalEquipments.QueryHandling
                     else return Downstream;
                 }
             }
-
         }
 
-        private record TraceEndInfo
+        public record TraceEndInfo
         {
             public GraphEdge NeighborSegment { get; set; }
             public UtilityGraphConnectedTerminal EndTerminal { get; set; }

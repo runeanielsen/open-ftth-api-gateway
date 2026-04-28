@@ -10,6 +10,7 @@ using OpenFTTH.UtilityGraphService.API.Model.UtilityNetwork;
 using OpenFTTH.UtilityGraphService.API.Model.UtilityNetwork.Views;
 using OpenFTTH.UtilityGraphService.API.Queries;
 using OpenFTTH.UtilityGraphService.Business.Graph;
+using OpenFTTH.UtilityGraphService.Business.Graph.Trace;
 using OpenFTTH.UtilityGraphService.Business.NodeContainers.Projections;
 using OpenFTTH.UtilityGraphService.Business.SpanEquipments.Projections;
 using OpenFTTH.UtilityGraphService.Business.TerminalEquipments.Projections;
@@ -162,38 +163,40 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments.QueryHandling
 
         private SpanEquipmentAZConnectivityViewEndInfo GetAEndInfo(RelevantEquipmentData relevantEquipmentData, SpanEquipment spanEquipment, SpanSegment spanSegment)
         {
-            var traceInfo = relevantEquipmentData.TracedSegments[spanSegment.Id].A;
+            var traceInfo = relevantEquipmentData.TracedSegments[spanSegment.Id];
+            var traceEndInfo = traceInfo.A;
 
             return new SpanEquipmentAZConnectivityViewEndInfo()
             {
-                ConnectedTo = CreateConnectedToString(relevantEquipmentData, spanEquipment, traceInfo),
-                End = CreateEndString(relevantEquipmentData, traceInfo),
+                ConnectedTo = CreateConnectedToString(relevantEquipmentData, spanEquipment, traceEndInfo),
+                End = CreateEndString(relevantEquipmentData, traceEndInfo),
                 Tags = GetTags(spanEquipment, spanSegment, relevantEquipmentData, traceInfo)
             };
         }
 
         private SpanEquipmentAZConnectivityViewEndInfo GetZEndInfo(RelevantEquipmentData relevantEquipmentData, SpanEquipment spanEquipment, SpanSegment spanSegment)
         {
-            var traceInfo = relevantEquipmentData.TracedSegments[spanSegment.Id].Z;
+            var traceInfo = relevantEquipmentData.TracedSegments[spanSegment.Id];
+
+            var traceEndInfo = traceInfo.Z;
 
             return new SpanEquipmentAZConnectivityViewEndInfo()
             {
-                ConnectedTo = CreateConnectedToString(relevantEquipmentData, spanEquipment, traceInfo),
-                End = CreateEndString(relevantEquipmentData, traceInfo),
+                ConnectedTo = CreateConnectedToString(relevantEquipmentData, spanEquipment, traceEndInfo),
+                End = CreateEndString(relevantEquipmentData, traceEndInfo),
                 Tags = GetTags(spanEquipment, spanSegment, relevantEquipmentData, traceInfo)
             };
         }
 
-        private string? GetTags(SpanEquipment spanEquipment, SpanSegment spanSegment, RelevantEquipmentData relevantEquipmentData, TraceEndInfo? traceInfo)
+        private string? GetTags(SpanEquipment spanEquipment, SpanSegment spanSegment, RelevantEquipmentData relevantEquipmentData, TraceInfo? traceInfo)
         {
-            var spanEquipmentTags = GetTagsBySpanSegment(spanEquipment, spanSegment.Id);
+            var spanEquipmentTags = RelatedDataHolder.GetTagsBySpanSegment(spanEquipment, spanSegment.Id);
 
-            if (spanEquipmentTags.Count > 0)
+            if (traceInfo != null && traceInfo.Tags != null && traceInfo.Tags.Count > 0)
             {
-                return String.Join(',', spanEquipmentTags.ToArray());
+                return String.Join(',', traceInfo.Tags);
             }
 
-            // TODO: Also search trace for tags
             return null;
         }
 
@@ -313,7 +316,11 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments.QueryHandling
                         {
                             traceInfo.Downstream = GetEndInfoFromTrace(segment.Id, terminalTraceResult.Downstream);
                         }
+
+                        traceInfo.Tags = RelatedDataHolder.GetTagsFromTrace(_utilityNetwork, terminalTraceResult);
                     }
+
+                    
 
                     traceInfosByTerminalId.Add(segment.Id, traceInfo);
                 }
@@ -417,28 +424,7 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments.QueryHandling
             return new TraceEndInfo((UtilityGraphConnectedTerminal)neighborTerminal, (UtilityGraphConnectedTerminal)terminalEnd);
         }
 
-        private List<string> GetTagsBySpanSegment(SpanEquipment spanEquipment, Guid spanSegmentId)
-        {
-            if (spanEquipment.EquipmentTags != null && spanEquipment.EquipmentTags.Count() > 0 && spanEquipment.EquipmentTags.Any(t => t.TerminalOrSpanId == spanSegmentId))
-            {
-                var spanTags = spanEquipment.EquipmentTags.Where(t => t.TerminalOrSpanId == spanSegmentId).ToArray();
-
-                HashSet<string> tags = new HashSet<string>();
-
-                foreach (var terminalTag in spanTags)
-                {
-                    if (terminalTag.Tags != null)
-                    {
-                        foreach (var tag in terminalTag.Tags)
-                            tags.Add(tag);
-                    }
-                }
-
-                return tags.ToList<string>();
-            }
-
-            return new List<string>();
-        }
+       
 
 
         private class RelevantEquipmentData : RelatedDataHolder
@@ -455,6 +441,7 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments.QueryHandling
         {
             public TraceEndInfo? Upstream { get; set; }
             public TraceEndInfo? Downstream { get; set; }
+            public List<string>? Tags  { get; set; }
 
             public bool UpstreamIsZ { get; set; }
             public TraceEndInfo? Z
