@@ -33,12 +33,12 @@ namespace OpenFTTH.APIGateway.GraphQL.Outage.Queries
                         new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "count" }
                     ))
                  .Description("Retrieve the latest n trouble ticket work tasks ordered by date.")
-                 .Resolve(context =>
+                 .ResolveAsync(async context =>
                  {
                      var count = context.GetArgument<int?>("count") ?? 10;
 
                      var queryRequest = new GetAllWorkTaskAndProjects();
-                     var queryResult = this._queryDispatcher.HandleAsync<GetAllWorkTaskAndProjects, Result<List<WorkTaskAndProject>>>(queryRequest).Result;
+                     var queryResult = await _queryDispatcher.HandleAsync<GetAllWorkTaskAndProjects, Result<List<WorkTaskAndProject>>>(queryRequest).ConfigureAwait(false);
 
                      var orderedTroubleTicketWorkTrask = queryResult.Value
                          .Where(w => w.WorkTask.Type != null && w.WorkTask.Type == "Trouble ticket")
