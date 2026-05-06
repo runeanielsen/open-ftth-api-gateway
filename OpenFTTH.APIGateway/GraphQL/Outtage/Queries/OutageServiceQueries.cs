@@ -25,23 +25,27 @@ namespace OpenFTTH.APIGateway.GraphQL.Outage.Queries
         {
             _queryDispatcher = queryDispatcher;
 
-            Description = "GraphQL API for querying outage / trouble ticket related data";
+            Description = "GraphQL API for querying work tasks on type and status.";
 
-            Field<ListGraphType<WorkTaskAndProjectType>>("latestTroubleTicketsOrderedByDate")
+            Field<ListGraphType<WorkTaskAndProjectType>>("latestTroubleTickets")
                 .Arguments(
                     new QueryArguments(
-                        new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "count" }
+                        new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "count" },
+                        new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "workTaskType" },
+                        new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "workTaskStatus" }
                     ))
                  .Description("Retrieve the latest n trouble ticket work tasks ordered by date.")
                  .ResolveAsync(async context =>
                  {
-                     var count = context.GetArgument<int?>("count") ?? 10;
+                     var count = context.GetArgument<int>("count");
+                     var workTaskType = context.GetArgument<string>("workTaskType");
+                     var workTaskStatus = context.GetArgument<string>("workTaskStatus");
 
                      var queryRequest = new GetAllWorkTaskAndProjects();
                      var queryResult = await _queryDispatcher.HandleAsync<GetAllWorkTaskAndProjects, Result<List<WorkTaskAndProject>>>(queryRequest).ConfigureAwait(false);
 
                      var orderedTroubleTicketWorkTrask = queryResult.Value
-                         .Where(w => w.WorkTask.Type != null && w.WorkTask.Type == "Trouble ticket")
+                         .Where(w => w.WorkTask?.Type == workTaskType && w.WorkTask?.Status == workTaskStatus)
                          .OrderByDescending(w => w.WorkTask.CreatedDate)
                          .Take(count);
 
@@ -94,6 +98,5 @@ namespace OpenFTTH.APIGateway.GraphQL.Outage.Queries
                     }
                 });
         }
-
     }
 }
