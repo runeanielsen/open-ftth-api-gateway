@@ -1,10 +1,10 @@
-﻿using OpenFTTH.Results;
-using GraphQL;
+﻿using GraphQL;
 using GraphQL.Types;
 using Microsoft.Extensions.Logging;
 using OpenFTTH.APIGateway.GraphQL.Outage.Types;
 using OpenFTTH.APIGateway.GraphQL.Work.Types;
 using OpenFTTH.CQRS;
+using OpenFTTH.Results;
 using OpenFTTH.UtilityGraphService.API.Commands;
 using OpenFTTH.UtilityGraphService.API.Model.Outage;
 using OpenFTTH.UtilityGraphService.API.Queries;
