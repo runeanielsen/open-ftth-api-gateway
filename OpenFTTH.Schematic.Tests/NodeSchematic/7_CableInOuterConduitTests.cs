@@ -39,10 +39,10 @@ namespace OpenFTTH.Schematic.Tests.NodeSchematic
         }
 
         [Fact, Order(1)]
-        public async void TestCableFromOuterConduitToOuterConduitInSP1()
+        public async System.Threading.Tasks.Task TestCableFromOuterConduitToOuterConduitInSP1()
         {
             var sutRouteNetworkElement = TestRouteNetwork.SP_1;
-        
+
             var utilityNetwork = _eventStore.Projections.Get<UtilityNetworkProjection>();
 
             PlaceCableBetweenCC1AndJ1(_commandDispatcher, _cable1, "flex-flex-1");
@@ -82,8 +82,8 @@ namespace OpenFTTH.Schematic.Tests.NodeSchematic
                 ),
             };
 
-         
-            var placeSpanEquipmentCommand = new PlaceSpanEquipmentInUtilityNetwork(Guid.NewGuid(), new UserContext("test", Guid.Empty),cableId, TestSpecifications.FiberCable_2Fiber, routingHops)
+
+            var placeSpanEquipmentCommand = new PlaceSpanEquipmentInUtilityNetwork(Guid.NewGuid(), new UserContext("test", Guid.Empty), cableId, TestSpecifications.FiberCable_2Fiber, routingHops)
             {
                 NamingInfo = new NamingInfo(name, null),
                 ManufacturerId = Guid.NewGuid()

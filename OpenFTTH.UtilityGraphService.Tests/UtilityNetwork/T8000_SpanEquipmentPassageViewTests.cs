@@ -91,7 +91,7 @@ namespace OpenFTTH.UtilityGraphService.Tests.UtilityNetwork
             viewModel.SpanEquipments[0].Lines[0].SegmentLength.Should().BeGreaterThan(0);
             totalLength += viewModel.SpanEquipments[0].Lines[0].SegmentLength;
             viewModel.SpanEquipments[0].Lines[0].SegmentLength.Should().Be(totalLength);
-            
+
             viewModel.SpanEquipments[0].Lines[1].SegmentLength.Should().BeGreaterThan(0);
             totalLength += viewModel.SpanEquipments[0].Lines[1].SegmentLength;
             viewModel.SpanEquipments[0].Lines[1].CumulativeDistance.Should().Be(totalLength);

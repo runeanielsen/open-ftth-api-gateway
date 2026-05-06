@@ -36,7 +36,7 @@ namespace OpenFTTH.Schematic.Tests.NodeSchematic
         }
 
         [Fact, Order(1)]
-        public async void TestGetDiagramQueryOnCC_1()
+        public async System.Threading.Tasks.Task TestGetDiagramQueryOnCC_1()
         {
             var sutRouteNetworkElement = TestRouteNetwork.CC_1;
 
@@ -72,7 +72,7 @@ namespace OpenFTTH.Schematic.Tests.NodeSchematic
         }
 
         [Fact, Order(20)]
-        public async void TestGetDiagramQueryOnHH_2()
+        public async System.Threading.Tasks.Task TestGetDiagramQueryOnHH_2()
         {
             var sutRouteNetworkElement = TestRouteNetwork.HH_2;
 
@@ -91,7 +91,7 @@ namespace OpenFTTH.Schematic.Tests.NodeSchematic
         }
 
         [Fact, Order(21)]
-        public async void TestGetDiagramQueryOnHH_1()
+        public async System.Threading.Tasks.Task TestGetDiagramQueryOnHH_1()
         {
             var sutRouteNetworkElement = TestRouteNetwork.HH_1;
 
@@ -111,7 +111,7 @@ namespace OpenFTTH.Schematic.Tests.NodeSchematic
         }
 
         [Fact, Order(22)]
-        public async void TestGetDiagramQueryOnHH_10()
+        public async System.Threading.Tasks.Task TestGetDiagramQueryOnHH_10()
         {
             var sutRouteNetworkElement = TestRouteNetwork.HH_10;
 
@@ -131,7 +131,7 @@ namespace OpenFTTH.Schematic.Tests.NodeSchematic
         }
 
         [Fact, Order(31)]
-        public async void TestGetDiagramForRouteNodeThatDontExist_ShouldFail()
+        public async System.Threading.Tasks.Task TestGetDiagramForRouteNodeThatDontExist_ShouldFail()
         {
             var sutRouteNetworkElement = Guid.NewGuid();
 
@@ -143,7 +143,7 @@ namespace OpenFTTH.Schematic.Tests.NodeSchematic
         }
 
         [Fact, Order(32)]
-        public async void TestGetDiagramQueryOnNodeWithNodeContainerOnly_ShouldReturnNodeContainerInDiagram()
+        public async System.Threading.Tasks.Task TestGetDiagramQueryOnNodeWithNodeContainerOnly_ShouldReturnNodeContainerInDiagram()
         {
             var sutRouteNetworkElement = TestRouteNetwork.J_1;
 
@@ -156,6 +156,6 @@ namespace OpenFTTH.Schematic.Tests.NodeSchematic
         }
 
 
-       
+
     }
 }

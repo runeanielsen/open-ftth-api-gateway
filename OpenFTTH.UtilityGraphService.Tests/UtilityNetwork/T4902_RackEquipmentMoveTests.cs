@@ -227,7 +227,7 @@ namespace OpenFTTH.UtilityGraphService.Tests.UtilityNetwork
             utilityNetworkUpdatedEvent.AffectedRouteNetworkElementIds.Should().Contain(sutNodeId);
         }
 
-      
+
 
         [Fact, Order(5)]
         public async Task MoveOLTRackDownToPosition13ShouldFail()
@@ -268,7 +268,7 @@ namespace OpenFTTH.UtilityGraphService.Tests.UtilityNetwork
             nodeContainerAfterUpdate.Racks.First(r => r.Name == "DATA").SubrackMounts.Any(m => m.TerminalEquipmentId == olt.TerminalEquipmentId && olt.Position == 14).Should().BeTrue();
         }
 
-       
+
 
         [Fact, Order(6)]
         public async Task MoveOLTBackToPosition30ShouldSucceed()

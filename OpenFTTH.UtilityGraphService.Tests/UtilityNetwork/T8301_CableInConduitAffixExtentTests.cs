@@ -50,11 +50,11 @@ namespace OpenFTTH.UtilityGraphService.Tests.UtilityNetwork
             cableWoiBeforeAfix[0].Should().Be(ConduitTestUtilityNetwork.N2);
             cableWoiBeforeAfix[1].Should().Be(ConduitTestUtilityNetwork.S2);
             cableWoiBeforeAfix[2].Should().Be(ConduitTestUtilityNetwork.N3);
-            
+
             /////////////////////////////////
             // Extent cable into Conduit N1_N2_1
             var cableAfterFirstAffix = _conduitTestUtilityNetwork.AffixCableToSingleConduit(ConduitTestUtilityNetwork.N2, sutCable.Id, ConduitTestUtilityNetwork.Conduit_N1_N2_1);
-            
+
             // Cable woi should now be extended to include s1
             var cableWoiAfterFirstAffix = _conduitTestUtilityNetwork.GetWalkOfInterest(sutCable.WalkOfInterestId);
             cableWoiAfterFirstAffix.Count().Should().Be(5);

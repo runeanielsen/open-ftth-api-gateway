@@ -17,7 +17,7 @@ namespace OpenFTTH.UtilityGraphService.Business.Graph
         private ConcurrentDictionary<Guid, IUtilityGraphElement> _graphElementsById = new ConcurrentDictionary<Guid, IUtilityGraphElement>();
 
         private InMemoryObjectManager _objectManager = new InMemoryObjectManager();
-        
+
         public long LatestCommitedVersion => _objectManager.GetLatestCommitedVersion();
 
         public UtilityGraph(UtilityNetworkProjection utilityNetworkProjection)
@@ -36,9 +36,9 @@ namespace OpenFTTH.UtilityGraphService.Business.Graph
                 }
             }
 
-            #pragma warning disable CS8601 // Possible null reference assignment.
+#pragma warning disable CS8601 // Possible null reference assignment.
             utilityGraphElement = default(T);
-            #pragma warning restore CS8601 // Possible null reference assignment.
+#pragma warning restore CS8601 // Possible null reference assignment.
 
             return false;
         }
@@ -267,7 +267,8 @@ namespace OpenFTTH.UtilityGraphService.Business.Graph
 
             public IGraphNode LastVisit = null;
 
-            public bool UpstreamTrace {
+            public bool UpstreamTrace
+            {
                 get { return _upstreamTrace; }
 
                 set { _upstreamTrace = value; }

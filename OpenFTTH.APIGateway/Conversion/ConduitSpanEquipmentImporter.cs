@@ -184,9 +184,9 @@ namespace OpenFTTH.APIGateway.Conversion
             public Guid Id { get; set; }
             public string ExternalId { get; set; }
             public string ExternalSpec { get; set; }
-            
+
             public List<Guid> SegmentIds = new List<Guid>();
-            public SpanEquipmentSpecInfo ConduitSpec { get; set;}
+            public SpanEquipmentSpecInfo ConduitSpec { get; set; }
 
             public Guid? AccessAddressId;
             public Guid? UnitAddressId;
@@ -278,7 +278,7 @@ namespace OpenFTTH.APIGateway.Conversion
                     return new SpanEquipmentSpecInfo(TestSpecifications.Tomrør_Ø50_Orange);
 
                 // Ø50
-                if (externalSpec ==  "ø50 5x10")
+                if (externalSpec == "ø50 5x10")
                     return new SpanEquipmentSpecInfo(TestSpecifications.Multi_Ø40_5x10, GetMarkingText(externalSpec));
 
                 if (externalSpec == "ø50 5x10+12x7 color")

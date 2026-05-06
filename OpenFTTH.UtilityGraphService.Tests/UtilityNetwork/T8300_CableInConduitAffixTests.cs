@@ -58,7 +58,7 @@ namespace OpenFTTH.UtilityGraphService.Tests.UtilityNetwork
             /////////////////////////////////
             // Move cable into Conduit N2_N3_1
             var cableAfterFirstAffix = _conduitTestUtilityNetwork.AffixCableToSingleConduit(ConduitTestUtilityNetwork.N2, sutCable.Id, ConduitTestUtilityNetwork.Conduit_N2_N3_1);
-            
+
             // Cable woi should not be changed
             var cableWoiAfterFirstAffix = _conduitTestUtilityNetwork.GetWalkOfInterest(sutCable.WalkOfInterestId);
             cableWoiAfterFirstAffix.Should().BeEquivalentTo(cableWoiBeforeAfix);

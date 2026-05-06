@@ -58,7 +58,7 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments.CommandHandlers
                 var interestAR = _eventStore.Aggregates.Load<InterestAR>(nodeContainer.InterestId);
 
                 OpenFTTH.RouteNetwork.Business.CommandContext routeNetworkCommandContext = new RouteNetwork.Business.CommandContext(commandContext.CorrelationId, commandContext.CmdId, commandContext.UserContext);
-              
+
                 var unregisterInterestResult = interestAR.UnregisterInterest(routeNetworkCommandContext, interestProjection, nodeContainer.InterestId);
 
                 if (unregisterInterestResult.IsFailed)

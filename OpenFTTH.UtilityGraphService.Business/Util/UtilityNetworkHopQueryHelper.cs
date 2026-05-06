@@ -34,7 +34,7 @@ namespace OpenFTTH.UtilityGraphService.Business.Util
             foreach (var parentAffix in utilityNetworkHop.ParentAffixes)
             {
                 if (!_utilityNetwork.Graph.TryGetGraphElement<IUtilityGraphSegmentRef>(parentAffix.SpanSegmentId, out var utilityGraphSegmentRef))
-                   throw new ApplicationException($"Cannot find span segment with id: {parentAffix.SpanSegmentId}");
+                    throw new ApplicationException($"Cannot find span segment with id: {parentAffix.SpanSegmentId}");
 
                 segmentRefsToProcess.Add(utilityGraphSegmentRef);
 
@@ -170,7 +170,7 @@ namespace OpenFTTH.UtilityGraphService.Business.Util
     }
 
 
-    public class UtilitySubHop 
+    public class UtilitySubHop
     {
         public Guid ParentSegementId { get; }
         public ValidatedRouteNetworkWalk Walk { get; }

@@ -39,7 +39,7 @@ namespace OpenFTTH.Schematic.Tests.NodeSchematic
         }
 
         [Fact, Order(1)]
-        public async void TestDrawingCableEndOutsideConduitInRouteNode()
+        public async System.Threading.Tasks.Task TestDrawingCableEndOutsideConduitInRouteNode()
         {
             var utilityNetwork = _eventStore.Projections.Get<UtilityNetworkProjection>();
 
@@ -84,7 +84,7 @@ namespace OpenFTTH.Schematic.Tests.NodeSchematic
 
 
         [Fact, Order(2)]
-        public async void TestDrawingCableOutsideConduitPassingThrougRouteSegment()
+        public async System.Threading.Tasks.Task TestDrawingCableOutsideConduitPassingThrougRouteSegment()
         {
             var utilityNetwork = _eventStore.Projections.Get<UtilityNetworkProjection>();
 
@@ -105,7 +105,7 @@ namespace OpenFTTH.Schematic.Tests.NodeSchematic
 
 
         [Fact, Order(10)]
-        public async void TestDrawingCableInsideConduitPassingThrougRouteSegment()
+        public async System.Threading.Tasks.Task TestDrawingCableInsideConduitPassingThrougRouteSegment()
         {
             var utilityNetwork = _eventStore.Projections.Get<UtilityNetworkProjection>();
 
@@ -151,13 +151,13 @@ namespace OpenFTTH.Schematic.Tests.NodeSchematic
 
 
         [Fact, Order(11)]
-        public async void TestDrawingCableInsideConduitStartingInNode()
+        public async System.Threading.Tasks.Task TestDrawingCableInsideConduitStartingInNode()
         {
             var utilityNetwork = _eventStore.Projections.Get<UtilityNetworkProjection>();
 
             var sutRouteNetworkElement = TestRouteNetwork.HH_1;
 
-       
+
             // Act
             var getDiagramQueryResult = await _queryDispatcher.HandleAsync<GetDiagram, Result<GetDiagramResult>>(new GetDiagram(sutRouteNetworkElement));
 
@@ -176,7 +176,7 @@ namespace OpenFTTH.Schematic.Tests.NodeSchematic
 
 
         [Fact, Order(19)]
-        public async void TestDrawingCableInConnectedConduitsInsideNodeContainer()
+        public async System.Threading.Tasks.Task TestDrawingCableInConnectedConduitsInsideNodeContainer()
         {
             var utilityNetwork = _eventStore.Projections.Get<UtilityNetworkProjection>();
 
@@ -221,7 +221,7 @@ namespace OpenFTTH.Schematic.Tests.NodeSchematic
 
 
         [Fact, Order(20)]
-        public async void TestDrawingCableInPassThroughConduitInsideNodeContainer()
+        public async System.Threading.Tasks.Task TestDrawingCableInPassThroughConduitInsideNodeContainer()
         {
             var utilityNetwork = _eventStore.Projections.Get<UtilityNetworkProjection>();
 
@@ -267,7 +267,7 @@ namespace OpenFTTH.Schematic.Tests.NodeSchematic
 
 
         [Fact, Order(21)]
-        public async void TestDrawingCableEndInsideNodeContainerCC1()
+        public async System.Threading.Tasks.Task TestDrawingCableEndInsideNodeContainerCC1()
         {
             var utilityNetwork = _eventStore.Projections.Get<UtilityNetworkProjection>();
 
@@ -312,7 +312,7 @@ namespace OpenFTTH.Schematic.Tests.NodeSchematic
 
 
         [Fact, Order(22)]
-        public async void TestDrawingCableThrowhWellInsideNodeContainerCC1()
+        public async System.Threading.Tasks.Task TestDrawingCableThrowhWellInsideNodeContainerCC1()
         {
             var utilityNetwork = _eventStore.Projections.Get<UtilityNetworkProjection>();
 
@@ -359,7 +359,7 @@ namespace OpenFTTH.Schematic.Tests.NodeSchematic
 
 
         [Fact, Order(23)]
-        public async void TestDrawingCableThrowSingleConduitInWellInsideNodeContainerCC1()
+        public async System.Threading.Tasks.Task TestDrawingCableThrowSingleConduitInWellInsideNodeContainerCC1()
         {
             var utilityNetwork = _eventStore.Projections.Get<UtilityNetworkProjection>();
 
@@ -411,7 +411,7 @@ namespace OpenFTTH.Schematic.Tests.NodeSchematic
 
 
         [Fact, Order(24)]
-        public async void TestDrawingCableThroughWellInsideNodeContainerHH2()
+        public async System.Threading.Tasks.Task TestDrawingCableThroughWellInsideNodeContainerHH2()
         {
             var utilityNetwork = _eventStore.Projections.Get<UtilityNetworkProjection>();
 
@@ -496,13 +496,13 @@ namespace OpenFTTH.Schematic.Tests.NodeSchematic
 
 
         [Fact, Order(31)]
-        public async void TestDrawingCableThroughOuterConduitInsideNodeSegment()
+        public async System.Threading.Tasks.Task TestDrawingCableThroughOuterConduitInsideNodeSegment()
         {
             var utilityNetwork = _eventStore.Projections.Get<UtilityNetworkProjection>();
 
             var sutRouteNetworkElement = TestRouteNetwork.S3;
 
-         
+
             // Assert
             var getDiagramQueryResult = await _queryDispatcher.HandleAsync<GetDiagram, Result<GetDiagramResult>>(new GetDiagram(sutRouteNetworkElement));
 
@@ -519,7 +519,7 @@ namespace OpenFTTH.Schematic.Tests.NodeSchematic
 
 
         [Fact, Order(30)]
-        public async void TestDrawingCableThroughOuterConduitEndInsideNode()
+        public async System.Threading.Tasks.Task TestDrawingCableThroughOuterConduitEndInsideNode()
         {
             var utilityNetwork = _eventStore.Projections.Get<UtilityNetworkProjection>();
 

@@ -34,7 +34,7 @@ namespace OpenFTTH.UtilityGraphService.Business.TerminalEquipments.CommandHandle
             {
                 return Task.FromResult(Result.Fail(new TerminalEquipmentError(TerminalEquipmentErrorCodes.TERMINAL_EQUIPMENT_NOT_FOUND, $"Cannot find any terminal equipment with id: {command.TerminalEquipmentId}")));
             }
-      
+
             var terminalEquipmentAR = _eventStore.Aggregates.Load<TerminalEquipmentAR>(command.TerminalEquipmentId);
 
             var commandContext = new CommandContext(command.CorrelationId, command.CmdId, command.UserContext);
@@ -56,7 +56,7 @@ namespace OpenFTTH.UtilityGraphService.Business.TerminalEquipments.CommandHandle
 
             return Task.FromResult(removeEquipmentStructureResult);
         }
-      
+
 
         private async void NotifyExternalServicesAboutChange(Guid routeNodeId, Guid terminalEquipmentId)
         {

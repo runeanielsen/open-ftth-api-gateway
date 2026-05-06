@@ -8,7 +8,7 @@ namespace OpenFTTH.UtilityGraphService.API.Commands
     {
         public Guid SpanEquipmentId { get; }
 
-        public Guid[] StructureSpecificationIds { get;  }
+        public Guid[] StructureSpecificationIds { get; }
 
         public PlaceAdditionalStructuresInSpanEquipment(Guid correlationId, UserContext userContext, Guid spanEquipmentId, Guid[] structureSpecificationIds) : base(correlationId, userContext)
         {

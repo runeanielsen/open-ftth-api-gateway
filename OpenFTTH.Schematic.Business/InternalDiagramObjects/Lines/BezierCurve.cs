@@ -27,7 +27,7 @@ namespace OpenFTTH.Schematic.Business.Lines
         private void CreateFactorialTable()
         {
             // fill untill n=32. The rest is too high to represent
-            double[] a = new double[33]; 
+            double[] a = new double[33];
             a[0] = 1.0;
             a[1] = 1.0;
             a[2] = 2.0;
@@ -70,7 +70,7 @@ namespace OpenFTTH.Schematic.Business.Lines
             double a1 = factorial(n);
             double a2 = factorial(i);
             double a3 = factorial(n - i);
-            ni =  a1/ (a2 * a3);
+            ni = a1 / (a2 * a3);
             return ni;
         }
 
@@ -83,18 +83,18 @@ namespace OpenFTTH.Schematic.Business.Lines
 
             /* Prevent problems with pow */
 
-            if (t == 0.0 && i == 0) 
-                ti = 1.0; 
-            else 
+            if (t == 0.0 && i == 0)
+                ti = 1.0;
+            else
                 ti = Math.Pow(t, i);
 
-            if (n == i && t == 1.0) 
-                tni = 1.0; 
-            else 
+            if (n == i && t == 1.0)
+                tni = 1.0;
+            else
                 tni = Math.Pow((1 - t), (n - i));
 
             //Bernstein basis
-            basis = Ni(n, i) * ti * tni; 
+            basis = Ni(n, i) * ti * tni;
             return basis;
         }
 
@@ -111,8 +111,8 @@ namespace OpenFTTH.Schematic.Business.Lines
             step = (double)1.0 / (cpts - 1);
 
             for (int i1 = 0; i1 != cpts; i1++)
-            { 
-                if ((1.0 - t) < 5e-6) 
+            {
+                if ((1.0 - t) < 5e-6)
                     t = 1.0;
 
                 jcount = 0;
@@ -123,7 +123,7 @@ namespace OpenFTTH.Schematic.Business.Lines
                     double basis = Bernstein(npts - 1, i, t);
                     p[icount] += basis * b[jcount];
                     p[icount + 1] += basis * b[jcount + 1];
-                    jcount = jcount +2;
+                    jcount = jcount + 2;
                 }
 
                 icount += 2;

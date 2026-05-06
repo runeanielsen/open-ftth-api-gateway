@@ -6,7 +6,7 @@ namespace OpenFTTH.UtilityGraphService.API.Model.UtilityNetwork
     public record NodeContainerSpecification : IIdentifiedObject
     {
         public Guid Id { get; }
-        public string Category { get;}
+        public string Category { get; }
         public string Name { get; }
         public bool Deprecated { get; init; }
 

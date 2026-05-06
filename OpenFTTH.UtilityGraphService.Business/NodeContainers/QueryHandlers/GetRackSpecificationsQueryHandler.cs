@@ -12,7 +12,7 @@ namespace OpenFTTH.UtilityGraphService.Business.NodeEquipments.QueryHandling
     public class GetRackSpecificationsQueryHandler
         : IQueryHandler<GetRackSpecifications, Result<LookupCollection<RackSpecification>>>
     {
-        private readonly IEventStore _eventStore;        
+        private readonly IEventStore _eventStore;
 
         public GetRackSpecificationsQueryHandler(IEventStore eventStore)
         {

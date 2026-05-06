@@ -58,7 +58,7 @@ namespace OpenFTTH.APIGateway.DynamicProperties
 
             // Dictionary used to lookup sections by name
             Dictionary<string, DynamicPropertiesSection> sectionByName = new();
-          
+
             if (installaionReader.Read())
             {
                 for (int fieldIndex = 0; fieldIndex < installaionReader.FieldCount; fieldIndex++)
@@ -89,7 +89,7 @@ namespace OpenFTTH.APIGateway.DynamicProperties
                     }
 
                     // Add property
-                    sectionByName[sectionName].Properties.Add(new DynamicProperty() { Name = propertyName, Value = propertyValue });   
+                    sectionByName[sectionName].Properties.Add(new DynamicProperty() { Name = propertyName, Value = propertyValue });
                 }
 
                 return sectionByName.Values.ToList();

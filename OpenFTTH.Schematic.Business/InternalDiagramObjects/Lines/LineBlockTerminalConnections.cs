@@ -66,7 +66,7 @@ namespace OpenFTTH.Schematic.Business.Lines
             }
             else
             {
-                NetTopologySuite.Geometries.LineString curve = CreateCurve(0,0,0);
+                NetTopologySuite.Geometries.LineString curve = CreateCurve(0, 0, 0);
 
                 result.Add(new DiagramObject(diagram)
                 {
@@ -139,7 +139,7 @@ namespace OpenFTTH.Schematic.Business.Lines
 
                 fromTerminalPointY += extraLengthBothEnds;
             }
-                        
+
             // Calculate to curve point
             if (ToTerminal.Port.Side == BlockSideEnum.West)
             {

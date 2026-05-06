@@ -115,7 +115,7 @@ namespace OpenFTTH.UtilityGraphService.Business.Graph.Projections
 
         public static SpanEquipment Apply(SpanEquipment existingSpanEquipment, SpanEquipmentCutReverted spanEquipmentCutReverted)
         {
-            UInt16 uncutNodeOfInterestIndex = (UInt16) Array.IndexOf(existingSpanEquipment.NodesOfInterestIds, spanEquipmentCutReverted.CutNodeOfInterestId);
+            UInt16 uncutNodeOfInterestIndex = (UInt16)Array.IndexOf(existingSpanEquipment.NodesOfInterestIds, spanEquipmentCutReverted.CutNodeOfInterestId);
 
             var newNodeOfInterestIdList = CreateNewNodeOfInterestIdListWithRemovedNode(existingSpanEquipment, spanEquipmentCutReverted.CutNodeOfInterestId);
 
@@ -165,7 +165,7 @@ namespace OpenFTTH.UtilityGraphService.Business.Graph.Projections
 
                         newSegments.Add(newSegment);
                     }
-                    else  
+                    else
                     {
                         // We're dealing with an segment not referencing the node to be reverted
                         var newSegment = existingSegment with { FromNodeOfInterestIndex = fromNodeOfInterestIndexToUse, ToNodeOfInterestIndex = toNodeOfInterestIndexToUse };
@@ -245,7 +245,7 @@ namespace OpenFTTH.UtilityGraphService.Business.Graph.Projections
                         newListOfAffixes.Add(existingAffix);
                 }
             }
-            
+
             return existingSpanEquipment with
             {
                 NodeContainerAffixes = newListOfAffixes.ToArray()
@@ -363,7 +363,7 @@ namespace OpenFTTH.UtilityGraphService.Business.Graph.Projections
                                 existingSegment with { FromTerminalId = Guid.Empty }
                             );
                         }
-                        else if(existingSegment.ToTerminalId == @event.TerminalId)
+                        else if (existingSegment.ToTerminalId == @event.TerminalId)
                         {
                             newSegments.Add(
                                 existingSegment with { ToTerminalId = Guid.Empty }
@@ -394,7 +394,7 @@ namespace OpenFTTH.UtilityGraphService.Business.Graph.Projections
         {
             List<SpanStructure> newStructures = new List<SpanStructure>();
 
-            Dictionary<Guid, SpanSegmentToTerminalDisconnectInfo> disconnectInfoBySpanEquipmentId  = @event.Disconnects.ToDictionary(e => e.SegmentId);
+            Dictionary<Guid, SpanSegmentToTerminalDisconnectInfo> disconnectInfoBySpanEquipmentId = @event.Disconnects.ToDictionary(e => e.SegmentId);
 
             // Loop though all span structures
             for (UInt16 structureIndex = 0; structureIndex < existingSpanEquipment.SpanStructures.Length; structureIndex++)
@@ -538,7 +538,7 @@ namespace OpenFTTH.UtilityGraphService.Business.Graph.Projections
                 if (modificationInstructionByStructureId.ContainsKey(existingSpanStructure.Id))
                 {
                     var instruction = modificationInstructionByStructureId[existingSpanStructure.Id];
-                    
+
                     if (instruction.StructureToBeDeleted == true)
                     {
                         // Don't copy the existing structure

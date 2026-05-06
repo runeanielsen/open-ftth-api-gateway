@@ -38,7 +38,7 @@ namespace OpenFTTH.UtilityGraphService.Tests.UtilityNetwork
             new TestUtilityNetwork(_commandDispatcher, _queryDispatcher).Run();
         }
 
-        [Fact,Order(1)]
+        [Fact, Order(1)]
         public async Task TestCut5x10ConduitAtCC_1_ShouldSucceed()
         {
             var utilityNetwork = _eventStore.Projections.Get<UtilityNetworkProjection>();
@@ -50,7 +50,7 @@ namespace OpenFTTH.UtilityGraphService.Tests.UtilityNetwork
             // Cut the outer conduit and 4 inner conduit
             var cutCmd = new CutSpanSegmentsAtRouteNode(Guid.NewGuid(), new UserContext("test", Guid.Empty),
                 routeNodeId: TestRouteNetwork.CC_1,
-                spanSegmentsToCut: new Guid[] { 
+                spanSegmentsToCut: new Guid[] {
                     spanEquipment.SpanStructures[0].SpanSegments[0].Id,
                     spanEquipment.SpanStructures[1].SpanSegments[0].Id,
                     spanEquipment.SpanStructures[2].SpanSegments[0].Id,
@@ -137,7 +137,7 @@ namespace OpenFTTH.UtilityGraphService.Tests.UtilityNetwork
 
             var cutCmd = new CutSpanSegmentsAtRouteNode(Guid.NewGuid(), new UserContext("test", Guid.Empty),
                 routeNodeId: TestRouteNetwork.J_1,
-                spanSegmentsToCut: new Guid[] { 
+                spanSegmentsToCut: new Guid[] {
                     Guid.NewGuid() // This one defiantly will not exists
                 }
             );

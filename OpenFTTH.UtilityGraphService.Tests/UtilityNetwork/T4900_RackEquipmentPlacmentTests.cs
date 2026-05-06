@@ -160,7 +160,7 @@ namespace OpenFTTH.UtilityGraphService.Tests.UtilityNetwork
             placeRackResult.IsSuccess.Should().BeTrue();
         }
 
-        
+
         [Fact, Order(4)]
         public async Task Place80LisaTraysInODFRackInCO1_ShouldSucceed()
         {
@@ -193,7 +193,7 @@ namespace OpenFTTH.UtilityGraphService.Tests.UtilityNetwork
             // Assert
             placeEquipmentCmdResult.IsSuccess.Should().BeTrue();
         }
-        
+
         [Fact, Order(5)]
         public async Task Place_1_to_2_SplitterGSSInODFRackInCO1_ShouldSucceed()
         {
@@ -213,7 +213,7 @@ namespace OpenFTTH.UtilityGraphService.Tests.UtilityNetwork
                 numberOfEquipments: 1,
                 startSequenceNumber: 1,
                 namingMethod: TerminalEquipmentNamingMethodEnum.NameOnly,
-                namingInfo: new Events.Core.Infos.NamingInfo() { Name = "1:2 Split"}
+                namingInfo: new Events.Core.Infos.NamingInfo() { Name = "1:2 Split" }
             )
             {
                 SubrackPlacementInfo = new SubrackPlacementInfo(nodeContainerBeforeCommand.Racks[0].Id, 100, SubrackPlacmentMethod.BottomUp)
@@ -330,14 +330,14 @@ namespace OpenFTTH.UtilityGraphService.Tests.UtilityNetwork
                 position: 1,
                 numberOfStructures: 4
             );
-           
+
             // Act
             var placeEquipmentCmdResult = await _commandDispatcher.HandleAsync<PlaceAdditionalStructuresInTerminalEquipment, Result>(placeEquipmentCmd);
 
             placeEquipmentCmdResult.IsSuccess.Should().BeTrue();
 
             utilityNetwork.TryGetEquipment<TerminalEquipment>(splitterMount.TerminalEquipmentId, out var terminalEquipmentAfterUpdate);
-        
+
             terminalEquipmentAfterUpdate.TerminalStructures.Length.Should().Be(4);
 
             utilityNetwork.Graph.TryGetGraphElement<IUtilityGraphElement>(terminalEquipmentAfterUpdate.TerminalStructures.First().Terminals.First().Id, out var firstTerminalInGraph);
@@ -466,7 +466,7 @@ namespace OpenFTTH.UtilityGraphService.Tests.UtilityNetwork
 
             // Act
             var placeEquipmentCmdResult = await _commandDispatcher.HandleAsync<PlaceTerminalEquipmentInNodeContainer, Result>(placeEquipmentCmd);
-    
+
             // Assert
             placeEquipmentCmdResult.IsSuccess.Should().BeTrue();
         }

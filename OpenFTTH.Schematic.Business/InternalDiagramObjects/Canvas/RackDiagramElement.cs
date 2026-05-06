@@ -42,7 +42,7 @@ namespace OpenFTTH.Schematic.Business.Canvas
             Width = _rackWidth;
             Height = (_rackUnitHeight * rackViewModel.MinHeightInUnits) + (_innerFrameMargin * 2);
         }
-   
+
         public override List<DiagramObject> CreateDiagramObjects(Diagram diagram, double offsetX, double offsetY)
         {
             List<DiagramObject> result = new List<DiagramObject>();

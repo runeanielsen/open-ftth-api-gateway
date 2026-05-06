@@ -7,5 +7,5 @@ namespace OpenFTTH.UtilityGraphService.Business.Graph
     {
         Guid RouteNodeId { get; }
         double FiberCoordLength { get; }
-     }
+    }
 }

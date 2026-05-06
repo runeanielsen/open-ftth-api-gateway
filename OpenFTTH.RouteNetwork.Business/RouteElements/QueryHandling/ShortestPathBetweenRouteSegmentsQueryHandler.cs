@@ -118,11 +118,11 @@ namespace OpenFTTH.RouteNetwork.Business.RouteElements.QueryHandlers
                         result.RouteSegmentElementIds.Add(destSegment.Id);
                     }
 
-                   return Task.FromResult(
-                       Result.Ok<ShortestPathBetweenRouteSegmentsResult>(
-                           result
-                       )
-                   );
+                    return Task.FromResult(
+                        Result.Ok<ShortestPathBetweenRouteSegmentsResult>(
+                            result
+                        )
+                    );
                 }
 
                 expandPercent = expandPercent * 2;

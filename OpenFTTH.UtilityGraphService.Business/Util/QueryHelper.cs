@@ -52,7 +52,7 @@ namespace OpenFTTH.UtilityGraphService.Business.Util
             return Result.Fail(new Error($"Failed to find node container in route node with id: {routeNodeId}"));
         }
 
-        public static Result<Dictionary<Guid,NodeContainer>> GetNodeContainersFromRouteNodeIds(IQueryDispatcher queryDispatcher, Guid[] routeNodeIds)
+        public static Result<Dictionary<Guid, NodeContainer>> GetNodeContainersFromRouteNodeIds(IQueryDispatcher queryDispatcher, Guid[] routeNodeIds)
         {
             Dictionary<Guid, NodeContainer> result = new();
 
@@ -97,7 +97,7 @@ namespace OpenFTTH.UtilityGraphService.Business.Util
 
                 if (equipmentQueryResult.Value.NodeContainers != null && equipmentQueryResult.Value.NodeContainers.Count > 0)
                 {
-                    
+
 
                     foreach (var nodeContainer in equipmentQueryResult.Value.NodeContainers)
                         result.Add(nodeContainer.Id, nodeContainer);

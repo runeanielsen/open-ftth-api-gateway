@@ -48,7 +48,7 @@ namespace OpenFTTH.UtilityGraphService.Tests.UtilityNetwork
 
             var sutCable1 = _conduitTestUtilityNetwork.PlaceCableDirectlyInRouteNetwork("K8325_1", TestSpecifications.FiberCable_12Fiber,
                 new Guid[] { ConduitTestUtilityNetwork.S7, ConduitTestUtilityNetwork.S1 });
-                  
+
             // Affix cable 1 into Conduit N1_N2_4
             var cable1AfterFirstAffix = _conduitTestUtilityNetwork.AffixCableToSingleConduit(ConduitTestUtilityNetwork.N2, sutCable1.Id, sutConduitId);
 
@@ -114,7 +114,7 @@ namespace OpenFTTH.UtilityGraphService.Tests.UtilityNetwork
 
             // Check cable 1
             var sutCable1 = utilityNetwork.SpanEquipmentsByEquipmentId.First(s => s.Value.NamingInfo != null && s.Value.NamingInfo.Name == "K8325_1").Value;
-   
+
             var sutCableWalkOfInterestAfterConduitMove = _conduitTestUtilityNetwork.GetWalkOfInterest(sutCable1.WalkOfInterestId);
             sutCableWalkOfInterestAfterConduitMove.Count().Should().Be(5);
             sutCableWalkOfInterestAfterConduitMove.First().Should().Be(ConduitTestUtilityNetwork.N5);
@@ -170,9 +170,9 @@ namespace OpenFTTH.UtilityGraphService.Tests.UtilityNetwork
             // Add cable to conduits
             var sutCable1 = _conduitTestUtilityNetwork.PlaceCableDirectlyInRouteNetwork("K8325_10", TestSpecifications.FiberCable_12Fiber,
                 //new Guid[] { ConduitTestUtilityNetwork.S1, ConduitTestUtilityNetwork.S2, ConduitTestUtilityNetwork.S3, ConduitTestUtilityNetwork.S10, ConduitTestUtilityNetwork.S6 });
-                new Guid[] { ConduitTestUtilityNetwork.S6, 
-                    ConduitTestUtilityNetwork.S10, 
-                    ConduitTestUtilityNetwork.S3, 
+                new Guid[] { ConduitTestUtilityNetwork.S6,
+                    ConduitTestUtilityNetwork.S10,
+                    ConduitTestUtilityNetwork.S3,
                     ConduitTestUtilityNetwork.S2,
                     ConduitTestUtilityNetwork.S1 });
 
@@ -196,7 +196,7 @@ namespace OpenFTTH.UtilityGraphService.Tests.UtilityNetwork
             cable1AfterAffix.UtilityNetworkHops.Last().ToNodeId.Should().Be(ConduitTestUtilityNetwork.N1);
 
             // Extend multi conduit to N5 og N6
-            var moveCmd = new MoveSpanEquipment(Guid.NewGuid(), new UserContext("test", Guid.Empty), sutMultiConduitId, 
+            var moveCmd = new MoveSpanEquipment(Guid.NewGuid(), new UserContext("test", Guid.Empty), sutMultiConduitId,
                 new RouteNetworkElementIdList() { ConduitTestUtilityNetwork.S2, ConduitTestUtilityNetwork.S1, ConduitTestUtilityNetwork.S7, ConduitTestUtilityNetwork.S4 });
 
             var moveCmdResult = await _commandDispatcher.HandleAsync<MoveSpanEquipment, Result>(moveCmd);
@@ -245,7 +245,7 @@ namespace OpenFTTH.UtilityGraphService.Tests.UtilityNetwork
 
             utilityNetwork.TryGetEquipment<SpanEquipment>(sutCabel1Id, out var cableConduitMove);
 
-           
+
 
             var sutCableWalkOfInterestAfterConduitMove = _conduitTestUtilityNetwork.GetWalkOfInterest(cableConduitMove.WalkOfInterestId);
             sutCableWalkOfInterestAfterConduitMove.Count().Should().Be(13);

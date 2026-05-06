@@ -35,17 +35,17 @@ namespace OpenFTTH.RouteNetwork.API.Queries
         #endregion
 
         #region Route Network Element Filter Options
-        private RouteNetworkElementFilterOptions _routeNetworkElementFilterOptions = 
+        private RouteNetworkElementFilterOptions _routeNetworkElementFilterOptions =
             new RouteNetworkElementFilterOptions()
-                {
-                    IncludeRouteNodeInfo = true,
-                    IncludeRouteSegmentInfo = true,
-                    IncludeCoordinates = true,
-                    IncludeNamingInfo = true,
-                    IncludeMappingInfo = true,
-                    IncludeLifecycleInfo = true,
-                    IncludeSafetyInfo = true
-                };
+            {
+                IncludeRouteNodeInfo = true,
+                IncludeRouteSegmentInfo = true,
+                IncludeCoordinates = true,
+                IncludeNamingInfo = true,
+                IncludeMappingInfo = true,
+                IncludeLifecycleInfo = true,
+                IncludeSafetyInfo = true
+            };
 
         public RouteNetworkElementFilterOptions RouteNetworkElementFilter
         {
@@ -61,7 +61,7 @@ namespace OpenFTTH.RouteNetwork.API.Queries
         public GetRouteNetworkDetails(RouteNetworkElementIdList routeNetworkElementIds)
         {
             // Add empty list to InterestIdsToQuery, because the client want to query by route network element ids
-            InterestIdsToQuery = new InterestIdList(); 
+            InterestIdsToQuery = new InterestIdList();
 
             this.RouteNetworkElementIdsToQuery = routeNetworkElementIds;
         }

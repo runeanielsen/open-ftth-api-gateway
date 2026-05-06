@@ -63,14 +63,14 @@ namespace OpenFTTH.Schematic.Business.Drawing
 
             var pntIndex = 1;
 
-            for (int i = 0; i < ((nPoints * 2) - 1); i+=2)
+            for (int i = 0; i < ((nPoints * 2) - 1); i += 2)
             {
                 pnts[pntIndex] = new Coordinate(Convert(result[i]), Convert(result[i + 1]));
                 pntIndex++;
             }
 
             // Add last point
-            pnts[nPoints+1] = new Coordinate(Convert(endX), Convert(endY));
+            pnts[nPoints + 1] = new Coordinate(Convert(endX), Convert(endY));
 
 
             return new LineString(pnts);
@@ -127,6 +127,6 @@ namespace OpenFTTH.Schematic.Business.Drawing
             return value / 10000;
         }
 
-        
+
     }
 }

@@ -160,7 +160,7 @@ namespace OpenFTTH.UtilityGraphService.Business.Trace
                             traceIdRefBySpanEquipmentId[segmentWalksBySpanEquipmentId.Key] = new List<SpanSegmentRouteNetworkTraceRef>() { traceRef };
                         else
                             traceIdRefBySpanEquipmentId[segmentWalksBySpanEquipmentId.Key].Add(traceRef);
-                        
+
                         // Add utility network trace (span segments)
                         if (!utilityTraceBySpanSegmentId.ContainsKey(segmentWalk.SpanEquipmentOrSegmentId))
                         {
@@ -383,7 +383,7 @@ namespace OpenFTTH.UtilityGraphService.Business.Trace
                                         walkOfInterestId: walkOfInterestId,
                                         addressInfo: ((UtilityGraphConnectedSegment)item).SpanEquipment(_utilityNetwork).AddressInfo
                                     );
-                                                                
+
                                     segmentWalk.Hops.Add(segmentHop);
                                 }
                             }
@@ -406,19 +406,19 @@ namespace OpenFTTH.UtilityGraphService.Business.Trace
                                             walkOfInterestId: walkOfInterestId,
                                             addressInfo: ((UtilityGraphConnectedSegment)item).SpanEquipment(_utilityNetwork).AddressInfo
                                         );
-                                                                           
+
                                         segmentWalk.Hops.Add(segmentHop);
                                     }
                                     else
                                     {
                                         var segmentHop = new SegmentWalkHop(
                                             spanEquipmentOrSegmentId: connectedSegment.Id,
-                                            fromNodeId:((UtilityGraphConnectedTerminal)spanTraceResult.Upstream[upstreamIndex - 1]).RouteNodeId,
+                                            fromNodeId: ((UtilityGraphConnectedTerminal)spanTraceResult.Upstream[upstreamIndex - 1]).RouteNodeId,
                                             toNodeId: ((UtilityGraphConnectedTerminal)spanTraceResult.Upstream[upstreamIndex + 1]).RouteNodeId,
                                             walkOfInterestId: walkOfInterestId,
                                             addressInfo: ((UtilityGraphConnectedSegment)item).SpanEquipment(_utilityNetwork).AddressInfo
                                         );
-                                                                        
+
                                         segmentWalk.Hops.Add(segmentHop);
                                     }
                                 }
@@ -445,7 +445,7 @@ namespace OpenFTTH.UtilityGraphService.Business.Trace
                                     );
 
                                     var segmentWalk = new SegmentWalk(spanSegment.Id, tags);
-                                                                     
+
                                     segmentWalk.Hops.Add(segmentHop);
                                     AddWalkToResult(result, spanEquipment, segmentWalk);
 
@@ -493,7 +493,7 @@ namespace OpenFTTH.UtilityGraphService.Business.Trace
             return result;
         }
 
-        private void GatherCableEndInformation(List<SpanEquipment> spanEquipmentsToTrace, ref Dictionary<Guid, string> cableDownstreamLabels, ref Dictionary<Guid, string> cableUpstreamLabels,  Guid? traceThisSpanSegmentIdOnly)
+        private void GatherCableEndInformation(List<SpanEquipment> spanEquipmentsToTrace, ref Dictionary<Guid, string> cableDownstreamLabels, ref Dictionary<Guid, string> cableUpstreamLabels, Guid? traceThisSpanSegmentIdOnly)
         {
             if (traceThisSpanSegmentIdOnly != null)
                 return;

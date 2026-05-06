@@ -50,6 +50,6 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
             return equipmentBlock;
         }
 
-       
+
     }
 }

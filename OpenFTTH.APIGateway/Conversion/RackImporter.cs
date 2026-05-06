@@ -27,7 +27,7 @@ namespace OpenFTTH.APIGateway.Conversion
         private UtilityNetworkProjection _utilityNetwork;
 
         private string _rackTableName = "conversion.racks";
-        
+
 
         private Dictionary<string, RackSpecification> _rackSpecByName = null;
 
@@ -55,7 +55,7 @@ namespace OpenFTTH.APIGateway.Conversion
 
 
             CreateTableLogColumn(_rackTableName);
-      
+
             var racks = LoadDataFromConversionDatabase();
 
             AddRacksToNetwork(racks.Values.ToList());
@@ -95,7 +95,7 @@ namespace OpenFTTH.APIGateway.Conversion
                 }
             }
         }
-     
+
         private Result PlaceRack(NpgsqlCommand logCmd, RackForConversion rack, Guid specId, RelatedEquipmentInfo relatedInfo)
         {
             Guid correlationId = Guid.NewGuid();

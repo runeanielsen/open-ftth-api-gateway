@@ -2,7 +2,7 @@
 
 namespace OpenFTTH.Schematic.API.Queries
 {
-    public record GetDiagramResult 
+    public record GetDiagramResult
     {
         public Diagram Diagram { get; }
 

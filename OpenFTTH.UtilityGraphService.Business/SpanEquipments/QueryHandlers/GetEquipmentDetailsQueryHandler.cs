@@ -157,13 +157,14 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments.QueryHandlers
                     nodeContainersToReturn.Add(nodeContainer);
             }
 
-            var result = new GetEquipmentDetailsResult() {
+            var result = new GetEquipmentDetailsResult()
+            {
                 SpanEquipment = new LookupCollection<SpanEquipmentWithRelatedInfo>(spanEquipmentsToReturn),
                 TerminalEquipment = new LookupCollection<TerminalEquipment>(terminalEquipmentsToReturn),
                 NodeContainers = new LookupCollection<NodeContainer>(nodeContainersToReturn),
                 RouteNetworkTraces = query.EquipmentDetailsFilter.IncludeRouteNetworkTrace ? AddRelatedInfoToSpanEquipments(spanEquipmentsToTrace, spanEquipmentsToReturn, traceThisSpanSegmentIdOnly) : null
             };
-    
+
             return Task.FromResult(
                 Result.Ok<GetEquipmentDetailsResult>(result)
             );

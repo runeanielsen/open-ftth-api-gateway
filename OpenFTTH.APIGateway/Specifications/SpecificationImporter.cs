@@ -52,7 +52,7 @@ namespace OpenFTTH.APIGateway.Specifications
             {
                 var jsonFiles = Directory.GetFiles(dictionary, "*.json", SearchOption.AllDirectories);
 
-                foreach(var fileInDirectory in jsonFiles)
+                foreach (var fileInDirectory in jsonFiles)
                 {
                     _logger.LogInformation($"Importing structure specfications from file: " + fileInDirectory);
 
@@ -436,7 +436,8 @@ namespace OpenFTTH.APIGateway.Specifications
                                         CableTubes = GetCableTubesFromSpecs(spanEquipmentSpec.CableTubes)
                                     }
                                 );
-                            } catch (Exception ex)
+                            }
+                            catch (Exception ex)
                             {
                                 throw new Exception($"Got exception processing span equipment specification: '{spanEquipmentSpec.Name}'", ex);
                             }

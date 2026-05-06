@@ -5,7 +5,7 @@ namespace OpenFTTH.UtilityGraphService.API.Model.UtilityNetwork
 {
     public record RackSpecification : IIdentifiedObject
     {
-        public Guid Id { get;}
+        public Guid Id { get; }
         public string Name { get; }
         public string ShortName { get; }
         public bool Deprecated { get; init; }

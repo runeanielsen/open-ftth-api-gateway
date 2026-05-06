@@ -60,7 +60,7 @@ namespace OpenFTTH.UtilityGraphService.Tests.UtilityNetwork
             var manufacturer = new Manufacturer(Guid.NewGuid(), "Tray Manufacturer");
             await _commandDispatcher.HandleAsync<AddManufacturer, Result>(new AddManufacturer(Guid.NewGuid(), new UserContext("test", Guid.Empty), manufacturer));
 
-            var TerminalStructureSpecification = new TerminalStructureSpecification(Guid.NewGuid(), "tray", "tray deluxe", "BUDI", 
+            var TerminalStructureSpecification = new TerminalStructureSpecification(Guid.NewGuid(), "tray", "tray deluxe", "BUDI",
                 new TerminalTemplate[] { }
             )
             {

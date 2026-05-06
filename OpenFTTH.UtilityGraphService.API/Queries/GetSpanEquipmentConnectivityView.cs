@@ -5,8 +5,8 @@ using System;
 
 namespace OpenFTTH.UtilityGraphService.API.Queries
 {
-    public class GetSpanEquipmentConnectivityView : IQuery<Result<SpanEquipmentAZConnectivityViewModel>> 
-    { 
+    public class GetSpanEquipmentConnectivityView : IQuery<Result<SpanEquipmentAZConnectivityViewModel>>
+    {
         public Guid RouteNetworkElementId { get; }
         public Guid[] SpanEquipmentOrSegmentIds { get; }
 

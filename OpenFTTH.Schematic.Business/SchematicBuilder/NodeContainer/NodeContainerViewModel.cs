@@ -17,7 +17,8 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
         public NodeContainer NodeContainer { get; }
         public bool HasRacksOrTerminalEquipments
         {
-            get {
+            get
+            {
                 if (Data.NodeContainer.Racks != null && Data.NodeContainer.Racks.Length > 0)
                     return true;
 
@@ -31,7 +32,7 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
         public NodeContainerViewModel(RouteNetworkElementRelatedData data)
         {
             _data = data;
-            
+
             if (_data.NodeContainer == null)
                 throw new ApplicationException("This view model requires a RouteNetworkElementRelatedData object with a non-null NodeContainer object!");
 
@@ -76,7 +77,7 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
                 foreach (var terminalEquipmentRef in Data.NodeContainer.TerminalEquipmentReferences)
                 {
                     var terminalEquipment = Data.TerminalEquipments[terminalEquipmentRef];
-                    var terminalEquipmentSpecification =Data.TerminalEquipmentSpecifications[terminalEquipment.SpecificationId];
+                    var terminalEquipmentSpecification = Data.TerminalEquipmentSpecifications[terminalEquipment.SpecificationId];
 
                     viewModels.Add(new TerminalEquipmentViewModel()
                     {
@@ -115,7 +116,7 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
                     });
                 }
             }
-          
+
             return viewModels;
         }
 
@@ -228,4 +229,4 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
 
         public List<NodeContainerBlockPortViewModel> PortViewModels = new();
     }
- }
+}

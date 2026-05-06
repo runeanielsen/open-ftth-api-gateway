@@ -56,7 +56,7 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments
             CommandContext cmdContext,
             IReadOnlyDictionary<Guid, SpanEquipment> spanEquipments,
             LookupCollection<SpanEquipmentSpecification> spanEquipmentSpecifications,
-            Guid spanEquipmentId, 
+            Guid spanEquipmentId,
             Guid spanEquipmentSpecificationId,
             RouteNetworkInterest interest,
             Guid? manufacturerId,
@@ -80,12 +80,12 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments
                 return Result.Fail(new PlaceSpanEquipmentInRouteNetworkError(PlaceSpanEquipmentInRouteNetworkErrorCodes.INVALID_SPAN_EQUIPMENT_SPECIFICATION_ID_NOT_FOUND, $"Cannot find span equipment specification with id: {spanEquipmentSpecificationId}"));
 
             var spanEquipment = CreateSpanEquipmentFromSpecification(
-                spanEquipmentId: spanEquipmentId, 
-                specification: spanEquipmentSpecifications[spanEquipmentSpecificationId], 
-                walkOfInterestId: interest.Id, 
-                nodesOfInterestIds: new Guid[] { interest.RouteNetworkElementRefs.First(), interest.RouteNetworkElementRefs.Last() }, 
-                manufacturerId: manufacturerId, 
-                namingInfo: namingInfo, 
+                spanEquipmentId: spanEquipmentId,
+                specification: spanEquipmentSpecifications[spanEquipmentSpecificationId],
+                walkOfInterestId: interest.Id,
+                nodesOfInterestIds: new Guid[] { interest.RouteNetworkElementRefs.First(), interest.RouteNetworkElementRefs.Last() },
+                manufacturerId: manufacturerId,
+                namingInfo: namingInfo,
                 lifecycleInfo: lifecycleInfo,
                 markingInfo: markingInfo,
                 addressInfo: addressInfo,
@@ -106,19 +106,19 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments
             return Result.Ok();
         }
 
-      
+
 
         public Result PlaceSpanEquipmentInUtilityNetwork(
             CommandContext cmdContext,
-            IReadOnlyDictionary<Guid,SpanEquipment> spanEquipments, 
-            LookupCollection<SpanEquipmentSpecification> spanEquipmentSpecifications, 
+            IReadOnlyDictionary<Guid, SpanEquipment> spanEquipments,
+            LookupCollection<SpanEquipmentSpecification> spanEquipmentSpecifications,
             Guid spanEquipmentId, Guid spanEquipmentSpecificationId,
             Guid walkOfInterestId,
             RouteNetworkElementIdList walk,
-            UtilityNetworkHop[] utilityNetworkHops, 
-            Guid? manufacturerId, 
-            NamingInfo? namingInfo, LifecycleInfo? lifecycleInfo, 
-            MarkingInfo? markingInfo, 
+            UtilityNetworkHop[] utilityNetworkHops,
+            Guid? manufacturerId,
+            NamingInfo? namingInfo, LifecycleInfo? lifecycleInfo,
+            MarkingInfo? markingInfo,
             AddressInfo? addressInfo)
         {
             this.Id = spanEquipmentId;
@@ -162,7 +162,7 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments
             return Result.Ok();
         }
 
-   
+
         private IEnumerable<Guid> GetReversedIds(RouteNetworkElementIdList routeNetworkElementRefs)
         {
             List<Guid> reversed = new();
@@ -479,7 +479,7 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments
             {
                 utilityNetworkHopWalkOfInterest.RouteNetworkElementRefs.Reverse();
             }
-            
+
             return new ValidatedRouteNetworkWalk(utilityNetworkHopWalkOfInterest.RouteNetworkElementRefs);
         }
 
@@ -490,7 +490,7 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments
             if (CheckIfNewHopExtentsStartOfExistingWalkOfInterest(childWalkOfInterest, utilityNetworkHopWalkOfInterest))
             {
                 if (utilityNetworkHopWalkOfInterest.ToNodeId != childWalkOfInterest.FromNodeId)
-                  reverse = true;
+                    reverse = true;
             }
 
             if (CheckIfNewHopExtentsEndOfExistingWalkOfInterest(childWalkOfInterest, utilityNetworkHopWalkOfInterest))
@@ -571,7 +571,7 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments
                         newWalkIds.Add(routeHop.Walk.RouteNetworkElementRefs[i]);
                 }
 
-               
+
             }
 
 
@@ -648,7 +648,7 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments
 
         }
 
-    
+
         private UtilityNetworkHop ReverseHopIfNeeded(ValidatedRouteNetworkWalk walkOfInterest, UtilityNetworkHop utilityNetworkHop)
         {
             foreach (var nodeId in walkOfInterest.NodeIds)
@@ -702,7 +702,7 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments
         #region Affix To Node Container
         public Result AffixToNodeContainer(
             CommandContext cmdContext,
-            IReadOnlyDictionary<Guid,NodeContainer> nodeContainers,
+            IReadOnlyDictionary<Guid, NodeContainer> nodeContainers,
             RouteNetworkInterest spanEquipmentInterest,
             Guid nodeContainerRouteNodeId,
             Guid nodeContainerId,
@@ -764,7 +764,7 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments
             return Result.Ok();
         }
 
-        private bool IsAlreadyAffixedToNodeContainerInRouteNode(IReadOnlyDictionary<Guid,NodeContainer> nodeContainers, Guid nodeContainerRouteNodeId)
+        private bool IsAlreadyAffixedToNodeContainerInRouteNode(IReadOnlyDictionary<Guid, NodeContainer> nodeContainers, Guid nodeContainerRouteNodeId)
         {
             if (_spanEquipment == null)
                 throw new ApplicationException($"Invalid internal state. Span equipment property cannot be null. Seems that span equipment has never been placed. Please check command handler logic.");
@@ -781,7 +781,7 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments
             return false;
         }
 
-        private bool SideHasChanged(IReadOnlyDictionary<Guid,NodeContainer> nodeContainers, Guid nodeContainerRouteNodeId, NodeContainerSideEnum nodeContainerIngoingSide)
+        private bool SideHasChanged(IReadOnlyDictionary<Guid, NodeContainer> nodeContainers, Guid nodeContainerRouteNodeId, NodeContainerSideEnum nodeContainerIngoingSide)
         {
             if (_spanEquipment == null)
                 throw new ApplicationException($"Invalid internal state. Span equipment property cannot be null. Seems that span equipment has never been placed. Please check command handler logic.");
@@ -947,7 +947,7 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments
 
         private UtilityNetworkHop[] DetachCreateNewUtilityNetworkHopList(Guid routeNodeId, ValidatedRouteNetworkWalk walk)
         {
-            if(_spanEquipment == null)
+            if (_spanEquipment == null)
                 throw new ApplicationException($"Invalid internal state. Span equipment property cannot be null. Seems that span equipment has never been placed. Please check command handler logic.");
 
             if (_spanEquipment.UtilityNetworkHops == null)
@@ -1000,8 +1000,8 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments
         #region Cut Span Segments
         public Result CutSpanSegments(
             CommandContext cmdContext,
-            RouteNetworkInterest spanEquipmentWalkOfInterest, 
-            Guid routeNodeId, 
+            RouteNetworkInterest spanEquipmentWalkOfInterest,
+            Guid routeNodeId,
             Guid[] spanSegmentsToCut)
         {
             if (routeNodeId == Guid.Empty)
@@ -1037,9 +1037,9 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments
 
             // Check that cuts are valid
             var spanSegmentToCutHash = spanSegmentsToCut.ToHashSet();
-            
+
             var validCutsResult = IsCutsValid(routeNodeId, spanSegmentToCutHash);
-            
+
             if (validCutsResult.IsFailed)
                 return validCutsResult;
 
@@ -1090,7 +1090,7 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments
 
                 idsBeforeCut.Add(routeNetworkElement);
             }
-       
+
             for (UInt16 nodeOfInterestIndex = 0; nodeOfInterestIndex <= _spanEquipment.NodesOfInterestIds.Length; nodeOfInterestIndex++)
             {
                 Guid nodeOfInterestId = _spanEquipment.NodesOfInterestIds[nodeOfInterestIndex];
@@ -1108,9 +1108,9 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments
                 throw new ApplicationException($"Invalid internal state. Span equipment property cannot be null. Seems that span equipment has never been placed. Please check command handler logic.");
 
             // If outer span is already cut at node, no problem
-            if (_spanEquipment.SpanStructures[0].SpanSegments.Any(s => 
+            if (_spanEquipment.SpanStructures[0].SpanSegments.Any(s =>
                 _spanEquipment.NodesOfInterestIds[s.FromNodeOfInterestIndex] == routeNodeId ||
-                _spanEquipment.NodesOfInterestIds[s.ToNodeOfInterestIndex] == routeNodeId)) 
+                _spanEquipment.NodesOfInterestIds[s.ToNodeOfInterestIndex] == routeNodeId))
             {
                 return false;
             }
@@ -1152,7 +1152,7 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments
             // Check that span segments are not already cut
             foreach (var structure in _spanEquipment.SpanStructures)
             {
-                foreach (var segment in  structure.SpanSegments)
+                foreach (var segment in structure.SpanSegments)
                 {
                     if (spanSegmentsToCut.Contains(segment.Id))
                     {
@@ -1175,7 +1175,7 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments
 
             // Check that we found all span segments
             var notFoundList = new List<Guid>();
-            
+
             foreach (var segmentToCut in spanSegmentsToCut)
             {
                 if (!spanSegmentsCutValidatedOk.Contains(segmentToCut))
@@ -1434,8 +1434,8 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments
                         {
                             spanSegmentToSimpleTerminalConnectInfo.ConnectionDirection = SpanSegmentToTerminalConnectionDirection.FromSpanSegmentToTerminal;
                         }
-                        else 
-                        { 
+                        else
+                        {
                             return Result.Fail(new ConnectSpanSegmentsAtRouteNodeError(
                                 ConnectSpanSegmentsAtRouteNodeErrorCodes.SPAN_SEGMENT_END_NOT_FOUND,
                                 $"No ends of the span segment with id: {segment.Id} can be found in route node with id: {routeNodeId}")
@@ -1676,7 +1676,7 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments
 
             if (_spanEquipment.SpanStructures.Any(s => s.Level == 2))
                 innerStructureStartPosition = _spanEquipment.SpanStructures.Where(s => s.Level == 2).Max(s => s.Position) + 1;
-                       
+
             // Add structures to level 2
             foreach (var structureSpecificationId in structureSpecificationIdsToAdd)
             {
@@ -1732,7 +1732,7 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments
                 return Result.Fail(new RemoveSpanStructureFromSpanEquipmentError(
                     RemoveSpanStructureFromSpanEquipmentErrorCodes.CANNOT_REMOVE_SPAN_STRUCTURES_FROM_FIXED_SPAN_EQUIPMENT,
                     $"Cannot remove span structures from a span equipment with fixed structure - i.e. from a span equipment with pre-installed inner conduits")
-                ); 
+                );
             }
 
             if (structureIndex == 0)
@@ -2060,7 +2060,7 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments
                     }
                 }
             }
-                        
+
             // Check that span equipment is not moved where affixed to parents conduits
             if (checkTerminalsAndParents && IsAnyParentSubwalksMoved(existingWalk, newWalk))
             {
@@ -2069,7 +2069,7 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments
                    $"Cannot move span equipment with id: {this.Id}. Sub walks affixed to parent span equipments are moved which is not a legal operation.")
                );
             }
-            
+
             var @event = new SpanEquipmentMoved(
               spanEquipmentId: this.Id,
               nodesOfInterestIds: CreateNewNodesOfInterestIdList(newWalk)
@@ -2280,12 +2280,12 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments
             // If child has not been dragged and impacted section is within new parent walk, then child walk is the same
             if (!childEndHasBeenDragged && allImpactedChildSegmentsIsCoveredByNewParentWalk)
             {
-                return Result.Ok((existingChildWalkOfInterest, new Dictionary<int, UtilityNetworkHop>() { } ));
+                return Result.Ok((existingChildWalkOfInterest, new Dictionary<int, UtilityNetworkHop>() { }));
             }
 
 
             // Calculate new walk for the child (this segment)
-            Dictionary<int, UtilityNetworkHop> utilityNetworkHopsToUpdateByIndex = new(); 
+            Dictionary<int, UtilityNetworkHop> utilityNetworkHopsToUpdateByIndex = new();
 
             foreach (var networkHop in childNetworkHops.Where(n => n.IsUtilityHop))
             {
@@ -2304,7 +2304,7 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments
                     foreach (var childSubWalk in childSubWalks)
                     {
                         if (childSubWalk == childSubWalks.Last())
-                            lastSubWalk = true; 
+                            lastSubWalk = true;
 
                         if (childSpanSegmentsImpacted.Contains(childSubWalk.ParentSegementId))
                         {
@@ -2359,7 +2359,7 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments
                     }
 
 
-                    
+
 
                     /*
              
@@ -2906,7 +2906,7 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments
 
                 return Result.Ok();
             }
-           
+
 
             // If the specification is changed from fixed to another fixed span equipment then the fun begins
             if (currentSpecification.IsFixed && newSpecification.IsFixed)
@@ -2977,7 +2977,7 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments
                         {
                             NewStructureToBeInserted = newStructure
                         };
-                        
+
                         structureModificationInstructions.Add(addStructureSpecIdInstruction);
 
                         newSpecificationSpanStructureTemplateProcessed.Add(spanStructureTemplate);
@@ -3152,7 +3152,7 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments
 
             return result;
         }
-             
+
         private class ExistingRouteHop
         {
             public int SequenceNumber { get; set; }

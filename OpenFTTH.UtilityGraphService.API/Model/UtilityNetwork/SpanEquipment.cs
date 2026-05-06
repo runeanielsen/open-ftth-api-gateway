@@ -53,9 +53,9 @@ namespace OpenFTTH.UtilityGraphService.API.Model.UtilityNetwork
                 }
             }
 
-            #pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
+#pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
             spanSegmentwithIndexInfo = default;
-            #pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
+#pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
 
             return false;
         }

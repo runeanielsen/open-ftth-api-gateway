@@ -51,7 +51,7 @@ namespace OpenFTTH.UtilityGraphService.Business.NodeContainers
             CommandContext cmdContext,
             IReadOnlyDictionary<Guid, NodeContainer> nodeContainers,
             LookupCollection<NodeContainerSpecification> nodeContainerSpecifications,
-            Guid nodeContainerId, 
+            Guid nodeContainerId,
             Guid nodeContainerSpecificationId,
             RouteNetworkInterest nodeOfInterest,
             NamingInfo? namingInfo,
@@ -74,12 +74,12 @@ namespace OpenFTTH.UtilityGraphService.Business.NodeContainers
                 return Result.Fail(new NodeContainerError(NodeContainerErrorCodes.INVALID_NODE_CONTAINER_SPECIFICATION_ID_NOT_FOUND, $"Cannot find node container specification with id: {nodeContainerSpecificationId}"));
 
             if (nodeContainers.Any(n => n.Value.RouteNodeId == nodeOfInterest.RouteNetworkElementRefs[0]))
-                return Result.Fail(new NodeContainerError(NodeContainerErrorCodes.NODE_CONTAINER_ALREADY_EXISTS_IN_ROUTE_NODE, $"A node container already exist in the route node with id: {nodeOfInterest.RouteNetworkElementRefs[0]} Only one node container is allowed per route node.")); 
+                return Result.Fail(new NodeContainerError(NodeContainerErrorCodes.NODE_CONTAINER_ALREADY_EXISTS_IN_ROUTE_NODE, $"A node container already exist in the route node with id: {nodeOfInterest.RouteNetworkElementRefs[0]} Only one node container is allowed per route node."));
 
             var nodeContainer = new NodeContainer(nodeContainerId, nodeContainerSpecificationId, nodeOfInterest.Id, nodeOfInterest.RouteNetworkElementRefs[0])
             {
                 ManufacturerId = manufacturerId,
-                NamingInfo = namingInfo, 
+                NamingInfo = namingInfo,
                 LifecycleInfo = lifecycleInfo
             };
 
@@ -756,13 +756,13 @@ namespace OpenFTTH.UtilityGraphService.Business.NodeContainers
 
             if (!CheckIfTerminalReferenceExistsInContainer(toTerminalEquipment.Id))
                 throw new ApplicationException($"Terminal equipment with id: {toTerminalEquipment.Id} not found in node container with id: {this.Id}");
-            
+
             if (!CheckIfTerminalExistsInEquipment(fromTerminalEquipment, fromTerminalId))
                 throw new ApplicationException($"Terminal with id: {fromTerminalId} not found in terminal equipment with id: {fromTerminalEquipment.Id} Error trying to connect terminals in node container with id: {this.Id}");
 
             if (!CheckIfTerminalExistsInEquipment(toTerminalEquipment, toTerminalId))
                 throw new ApplicationException($"Terminal with id: {toTerminalId} not found in terminal equipment with id: {toTerminalEquipment.Id} Error trying to connect terminals in node container with id: {this.Id}");
-        
+
             if (fromTerminalId == toTerminalId)
                 throw new ApplicationException($"Terminal with id: {toTerminalId} can't be connected to itself. Error trying to connect terminals in node container with id: {this.Id}");
 
@@ -821,7 +821,7 @@ namespace OpenFTTH.UtilityGraphService.Business.NodeContainers
         {
             if (_container == null)
                 throw new ApplicationException($"Invalid internal state. Node container property cannot be null. Seems that node container has never been created. Please check command handler logic.");
-          
+
             var version = graph.LatestCommitedVersion;
 
             foreach (var terminalStructure in _terminalEquipment.TerminalStructures)
@@ -940,7 +940,7 @@ namespace OpenFTTH.UtilityGraphService.Business.NodeContainers
 
             _container = NodeContainerProjectionFunctions.Apply(_container, @event);
         }
-       
+
 
         #endregion
 
@@ -1165,10 +1165,10 @@ namespace OpenFTTH.UtilityGraphService.Business.NodeContainers
         }
 
         #endregion
-              
 
-      
 
-        
+
+
+
     }
 }

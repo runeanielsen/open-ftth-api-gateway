@@ -10,7 +10,8 @@
 
         public string PostgresConnectionString
         {
-            get {
+            get
+            {
                 return $"Host={Host};Port={Port};Username={Username};Password={Password};Database={Database}";
             }
         }

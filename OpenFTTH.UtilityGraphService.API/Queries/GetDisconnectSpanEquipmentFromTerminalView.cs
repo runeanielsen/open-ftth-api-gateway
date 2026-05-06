@@ -5,7 +5,7 @@ using System;
 
 namespace OpenFTTH.UtilityGraphService.API.Queries
 {
-    public class GetDisconnectSpanEquipmentFromTerminalView : IQuery<Result<DisconnectSpanEquipmentFromTerminalView>> 
+    public class GetDisconnectSpanEquipmentFromTerminalView : IQuery<Result<DisconnectSpanEquipmentFromTerminalView>>
     {
         public Guid SpanSegmentId { get; }
         public Guid TerminalId { get; }

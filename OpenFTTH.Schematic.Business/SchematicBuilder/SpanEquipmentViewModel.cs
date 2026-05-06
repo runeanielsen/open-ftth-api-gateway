@@ -27,7 +27,7 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
         private readonly RouteNetworkInterestRelationKindEnum _relationKind;
 
         private readonly Dictionary<Guid, RouteNetworkTraceResult> _traceByBySpanId = new();
-              
+
         public SpanEquipmentWithRelatedInfo SpanEquipment => _spanEquipment;
 
         public Guid RouteNetworkElementIdOfInterest => _data.RouteNetworkElementId;
@@ -90,7 +90,7 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
             return label;
         }
 
-       
+
 
         public List<SpanDiagramInfo> GetInnerSpanDiagramInfos(string stylePrefix)
         {
@@ -202,7 +202,7 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
 
             return trace.FromRouteNodeName;
         }
-       
+
 
         public string GetToRouteNodeName(Guid conduitSpanSegmentId, Guid? cableId)
         {
@@ -335,7 +335,8 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
             }
         }
 
-        public bool IsSingleSpan { 
+        public bool IsSingleSpan
+        {
             get
             {
                 var spec = _data.SpanEquipmentSpecifications[_spanEquipment.SpecificationId];

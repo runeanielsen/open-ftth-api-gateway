@@ -61,11 +61,11 @@ namespace OpenFTTH.APIGateway.Workers
                 var inMemRouteNetworkState = (InMemRouteNetworkState)_routeNetworkState;
 
                 _logger.LogInformation($"Event store host: {_geoDatabaseSetting.Host}");
-                
+
 
                 // Dehydrate projections
                 _logger.LogInformation("Start dehydrate in-memory projections...");
-               
+
                 await _eventStore.DehydrateProjectionsAsync(stoppingToken).ConfigureAwait(false);
 
                 _logger.LogInformation($"{inMemRouteNetworkState.NumberOfObjectsLoaded} route network objects loaded.");

@@ -170,8 +170,8 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments.CommandHandlers
                 if (parentAR.GetUncommittedEvents().Count() > 0)
                     _eventStore.Aggregates.Store(parentAR);
             }
-         
-                   
+
+
             NotifyExternalServicesAboutSpanEquipmentChange(spanEquipment.Id, existingWalk, newWalk);
 
             return Task.FromResult(moveSpanEquipmentResult);

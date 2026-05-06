@@ -124,6 +124,6 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
             return yOffset;
         }
 
-       
+
     }
 }

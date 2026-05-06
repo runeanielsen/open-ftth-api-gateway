@@ -26,14 +26,15 @@ namespace OpenFTTH.RouteNetwork.Business.RouteElements.Model
             }
         }
 
-        public string Coordinates { 
+        public string Coordinates
+        {
             get
             {
                 StringBuilder sb = new StringBuilder();
 
                 sb.Append('[');
 
-                for (int i = 0; i < CoordArray.Length; i+=2) 
+                for (int i = 0; i < CoordArray.Length; i += 2)
                 {
                     if (sb.Length > 1)
                         sb.Append(',');
@@ -41,7 +42,7 @@ namespace OpenFTTH.RouteNetwork.Business.RouteElements.Model
                     sb.Append('[');
                     sb.Append(CoordArray[i].ToString(CultureInfo.InvariantCulture));
                     sb.Append(',');
-                    sb.Append(CoordArray[i+1].ToString(CultureInfo.InvariantCulture));
+                    sb.Append(CoordArray[i + 1].ToString(CultureInfo.InvariantCulture));
                     sb.Append(']');
                 }
 
@@ -63,9 +64,9 @@ namespace OpenFTTH.RouteNetwork.Business.RouteElements.Model
             {
                 var extend = new Envelope();
 
-                for (int i = 0; i < CoordArray.Length; i+=2)
+                for (int i = 0; i < CoordArray.Length; i += 2)
                 {
-                    extend.ExpandToInclude(CoordArray[i], CoordArray[i+1]);
+                    extend.ExpandToInclude(CoordArray[i], CoordArray[i + 1]);
                 }
 
                 return extend;
@@ -92,7 +93,7 @@ namespace OpenFTTH.RouteNetwork.Business.RouteElements.Model
             }
         }
 
-     
+
         private static double[] DoubleArrayFromCoordinateString(string coordinates)
         {
             var coordSplit = coordinates.Replace("[", "").Replace("]", "").Replace(" ", "").Split(',');

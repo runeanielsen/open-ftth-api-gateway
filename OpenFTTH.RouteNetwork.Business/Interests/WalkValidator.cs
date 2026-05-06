@@ -31,7 +31,7 @@ namespace OpenFTTH.RouteNetwork.Business.Interest
             // If only one id is specified, make sure it'a a route segment
             if (lookupRouteNetworkObjectsResult.Value.Count == 1 && !(lookupRouteNetworkObjectsResult.Value[0] is IRouteSegment))
                 return Result.Fail(new RegisterWalkOfInterestError(RegisterWalkOfInterestErrorCodes.INVALID_WALK_SHOULD_CONTAIN_ROUTE_SEGMENT_IDS_ONLY, "If only one route network id is specified in a walk, it must be a route segment id"));
-          
+
             var routeElementsSummary = GetRouteNetworkElementsListSummary(lookupRouteNetworkObjectsResult.Value);
 
             switch (routeElementsSummary)

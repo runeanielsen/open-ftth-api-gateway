@@ -326,7 +326,7 @@ namespace OpenFTTH.UtilityGraphService.Tests.UtilityNetwork
 
             var sutNodeId = TestRouteNetwork.CO_1;
             var sutNodeContainerId = TestUtilityNetwork.NodeContainer_CO_1;
-       
+
             // Get node container
             utilityNetwork.TryGetEquipment<NodeContainer>(sutNodeContainerId, out var nodeContainer);
 
@@ -352,7 +352,7 @@ namespace OpenFTTH.UtilityGraphService.Tests.UtilityNetwork
             connectCmdResult.IsSuccess.Should().BeTrue();
 
             var trace = utilityNetwork.Graph.SimpleTrace(lisaTray.TerminalStructures.First().Terminals.First().Id);
-            
+
             trace.All.Any(g => g.Id == customerSplitter.TerminalStructures.First().Terminals[5].Id).Should().BeTrue();
 
 
@@ -417,7 +417,7 @@ namespace OpenFTTH.UtilityGraphService.Tests.UtilityNetwork
 
             var sutNodeId = TestRouteNetwork.CO_1;
             var sutNodeContainerId = TestUtilityNetwork.NodeContainer_CO_1;
-       
+
             // Get node container
             utilityNetwork.TryGetEquipment<NodeContainer>(sutNodeContainerId, out var nodeContainer);
 
@@ -459,7 +459,7 @@ namespace OpenFTTH.UtilityGraphService.Tests.UtilityNetwork
 
             // Try trace from lisa tray 1 pin 1
             var traceFromLisaTray1Pin1 = utilityNetwork.Graph.SimpleTrace(lisaTray1Pin1);
-            
+
             // We should hit both 1_2 and 1_32 splitter out ports
             traceFromLisaTray1Pin1.All.Any(g => g.Id == split_1_2_out1).Should().BeTrue();
             traceFromLisaTray1Pin1.All.Any(g => g.Id == split_1_32_out5).Should().BeTrue();
@@ -594,7 +594,7 @@ namespace OpenFTTH.UtilityGraphService.Tests.UtilityNetwork
                 {
                     new DisconnectSpanSegmentFromTerminalOperation(terminalToTerminalConnection.Id, oltCard1Port1Id)
                 }
-            ); 
+            );
 
             var disconnectCmdResult = await _commandDispatcher.HandleAsync<DisconnectSpanSegmentsFromTerminalsAtRouteNode, Result>(disconnectCmd);
 
@@ -1047,7 +1047,7 @@ namespace OpenFTTH.UtilityGraphService.Tests.UtilityNetwork
             var sutNodeId = TestRouteNetwork.CO_1;
             var sutNodeContainerId = TestUtilityNetwork.NodeContainer_CO_1;
             var sutCableName = "K69373563";
-        
+
             var cable = FindSpanEquipmentRelatedToRouteNetworkElementByName(sutNodeId, sutCableName);
 
             var equipmentQueryResult = await _queryDispatcher.HandleAsync<GetEquipmentDetails, Result<GetEquipmentDetailsResult>>(

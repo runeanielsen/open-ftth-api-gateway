@@ -34,7 +34,7 @@ namespace OpenFTTH.UtilityGraphService.Business.Graph.Trace
 
                 //  add downstreams
                 for (int i = 1; i < Downstream.Length; i++)
-                { 
+                {
                     result.Add(Downstream[i]);
                 }
 

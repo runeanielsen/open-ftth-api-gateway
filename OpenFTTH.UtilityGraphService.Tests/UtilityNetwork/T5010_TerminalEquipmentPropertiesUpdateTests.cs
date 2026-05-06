@@ -213,7 +213,7 @@ namespace OpenFTTH.UtilityGraphService.Tests.UtilityNetwork
 
             // Get first terminal structure
             var terminalStructureBeforeUpdate = terminalEquipmentBeforeUpdate.TerminalStructures[0];
-         
+
             var updateCmd = new UpdateTerminalStructureProperties(Guid.NewGuid(), new UserContext("test", Guid.Empty), terminalEquipmentId: terminalEquipmentBeforeUpdate.Id, terminalStructureId: terminalStructureBeforeUpdate.Id)
             {
                 StructureSpecificationId = terminalStructureBeforeUpdate.SpecificationId,

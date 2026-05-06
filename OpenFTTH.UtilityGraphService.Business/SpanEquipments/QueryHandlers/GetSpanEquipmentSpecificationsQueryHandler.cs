@@ -12,7 +12,7 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments.QueryHandling
     public class GetSpanEquipmentSpecificationsQueryHandler
         : IQueryHandler<GetSpanEquipmentSpecifications, Result<LookupCollection<SpanEquipmentSpecification>>>
     {
-        private readonly IEventStore _eventStore;        
+        private readonly IEventStore _eventStore;
 
         public GetSpanEquipmentSpecificationsQueryHandler(IEventStore eventStore)
         {

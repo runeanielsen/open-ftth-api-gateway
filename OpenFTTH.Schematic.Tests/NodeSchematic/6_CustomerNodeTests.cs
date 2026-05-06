@@ -35,7 +35,7 @@ namespace OpenFTTH.Schematic.Tests.NodeSchematic
         }
 
         [Fact, Order(1)]
-        public async void TestDrawingAddressesInCC()
+        public async System.Threading.Tasks.Task TestDrawingAddressesInCC()
         {
             var sutRouteNetworkElement = TestRouteNetwork.CC_1;
             var sutSpanEquipment = TestUtilityNetwork.CustomerConduit_CC_1_to_SDU_1;
@@ -57,7 +57,7 @@ namespace OpenFTTH.Schematic.Tests.NodeSchematic
         }
 
         [Fact, Order(2)]
-        public async void TestDrawingAddressesInCustomerTermination()
+        public async System.Threading.Tasks.Task TestDrawingAddressesInCustomerTermination()
         {
             var sutRouteNetworkElement = TestRouteNetwork.SDU_1;
             var sutSpanEquipment = TestUtilityNetwork.CustomerConduit_CC_1_to_SDU_1;
@@ -79,7 +79,7 @@ namespace OpenFTTH.Schematic.Tests.NodeSchematic
         }
 
         [Fact, Order(3)]
-        public async void TestAddCustomerTerminationInSDU_1()
+        public async System.Threading.Tasks.Task TestAddCustomerTerminationInSDU_1()
         {
             var sutRouteNetworkElement = TestRouteNetwork.SDU_1;
             var sutNodeContainer = TestUtilityNetwork.NodeContainer_SDU_1;

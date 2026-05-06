@@ -8,7 +8,7 @@ namespace OpenFTTH.UtilityGraphService.API.Model.UtilityNetwork
     /// </summary>
     public record SpanStructureSpecification : IIdentifiedObject
     {
-        public Guid Id { get;}
+        public Guid Id { get; }
         public string SpanClassType { get; }
         public string Name { get; }
         public string Color { get; }

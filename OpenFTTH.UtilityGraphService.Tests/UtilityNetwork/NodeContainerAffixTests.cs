@@ -36,7 +36,7 @@ namespace OpenFTTH.UtilityGraphService.Tests.UtilityNetwork
             _queryDispatcher = queryDispatcher;
             _externalEventProducer = (FakeExternalEventProducer)externalEventProducer;
         }
-        
+
         [Fact, Order(10)]
         public async Task TestAffixConduitToContainer_ShouldSucceed()
         {

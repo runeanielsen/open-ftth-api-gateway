@@ -37,7 +37,7 @@ namespace OpenFTTH.Schematic.Tests.NodeSchematic
         }
 
         [Fact, Order(1)]
-        public async void TestDrawingFP2_WithNoEquipments()
+        public async System.Threading.Tasks.Task TestDrawingFP2_WithNoEquipments()
         {
             var sutRouteNetworkElement = TestRouteNetwork.FP_2;
 
@@ -63,7 +63,7 @@ namespace OpenFTTH.Schematic.Tests.NodeSchematic
 
 
         [Fact, Order(10)]
-        public async void TestDrawingOneRackInFP2()
+        public async System.Threading.Tasks.Task TestDrawingOneRackInFP2()
         {
             var sutRouteNetworkElement = TestRouteNetwork.FP_2;
 
@@ -105,7 +105,7 @@ namespace OpenFTTH.Schematic.Tests.NodeSchematic
         }
 
         [Fact, Order(11)]
-        public async void TestAddOneMoreRackInFP2()
+        public async System.Threading.Tasks.Task TestAddOneMoreRackInFP2()
         {
             var sutRouteNetworkElement = TestRouteNetwork.FP_2;
 
@@ -143,7 +143,7 @@ namespace OpenFTTH.Schematic.Tests.NodeSchematic
         }
 
         [Fact, Order(20)]
-        public async void TestAddFirstTerminalEquipmentInFP2()
+        public async System.Threading.Tasks.Task TestAddFirstTerminalEquipmentInFP2()
         {
             var sutRouteNetworkElement = TestRouteNetwork.FP_2;
             var sutNodeContainer = TestUtilityNetwork.NodeContainer_FP_2;
@@ -189,7 +189,7 @@ namespace OpenFTTH.Schematic.Tests.NodeSchematic
 
 
         [Fact, Order(21)]
-        public async void TestAddFirstTerminalEquipmentInFP2Rack1()
+        public async System.Threading.Tasks.Task TestAddFirstTerminalEquipmentInFP2Rack1()
         {
             var sutRouteNetworkElement = TestRouteNetwork.FP_2;
             var sutNodeContainer = TestUtilityNetwork.NodeContainer_FP_2;
@@ -237,7 +237,7 @@ namespace OpenFTTH.Schematic.Tests.NodeSchematic
 
 
         [Fact, Order(22)]
-        public async void TestAdd80EquipmentsInFP2Rack2()
+        public async System.Threading.Tasks.Task TestAdd80EquipmentsInFP2Rack2()
         {
             var sutRouteNetworkElement = TestRouteNetwork.FP_2;
             var sutNodeContainer = TestUtilityNetwork.NodeContainer_FP_2;

@@ -83,9 +83,9 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments.CommandHandlers
             // Check that only one cable is selected
             if (command.SpanSegmentsToCut.Length > 1)
             {
-                    return Task.FromResult(Result.Fail(new CutSpanSegmentsAtRouteNodeError(CutSpanSegmentsAtRouteNodeErrorCodes.EXPECTED_ONLY_ONE_CABLE, $"Expected only one cable to be cut. Cutting multiple cables at once is not allowed.")));
+                return Task.FromResult(Result.Fail(new CutSpanSegmentsAtRouteNodeError(CutSpanSegmentsAtRouteNodeErrorCodes.EXPECTED_ONLY_ONE_CABLE, $"Expected only one cable to be cut. Cutting multiple cables at once is not allowed.")));
             }
-            
+
             utilityNetwork.TryGetEquipment<SpanEquipment>(command.SpanSegmentsToCut[0], out var cableToBeCut);
 
             var utilityCmdContext = new CommandContext(command.CorrelationId, command.CmdId, command.UserContext);
@@ -148,7 +148,7 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments.CommandHandlers
                 // Create new cable
 
                 var newCableWalkOfInterestId = Guid.NewGuid();
-                              
+
                 var newCableUtilityNetworkHops = GetUtilityHopsRelatedToWalk(cableToBeCut.UtilityNetworkHops, newCableWalk);
 
                 var newCableEquipmentAR = new SpanEquipmentAR();
@@ -320,7 +320,7 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments.CommandHandlers
                 }
             }
 
-          
+
 
             return disconnects;
         }
@@ -428,7 +428,7 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments.CommandHandlers
                 var commandContext = new CommandContext(command.CorrelationId, command.CmdId, command.UserContext);
 
                 var newConduitWalk = GetWalkAfterNode(existingWalk.RouteNetworkElementRefs, command.RouteNodeId);
-         
+
                 var existingConduitWalkAfterShrink = GetWalkBeforeNode(existingWalk.RouteNetworkElementRefs, command.RouteNodeId);
 
                 // Disconnect eventually to terminals
@@ -456,7 +456,7 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments.CommandHandlers
                 var containerAffixesFromShrinkedConduit = FindContainersToDetach(utilityNetwork, conduitToBeCut, newConduitWalk, command.RouteNodeId);
 
                 foreach (var containerAffix in containerAffixesFromShrinkedConduit)
-                { 
+                {
                     if (utilityNetwork.TryGetEquipment<NodeContainer>(containerAffix.NodeContainerId, out NodeContainer nodeContainer))
                     {
                         existingConduitEquipmentAR.DetachFromNodeContainer(commandContext, nodeContainer);
@@ -466,7 +466,7 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments.CommandHandlers
 
                 ////////////////////////////
                 // Shrink existing conduit
-     
+
                 var moveSpanEquipmentResult = existingConduitEquipmentAR.Shrink(utilityCmdContext, existingConduitWalkAfterShrink, existingWalk, null);
 
                 if (moveSpanEquipmentResult.IsFailed)
@@ -486,7 +486,7 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments.CommandHandlers
                 var newConduitWalkOfInterestId = Guid.NewGuid();
 
                 var newConduitEquipmentAR = new SpanEquipmentAR();
-                       
+
                 var placeSpanEquipmentResult = newConduitEquipmentAR.PlaceSpanEquipmentInUtilityNetwork(
                     cmdContext: commandContext,
                     spanEquipments,
@@ -568,7 +568,7 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments.CommandHandlers
         private List<SpanEquipmentNodeContainerAffix> FindContainersToDetach(UtilityNetworkProjection utilityNetwork, SpanEquipment conduitToBeCut, ValidatedRouteNetworkWalk newConduitWalk, Guid routeNodeId)
         {
             List<SpanEquipmentNodeContainerAffix> affixesAfterNode = new List<SpanEquipmentNodeContainerAffix>();
-                
+
             if (conduitToBeCut.NodeContainerAffixes != null)
             {
                 foreach (var affix in conduitToBeCut.NodeContainerAffixes)

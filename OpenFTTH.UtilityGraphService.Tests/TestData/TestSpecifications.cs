@@ -1023,7 +1023,7 @@ namespace OpenFTTH.TestData
                     new TerminalTemplate("1", TerminalDirectionEnum.BI, false, true),
                     new TerminalTemplate("2", TerminalDirectionEnum.BI, false, true),
                     new TerminalTemplate("3", TerminalDirectionEnum.BI, false, true),
-                    new TerminalTemplate("4", TerminalDirectionEnum.BI, false, true),   
+                    new TerminalTemplate("4", TerminalDirectionEnum.BI, false, true),
                     new TerminalTemplate("5", TerminalDirectionEnum.BI, false, true),
                     new TerminalTemplate("6", TerminalDirectionEnum.BI, false, true),
                     new TerminalTemplate("7", TerminalDirectionEnum.BI, false, true),
@@ -1290,7 +1290,7 @@ namespace OpenFTTH.TestData
                     new TerminalTemplate("1", TerminalDirectionEnum.OUT, false, false) { ConnectorType = "SC/UPC", InternalConnectivityNode = "data" },
                 }
             )
-            {  
+            {
                 IsInterfaceModule = true,
             }
             );
@@ -1338,7 +1338,7 @@ namespace OpenFTTH.TestData
                     new TerminalTemplate("COM B", TerminalDirectionEnum.OUT, false, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "spl1" },
                     new TerminalTemplate("COM C", TerminalDirectionEnum.OUT, false, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "spl2" },
                     new TerminalTemplate("COM D", TerminalDirectionEnum.OUT, false, false) { ConnectorType = "LC/APC", InternalConnectivityNode = "spl2" }
-                
+
                 }
             ));
         }

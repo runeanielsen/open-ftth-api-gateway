@@ -62,7 +62,7 @@ namespace OpenFTTH.RouteNetwork.Business.RouteElements.QueryHandlers
 
             if (sourceRouteNode == null)
                 return Task.FromResult(
-                    Result.Fail<FindNearestRouteNodesResult>(new FindNearestRouteNodesError(FindNearestRouteNodesErrorCodes.INVALID_QUERY_ARGUMENT_ERROR_LOOKING_UP_SPECIFIED_ROUTE_NETWORK_ELEMENT_BY_ID, $"Error looking up route network node. Got { getRouteNetworkElementsResult.Value.First().GetType().Name} querying element with id: {query.SourceRouteNodeId}")).
+                    Result.Fail<FindNearestRouteNodesResult>(new FindNearestRouteNodesError(FindNearestRouteNodesErrorCodes.INVALID_QUERY_ARGUMENT_ERROR_LOOKING_UP_SPECIFIED_ROUTE_NETWORK_ELEMENT_BY_ID, $"Error looking up route network node. Got {getRouteNetworkElementsResult.Value.First().GetType().Name} querying element with id: {query.SourceRouteNodeId}")).
                     WithError(getRouteNetworkElementsResult.Errors.First())
                 );
 
@@ -74,8 +74,8 @@ namespace OpenFTTH.RouteNetwork.Business.RouteElements.QueryHandlers
 
             // Fetch objects from route network graph to query on
             var routeNetworkSubset = sourceRouteNode.UndirectionalDFS<RouteNode, RouteSegment>(
-                version: version, 
-                nodeCriteria: n => (n.RouteNodeInfo == null || n.RouteNodeInfo.Kind == null || !stopHash.Contains(n.RouteNodeInfo.Kind.Value)) && GetPoint(n.Coordinates).Distance(sourceRouteNodePoint) < query.SearchRadiusMeters, 
+                version: version,
+                nodeCriteria: n => (n.RouteNodeInfo == null || n.RouteNodeInfo.Kind == null || !stopHash.Contains(n.RouteNodeInfo.Kind.Value)) && GetPoint(n.Coordinates).Distance(sourceRouteNodePoint) < query.SearchRadiusMeters,
                 includeElementsWhereCriteriaIsFalse: true
             );
 
@@ -83,7 +83,7 @@ namespace OpenFTTH.RouteNetwork.Business.RouteElements.QueryHandlers
             var nodeCandidates = GetAllNodeCandidates(sourceRouteNode, interestHash, routeNetworkSubset);
             var graphForTracing = GetGraphForTracing(version, nodeCandidates, routeNetworkSubset);
             var nodesOfInterest = GetNodesOfInterest(nodeCandidates, interestHash).ToList();
-            
+
             ConcurrentBag<NearestRouteNodeTraceResult> nodeTraceResults = new();
 
             int nShortestPathTraces = 0;
@@ -149,7 +149,7 @@ namespace OpenFTTH.RouteNetwork.Business.RouteElements.QueryHandlers
             return tracesWithinDistance;
         }
 
-        
+
         private NearestRouteNodeTraceResult ShortestPath(RouteNode fromNode, Guid toNodeId, GraphHolder graphHolder)
         {
             var pathFinder = new PathFinder();
@@ -178,7 +178,7 @@ namespace OpenFTTH.RouteNetwork.Business.RouteElements.QueryHandlers
             }
             return new NearestRouteNodeTraceResult(fromNode.Id, fromNode?.NamingInfo?.Name, distance, segmentIds.ToArray(), segmentGeometries.ToArray());
         }
-        
+
 
         private static IOrderedEnumerable<NodeCandidateHolder> GetNodesOfInterest(IEnumerable<NodeCandidateHolder> nodeCandidates, HashSet<RouteNodeKindEnum> interestHash)
         {

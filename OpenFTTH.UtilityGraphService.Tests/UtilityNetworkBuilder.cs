@@ -45,6 +45,6 @@ namespace OpenFTTH.Tests.Util
             return result;
         }
 
-        
+
     }
 }

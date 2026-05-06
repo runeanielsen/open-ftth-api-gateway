@@ -76,7 +76,7 @@ namespace OpenFTTH.UtilityGraphService.Tests.UtilityNetwork
 
             var fromEquipmentAfterConnect = fromEquipmentQueryResult.Value.SpanEquipment[sutConnectFromSpanEquipmentId];
             fromEquipmentAfterConnect.SpanStructures[4].SpanSegments[0].ToTerminalId.Should().NotBeEmpty();
-            
+
             var terminalId = fromEquipmentAfterConnect.SpanStructures[4].SpanSegments[0].ToTerminalId;
 
             var toEquipmentAfterConnect = toEquipmentQueryResult.Value.SpanEquipment[sutConnectToSpanEquipmentId];

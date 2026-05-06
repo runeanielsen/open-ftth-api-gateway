@@ -14,7 +14,7 @@ namespace OpenFTTH.Schematic.Business.Lines
         public bool IsSidesVisible { get; set; }
 
         public VerticalAlignmentEnum VerticalContentAlignment = VerticalAlignmentEnum.Bottom;
-        
+
         private string _style = "LineBlock";
         public string Style
         {
@@ -28,7 +28,7 @@ namespace OpenFTTH.Schematic.Business.Lines
                 _style = value;
             }
         }
-           
+
         public double Margin { get; init; }
 
         // Reference property
@@ -216,7 +216,7 @@ namespace OpenFTTH.Schematic.Business.Lines
             return _actualSize;
         }
 
-       
+
 
         public override IEnumerable<DiagramObject> CreateDiagramObjects(Diagram diagram, double _offsetX, double _offsetY)
         {
@@ -331,6 +331,6 @@ namespace OpenFTTH.Schematic.Business.Lines
                 _sides[side].CenterAlignment = true;
         }
 
-     
+
     }
 }

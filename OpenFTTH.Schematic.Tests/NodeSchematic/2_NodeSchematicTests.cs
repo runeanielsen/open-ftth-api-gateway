@@ -75,7 +75,7 @@ namespace OpenFTTH.Schematic.Tests.NodeSchematic
         }
 
         [Fact, Order(2)]
-        public async void TestAffixConduitInCC_1()
+        public async System.Threading.Tasks.Task TestAffixConduitInCC_1()
         {
             // Affix 5x10 to west side
             var conduit1Id = TestUtilityNetwork.MultiConduit_12x7_HH_1_to_HH_10;
@@ -141,7 +141,7 @@ namespace OpenFTTH.Schematic.Tests.NodeSchematic
         }
 
         [Fact, Order(3)]
-        public async void CutPassThroughConduitInCC1()
+        public async System.Threading.Tasks.Task CutPassThroughConduitInCC1()
         {
             var sutRouteNetworkElement = TestRouteNetwork.CC_1;
             var sutSpanEquipment = TestUtilityNetwork.MultiConduit_12x7_HH_1_to_HH_10;
@@ -176,7 +176,7 @@ namespace OpenFTTH.Schematic.Tests.NodeSchematic
         }
 
         [Fact, Order(4)]
-        public async void CutSouthAndEastSideConduitInCC1()
+        public async System.Threading.Tasks.Task CutSouthAndEastSideConduitInCC1()
         {
             var sutRouteNetworkElement = TestRouteNetwork.CC_1;
             var sutSpanEquipmentFrom = TestUtilityNetwork.MultiConduit_12x7_HH_1_to_HH_10;
@@ -214,7 +214,7 @@ namespace OpenFTTH.Schematic.Tests.NodeSchematic
 
 
         [Fact, Order(10)]
-        public async void TestAddAdditionalInnerConduitsToPassThroughConduitInJ_1()
+        public async System.Threading.Tasks.Task TestAddAdditionalInnerConduitsToPassThroughConduitInJ_1()
         {
             var utilityNetwork = _eventStore.Projections.Get<UtilityNetworkProjection>();
 
@@ -272,7 +272,7 @@ namespace OpenFTTH.Schematic.Tests.NodeSchematic
 
 
         [Fact, Order(11)]
-        public async void TestThatRemovedStructuresAreNotShownInDiagram()
+        public async System.Threading.Tasks.Task TestThatRemovedStructuresAreNotShownInDiagram()
         {
             var utilityNetwork = _eventStore.Projections.Get<UtilityNetworkProjection>();
 
@@ -303,7 +303,7 @@ namespace OpenFTTH.Schematic.Tests.NodeSchematic
         }
 
         [Fact, Order(12)]
-        public async void TestThatRemovedSpanEquipmentAreNotShownInDiagram()
+        public async System.Threading.Tasks.Task TestThatRemovedSpanEquipmentAreNotShownInDiagram()
         {
             var utilityNetwork = _eventStore.Projections.Get<UtilityNetworkProjection>();
 
@@ -337,7 +337,7 @@ namespace OpenFTTH.Schematic.Tests.NodeSchematic
         }
 
         [Fact, Order(13)]
-        public async void TestVerticalAlignmentDiagram()
+        public async System.Threading.Tasks.Task TestVerticalAlignmentDiagram()
         {
             var utilityNetwork = _eventStore.Projections.Get<UtilityNetworkProjection>();
 
@@ -372,7 +372,7 @@ namespace OpenFTTH.Schematic.Tests.NodeSchematic
 
 
         [Fact, Order(20)]
-        public async void TestAffixConduitInHH_10()
+        public async System.Threading.Tasks.Task TestAffixConduitInHH_10()
         {
             // Affix 5x10 to west side
             var conduit1Id = TestUtilityNetwork.MultiConduit_12x7_HH_1_to_HH_10;
@@ -405,7 +405,7 @@ namespace OpenFTTH.Schematic.Tests.NodeSchematic
         }
 
         [Fact, Order(30)]
-        public async void TestConnectSingleConduitInCC1()
+        public async System.Threading.Tasks.Task TestConnectSingleConduitInCC1()
         {
             var sutRouteNetworkElement = TestRouteNetwork.CC_1;
             var sutSpanEquipmentFrom = TestUtilityNetwork.MultiConduit_12x7_HH_1_to_HH_10;
@@ -440,7 +440,7 @@ namespace OpenFTTH.Schematic.Tests.NodeSchematic
 
 
         [Fact, Order(31)]
-        public async void TestConnectOneMoreSingleConduitInCC1()
+        public async System.Threading.Tasks.Task TestConnectOneMoreSingleConduitInCC1()
         {
             var sutRouteNetworkElement = TestRouteNetwork.CC_1;
             var sutSpanEquipmentFrom = TestUtilityNetwork.MultiConduit_12x7_HH_1_to_HH_10;

@@ -36,7 +36,7 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
             return data.SpanEquipmentSpecifications[spanEquipment.SpecificationId].IsMultiLevel;
         }
 
-        
+
 
     }
 }

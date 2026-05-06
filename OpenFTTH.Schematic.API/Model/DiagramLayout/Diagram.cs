@@ -34,7 +34,7 @@ namespace OpenFTTH.Schematic.API.Model.DiagramLayout
             }
         }
 
-        public List<DiagramObject> DiagramObjects 
+        public List<DiagramObject> DiagramObjects
         {
             get
             {

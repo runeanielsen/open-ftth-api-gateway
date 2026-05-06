@@ -9,7 +9,7 @@ namespace OpenFTTH.UtilityGraphService.API.Model.UtilityNetwork
     public record SpanEquipmentSpecification : IIdentifiedObject
     {
         public Guid Id { get; }
-        public string Category { get;}
+        public string Category { get; }
         public string Name { get; }
         public SpanStructureTemplate RootTemplate { get; }
         public bool Deprecated { get; init; }
@@ -116,7 +116,7 @@ namespace OpenFTTH.UtilityGraphService.API.Model.UtilityNetwork
         {
             if (CableTubes == null)
                 return null;
-         
+
             if (CableTubes.Count() < tubeNo)
                 return null;
 

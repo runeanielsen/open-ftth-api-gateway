@@ -14,7 +14,7 @@ namespace OpenFTTH.Schematic.Business.Canvas
         public bool IsSidesVisible { get; set; }
 
         public VerticalAlignmentEnum VerticalContentAlignment = VerticalAlignmentEnum.Bottom;
-        
+
         private string _style = "CanvasBlock";
         public string Style
         {
@@ -28,7 +28,7 @@ namespace OpenFTTH.Schematic.Business.Canvas
                 _style = value;
             }
         }
-           
+
         public double Margin { get; init; }
 
         public double SpaceBetweenChildren { get; init; }
@@ -58,7 +58,7 @@ namespace OpenFTTH.Schematic.Business.Canvas
         {
             this.IsVisible = isVisible;
         }
-       
+
 
         private double WidthOfChildren()
         {
@@ -97,7 +97,7 @@ namespace OpenFTTH.Schematic.Business.Canvas
             width += (Margin * 2);
 
             // Add space between children
-            width += (SpaceBetweenChildren * (Children.Count -1));
+            width += (SpaceBetweenChildren * (Children.Count - 1));
 
             // If no width, set to 100
             if (width == 0)
@@ -162,6 +162,6 @@ namespace OpenFTTH.Schematic.Business.Canvas
 
             return result;
         }
-       
+
     }
 }

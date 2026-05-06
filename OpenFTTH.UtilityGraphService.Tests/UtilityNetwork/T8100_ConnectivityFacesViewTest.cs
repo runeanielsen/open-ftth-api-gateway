@@ -39,7 +39,7 @@ namespace OpenFTTH.UtilityGraphService.Tests.UtilityNetwork
             _conduitTestUtilityNetwork = new ConduitTestUtilityNetwork(_eventStore, _commandDispatcher, _queryDispatcher).Run();
         }
 
-  
+
 
         [Fact, Order(1)]
         public async Task QueryConnectivityFacesInCC1_ShouldSucceed()
@@ -71,7 +71,7 @@ namespace OpenFTTH.UtilityGraphService.Tests.UtilityNetwork
 
             connectivityFaces.Count(f => f.EquipmentKind == ConnectivityEquipmentKindEnum.TerminalEquipment).Should().BeGreaterThan(0);
             connectivityFaces.Count(f => f.EquipmentKind == ConnectivityEquipmentKindEnum.SpanEquipment).Should().BeGreaterThan(0);
-            
+
             connectivityFaces.Should().Contain(s => s.FaceName == "Mod Vesterbrogade 7A");
 
 

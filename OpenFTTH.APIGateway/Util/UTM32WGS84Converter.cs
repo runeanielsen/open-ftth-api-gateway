@@ -74,7 +74,7 @@ namespace OpenFTTH.APIGateway.Util
             var geometryFactory = new GeometryFactory();
             var envelopeGeometry = geometryFactory.ToGeometry(envelope);
             var envelopeCoordinates = _trans.MathTransform
-                .TransformList(envelopeGeometry.Coordinates.Select(x => new double[] { x.X, x.Y}).ToList())
+                .TransformList(envelopeGeometry.Coordinates.Select(x => new double[] { x.X, x.Y }).ToList())
                 .Select(x => new Coordinate(x[0], x[1]));
 
             return new Envelope(envelopeCoordinates);
@@ -137,7 +137,7 @@ namespace OpenFTTH.APIGateway.Util
     public class CoordinateConversionResult
     {
         public Envelope WGS84BoundingBox { get; }
-        public Envelope ETRS89BoundingBox { get;  }
+        public Envelope ETRS89BoundingBox { get; }
         public string[] WGS84GeoJsonStrings { get; }
 
         public CoordinateConversionResult(Envelope wGS84BoundingBox, Envelope eTRS89BoundingBox, string[] wGS84GeoJsonStrings)

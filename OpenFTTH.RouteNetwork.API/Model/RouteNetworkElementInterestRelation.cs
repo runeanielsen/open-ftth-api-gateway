@@ -8,7 +8,7 @@ namespace OpenFTTH.RouteNetwork.API.Model
 {
     public record RouteNetworkElementInterestRelation
     {
-        public Guid RefId { get;}
+        public Guid RefId { get; }
         public RouteNetworkInterestRelationKindEnum RelationKind { get; }
 
         public RouteNetworkElementInterestRelation(Guid refId, RouteNetworkInterestRelationKindEnum relationKind)

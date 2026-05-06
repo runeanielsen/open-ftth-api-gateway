@@ -116,5 +116,9 @@ namespace OpenFTTH.RouteNetwork.API.Model
             return false;
         }
 
+        public override int GetHashCode()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

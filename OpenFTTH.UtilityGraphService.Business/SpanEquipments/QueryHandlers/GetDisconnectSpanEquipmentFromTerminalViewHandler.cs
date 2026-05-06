@@ -63,7 +63,7 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments.QueryHandling
             }
         }
 
-      
+
 
         private DisconnectSpanEquipmentFromTerminalView BuildDisconnectSpanEquipmentFromTerminalView(IUtilityGraphTerminalRef terminalRef, IUtilityGraphSegmentRef segmentRef)
         {
@@ -409,7 +409,7 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments.QueryHandling
             public TraceEndInfo? Upstream { get; set; }
             public TraceEndInfo? Downstream { get; set; }
 
-            public bool UpstreamIsZ {get; set;}
+            public bool UpstreamIsZ { get; set; }
             public TraceEndInfo? Z
             {
                 get

@@ -379,7 +379,7 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                     {
                         nodeContainerId = getNodeContainerResult.Value.Id;
                     }
-                 
+
                     var placeEquipmentInNodeContainer = new PlaceTerminalEquipmentInNodeContainer(
                       correlationId: correlationId,
                       userContext: commandUserContext,

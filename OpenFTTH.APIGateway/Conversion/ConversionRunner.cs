@@ -43,10 +43,10 @@ namespace OpenFTTH.APIGateway.Conversion
             if (CheckIfConversionSchemaExists())
             {
                 _logger.LogInformation("Start seeding database with test specifications...");
-                 var result = new TestSpecifications(_loggerFactory, _commandDispatcher, _queryDispatcher, _eventStore).Run();
+                var result = new TestSpecifications(_loggerFactory, _commandDispatcher, _queryDispatcher, _eventStore).Run();
                 _logger.LogInformation("Finish seeding database with test specifications.");
 
-                
+
 
 
                 var localDb = new Settings.GeoDatabaseSetting()
@@ -61,7 +61,7 @@ namespace OpenFTTH.APIGateway.Conversion
                 var dbToReadConversionDataFrom = _geoDatabaseSetting;
 
                 //new Checker(_loggerFactory.CreateLogger<Checker>(), _workTaskId, _eventStore, dbToReadConversionDataFrom, _commandDispatcher, _queryDispatcher).Run();
-               
+
 
                 new CableSpanEquipmentImporter(_loggerFactory.CreateLogger<ConduitSpanEquipmentImporter>(), _eventStore, dbToReadConversionDataFrom, _commandDispatcher, _queryDispatcher, _routeNetworkState).Run();
 
@@ -79,7 +79,7 @@ namespace OpenFTTH.APIGateway.Conversion
 
                 new CablePlaceInConduit(_loggerFactory.CreateLogger<ConduitSpanEquipmentImporter>(), _eventStore, dbToReadConversionDataFrom, _commandDispatcher, _queryDispatcher, _routeNetworkState).Run();
 
-                
+
 
             }
             else
@@ -103,7 +103,7 @@ namespace OpenFTTH.APIGateway.Conversion
                 return false;
         }
 
-        
+
 
         private IDbConnection GetConnection()
         {

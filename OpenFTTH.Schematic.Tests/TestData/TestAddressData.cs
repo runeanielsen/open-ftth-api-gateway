@@ -74,7 +74,7 @@ namespace OpenFTTH.TestData
                     new AccessAddress(
                         id: Guid.Parse("0c5a203e-b989-4b88-ab90-283c6e7aafc7"),
                         addressPoint: new Point(553089.64, 6190980.39),
-                        unitAddressIds: new Guid[] { 
+                        unitAddressIds: new Guid[] {
                             Guid.Parse("9fe3d78b-0f22-48a2-afb4-fc76a9120e92"),
                             Guid.Parse("ea4d5132-c605-4c5a-9fc6-81f7935a16d9"),
                             Guid.Parse("5e6293be-b8f6-4eb4-b871-ed08541f5951"),
@@ -101,7 +101,7 @@ namespace OpenFTTH.TestData
                         null,
                         null)
                 );
-                
+
                 // St (living floor)
                 result.Add(
                     new UnitAddress(

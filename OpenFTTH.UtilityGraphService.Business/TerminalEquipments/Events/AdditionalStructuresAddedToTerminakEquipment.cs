@@ -7,7 +7,7 @@ namespace OpenFTTH.UtilityGraphService.Business.TerminalEquipments.Events
     public record AdditionalStructuresAddedToTerminalEquipment : EventStoreBaseEvent
     {
         public Guid TerminalEquipmentId { get; }
-        public TerminalStructure[] TerminalStructuresToAdd {get; }
+        public TerminalStructure[] TerminalStructuresToAdd { get; }
 
         public AdditionalStructuresAddedToTerminalEquipment(Guid terminalEquipmentId, TerminalStructure[] terminalStructuresToAdd)
         {

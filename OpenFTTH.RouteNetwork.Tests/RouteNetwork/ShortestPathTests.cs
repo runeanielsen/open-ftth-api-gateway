@@ -131,7 +131,7 @@ namespace OpenFTTH.RouteNetwork.Tests
 
             var validatoresult = await _commandDispatcher.HandleAsync<ValidateWalkOfInterest, Result<ValidatedRouteNetworkWalk>>(validatorQuery);
             validatoresult.IsSuccess.Should().BeTrue();
-            
+
 
         }
 

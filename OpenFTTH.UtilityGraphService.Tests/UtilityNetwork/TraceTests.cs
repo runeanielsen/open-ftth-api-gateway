@@ -210,7 +210,7 @@ namespace OpenFTTH.UtilityGraphService.Tests.UtilityNetwork
             // Assert
             traceQueryResult.IsSuccess.Should().BeTrue();
 
-            
+
 
 
         }

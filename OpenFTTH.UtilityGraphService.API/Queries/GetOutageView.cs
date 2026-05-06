@@ -5,7 +5,7 @@ using System;
 
 namespace OpenFTTH.UtilityGraphService.API.Queries
 {
-    public class GetOutageView : IQuery<Result<OutageViewNode>> 
+    public class GetOutageView : IQuery<Result<OutageViewNode>>
     {
         public Guid RouteNetworkElementId { get; }
         public Guid? EquipmentId { get; }

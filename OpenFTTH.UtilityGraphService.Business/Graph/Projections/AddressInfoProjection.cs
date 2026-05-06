@@ -119,11 +119,11 @@ namespace OpenFTTH.UtilityGraphService.Business.Graph.Projections
                     accessAddressToUpdate.EastCoordinate = @event.EastCoordinate;
                     accessAddressToUpdate.NorthCoordinate = @event.NorthCoordinate;
                     break;
-           
+
                 case (AccessAddressHouseNumberChanged @event):
                     _accessAddressById[@event.Id].HouseNumber = @event.HouseNumber;
                     break;
-           
+
                 case (AccessAddressRoadIdChanged @event):
                     _accessAddressById[@event.Id].RoadId = @event.RoadId;
                     break;

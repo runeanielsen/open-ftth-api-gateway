@@ -95,7 +95,7 @@ namespace OpenFTTH.RouteNetwork.Business.RouteElements.QueryHandlers
             Stopwatch st = new Stopwatch();
 
             st.Start();
-            
+
             var graph = GetGraphForTracing(sourceRouteNodeId, destRouteNodeId, expandPercent);
 
             var shortestPathResult = graph.ShortestPath(sourceRouteNodeId, destRouteNodeId);

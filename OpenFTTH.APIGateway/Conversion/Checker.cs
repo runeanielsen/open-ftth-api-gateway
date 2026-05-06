@@ -198,7 +198,7 @@ namespace OpenFTTH.APIGateway.Conversion
                                 }
 
 
-                                var csvLine = "\"" + routeNodeName + "\";\"" + splitterNr + "\";\"" +  splitterPort.Name + "\";\"" + eqName + "\";\"" + eqKort + "\";\"" + eqPort + "\";\""  + rammerCpe + "\"";
+                                var csvLine = "\"" + routeNodeName + "\";\"" + splitterNr + "\";\"" + splitterPort.Name + "\";\"" + eqName + "\";\"" + eqKort + "\";\"" + eqPort + "\";\"" + rammerCpe + "\"";
 
                                 csvFile.WriteLine(csvLine);
                             }

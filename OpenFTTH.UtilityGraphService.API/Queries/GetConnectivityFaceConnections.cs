@@ -6,8 +6,8 @@ using System.Collections.Generic;
 
 namespace OpenFTTH.UtilityGraphService.API.Queries
 {
-    public class GetConnectivityFaceConnections : IQuery<Result<List<ConnectivityFaceConnection>>> 
-    { 
+    public class GetConnectivityFaceConnections : IQuery<Result<List<ConnectivityFaceConnection>>>
+    {
         public Guid routeNodeId { get; }
 
         public Guid spanOrTerminalEquipmentId { get; }

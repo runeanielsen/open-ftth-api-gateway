@@ -110,10 +110,10 @@ namespace OpenFTTH.RouteNetwork.Business.RouteElements.QueryHandlers
 
             // Here we return a error result, because we're dealing with invalid route network ids provided by the client
             if (getRouteNetworkElementsResult.IsFailed)
-                    return Task.FromResult(
-                        Result.Fail<GetRouteNetworkDetailsResult>(new GetRouteNetworkDetailsError(GetRouteNetworkDetailsErrorCodes.INVALID_QUERY_ARGUMENT_ERROR_LOOKING_UP_SPECIFIED_ROUTE_NETWORK_ELEMENT_BY_ID, $"Error looking up route network elements: " + JsonConvert.SerializeObject(query))).
-                        WithError(getRouteNetworkElementsResult.Errors.First())
-                    );
+                return Task.FromResult(
+                    Result.Fail<GetRouteNetworkDetailsResult>(new GetRouteNetworkDetailsError(GetRouteNetworkDetailsErrorCodes.INVALID_QUERY_ARGUMENT_ERROR_LOOKING_UP_SPECIFIED_ROUTE_NETWORK_ELEMENT_BY_ID, $"Error looking up route network elements: " + JsonConvert.SerializeObject(query))).
+                    WithError(getRouteNetworkElementsResult.Errors.First())
+                );
 
             var routeNetworkElementsToReturn = MapRouteElementDomainObjectsToQueryObjects(query.RouteNetworkElementFilter, getRouteNetworkElementsResult.Value);
 

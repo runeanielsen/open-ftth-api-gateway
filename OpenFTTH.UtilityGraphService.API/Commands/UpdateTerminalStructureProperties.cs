@@ -13,7 +13,7 @@ namespace OpenFTTH.UtilityGraphService.API.Commands
         public Guid StructureSpecificationId { get; set; }
         public int Position { get; set; }
         public InterfaceInfo? InterfaceInfo { get; set; }
-             
+
         public UpdateTerminalStructureProperties(Guid correlationId, UserContext userContext, Guid terminalEquipmentId, Guid terminalStructureId) : base(correlationId, userContext)
         {
             TerminalEquipmentId = terminalEquipmentId;

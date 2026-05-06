@@ -21,7 +21,7 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments.QueryHandlers.Pas
         List<UtilityNetworkHop> _networkHops = new();
 
         HashSet<Guid> _woiContainsId = new();
-       
+
 
         public CablePassageViewBuilder(IEventStore eventStore, UtilityNetworkProjection utilityNetwork, IQueryDispatcher queryDispatcher, Guid routeNetworkElementId, SpanEquipment cableSpanEquipment) : base(eventStore, utilityNetwork, queryDispatcher, routeNetworkElementId, cableSpanEquipment)
         {
@@ -32,7 +32,7 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments.QueryHandlers.Pas
         public SpanEquipmentPassageViewEquipmentInfo GetCablePassageView()
         {
             var walkOfInterest = _routeNetworkInterests[_spanEquipment.WalkOfInterestId];
-         
+
             // Build woi index
             for (int index = 0; index < walkOfInterest.RouteNetworkElementRefs.Count; index++)
             {
@@ -154,6 +154,6 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments.QueryHandlers.Pas
 
             return lineInfo;
         }
-       
+
     }
 }

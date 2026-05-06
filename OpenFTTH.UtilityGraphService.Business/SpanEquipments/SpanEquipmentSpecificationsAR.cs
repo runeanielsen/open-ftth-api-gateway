@@ -105,7 +105,7 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments
                     nextLevelChildsToCheck.AddRange(childTemplate.ChildTemplates);
                 }
 
-                childsToCheck = nextLevelChildsToCheck.ToArray();                
+                childsToCheck = nextLevelChildsToCheck.ToArray();
 
                 expectedChildLevel++;
             }

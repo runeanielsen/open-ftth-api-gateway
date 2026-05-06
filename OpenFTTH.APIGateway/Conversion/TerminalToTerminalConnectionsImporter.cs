@@ -229,7 +229,7 @@ namespace OpenFTTH.APIGateway.Conversion
 
                     if (toTerminalId == null)
                         return Result.Fail(new Error($"Cannot find to terminal fom information: '{connection.To}"));
-                                 
+
                     // Do the connect between terminals)
                     var connectCmd = new ConnectTerminalsAtRouteNode(
                         correlationId: Guid.NewGuid(),
@@ -259,7 +259,7 @@ namespace OpenFTTH.APIGateway.Conversion
         {
             if (relatedInfo.NodeContainer == null)
                 return null;
-          
+
             // Find terminal equipment
             TerminalEquipment? te = null;
 
@@ -315,7 +315,7 @@ namespace OpenFTTH.APIGateway.Conversion
         {
             if (relatedInfo.NodeContainer == null)
                 return null;
-                   
+
             // Find terminal equipment
             TerminalEquipment? te = null;
 
@@ -406,7 +406,7 @@ namespace OpenFTTH.APIGateway.Conversion
                 connection.NodeId = Guid.Parse(connectionstReader.GetString(1));
                 connection.From = connectionstReader.GetString(2);
                 connection.To = connectionstReader.GetString(3);
-              
+
                 connectionsForConversions.Add(connection);
             }
 
@@ -476,7 +476,7 @@ namespace OpenFTTH.APIGateway.Conversion
                         }
                     }
 
-                    
+
 
                 }
                 else

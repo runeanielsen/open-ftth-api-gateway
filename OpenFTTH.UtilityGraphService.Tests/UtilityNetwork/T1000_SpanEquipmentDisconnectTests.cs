@@ -41,7 +41,7 @@ namespace OpenFTTH.UtilityGraphService.Tests.UtilityNetwork
         [Fact, Order(1)]
         public async Task TestDisconnect5x10From3x10ConduitAtCC_1_ShouldSucceed()
         {
-           MakeSureTestConduitIsCutAndConnectedAtCC_1();
+            MakeSureTestConduitIsCutAndConnectedAtCC_1();
 
             var utilityNetwork = _eventStore.Projections.Get<UtilityNetworkProjection>();
 

@@ -12,7 +12,7 @@ namespace OpenFTTH.UtilityGraphService.Business.NodeEquipments.QueryHandling
     public class GetNodeContainerSpecificationsQueryHandler
         : IQueryHandler<GetNodeContainerSpecifications, Result<LookupCollection<NodeContainerSpecification>>>
     {
-        private readonly IEventStore _eventStore;        
+        private readonly IEventStore _eventStore;
 
         public GetNodeContainerSpecificationsQueryHandler(IEventStore eventStore)
         {

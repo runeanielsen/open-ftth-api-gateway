@@ -33,7 +33,7 @@ namespace OpenFTTH.UtilityGraphService.Tests.UtilityNetwork
             _externalEventProducer = (FakeExternalEventProducer)externalEventProducer;
         }
 
-        
+
         [Fact]
         public async Task TestPlaceValidNodeContainer_ShouldSucceed()
         {

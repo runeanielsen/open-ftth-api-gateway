@@ -35,7 +35,7 @@ namespace OpenFTTH.Schematic.Tests.NodeSchematic
         }
 
         [Fact, Order(1)]
-        public async void TestDrawingSpanEquipmentWithSegmentsCut()
+        public async System.Threading.Tasks.Task TestDrawingSpanEquipmentWithSegmentsCut()
         {
             var sutRouteNetworkElement = TestRouteNetwork.CC_1;
             var sutSpanEquipment = TestUtilityNetwork.MultiConduit_12x7_HH_1_to_HH_10;
@@ -102,7 +102,7 @@ namespace OpenFTTH.Schematic.Tests.NodeSchematic
         }
 
         [Fact, Order(2)]
-        public async void TestConnectWestSegmentToNorthSegmentInCC_1()
+        public async System.Threading.Tasks.Task TestConnectWestSegmentToNorthSegmentInCC_1()
         {
             var utilityNetwork = _eventStore.Projections.Get<UtilityNetworkProjection>();
 
@@ -140,7 +140,7 @@ namespace OpenFTTH.Schematic.Tests.NodeSchematic
         }
 
         [Fact, Order(10)]
-        public async void TestSpanEquipmentDrawingPositionAccordingToOrder()
+        public async System.Threading.Tasks.Task TestSpanEquipmentDrawingPositionAccordingToOrder()
         {
             var utilityNetwork = _eventStore.Projections.Get<UtilityNetworkProjection>();
 
@@ -180,7 +180,7 @@ namespace OpenFTTH.Schematic.Tests.NodeSchematic
         }
 
         [Fact, Order(50)]
-        public async void TestHH_2()
+        public async System.Threading.Tasks.Task TestHH_2()
         {
             var utilityNetwork = _eventStore.Projections.Get<UtilityNetworkProjection>();
 

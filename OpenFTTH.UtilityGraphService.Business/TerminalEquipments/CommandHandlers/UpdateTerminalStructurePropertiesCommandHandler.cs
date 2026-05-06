@@ -59,7 +59,7 @@ namespace OpenFTTH.UtilityGraphService.Business.TerminalEquipments.CommandHandle
                (command.InterfaceInfo != null && terminalStructure.interfaceInfo == null) ||
                (command.InterfaceInfo != null && terminalStructure.interfaceInfo != null && !command.InterfaceInfo.EqualTo(terminalStructure.interfaceInfo))
             )
-            { 
+            {
                 var updateNamingInfoResult = terminalEquipmentAR.ChangeInterfaceInfo(
                     cmdContext: commandContext,
                     terminalStructure.Id,
@@ -72,7 +72,7 @@ namespace OpenFTTH.UtilityGraphService.Business.TerminalEquipments.CommandHandle
                 somethingChanged = true;
             }
 
-                   
+
             // Check if specification has been updated
             if (command.StructureSpecificationId != null && !command.StructureSpecificationId.Equals(terminalStructure.SpecificationId))
             {

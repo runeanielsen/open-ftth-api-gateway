@@ -20,7 +20,7 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments.Events
         public Guid SegmentId { get; }
         public Guid TerminalId { get; set; }
         public SpanSegmentToTerminalConnectionDirection ConnectionDirection { get; set; }
-   
+
         public SpanSegmentToSimpleTerminalConnectInfo(Guid segmentId, Guid terminalId)
         {
             SegmentId = segmentId;

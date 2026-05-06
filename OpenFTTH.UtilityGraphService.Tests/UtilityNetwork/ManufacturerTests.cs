@@ -49,7 +49,7 @@ namespace OpenFTTH.UtilityGraphService.Tests.UtilityNetwork
         public async Task AddManufacturerWithEmptyName_ShouldFail()
         {
             // Setup
-            var manu1 = new Manufacturer(Guid.NewGuid(),"");
+            var manu1 = new Manufacturer(Guid.NewGuid(), "");
 
             // Act
             var cmdResult = await _commandDispatcher.HandleAsync<AddManufacturer, Result>(new AddManufacturer(Guid.NewGuid(), new UserContext("test", Guid.Empty), manu1));

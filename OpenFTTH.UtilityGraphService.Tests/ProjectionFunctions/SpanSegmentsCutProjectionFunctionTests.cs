@@ -23,7 +23,7 @@ namespace OpenFTTH.UtilityGraphService.Tests.ProjectionFunctions
                 specificationId: Guid.NewGuid(),
                 walkOfInterestId: Guid.NewGuid(),
                 nodesOfInterestIds: new Guid[] { Guid.NewGuid(), Guid.NewGuid() },
-                spanStructures: 
+                spanStructures:
                     new SpanStructure[]
                     {
                         new SpanStructure(
@@ -249,7 +249,7 @@ namespace OpenFTTH.UtilityGraphService.Tests.ProjectionFunctions
             // Cut structure 2 second time
             var structure1cut2newSegmentId1 = Guid.NewGuid();
             var structure1cut2newSegmentId2 = Guid.NewGuid();
-            
+
             var cut2Event = new SpanSegmentsCut(
                  spanEquipmentId: existingSpanEquipment.Id,
                  cutNodeOfInterestId: Guid.NewGuid(),
@@ -390,7 +390,7 @@ namespace OpenFTTH.UtilityGraphService.Tests.ProjectionFunctions
             // Cut second structure
             var cut2newSegmentId1 = Guid.NewGuid();
             var cut2newSegmentId2 = Guid.NewGuid();
-                        
+
             var cut2Event = new SpanSegmentsCut(
                  spanEquipmentId: existingSpanEquipment.Id,
                  cutNodeOfInterestId: cutNodeOfInterestId,
@@ -545,7 +545,7 @@ namespace OpenFTTH.UtilityGraphService.Tests.ProjectionFunctions
             newSpanEquipment1.SpanStructures[0].SpanSegments[1].FromNodeOfInterestIndex.Should().Be(1);
             newSpanEquipment1.SpanStructures[0].SpanSegments[1].ToNodeOfInterestIndex.Should().Be(2);
 
-       
+
 
         }
     }

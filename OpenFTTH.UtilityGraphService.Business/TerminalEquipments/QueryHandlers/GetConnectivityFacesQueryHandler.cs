@@ -300,7 +300,7 @@ namespace OpenFTTH.UtilityGraphService.Business.TerminalEquipments.QueryHandling
             result.CableToRelatedConduitAddressRelations = new();
 
             HashSet<Guid> adresseIdsToQuery = new();
-                        
+
             if (result.SpanEquipments != null)
             {
                 foreach (var spanEquipment in result.SpanEquipments)

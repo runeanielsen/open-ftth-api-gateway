@@ -12,7 +12,7 @@ namespace OpenFTTH.UtilityGraphService.Business.TerminalEquipments.QueryHandling
     public class GetTerminalEquipmentSpecificationsQueryHandler
         : IQueryHandler<GetTerminalEquipmentSpecifications, Result<LookupCollection<TerminalEquipmentSpecification>>>
     {
-        private readonly IEventStore _eventStore;        
+        private readonly IEventStore _eventStore;
 
         public GetTerminalEquipmentSpecificationsQueryHandler(IEventStore eventStore)
         {

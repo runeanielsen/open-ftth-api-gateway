@@ -115,7 +115,7 @@ namespace OpenFTTH.APIGateway.Conversion
             try
             {
                 var placeEqResult = _commandDispatcher.HandleAsync<PlaceAdditionalStructuresInTerminalEquipment, Result>(placeEqCmd).Result;
-                
+
                 LogStatus((NpgsqlCommand)logCmd, _terminalConnectionTable, "external_id", terminalStructure.ExternalId, placeEqResult);
 
                 return placeEqResult;
@@ -156,7 +156,7 @@ namespace OpenFTTH.APIGateway.Conversion
                 terminalEquipment.TerminalEquipmentId = Guid.Parse(terminalEquipmentReader.GetString(2));
                 terminalEquipment.Specification = terminalEquipmentReader.GetString(3).Trim();
                 terminalEquipment.Position = Int32.Parse(terminalEquipmentReader.GetString(4).Trim());
-          
+
                 termianEquipmentsForConversions.Add(terminalEquipment);
             }
 
@@ -195,10 +195,10 @@ namespace OpenFTTH.APIGateway.Conversion
             public Guid TerminalEquipmentId { get; set; }
             public string Specification { get; set; }
             public int Position { get; set; }
-     
+
         }
 
-      
+
     }
 }
 

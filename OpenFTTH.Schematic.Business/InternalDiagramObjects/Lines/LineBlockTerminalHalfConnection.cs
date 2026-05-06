@@ -103,7 +103,7 @@ namespace OpenFTTH.Schematic.Business.Lines
             {
                 toTerminalEndPointY += LineLength;
             }
-            
+
             List<Coordinate> pnts = new List<Coordinate>();
             pnts.Add(new Coordinate(GeometryBuilder.Convert(fromTerminalStartPointX), GeometryBuilder.Convert(fromTerminalStartPointY)));
             pnts.Add(new Coordinate(GeometryBuilder.Convert(toTerminalEndPointX), GeometryBuilder.Convert(toTerminalEndPointY)));

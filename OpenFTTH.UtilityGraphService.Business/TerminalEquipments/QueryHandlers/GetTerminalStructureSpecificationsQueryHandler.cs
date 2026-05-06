@@ -11,8 +11,8 @@ namespace OpenFTTH.UtilityGraphService.Business.TerminalStructures.QueryHandling
 {
     public class GetTerminalStructureSpecificationsQueryHandler
         : IQueryHandler<GetTerminalStructureSpecifications, Result<LookupCollection<TerminalStructureSpecification>>>
-    {           
-        private readonly IEventStore _eventStore;        
+    {
+        private readonly IEventStore _eventStore;
 
         public GetTerminalStructureSpecificationsQueryHandler(IEventStore eventStore)
         {

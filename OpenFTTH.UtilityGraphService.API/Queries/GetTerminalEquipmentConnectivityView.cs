@@ -5,8 +5,8 @@ using System;
 
 namespace OpenFTTH.UtilityGraphService.API.Queries
 {
-    public class GetTerminalEquipmentConnectivityView : IQuery<Result<TerminalEquipmentAZConnectivityViewModel>> 
-    { 
+    public class GetTerminalEquipmentConnectivityView : IQuery<Result<TerminalEquipmentAZConnectivityViewModel>>
+    {
         public Guid routeNodeId { get; }
         public Guid terminalEquipmentOrRackId { get; }
 

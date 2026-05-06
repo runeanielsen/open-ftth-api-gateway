@@ -244,7 +244,7 @@ namespace OpenFTTH.UtilityGraphService.Business.Graph.Projections
                     transaction.Delete(segmentId);
             }
         }
-                
+
         private static IUtilityGraphTerminalRef FindOrCreateSimpleTerminal(Guid terminalId, Guid terminalNodeOfInterestId, UtilityGraph graph, ITransaction transaction)
         {
             // Try find terminal in graph
@@ -273,6 +273,6 @@ namespace OpenFTTH.UtilityGraphService.Business.Graph.Projections
 
             return terminal;
         }
-        
+
     }
 }

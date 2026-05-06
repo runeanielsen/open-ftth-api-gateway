@@ -56,7 +56,7 @@ namespace OpenFTTH.UtilityGraphService.Tests.UtilityNetwork
                 InnerDiameter = 10
             };
             await _commandDispatcher.HandleAsync<AddSpanStructureSpecification, Result>(new AddSpanStructureSpecification(Guid.NewGuid(), new UserContext("test", Guid.Empty), innerConduitSpanStructureSpec2));
-                       
+
 
             // Setup a span equipment specification with 2 levels
             var spanEquipmentSpecification = new SpanEquipmentSpecification(Guid.NewGuid(), "Conduit", "Ø50 2x12",

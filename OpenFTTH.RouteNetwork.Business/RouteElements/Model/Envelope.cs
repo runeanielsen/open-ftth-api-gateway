@@ -39,8 +39,8 @@ namespace OpenFTTH.RouteNetwork.Business.RouteElements.Model
         public void ExpandToInclude(double x, double y)
         {
             if (MinX > x)
-            { 
-                MinX = x; 
+            {
+                MinX = x;
             }
 
             if (MinY > y)
@@ -61,7 +61,7 @@ namespace OpenFTTH.RouteNetwork.Business.RouteElements.Model
 
         public bool IsWithin(double[] coordArray)
         {
-            for (int i = 0; i < coordArray.Length; i+=2)
+            for (int i = 0; i < coordArray.Length; i += 2)
             {
                 if (!IsWithin(coordArray[i], coordArray[i + 1]))
                     return false;
@@ -70,7 +70,7 @@ namespace OpenFTTH.RouteNetwork.Business.RouteElements.Model
             return true;
         }
 
-        public bool IsWithin(double x, double y) 
+        public bool IsWithin(double x, double y)
         {
             if (x >= MinX && x <= MaxX && y >= MinY && y <= MaxY)
                 return true;

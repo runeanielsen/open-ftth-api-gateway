@@ -8,7 +8,7 @@
         /// <summary>
         /// Optionally array of node structures - i.e. racks - that the terminal equipment are placed within
         /// </summary>
-        public TerminalEquipmentAZConnectivityViewNodeStructureInfo[]? ParentNodeStructures {get; init;}
+        public TerminalEquipmentAZConnectivityViewNodeStructureInfo[]? ParentNodeStructures { get; init; }
 
         /// <summary>
         /// All terminal equipments to be displayed

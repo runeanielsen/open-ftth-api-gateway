@@ -241,7 +241,7 @@ namespace OpenFTTH.UtilityGraphService.Business.Trace.QueryHandling
 
             return result;
         }
-        
+
 
         private string[] GetSegmentGeometries(RelatedDataHolder relatedData, List<IGraphObject> traceElements, int graphElementIndex)
         {
@@ -295,7 +295,7 @@ namespace OpenFTTH.UtilityGraphService.Business.Trace.QueryHandling
                     if (relatedData.RouteNetworkInterestById.ContainsKey(spanEquipment.WalkOfInterestId))
                     {
                         var woi = relatedData.RouteNetworkInterestById[spanEquipment.WalkOfInterestId];
-                        
+
                         foreach (var routeNetworkElementId in woi.RouteNetworkElementRefs)
                         {
                             if (relatedData.RouteNetworkElementById.ContainsKey(routeNetworkElementId))
@@ -372,7 +372,7 @@ namespace OpenFTTH.UtilityGraphService.Business.Trace.QueryHandling
 
         public string? GetTags(RelatedDataHolder relatedData, List<IGraphObject> traceElements, int graphElementIndex)
         {
-            List<string> tags = new List<string>(); 
+            List<string> tags = new List<string>();
 
             // Collect tags from terminal if any
             var terminalRef = traceElements[graphElementIndex] as IUtilityGraphTerminalRef;

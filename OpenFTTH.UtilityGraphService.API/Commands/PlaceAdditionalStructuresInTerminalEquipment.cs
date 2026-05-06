@@ -9,7 +9,7 @@ namespace OpenFTTH.UtilityGraphService.API.Commands
     {
         public Guid RouteNodeId { get; }
         public Guid TerminalEquipmentId { get; }
-        public Guid StructureSpecificationId { get;  }
+        public Guid StructureSpecificationId { get; }
         public int Position { get; }
         public int NumberOfStructures { get; }
         public InterfaceInfo? InterfaceInfo { get; set; }

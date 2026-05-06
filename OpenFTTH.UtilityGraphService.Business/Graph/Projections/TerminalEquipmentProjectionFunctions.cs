@@ -62,12 +62,12 @@ namespace OpenFTTH.UtilityGraphService.Business.Graph.Projections
             List<TerminalStructure> newTerminalStructureList = new();
 
             // Replace the one with new interface info
-            foreach(var existingTerminalStructure in existingTerminalEquipment.TerminalStructures)
+            foreach (var existingTerminalStructure in existingTerminalEquipment.TerminalStructures)
             {
                 if (existingTerminalStructure.Id == @event.TerminalStructureId)
                 {
                     newTerminalStructureList.Add(
-                        existingTerminalStructure with { interfaceInfo = @event.InterfaceInfo}
+                        existingTerminalStructure with { interfaceInfo = @event.InterfaceInfo }
                     );
                 }
                 else

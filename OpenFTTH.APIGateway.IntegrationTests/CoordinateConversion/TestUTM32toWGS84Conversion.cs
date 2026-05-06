@@ -39,10 +39,10 @@ namespace OpenFTTH.APIGateway.IntegrationTests.CoordinateConversion
             result.ETRS89BoundingBox.MaxX.Should().Be(552001 + expandDistance);
             result.ETRS89BoundingBox.MaxY.Should().Be(6190001 + expandDistance);
 
-            Math.Round(result.WGS84BoundingBox.MinX,5).Should().Be(9.83062);
-            Math.Round(result.WGS84BoundingBox.MinY,5).Should().Be(55.85272);
-            Math.Round(result.WGS84BoundingBox.MaxX,5).Should().Be(9.83064);
-            Math.Round(result.WGS84BoundingBox.MaxY,5).Should().Be(55.85273);
+            Math.Round(result.WGS84BoundingBox.MinX, 5).Should().Be(9.83062);
+            Math.Round(result.WGS84BoundingBox.MinY, 5).Should().Be(55.85272);
+            Math.Round(result.WGS84BoundingBox.MaxX, 5).Should().Be(9.83064);
+            Math.Round(result.WGS84BoundingBox.MaxY, 5).Should().Be(55.85273);
         }
     }
 }

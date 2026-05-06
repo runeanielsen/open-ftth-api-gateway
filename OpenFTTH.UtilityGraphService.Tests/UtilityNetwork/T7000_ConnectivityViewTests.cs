@@ -173,7 +173,7 @@ namespace OpenFTTH.UtilityGraphService.Tests.UtilityNetwork
 
         }
 
-        
+
         [Fact, Order(5)]
         public async Task GetTerminalEquipmentConnectivityViewOnCC1_ShouldSucceed()
         {

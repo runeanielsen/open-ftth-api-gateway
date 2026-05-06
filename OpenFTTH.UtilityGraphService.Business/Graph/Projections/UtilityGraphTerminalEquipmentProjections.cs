@@ -106,7 +106,7 @@ namespace OpenFTTH.UtilityGraphService.Business.Graph.Projections
                 ApplyInternalConnectivityToGraph(nodeContainer, terminalEquipment, graph, structuresToAdd);
             }
         }
-               
+
 
         public static void ApplyInternalConnectivityToGraph(NodeContainer nodeContainer, TerminalEquipment terminalEquipment, UtilityGraph graph, HashSet<Guid>? structuresToConnect = null)
         {
@@ -117,7 +117,7 @@ namespace OpenFTTH.UtilityGraphService.Business.Graph.Projections
             for (int structureIndex = 0; structureIndex < terminalEquipment.TerminalStructures.Length; structureIndex++)
             {
                 var terminalStructure = terminalEquipment.TerminalStructures[structureIndex];
-                
+
                 if (structuresToConnect != null && !structuresToConnect.Contains(terminalStructure.Id))
                     continue;
 

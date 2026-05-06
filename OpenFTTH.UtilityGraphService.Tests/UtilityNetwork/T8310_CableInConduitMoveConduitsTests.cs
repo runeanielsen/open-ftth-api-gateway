@@ -157,7 +157,7 @@ namespace OpenFTTH.UtilityGraphService.Tests.UtilityNetwork
             sutCableWalkOfInterestAfterConduitMove[4].Should().Be(ConduitTestUtilityNetwork.N7);
             sutCableWalkOfInterestAfterConduitMove[5].Should().Be(ConduitTestUtilityNetwork.S9);
             sutCableWalkOfInterestAfterConduitMove[6].Should().Be(ConduitTestUtilityNetwork.N3);
-        
+
         }
 
 
@@ -170,8 +170,8 @@ namespace OpenFTTH.UtilityGraphService.Tests.UtilityNetwork
             var sutConduitId = ConduitTestUtilityNetwork.Conduit_N2_N3_1;
 
             utilityNetwork.TryGetEquipment<SpanEquipment>(sutConduitId, out var sutConduit);
-            
-            var moveCmd = new MoveSpanEquipment(Guid.NewGuid(), new UserContext("test", Guid.Empty), sutConduitId, 
+
+            var moveCmd = new MoveSpanEquipment(Guid.NewGuid(), new UserContext("test", Guid.Empty), sutConduitId,
                 new RouteNetworkElementIdList() { ConduitTestUtilityNetwork.S8 });
 
             var moveCmdResult = await _commandDispatcher.HandleAsync<MoveSpanEquipment, Result>(moveCmd);
@@ -192,7 +192,7 @@ namespace OpenFTTH.UtilityGraphService.Tests.UtilityNetwork
             utilityNetwork.TryGetEquipment<SpanEquipment>(sutConduitId, out var sutConduit);
 
 
-            var moveCmd = new MoveSpanEquipment(Guid.NewGuid(), new UserContext("test", Guid.Empty), sutConduitId, 
+            var moveCmd = new MoveSpanEquipment(Guid.NewGuid(), new UserContext("test", Guid.Empty), sutConduitId,
                 new RouteNetworkElementIdList() { ConduitTestUtilityNetwork.S2, ConduitTestUtilityNetwork.S3 });
 
             var moveCmdResult = await _commandDispatcher.HandleAsync<MoveSpanEquipment, Result>(moveCmd);

@@ -196,7 +196,7 @@ namespace OpenFTTH.APIGateway.Specifications
 
             // Eksport to file
             string json = JsonConvert.SerializeObject(specificationData, Formatting.Indented);
-            
+
             File.WriteAllText(fileName, json);
         }
 

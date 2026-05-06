@@ -19,8 +19,10 @@ namespace OpenFTTH.UtilityGraphService.API.Model.UtilityNetwork
 
         private string? _name;
 
-        public string? Name { 
-            get {
+        public string? Name
+        {
+            get
+            {
                 if (_name != null)
                     return _name;
                 else

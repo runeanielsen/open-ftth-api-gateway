@@ -40,7 +40,7 @@ namespace OpenFTTH.Schematic.Business.Canvas
             Width = _width;
             Height = _height;
         }
-   
+
         public override List<DiagramObject> CreateDiagramObjects(Diagram diagram, double offsetX, double offsetY)
         {
             List<DiagramObject> result = new List<DiagramObject>();

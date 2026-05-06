@@ -116,7 +116,7 @@ namespace OpenFTTH.UtilityGraphService.Tests.UtilityNetwork
             // Assert
             updateResult.IsSuccess.Should().BeTrue();
             nodeContainerAfterUpdate.SpecificationId.Should().Be(updateCmd.SpecificationId.Value);
-         
+
             // Check if an event is published to the notification.utility-network topic having an idlist containing the span equipment id we just created
             var utilityNetworkNotifications = _externalEventProducer.GetMessagesByTopic(nameof(RouteNetworkElementContainedEquipmentUpdated)).OfType<RouteNetworkElementContainedEquipmentUpdated>();
             var utilityNetworkUpdatedEvent = utilityNetworkNotifications.First(n => n.Category == "EquipmentModification.PropertiesUpdated" && n.IdChangeSets != null && n.IdChangeSets.Any(i => i.IdList.Any(i => i == sutNodeContainerId)));

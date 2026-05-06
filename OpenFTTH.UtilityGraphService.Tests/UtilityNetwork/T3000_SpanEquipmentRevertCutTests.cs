@@ -122,7 +122,7 @@ namespace OpenFTTH.UtilityGraphService.Tests.UtilityNetwork
            );
 
             traceQueryResult.IsSuccess.Should().BeTrue();
-                        
+
             var routeNetworkTraces = traceQueryResult.Value.RouteNetworkTraces;
 
             routeNetworkTraces.Count.Should().Be(5);

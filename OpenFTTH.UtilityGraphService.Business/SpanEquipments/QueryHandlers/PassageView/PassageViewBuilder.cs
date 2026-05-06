@@ -285,7 +285,7 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments.QueryHandlers.Pas
         {
             if (_spanEquipment.MarkingInfo != null && _spanEquipment.MarkingInfo.MarkingText != null)
             {
-                return $"{_spanEquipment.Name} ({ _spanEquipment.MarkingInfo.MarkingText})";
+                return $"{_spanEquipment.Name} ({_spanEquipment.MarkingInfo.MarkingText})";
             }
             else
             {
@@ -297,7 +297,7 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments.QueryHandlers.Pas
         {
             if (segmentTrace.SpanEquipment.MarkingInfo != null && segmentTrace.SpanEquipment.MarkingInfo.MarkingText != null)
             {
-                return $"{segmentTrace.SpanEquipmentSpecification.Name} ({ segmentTrace.SpanEquipment.MarkingInfo.MarkingText})";
+                return $"{segmentTrace.SpanEquipmentSpecification.Name} ({segmentTrace.SpanEquipment.MarkingInfo.MarkingText})";
             }
             else
             {

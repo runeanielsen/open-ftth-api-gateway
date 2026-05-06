@@ -30,7 +30,7 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments.CommandHandlers
         private readonly UtilityNetworkProjection _utilityNetwork;
         private readonly IRouteNetworkRepository _routeNetworkRepository;
 
-        public PlaceSpanEquipmentInUtilityNetworkCommandHandler(IEventStore eventStore,IQueryDispatcher queryDispatcher, IExternalEventProducer externalEventProducer, IRouteNetworkRepository routeNodeRepository)
+        public PlaceSpanEquipmentInUtilityNetworkCommandHandler(IEventStore eventStore, IQueryDispatcher queryDispatcher, IExternalEventProducer externalEventProducer, IRouteNetworkRepository routeNodeRepository)
         {
             _eventStore = eventStore;
             _queryDispatcher = queryDispatcher;

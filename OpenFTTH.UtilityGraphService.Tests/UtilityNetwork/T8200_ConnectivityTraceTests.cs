@@ -124,7 +124,7 @@ namespace OpenFTTH.UtilityGraphService.Tests.UtilityNetwork
             // Get connectivity trace
             var connectivityTraceQuery = new GetConnectivityTraceView(sutRouteNodeId, terminalEquipment.TerminalStructures[0].Terminals[0].Id);
 
-            var connectivityTraceQueryResult = await _queryDispatcher.HandleAsync<GetConnectivityTraceView, Result<ConnectivityTraceView>> (
+            var connectivityTraceQueryResult = await _queryDispatcher.HandleAsync<GetConnectivityTraceView, Result<ConnectivityTraceView>>(
                 connectivityTraceQuery
             );
 

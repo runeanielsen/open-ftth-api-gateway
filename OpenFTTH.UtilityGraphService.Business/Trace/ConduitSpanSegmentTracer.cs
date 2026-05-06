@@ -155,7 +155,7 @@ namespace OpenFTTH.UtilityGraphService.Business.Trace
 
             var spanTraceResult = _utilityNetwork.Graph.SimpleTrace(spanSegmentIdToTrace);
 
-            string[]? tags = ExtractTagsFromTrace(_utilityNetwork, spanTraceResult); 
+            string[]? tags = ExtractTagsFromTrace(_utilityNetwork, spanTraceResult);
 
             // We're dealing with a connected segment if non-empty trace result is returned
             if (spanTraceResult.Upstream.Length > 0)

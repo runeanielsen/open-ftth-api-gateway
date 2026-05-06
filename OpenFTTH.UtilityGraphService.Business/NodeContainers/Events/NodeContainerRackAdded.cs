@@ -10,7 +10,7 @@ namespace OpenFTTH.UtilityGraphService.Business.NodeContainers.Events
         public Guid NodeContainerId { get; }
         public Guid RackId { get; }
         public Guid RackSpecificationId { get; }
-        public string RackName { get;}
+        public string RackName { get; }
         public int RackPosition { get; }
         public int RackHeightInUnits { get; }
 

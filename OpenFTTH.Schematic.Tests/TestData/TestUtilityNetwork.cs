@@ -150,7 +150,7 @@ namespace OpenFTTH.TestData
                 AffixSpanEquipmentToContainer(FlexConduit_40_Red_CC_1_to_SP_1, NodeContainer_SP_1, NodeContainerSideEnum.South);
                 AffixSpanEquipmentToContainer(FlexConduit_40_Red_SP_1_to_J_1, NodeContainer_SP_1, NodeContainerSideEnum.North);
 
-               
+
 
                 Thread.Sleep(100);
 

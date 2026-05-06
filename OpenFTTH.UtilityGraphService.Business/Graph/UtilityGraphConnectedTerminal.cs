@@ -19,7 +19,7 @@ namespace OpenFTTH.UtilityGraphService.Business.Graph
             TerminalEquipmentId = terminalEquipmentId;
             RouteNodeId = nodeOfInterestId;
             StructureIndex = structureIndex;
-            TerminalIndex = terminalIndex; 
+            TerminalIndex = terminalIndex;
         }
 
         public override string ToString()
@@ -56,6 +56,6 @@ namespace OpenFTTH.UtilityGraphService.Business.Graph
             throw new ApplicationException($"Cannot find terminial equipment with id: {TerminalEquipmentId}. State corrupted!");
         }
 
-      
+
     }
 }

@@ -221,7 +221,7 @@ namespace OpenFTTH.APIGateway.Conversion
                 }
             }
 
-            
+
             // trace all conduits
             var conduitsTraceResult = TraceAllConduits(conduitRels);
 

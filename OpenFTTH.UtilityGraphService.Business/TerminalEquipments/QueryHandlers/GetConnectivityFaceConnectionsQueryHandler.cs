@@ -247,7 +247,7 @@ namespace OpenFTTH.UtilityGraphService.Business.TerminalEquipments.QueryHandling
                 if (traceResult.Upstream.First() is UtilityGraphConnectedSegment connectedSegment)
                 {
                     if (connectedSegment.IsPatch)
-                    return true; 
+                        return true;
                 }
             }
 
@@ -259,7 +259,7 @@ namespace OpenFTTH.UtilityGraphService.Business.TerminalEquipments.QueryHandling
             if (traceResult.Downstream.Count() > 0)
             {
                 var firstConnection = traceResult.Downstream.First();
-                
+
                 if (firstConnection is UtilityGraphConnectedSegment connectedSegment)
                 {
                     if (connectedSegment.IsPatch)
@@ -268,7 +268,7 @@ namespace OpenFTTH.UtilityGraphService.Business.TerminalEquipments.QueryHandling
 
                 if (firstConnection is UtilityGraphTerminalToTerminalConnectivityLink)
                 {
-                        return true;
+                    return true;
                 }
             }
 

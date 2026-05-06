@@ -136,7 +136,7 @@ namespace OpenFTTH.APIGateway.Conversion
 
         }
 
-      
+
 
         private void AddSpecification(SpanEquipmentSpecification spec)
         {
@@ -161,7 +161,7 @@ namespace OpenFTTH.APIGateway.Conversion
 
         private void AddSpecification(NodeContainerSpecification spec)
         {
-            var cmd = new AddNodeContainerSpecification(Guid.NewGuid(), new UserContext("specification seeder",_specSeederId), spec);
+            var cmd = new AddNodeContainerSpecification(Guid.NewGuid(), new UserContext("specification seeder", _specSeederId), spec);
 
             var cmdResult = _commandDispatcher.HandleAsync<AddNodeContainerSpecification, Result>(cmd).Result;
 

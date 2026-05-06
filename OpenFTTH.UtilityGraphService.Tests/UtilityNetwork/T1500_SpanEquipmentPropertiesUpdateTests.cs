@@ -53,7 +53,7 @@ namespace OpenFTTH.UtilityGraphService.Tests.UtilityNetwork
 
             var updateCmd = new UpdateSpanEquipmentProperties(Guid.NewGuid(), new UserContext("test", Guid.Empty), spanEquipmentOrSegmentId: sutSpanEquipmentId)
             {
-                MarkingInfo = new MarkingInfo() { MarkingColor = "Red", MarkingText = "Rød"}
+                MarkingInfo = new MarkingInfo() { MarkingColor = "Red", MarkingText = "Rød" }
             };
 
             var updateResult = await _commandDispatcher.HandleAsync<UpdateSpanEquipmentProperties, Result>(updateCmd);

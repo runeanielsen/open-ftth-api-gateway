@@ -60,7 +60,7 @@ namespace OpenFTTH.UtilityGraphService.Business.Graph.Projections
 
                     _installationById.TryAdd(@event.Id, newInst);
                     _installationByInstallationId.TryAdd(@event.InstallationId, newInst);
-                       
+
                     break;
 
                 case (InstallationStatusChanged @event):

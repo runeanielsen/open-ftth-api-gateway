@@ -205,7 +205,7 @@ namespace OpenFTTH.UtilityGraphService.Tests.UtilityNetwork
             // Check that subrack mount is removed from node container
             nodeContainerAfterTerminalEquipmentRemoval.Racks.First().SubrackMounts.Any(s => s.TerminalEquipmentId == rackMountedEquipmentIdToBeRemoved);
         }
-      
+
 
         [Fact, Order(5)]
         public async Task RemoveRackInJ1_ShouldSucceed()

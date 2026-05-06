@@ -109,8 +109,8 @@ namespace OpenFTTH.APIGateway.Conversion
             // Check if node container already exists
             if (relatedInfo.NodeContainer == null)
             {
-                    System.Diagnostics.Debug.WriteLine($"No container exists in node: {terminalEquipment.NodeId}");
-                    return Result.Fail(new Error($"No container exists in node: {terminalEquipment.NodeId}"));
+                System.Diagnostics.Debug.WriteLine($"No container exists in node: {terminalEquipment.NodeId}");
+                return Result.Fail(new Error($"No container exists in node: {terminalEquipment.NodeId}"));
             }
 
 

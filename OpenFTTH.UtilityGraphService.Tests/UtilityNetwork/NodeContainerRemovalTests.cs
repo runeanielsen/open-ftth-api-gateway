@@ -39,7 +39,7 @@ namespace OpenFTTH.UtilityGraphService.Tests.UtilityNetwork
             _externalEventProducer = (FakeExternalEventProducer)externalEventProducer;
         }
 
-        
+
         [Fact, Order(1)]
         public async Task TestPlaceNodeContainer_ShouldSucceed()
         {
@@ -139,7 +139,7 @@ namespace OpenFTTH.UtilityGraphService.Tests.UtilityNetwork
             var equipmentQueryResult = await _queryDispatcher.HandleAsync<GetEquipmentDetails, Result<GetEquipmentDetailsResult>>(
                 new GetEquipmentDetails(new EquipmentIdList() { _sutContainerId })
             );
-            
+
             // Assert
             removeResult.IsSuccess.Should().BeTrue();
 

@@ -9,7 +9,7 @@ namespace OpenFTTH.UtilityGraphService.API.Model.UtilityNetwork.Views
     {
         public Guid SpanSegmentId { get; }
         public Guid FromNodeId { get; set; }
-        public Guid ToNodeId { get; set;  }
+        public Guid ToNodeId { get; set; }
         public string? From { get; set; }
         public string? To { get; set; }
         public string? ConduitId { get; init; }

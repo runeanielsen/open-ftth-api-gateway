@@ -35,7 +35,7 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
         public NodeContainerBuilder(ILogger<GetDiagramQueryHandler> logger, NodeContainerViewModel viewModel)
         {
             _logger = logger;
-           _nodeContainerViewModel = viewModel;
+            _nodeContainerViewModel = viewModel;
         }
 
         public Size CreateDiagramObjects(Diagram diagram, double offsetX, double offsetY)
@@ -52,7 +52,7 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
                 terminalEquipmentBlockBuilder = new TerminalEquipmentBlockBuilder(_nodeContainerViewModel);
                 var terminalEquipmentBlockMinSize = terminalEquipmentBlockBuilder.Measure();
 
-               nodeContainerExtraHeightForTerminalEquipments = terminalEquipmentBlockMinSize.Height;
+                nodeContainerExtraHeightForTerminalEquipments = terminalEquipmentBlockMinSize.Height;
 
                 if (terminalEquipmentBlockMinSize.Width > _initialMinWidth)
                     _initialMinWidth = terminalEquipmentBlockMinSize.Width;
@@ -157,7 +157,7 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
             return nodeEquipmentBlock;
         }
 
-      
+
 
         private VerticalAlignmentEnum GetContainerVerticalAlignment()
         {
@@ -171,7 +171,7 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
         private void AffixConduits(LineBlock nodeContainerBlock)
         {
             var affixedSpanEquipmentViewModels = new List<SpanEquipmentViewModel>();
-                
+
             foreach (var spanEquipment in _nodeContainerViewModel.Data.SpanEquipments.Where(s => s.IsAttachedToNodeContainer(_nodeContainerViewModel.Data)))
                 affixedSpanEquipmentViewModels.Add(new SpanEquipmentViewModel(_logger, _nodeContainerViewModel.Data.RouteNetworkElementId, spanEquipment.Id, _nodeContainerViewModel.Data));
 
@@ -472,7 +472,7 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
                 }
             }
         }
-  
+
         private BlockPort CreatePortForOuterConduitEnd(SpanEquipmentViewModel viewModel, BlockSideEnum blockSide)
         {
             var routeSpanDiagramInfo = viewModel.RootSpanDiagramInfo("OuterConduit");
@@ -512,7 +512,7 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
 
             return terminal;
         }
-        
+
         private void CreateTerminalForSingleConduitEnd(SpanEquipmentViewModel viewModel, BlockPort outerConduitPort)
         {
             var routeSpanDiagramInfo = viewModel.RootSpanDiagramInfo("OuterConduit");
@@ -672,7 +672,7 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
                             }
                         }
                         // Not connected conduit ends
-                        else 
+                        else
                         {
                             var test = _nodeContainerViewModel.Data.ConduitSegmentToCableChildRelations;
 
@@ -780,7 +780,7 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
                 }
             }
         }
-      
+
         private void AddToTerminalEnds(Guid terminalId, SpanSegment spanSegment, BlockPortTerminal digramTerminal, string style, bool isCableInsideOuterConduitTerminal = false)
         {
             var terminalEndHolder = new TerminalEndHolder()
@@ -802,9 +802,9 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
             }
         }
 
-       
 
-      
+
+
 
         private class TerminalEndHolder
         {

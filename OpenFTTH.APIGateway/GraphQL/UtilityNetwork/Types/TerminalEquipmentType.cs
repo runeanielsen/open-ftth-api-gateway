@@ -90,7 +90,7 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Types
               {
                   // Try lookup via installation via name (installation id string) first
                   var installations = eventStore.Projections.Get<InstallationProjection>();
-               
+
                   var installationInfo = installations.GetInstallationInfo(context.Source.Name, eventStore.Projections.Get<UtilityNetworkProjection>());
 
                   if (installationInfo != null && installationInfo.UnitAddressId != null)
@@ -99,7 +99,7 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Types
 
                       AddressInfo addrInfo = addresses.GetAddressInfo((Guid)installationInfo.UnitAddressId);
 
-                      if (addrInfo != null) 
+                      if (addrInfo != null)
                       {
                           addrInfo.Remark = installationInfo.LocationRemark;
 
@@ -120,9 +120,9 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Types
 
                var installationInfo = installations.GetInstallationInfo(context.Source.Name, eventStore.Projections.Get<UtilityNetworkProjection>());
 
-               if (installationInfo != null )
+               if (installationInfo != null)
                {
-                    return installationInfo;
+                   return installationInfo;
                }
 
                return null;

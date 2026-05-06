@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace OpenFTTH.Schematic.Business.SchematicBuilder
 {
-   
+
     public class NodeContainerSpanEquipmentOrganizer
     {
         private List<SpanEquipmentViewModel> _affixedSpanEquipmentViewModels;
@@ -206,5 +206,5 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
         public SpanSegment SpanSegment { get; set; }
         public ushort StructurePosition { get; set; }
     }
-    
+
 }

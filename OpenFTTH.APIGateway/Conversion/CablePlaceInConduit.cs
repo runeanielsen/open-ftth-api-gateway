@@ -107,7 +107,7 @@ namespace OpenFTTH.APIGateway.Conversion
         private void AddCablesToNetwork(List<SpanEquipmentForConversion> spanEquipments)
         {
             using var conn = GetConnection();
-                    
+
             using var logCmd = conn.CreateCommand() as NpgsqlCommand;
 
             foreach (var spanEquipment in spanEquipments)
@@ -202,8 +202,8 @@ namespace OpenFTTH.APIGateway.Conversion
             }
         }
 
-      
-   
+
+
 
         private void ExecuteStmt(IDbConnection conn, string sql)
         {
@@ -303,9 +303,9 @@ namespace OpenFTTH.APIGateway.Conversion
 
         }
 
-      
+
     }
 
-  
+
 
 }

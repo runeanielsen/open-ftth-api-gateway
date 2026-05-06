@@ -71,7 +71,7 @@ namespace OpenFTTH.UtilityGraphService.API.Queries
                 throw new ArgumentException($"Search string cannot be null or empty");
             }
 
-            this.EquipmentNameToQuery =name;
+            this.EquipmentNameToQuery = name;
         }
     }
 }

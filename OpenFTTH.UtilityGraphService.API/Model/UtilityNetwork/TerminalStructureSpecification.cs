@@ -8,10 +8,10 @@ namespace OpenFTTH.UtilityGraphService.API.Model.UtilityNetwork
     /// </summary>
     public record TerminalStructureSpecification : IIdentifiedObject
     {
-        public Guid Id { get;}
+        public Guid Id { get; }
         public string Category { get; }
         public string Name { get; }
-        public string ShortName { get; }   
+        public string ShortName { get; }
         public TerminalTemplate[] TerminalTemplates { get; }
         public bool Deprecated { get; init; }
         public string? Description { get; init; }

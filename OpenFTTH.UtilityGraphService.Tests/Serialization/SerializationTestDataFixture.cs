@@ -33,7 +33,7 @@ namespace OpenFTTH.UtilityGraphService.Tests.Fixtures
 
                 queryResult.SpanEquipmentSpecifications = new SpanEquipmentSpecification[] { spec };
 
-                RelatedSpanStructure rootStructure = new RelatedSpanStructure(Guid.NewGuid(), spec.Id, 1,1,1,Array.Empty<SpanSegment>());
+                RelatedSpanStructure rootStructure = new RelatedSpanStructure(Guid.NewGuid(), spec.Id, 1, 1, 1, Array.Empty<SpanSegment>());
 
                 queryResult.RelatedSpanEquipment = new RelatedSpanEquipment[]
                 {

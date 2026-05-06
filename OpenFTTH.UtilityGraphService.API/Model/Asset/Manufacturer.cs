@@ -1,7 +1,7 @@
 ﻿using System;
 
-namespace OpenFTTH.UtilityGraphService.API.Model.Asset 
-{ 
+namespace OpenFTTH.UtilityGraphService.API.Model.Asset
+{
     public class Manufacturer : IManufacturer
     {
         public Guid Id { get; }

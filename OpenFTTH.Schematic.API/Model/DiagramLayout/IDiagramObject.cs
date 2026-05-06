@@ -9,6 +9,6 @@ namespace OpenFTTH.Schematic.API.Model.DiagramLayout
     {
         Guid MRID { get; }
 
-        Geometry Geometry { get;  }
+        Geometry Geometry { get; }
     }
 }

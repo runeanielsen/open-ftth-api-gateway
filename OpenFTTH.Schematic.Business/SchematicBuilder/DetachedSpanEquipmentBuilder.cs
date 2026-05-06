@@ -140,7 +140,7 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
                 };
 
                 fromTerminal.SetReference(spanInfo.IngoingSegmentId, "SpanSegment");
-                                
+
 
                 var toTerminal = new BlockPortTerminal(toPort)
                 {
@@ -148,7 +148,7 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
                     ShapeType = TerminalShapeTypeEnum.Point,
                     PointStyle = "EastTerminalLabel",
                     PointLabel = _spanEquipmentViewModel.GetToRouteNodeName(spanInfo.SegmentId, null),
-                    DrawingOrder = 520,                    
+                    DrawingOrder = 520,
                     Properties = _spanEquipmentViewModel.GetTagsPropertiesFromSpanInfo(spanInfo.SpanSegment.Id)
                 };
 
@@ -369,7 +369,7 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
                         toTerminal.PointLabel = cableEqLabel;
                         toTerminal.Properties = _spanEquipmentViewModel.GetTagsPropertiesFromSpanInfo(data.SegmentId);
                     }
-                                   
+
                     var cableTerminalConnection = spanEquipmentBlock.AddTerminalConnection(BlockSideEnum.West, 1, terminalNo, BlockSideEnum.East, 1, terminalNo, fiberCableLineLabel, "FiberCable", LineShapeTypeEnum.Line);
                     cableTerminalConnection.DrawingOrder = 600;
                     cableTerminalConnection.SetReference(cableId, "SpanSegment");
@@ -513,7 +513,7 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
             var spanEquipmentBlock = new LineBlock()
             {
                 MinWidth = _spanEquipmentAreaWidth / 2,
-                IsVisible =  false,
+                IsVisible = false,
                 Style = rootSpanInfo.StyleName,
                 Margin = _spanEquipmentViewModel.IsSingleSpan ? 0 : _spanEquipmentBlockMargin,
                 DrawingOrder = 400
@@ -522,7 +522,7 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
             spanEquipmentBlock.SetReference(rootSpanInfo.SegmentId, "SpanSegment");
 
             // Create ports
-            var fromPort = new BlockPort(BlockSideEnum.West, null, null, 0, 4, 0) { IsVisible = false, DrawingOrder = 420 }; 
+            var fromPort = new BlockPort(BlockSideEnum.West, null, null, 0, 4, 0) { IsVisible = false, DrawingOrder = 420 };
 
             spanEquipmentBlock.AddPort(fromPort);
 

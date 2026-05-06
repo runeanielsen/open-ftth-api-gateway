@@ -33,7 +33,7 @@ namespace OpenFTTH.UtilityGraphService.Business.Trace.Util
         private LookupCollection<SpanStructureSpecification> _spanStructureSpecifications;
 
         public Dictionary<Guid, RouteNetworkElement> RouteNetworkElementById { get; }
-        public Dictionary<Guid, NodeContainer> NodeContainerById  { get; }
+        public Dictionary<Guid, NodeContainer> NodeContainerById { get; }
         public Dictionary<Guid, RouteNetworkInterest> RouteNetworkInterestById { get; }
 
         public RelatedDataHolder(IEventStore eventStore, UtilityNetworkProjection utilityNetwork, IQueryDispatcher queryDispatcher, IEnumerable<Guid> nodeOfInterestIds, IEnumerable<Guid>? segmentWalkOfInterestIds = null)
@@ -100,7 +100,7 @@ namespace OpenFTTH.UtilityGraphService.Business.Trace.Util
 
             return routeNetworkQueryResult.Value.RouteNetworkElements.ToDictionary(x => x.Id);
         }
-  
+
         private Dictionary<Guid, NodeContainer> GatcherNodeContainerInformation(List<RouteNetworkElement> routeNetworkElements)
         {
             Dictionary<Guid, NodeContainer> result = new();
@@ -174,7 +174,7 @@ namespace OpenFTTH.UtilityGraphService.Business.Trace.Util
                 return $"{nodeName} løs ende";
 
             var terminalEquipment = terminalRef.TerminalEquipment(_utilityNetwork);
-       
+
             // Prepare node name if available
             if (nodeName != null)
                 nodeName += " ";
@@ -209,7 +209,7 @@ namespace OpenFTTH.UtilityGraphService.Business.Trace.Util
             if (includeAddressInfo && terminalEquipment.AddressInfo != null && terminalEquipment.AddressInfo.AccessAddressId != null)
             {
                 addressInfo = GetTerminalEquipmentAddressLabel(terminalEquipment);
-                    
+
                 if (addressInfo != null)
                     addressInfo = " (" + addressInfo + ")";
             }
@@ -570,7 +570,7 @@ namespace OpenFTTH.UtilityGraphService.Business.Trace.Util
 
             return addressLabel;
         }
-        
+
         public string? GetAddressLabel(Guid? accessOrUnitAddressId)
         {
             if (accessOrUnitAddressId == null)

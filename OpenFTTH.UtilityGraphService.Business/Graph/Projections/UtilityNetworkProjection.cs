@@ -100,7 +100,7 @@ namespace OpenFTTH.UtilityGraphService.Business.Graph
             ProjectEventAsync<NodeContainerTerminalsDisconnected>(ProjectAsync);
         }
 
-        public bool TryGetEquipment<T>(Guid equipmentOrInterestId, out T equipment) where T: IEquipment
+        public bool TryGetEquipment<T>(Guid equipmentOrInterestId, out T equipment) where T : IEquipment
         {
             if (_spanEquipmentByEquipmentId.TryGetValue(equipmentOrInterestId, out SpanEquipment? spanEquipmentByEquipmentId))
             {
@@ -151,9 +151,9 @@ namespace OpenFTTH.UtilityGraphService.Business.Graph
                 }
             }
 
-            #pragma warning disable CS8601 // Possible null reference assignment.
+#pragma warning disable CS8601 // Possible null reference assignment.
             equipment = default(T);
-            #pragma warning restore CS8601 // Possible null reference assignment.
+#pragma warning restore CS8601 // Possible null reference assignment.
 
             return false;
         }
@@ -165,7 +165,7 @@ namespace OpenFTTH.UtilityGraphService.Business.Graph
             else
                 return false;
         }
-        
+
 
         private Task ProjectAsync(IEventEnvelope eventEnvelope)
         {
@@ -255,8 +255,8 @@ namespace OpenFTTH.UtilityGraphService.Business.Graph
                     break;
 
                 case (SpanEquipmentAffixedToParent @event):
-                   ProcessSpanEquipmentParentAffix(@event);
-                   break;
+                    ProcessSpanEquipmentParentAffix(@event);
+                    break;
 
                 case (SpanEquipmentDetachedFromParent @event):
                     ProcessSpanEquipmentParentDetach(@event);
@@ -523,12 +523,13 @@ namespace OpenFTTH.UtilityGraphService.Business.Graph
                     foreach (var parentAffix in utilityHop.ParentAffixes)
                     {
                         _relatedCablesByConduitSegmentId.AddOrUpdate(
-                            parentAffix.SpanSegmentId, 
+                            parentAffix.SpanSegmentId,
                             new List<Guid> { spanEquipment.Id },
-                            (key, oldValue) => {
+                            (key, oldValue) =>
+                            {
                                 var newList = new List<Guid> { spanEquipment.Id };
                                 newList.AddRange(oldValue);
-                                return newList; 
+                                return newList;
                             }
                          );
                     }
@@ -785,7 +786,7 @@ namespace OpenFTTH.UtilityGraphService.Business.Graph
             {
                 if (_terminalEquipmentIdByName.TryGetValue(terminalEquipment.NamingInfo.Name.ToLower(), out var existingIndexEntry))
                 {
-                     existingIndexEntry.Add(terminalEquipment.Id);
+                    existingIndexEntry.Add(terminalEquipment.Id);
                 }
                 else
                 {

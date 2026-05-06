@@ -16,7 +16,7 @@ namespace OpenFTTH.Schematic.Business.Lines
         public string PolygonLabel { get; set; }
         public int DrawingOrder { get; set; }
 
-        public List<KeyValuePair<string,string>> Properties { get; set; }
+        public List<KeyValuePair<string, string>> Properties { get; set; }
 
         public BlockPortTerminal(BlockPort port)
         {
@@ -34,7 +34,8 @@ namespace OpenFTTH.Schematic.Business.Lines
         public double ConnectionPointY = 0;
 
         private double _length = 8;
-        public double Length {
+        public double Length
+        {
             get { return _length; }
             set { _length = value; }
         }

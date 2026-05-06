@@ -79,7 +79,7 @@ namespace OpenFTTH.TestData
             _ = new TestSpecifications(commandDispatcher, queryDispatcher);
         }
 
-       
+
 
         public ConduitTestUtilityNetwork Run()
         {
@@ -283,7 +283,7 @@ namespace OpenFTTH.TestData
 
             if (affixCommandResult.IsFailed)
                 throw new ApplicationException(affixCommandResult.Errors.First().Message);
-                       
+
             utilityNetwork.TryGetEquipment<SpanEquipment>(cableId, out var cableAfterAffix);
 
             return cableAfterAffix;

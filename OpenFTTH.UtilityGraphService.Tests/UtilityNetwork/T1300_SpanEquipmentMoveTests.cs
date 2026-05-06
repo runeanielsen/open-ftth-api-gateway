@@ -61,8 +61,8 @@ namespace OpenFTTH.UtilityGraphService.Tests.UtilityNetwork
 
             var sdu1RouteNetworkQueryResult = await _queryDispatcher.HandleAsync<GetRouteNetworkDetails, Result<GetRouteNetworkDetailsResult>>(
                 new GetRouteNetworkDetails(new RouteNetworkElementIdList() { TestRouteNetwork.SDU_1, TestRouteNetwork.S7 })
-                { 
-                    RelatedInterestFilter = RelatedInterestFilterOptions.ReferencesFromRouteElementOnly 
+                {
+                    RelatedInterestFilter = RelatedInterestFilterOptions.ReferencesFromRouteElementOnly
                 }
             );
 
@@ -108,7 +108,7 @@ namespace OpenFTTH.UtilityGraphService.Tests.UtilityNetwork
             var moveCmd = new MoveSpanEquipment(Guid.NewGuid(), new UserContext("test", Guid.Empty), spanEquipment.Id, new RouteNetworkElementIdList() { TestRouteNetwork.S8 });
 
             var moveCmdResult = await _commandDispatcher.HandleAsync<MoveSpanEquipment, Result>(moveCmd);
-          
+
             // Assert
             moveCmdResult.IsFailed.Should().BeTrue();
             ((MoveSpanEquipmentError)moveCmdResult.Errors.First()).Code.Should().Be(MoveSpanEquipmentErrorCodes.CANNOT_MOVE_FROM_END_TO_NODE_WHERE_SEGMENTS_ARE_CUT);
@@ -125,7 +125,7 @@ namespace OpenFTTH.UtilityGraphService.Tests.UtilityNetwork
 
             utilityNetwork.TryGetEquipment<SpanEquipment>(sutSpanEquipmentId, out var spanEquipment);
 
-            var moveCmd = new MoveSpanEquipment(Guid.NewGuid(), new UserContext("test", Guid.Empty), spanEquipment.Id, new RouteNetworkElementIdList() { TestRouteNetwork.S7});
+            var moveCmd = new MoveSpanEquipment(Guid.NewGuid(), new UserContext("test", Guid.Empty), spanEquipment.Id, new RouteNetworkElementIdList() { TestRouteNetwork.S7 });
 
             var moveCmdResult = await _commandDispatcher.HandleAsync<MoveSpanEquipment, Result>(moveCmd);
 

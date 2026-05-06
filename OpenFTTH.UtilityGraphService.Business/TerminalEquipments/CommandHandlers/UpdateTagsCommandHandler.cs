@@ -74,7 +74,7 @@ namespace OpenFTTH.UtilityGraphService.Business.TerminalEquipments.CommandHandle
                 return Task.FromResult(Result.Ok());
             }
             else
-               return Task.FromResult(Result.Fail(new UpdateEquipmentPropertiesError(UpdateEquipmentPropertiesErrorCodes.TERMINAL_OR_SPAN_EQUIPMENT_NOT_FOUND, $"Cannot find any terminal or span equipment in the utility graph with id: {command.TerminalOrSpanEquipmentId}")));
+                return Task.FromResult(Result.Fail(new UpdateEquipmentPropertiesError(UpdateEquipmentPropertiesErrorCodes.TERMINAL_OR_SPAN_EQUIPMENT_NOT_FOUND, $"Cannot find any terminal or span equipment in the utility graph with id: {command.TerminalOrSpanEquipmentId}")));
 
         }
 

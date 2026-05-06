@@ -37,7 +37,7 @@ namespace OpenFTTH.UtilityGraphService.Tests.UtilityNetwork
             new TestUtilityNetwork(_commandDispatcher, _queryDispatcher).Run();
         }
 
-        [Fact,Order(1)]
+        [Fact, Order(1)]
         public async Task TestConnectTwo5x10inCO1_ShouldSucceed()
         {
             var utilityNetwork = _eventStore.Projections.Get<UtilityNetworkProjection>();
@@ -68,7 +68,7 @@ namespace OpenFTTH.UtilityGraphService.Tests.UtilityNetwork
 
             // Assert
             connectResult.IsSuccess.Should().BeTrue();
-          }
+        }
 
         [Fact, Order(2)]
         public async Task CutConduitInCC1_ShouldSucceed()

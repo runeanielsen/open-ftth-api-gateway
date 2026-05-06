@@ -36,7 +36,7 @@ public class InstallationQueries : ObjectGraphType
                     var utilityNetworkProjection = eventStore.Projections.Get<UtilityNetworkProjection>();
                     var addressProjection = eventStore.Projections.Get<AddressInfoProjection>();
                     var installationProjection = eventStore.Projections.Get<InstallationProjection>();
-                    
+
                     // Find installations that has not yet been added to the utility network
                     List<InstallationRecord> installationsNotRegisteredInNetwork = [];
 

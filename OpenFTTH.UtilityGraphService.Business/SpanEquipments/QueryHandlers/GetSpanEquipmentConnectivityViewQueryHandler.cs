@@ -320,7 +320,7 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments.QueryHandling
                         traceInfo.Tags = RelatedDataHolder.GetTagsFromTrace(_utilityNetwork, terminalTraceResult);
                     }
 
-                    
+
 
                     traceInfosByTerminalId.Add(segment.Id, traceInfo);
                 }
@@ -424,7 +424,7 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments.QueryHandling
             return new TraceEndInfo((UtilityGraphConnectedTerminal)neighborTerminal, (UtilityGraphConnectedTerminal)terminalEnd);
         }
 
-       
+
 
 
         private class RelevantEquipmentData : RelatedDataHolder
@@ -441,7 +441,7 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments.QueryHandling
         {
             public TraceEndInfo? Upstream { get; set; }
             public TraceEndInfo? Downstream { get; set; }
-            public List<string>? Tags  { get; set; }
+            public List<string>? Tags { get; set; }
 
             public bool UpstreamIsZ { get; set; }
             public TraceEndInfo? Z
