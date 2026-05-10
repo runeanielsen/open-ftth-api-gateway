@@ -277,7 +277,7 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
                 Margin = _portMargin,
                 Style = spanDiagramInfo.StyleName,
                 PointStyle = fromSide.ToString() + "TerminalLabel",
-                PointLabel = viewModel.GetConduitEquipmentLabel()
+                PointLabel = viewModel.GetConduitEquipmentLabel(),
             };
 
             fromPort.DrawingOrder = 420;
@@ -344,7 +344,8 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
                     ShapeType = terminalShapeType,
                     PointStyle = fromSide.ToString() + "TerminalLabel",
                     PointLabel = fromNodeName,
-                    PolygonStyle = innerSpan.StyleName
+                    PolygonStyle = innerSpan.StyleName,
+                    Properties = viewModel.GetTagsPropertiesFromSpanInfo(innerSpan.SpanSegment.Id)
                 };
 
                 fromTerminal.SetReference(innerSpan.IngoingSegmentId, "SpanSegment");
@@ -356,7 +357,8 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
                     ShapeType = terminalShapeType,
                     PointStyle = toSide.ToString() + "TerminalLabel",
                     PointLabel = toNodeName,
-                    PolygonStyle = innerSpan.StyleName
+                    PolygonStyle = innerSpan.StyleName,
+                    Properties = viewModel.GetTagsPropertiesFromSpanInfo(innerSpan.SpanSegment.Id)
                 };
 
                 toTerminal.SetReference(innerSpan.OutgoingSegmentId, "SpanSegment");
@@ -403,7 +405,8 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
                     ShapeType = TerminalShapeTypeEnum.Point,
                     PointStyle = fromSide.ToString() + "TerminalLabel",
                     PointLabel = viewModel.GetFromRouteNodeName(spanDiagramInfo.IngoingSegmentId, null),
-                    DrawingOrder = 520
+                    DrawingOrder = 520,
+                    Properties = viewModel.GetTagsPropertiesFromSpanInfo(spanDiagramInfo.IngoingSegmentId)
                 };
 
                 fromTerminal.SetReference(spanDiagramInfo.IngoingSegmentId, "SpanSegment");
@@ -414,7 +417,8 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
                     ShapeType = TerminalShapeTypeEnum.Point,
                     PointStyle = toSide.ToString() + "TerminalLabel",
                     PointLabel = viewModel.GetToRouteNodeName(spanDiagramInfo.IngoingSegmentId, null),
-                    DrawingOrder = 520
+                    DrawingOrder = 520,
+                    Properties = viewModel.GetTagsPropertiesFromSpanInfo(spanDiagramInfo.IngoingSegmentId)
                 };
 
                 toTerminal.SetReference(spanDiagramInfo.OutgoingSegmentId, "SpanSegment");
@@ -501,7 +505,8 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
                 ShapeType = TerminalShapeTypeEnum.PointAndPolygon,
                 PointStyle = outerConduitPort.Side.ToString() + "TerminalLabel",
                 PointLabel = viewModel.InterestRelationKind() == RouteNetworkInterestRelationKindEnum.End ? viewModel.GetFromRouteNodeName(innerSpanDiagramInfo.SegmentId, null) : viewModel.GetToRouteNodeName(innerSpanDiagramInfo.SegmentId, null),
-                PolygonStyle = innerSpanDiagramInfo.StyleName
+                PolygonStyle = innerSpanDiagramInfo.StyleName,
+                Properties = viewModel.GetTagsPropertiesFromSpanInfo(innerSpanDiagramInfo.SegmentId)
             };
 
             terminal.DrawingOrder = 620;
@@ -524,7 +529,8 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
                 PointStyle = outerConduitPort.Side.ToString() + "TerminalLabel",
                 PointLabel = viewModel.InterestRelationKind() == RouteNetworkInterestRelationKindEnum.End ? viewModel.GetFromRouteNodeName(routeSpanDiagramInfo.SegmentId, null) : viewModel.GetToRouteNodeName(routeSpanDiagramInfo.SegmentId, null),
                 PolygonStyle = routeSpanDiagramInfo.StyleName,
-                DrawingOrder = 620
+                DrawingOrder = 620,
+                Properties = viewModel.GetTagsPropertiesFromSpanInfo(routeSpanDiagramInfo.SegmentId)
             };
 
             terminal.SetReference(routeSpanDiagramInfo.SegmentId, "SpanSegment");
@@ -559,7 +565,8 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
                     PointStyle = outerConduitPort.Side + "TerminalLabel",
                     PointLabel = viewModel.InterestRelationKind() == RouteNetworkInterestRelationKindEnum.End ? viewModel.GetFromRouteNodeName(routeSpanDiagramInfo.SegmentId, cableId) : viewModel.GetToRouteNodeName(routeSpanDiagramInfo.SegmentId, cableId),
                     PolygonStyle = routeSpanDiagramInfo.StyleName,
-                    DrawingOrder = 620
+                    DrawingOrder = 620,
+                    Properties = viewModel.GetTagsPropertiesFromSpanInfo(routeSpanDiagramInfo.SegmentId)
                 };
 
                 terminal.SetReference(routeSpanDiagramInfo.SegmentId, "SpanSegment");
@@ -580,7 +587,8 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
                 PointStyle = outerConduitPort.Side.ToString() + "TerminalLabel",
                 PointLabel = viewModel.InterestRelationKind() == RouteNetworkInterestRelationKindEnum.End ? viewModel.GetFromRouteNodeName(routeSpanDiagramInfo.SegmentId, null) : viewModel.GetToRouteNodeName(routeSpanDiagramInfo.SegmentId, null),
                 PolygonStyle = routeSpanDiagramInfo.StyleName,
-                DrawingOrder = 620
+                DrawingOrder = 620,
+                Properties = viewModel.GetTagsPropertiesFromSpanInfo(routeSpanDiagramInfo.SegmentId)
             };
 
             terminal.SetReference(routeSpanDiagramInfo.SegmentId, "SpanSegment");
