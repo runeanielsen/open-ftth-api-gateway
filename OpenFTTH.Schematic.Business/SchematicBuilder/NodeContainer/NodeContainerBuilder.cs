@@ -381,6 +381,8 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
                         var cableTerminalConnection = nodeContainerBlock.AddTerminalConnection(fromSide, fromPort.Index, terminalNo, toSide, toPort.Index, terminalNo, fiberCableLineLabel, "FiberCable", LineShapeTypeEnum.Line);
                         cableTerminalConnection.DrawingOrder = 600;
                         cableTerminalConnection.SetReference(cableId, "SpanSegment");
+                        cableTerminalConnection.Properties = viewModel.GetUniqueTagsBySpanEquipmentId(cableId);
+
                     }
                 }
                 else
@@ -656,6 +658,8 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
                                     {
                                         var fiberCableLineLabel = _nodeContainerViewModel.Data.GetCableEquipmentLineLabel(cableId);
 
+                                        var affixedSpanEquipmentViewModels = new List<SpanEquipmentViewModel>();
+
                                         System.Diagnostics.Debug.WriteLine($" Will connect cable: {cableId} {fiberCableLineLabel} through conduit connection");
 
                                         var cableTerminalConnection = nodeContainerBlock.AddTerminalConnection(
@@ -673,6 +677,10 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
                                         cableTerminalConnection.SetReference(cableId, "SpanSegment");
 
                                         cableTerminalConnection.DrawingOrder = 600;
+
+                                        var cableViewModel = new SpanEquipmentViewModel(_logger, _nodeContainerViewModel.Data.RouteNetworkElementId, cableId, _nodeContainerViewModel.Data);
+                                        cableTerminalConnection.Properties = cableViewModel.GetUniqueTagsBySpanEquipmentId(cableId);
+
                                     }
                                 }
 
@@ -747,6 +755,9 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
                                                 cableTerminalConnection.SetReference(cableId, "SpanSegment");
 
                                                 cableTerminalConnection.DrawingOrder = 600;
+
+                                                var cableViewModel = new SpanEquipmentViewModel(_logger, _nodeContainerViewModel.Data.RouteNetworkElementId, cableId, _nodeContainerViewModel.Data);
+                                                cableTerminalConnection.Properties = cableViewModel.GetUniqueTagsBySpanEquipmentId(cableId);
                                             }
                                         }
                                     }
