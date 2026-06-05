@@ -1,19 +1,19 @@
 ﻿using DAX.EventProcessing;
-using OpenFTTH.Results;
 using OpenFTTH.CQRS;
 using OpenFTTH.EventSourcing;
 using OpenFTTH.Events.Changes;
 using OpenFTTH.Events.UtilityNetwork;
+using OpenFTTH.Results;
 using OpenFTTH.UtilityGraphService.API.Commands;
 using OpenFTTH.UtilityGraphService.API.Model.UtilityNetwork;
 using OpenFTTH.UtilityGraphService.Business.Graph;
 using OpenFTTH.UtilityGraphService.Business.NodeContainers;
+using OpenFTTH.UtilityGraphService.Business.SpanEquipments;
 using OpenFTTH.UtilityGraphService.Business.TerminalEquipments.Projections;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using OpenFTTH.UtilityGraphService.Business.SpanEquipments;
 
 namespace OpenFTTH.UtilityGraphService.Business.TerminalEquipments.CommandHandlers
 {
@@ -58,6 +58,9 @@ namespace OpenFTTH.UtilityGraphService.Business.TerminalEquipments.CommandHandle
             }
             else if (utilityNetwork.TryGetEquipment<SpanEquipment>(command.TerminalOrSpanEquipmentId, out var spanEquipment))
             {
+                if (!utilityNetwork.TryGetEquipment<NodeContainer>(terminalEquipment.NodeContainerId, out NodeContainer nodeContainer))
+                    return Task.FromResult(Result.Fail(new UpdateEquipmentPropertiesError(UpdateEquipmentPropertiesErrorCodes.NODE_CONTAINER_NOT_FOUND, $"Cannot find any node container with id: {terminalEquipment.NodeContainerId}")));
+
                 var spanEquipmentAR = _eventStore.Aggregates.Load<SpanEquipmentAR>(spanEquipment.Id);
 
                 var commandContext = new CommandContext(command.CorrelationId, command.CmdId, command.UserContext);
@@ -69,7 +72,7 @@ namespace OpenFTTH.UtilityGraphService.Business.TerminalEquipments.CommandHandle
 
                 _eventStore.Aggregates.Store(spanEquipmentAR);
 
-                NotifyExternalServicesAboutSpanEquipmentChange(spanEquipment.Id, Guid.Empty);
+                NotifyExternalServicesAboutSpanEquipmentChange(spanEquipment.Id, nodeContainer.Id);
 
                 return Task.FromResult(Result.Ok());
             }
