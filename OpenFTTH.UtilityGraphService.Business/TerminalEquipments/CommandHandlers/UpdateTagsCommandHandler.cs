@@ -21,26 +21,20 @@ namespace OpenFTTH.UtilityGraphService.Business.TerminalEquipments.CommandHandle
     {
         private readonly IEventStore _eventStore;
         private readonly IExternalEventProducer _externalEventProducer;
-        private readonly IQueryDispatcher _queryDispatcher;
 
         public UpdateTagsCommandHandler(IEventStore eventStore, IQueryDispatcher queryDispatcher, IExternalEventProducer externalEventProducer)
         {
             _eventStore = eventStore;
-            _queryDispatcher = queryDispatcher;
             _externalEventProducer = externalEventProducer;
         }
 
         public Task<Result> HandleAsync(UpdateTags command)
         {
-            var terminalEquipmentSpecifications = _eventStore.Projections.Get<TerminalEquipmentSpecificationsProjection>().Specifications;
             var utilityNetwork = _eventStore.Projections.Get<UtilityNetworkProjection>();
 
             // Because the client is allowed to provide either a span equipment or segment id, we need look it up via the utility network graph
             if (utilityNetwork.TryGetEquipment<TerminalEquipment>(command.TerminalOrSpanEquipmentId, out var terminalEquipment))
             {
-                if (!utilityNetwork.TryGetEquipment<NodeContainer>(terminalEquipment.NodeContainerId, out NodeContainer nodeContainer))
-                    return Task.FromResult(Result.Fail(new UpdateEquipmentPropertiesError(UpdateEquipmentPropertiesErrorCodes.NODE_CONTAINER_NOT_FOUND, $"Cannot find any node container with id: {terminalEquipment.NodeContainerId}")));
-
                 var terminalEquipmentAR = _eventStore.Aggregates.Load<TerminalEquipmentAR>(terminalEquipment.Id);
 
                 var commandContext = new CommandContext(command.CorrelationId, command.CmdId, command.UserContext);
@@ -52,17 +46,13 @@ namespace OpenFTTH.UtilityGraphService.Business.TerminalEquipments.CommandHandle
 
                 _eventStore.Aggregates.Store(terminalEquipmentAR);
 
-                NotifyExternalServicesAboutSpanEquipmentChange(terminalEquipment.Id, nodeContainer.RouteNodeId);
+                NotifyExternalServicesAboutSpanEquipmentChange(terminalEquipment.Id, command.NodeId);
 
                 return Task.FromResult(Result.Ok());
             }
             else if (utilityNetwork.TryGetEquipment<SpanEquipment>(command.TerminalOrSpanEquipmentId, out var spanEquipment))
             {
-                if (!utilityNetwork.TryGetEquipment<NodeContainer>(terminalEquipment.NodeContainerId, out NodeContainer nodeContainer))
-                    return Task.FromResult(Result.Fail(new UpdateEquipmentPropertiesError(UpdateEquipmentPropertiesErrorCodes.NODE_CONTAINER_NOT_FOUND, $"Cannot find any node container with id: {terminalEquipment.NodeContainerId}")));
-
                 var spanEquipmentAR = _eventStore.Aggregates.Load<SpanEquipmentAR>(spanEquipment.Id);
-
                 var commandContext = new CommandContext(command.CorrelationId, command.CmdId, command.UserContext);
 
                 var updateNamingInfoResult = spanEquipmentAR.UpdateTags(
@@ -72,7 +62,7 @@ namespace OpenFTTH.UtilityGraphService.Business.TerminalEquipments.CommandHandle
 
                 _eventStore.Aggregates.Store(spanEquipmentAR);
 
-                NotifyExternalServicesAboutSpanEquipmentChange(spanEquipment.Id, nodeContainer.Id);
+                NotifyExternalServicesAboutSpanEquipmentChange(spanEquipment.Id, command.NodeId);
 
                 return Task.FromResult(Result.Ok());
             }

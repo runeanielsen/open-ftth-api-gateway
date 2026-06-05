@@ -1,5 +1,4 @@
-﻿using OpenFTTH.Results;
-using GraphQL;
+﻿using GraphQL;
 using GraphQL.Types;
 using OpenFTTH.APIGateway.CoreTypes;
 using OpenFTTH.APIGateway.GraphQL.Addresses.Types;
@@ -10,6 +9,7 @@ using OpenFTTH.APIGateway.GraphQL.Work;
 using OpenFTTH.CQRS;
 using OpenFTTH.EventSourcing;
 using OpenFTTH.Events.Core.Infos;
+using OpenFTTH.Results;
 using OpenFTTH.UtilityGraphService.API.Commands;
 using OpenFTTH.UtilityGraphService.API.Model.UtilityNetwork;
 using System;
@@ -356,11 +356,13 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
             Field<CommandResultType>("updateTags")
            .Description("Mutation that update tags on a specific terminal og span equipment")
            .Arguments(new QueryArguments(
+               new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "nodeId" },
                new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "terminalOrSpanEquipmentId" },
                new QueryArgument<NonNullGraphType<ListGraphType<EquipmentTagType>>> { Name = "tags" }
            ))
            .ResolveAsync(async context =>
            {
+               var nodeId = context.GetArgument<Guid>("nodeId");
                var terminalOrSpanEquipmentId = context.GetArgument<Guid>("terminalOrSpanEquipmentId");
                var tags = context.GetArgument<EquipmentTag[]>("tags");
 
@@ -377,7 +379,7 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
 
                var commandUserContext = new UserContext(userName, currentWorkTaskIdResult.Value);
 
-               var updateCmd = new UpdateTags(correlationId, commandUserContext, terminalOrSpanEquipmentId: terminalOrSpanEquipmentId, tags: tags);
+               var updateCmd = new UpdateTags(correlationId, commandUserContext, terminalOrSpanEquipmentId: terminalOrSpanEquipmentId, tags: tags, nodeId: nodeId);
 
                var updateResult = await commandDispatcher.HandleAsync<UpdateTags, Result>(updateCmd);
 
