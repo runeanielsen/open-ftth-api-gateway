@@ -477,6 +477,32 @@ namespace OpenFTTH.UtilityGraphService.Business.Trace
 
                     var tags = ConduitSpanSegmentTracer.ExtractTagsFromSpanEquipment(spanEquipment);
 
+                    // If cable find all tags in trace
+                    if (spanEquipment.IsCable)
+                    {
+                        List<string> cableTags = new();
+
+                        foreach (var spanStructure in spanEquipment.SpanStructures)
+                        {
+                            foreach (var spanSegment in spanStructure.SpanSegments)
+                            {
+                                var spanTraceResult = _utilityNetwork.Graph.SimpleTrace(spanSegment.Id);
+
+                                cableTags.AddRange(ConduitSpanSegmentTracer.ExtractTagsFromTrace(_utilityNetwork, spanTraceResult) ?? Array.Empty<string>());
+                            }
+                        }
+
+                        if (tags == null)
+                            tags = cableTags.ToArray();
+                        else
+                        {
+                            cableTags.AddRange(tags);
+
+                            tags = cableTags.ToArray();
+                        }
+
+                    }
+
                     var walk = new SegmentWalk(spanEquipment.Id, tags) { Hops = new List<SegmentWalkHop>() { spanEquipmentSegmentHop } };
 
                     if (result.SegmentWalksBySpanEquipmentId.ContainsKey(spanEquipment.Id))

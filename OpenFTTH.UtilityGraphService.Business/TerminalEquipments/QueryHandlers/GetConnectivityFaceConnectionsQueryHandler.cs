@@ -88,7 +88,15 @@ namespace OpenFTTH.UtilityGraphService.Business.TerminalEquipments.QueryHandling
 
             var numberOfFibers = spanEquipment.SpanStructures.Count() - 1;
 
-            var equipmentName = spanEquipment.Name + " (" + numberOfFibers + ") - Fiber " + structureIndex;
+            var tagString = "";
+
+            var tags = GetTags(spanSegmentId, spanEquipment);
+
+            if (tags != null)
+                tagString = " (" + String.Join(",", tags) + ")";
+
+            var equipmentName = spanEquipment.Name + " (" + numberOfFibers + ") - Fiber " + structureIndex + tagString;
+                    
 
             return new ConnectivityFaceConnection()
             {
@@ -162,6 +170,14 @@ namespace OpenFTTH.UtilityGraphService.Business.TerminalEquipments.QueryHandling
             var terminalEquipmentSpecification = _terminalEquipmentSpecifications[terminalEquipment.SpecificationId];
             var terminalStructureSpecification = _terminalStructureSpecifications[terminalStructure.SpecificationId];
 
+            var tagString = "";
+
+            var tags = GetTags(terminal, terminalEquipment);
+
+            if (tags != null) 
+                tagString = " (" + String.Join(",", tags) + ")";
+
+
             string? rackInfo = null;
 
             if (terminalEquipmentSpecification.IsRackEquipment)
@@ -174,16 +190,133 @@ namespace OpenFTTH.UtilityGraphService.Business.TerminalEquipments.QueryHandling
 
                 if (terminalStructureSpecification.Category == "Splitters")
                 {
-                    return rackInfo + "Splitter " + terminalStructure.Name + " (" + terminalStructureSpecification.ShortName + ") - " + terminal.Name;
+                    return rackInfo + "Splitter " + terminalStructure.Name + " (" + terminalStructureSpecification.ShortName + ") - " + terminal.Name + tagString;
                 }
                 else
                 {
-                    return rackInfo + "Tray " + terminalStructure.Name + " - Søm " + terminal.Name + " (" + terminalEquipmentSpecification.ShortName + ")";
+                    return rackInfo + "Tray " + terminalStructure.Name + " - Søm " + terminal.Name + " (" + terminalEquipmentSpecification.ShortName + ")" + tagString;
                 }
             }
             else
             {
-                return rackInfo + RelatedDataHolder.GetInterfaceName(terminalStructure);
+                return rackInfo + RelatedDataHolder.GetInterfaceName(terminalStructure) + tagString;
+            }
+        }
+
+        private string[]? GetTags(Terminal terminal, TerminalEquipment terminalEquipment)
+        {
+            HashSet<string> tags = new();
+
+            // Add tags from terminal
+            AddTagsFromTerminal(terminal, terminalEquipment, tags);
+
+            var traceResult = _utilityNetwork.Graph.SimpleTrace(terminal.Id);
+
+            AddTagsFromTrace(tags, traceResult);
+
+            if (tags.Count > 0)
+                return tags.ToArray();
+            else
+                return null;
+        }
+
+        private string[]? GetTags(Guid spanSegmentId, SpanEquipment terminalEquipment)
+        {
+            HashSet<string> tags = new();
+
+            // Add tags from terminal
+            AddTagsFromSegment(spanSegmentId, terminalEquipment, tags);
+
+            var traceResult = _utilityNetwork.Graph.SimpleTrace(spanSegmentId);
+
+            AddTagsFromTrace(tags, traceResult);
+
+            if (tags.Count > 0)
+                return tags.ToArray();
+            else
+                return null;
+        }
+
+        private void AddTagsFromTrace(HashSet<string> tags, UtilityGraphTraceResult traceResult)
+        {
+            if (traceResult != null && traceResult.Upstream != null && traceResult.Upstream.Length > 0)
+            {
+                foreach (var hop in traceResult.Upstream)
+                {
+                    if (hop is UtilityGraphConnectedTerminal connectedTerminal)
+                    {
+                        AddTagsFromTerminal(connectedTerminal.Terminal(_utilityNetwork), connectedTerminal.TerminalEquipment(_utilityNetwork), tags);
+                    }
+                    else if (hop is UtilityGraphConnectedSegment connectedSegment)
+                    {
+                        AddTags(connectedSegment.SpanSegment(_utilityNetwork), connectedSegment.SpanEquipment(_utilityNetwork), tags);
+                    }
+                }
+            }
+
+            if (traceResult != null && traceResult.Downstream != null && traceResult.Downstream.Length > 0)
+            {
+                foreach (var hop in traceResult.Downstream)
+                {
+                    if (hop is UtilityGraphConnectedTerminal connectedTerminal)
+                    {
+                        AddTagsFromTerminal(connectedTerminal.Terminal(_utilityNetwork), connectedTerminal.TerminalEquipment(_utilityNetwork), tags);
+                    }
+                    else if (hop is UtilityGraphConnectedSegment connectedSegment)
+                    {
+                        AddTags(connectedSegment.SpanSegment(_utilityNetwork), connectedSegment.SpanEquipment(_utilityNetwork), tags);
+                    }
+                }
+            }
+        }
+
+        private static void AddTagsFromTerminal(Terminal terminal, TerminalEquipment terminalEquipment, HashSet<string> tags)
+        {
+            if (terminalEquipment.EquipmentTags != null)
+            {
+                Dictionary<Guid, EquipmentTag> tagByTerminalIdDict = terminalEquipment.EquipmentTags == null ? [] : terminalEquipment.EquipmentTags.ToDictionary(tag => tag.TerminalOrSpanId);
+
+                var tagData = !tagByTerminalIdDict.TryGetValue(terminal.Id, out EquipmentTag? value) ? null : value;
+
+                if (tagData != null && tagData.Tags != null)
+                {
+                    foreach (var tagValue in tagData.Tags)
+                        tags.Add(tagValue);
+                }
+            }
+        }
+
+       
+
+        private static void AddTags(SpanSegment spanSegment, SpanEquipment spanEquipment, HashSet<string> tags)
+        {
+            if (spanEquipment.EquipmentTags != null)
+            {
+                Dictionary<Guid, EquipmentTag> tagByTerminalIdDict = spanEquipment.EquipmentTags == null ? [] : spanEquipment.EquipmentTags.ToDictionary(tag => tag.TerminalOrSpanId);
+
+                var tagData = !tagByTerminalIdDict.TryGetValue(spanSegment.Id, out EquipmentTag? value) ? null : value;
+
+                if (tagData != null && tagData.Tags != null)
+                {
+                    foreach (var tagValue in tagData.Tags)
+                        tags.Add(tagValue);
+                }
+            }
+        }
+
+        private static void AddTagsFromSegment(Guid spanSegmentId, SpanEquipment spanEquipment, HashSet<string> tags)
+        {
+            if (spanEquipment.EquipmentTags != null)
+            {
+                Dictionary<Guid, EquipmentTag> tagByTerminalIdDict = spanEquipment.EquipmentTags == null ? [] : spanEquipment.EquipmentTags.ToDictionary(tag => tag.TerminalOrSpanId);
+
+                var tagData = !tagByTerminalIdDict.TryGetValue(spanSegmentId, out EquipmentTag? value) ? null : value;
+
+                if (tagData != null && tagData.Tags != null)
+                {
+                    foreach (var tagValue in tagData.Tags)
+                        tags.Add(tagValue);
+                }
             }
         }
 
