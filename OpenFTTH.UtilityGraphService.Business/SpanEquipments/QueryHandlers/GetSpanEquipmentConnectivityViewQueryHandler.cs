@@ -317,7 +317,7 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments.QueryHandling
                             traceInfo.Downstream = GetEndInfoFromTrace(segment.Id, terminalTraceResult.Downstream);
                         }
 
-                        traceInfo.Tags = RelatedDataHolder.GetTagsFromTrace(_utilityNetwork, terminalTraceResult);
+                        traceInfo.Tags = RelatedDataHolder.GetTagsFromTrace(_utilityNetwork, spanEquipment, segment, terminalTraceResult);
                     }
 
 

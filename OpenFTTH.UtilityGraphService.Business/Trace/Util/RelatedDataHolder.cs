@@ -652,30 +652,54 @@ namespace OpenFTTH.UtilityGraphService.Business.Trace.Util
             return tags;
         }
 
-        public static List<string> GetTagsFromTrace(UtilityNetworkProjection utilityNetwork, UtilityGraphTraceResult terminalTraceResult)
+        public static List<string> GetTagsFromTrace(UtilityNetworkProjection utilityNetwork, TerminalEquipment sourceEquipment, Terminal sourceTerminal, UtilityGraphTraceResult terminalTraceResult)
         {
             HashSet<string> tags = new HashSet<string>();
-
-            if (terminalTraceResult.Source is UtilityGraphConnectedTerminal sourceTerminal)
+     
+            foreach (var terminalTags in RelatedDataHolder.GetTagsByTerminal(sourceEquipment, sourceTerminal.Id))
             {
-                if (!sourceTerminal.IsDummyEnd && !sourceTerminal.IsSimpleTerminal)
-                {
-                    var equipment = sourceTerminal.TerminalEquipment(utilityNetwork);
+                tags.Add(terminalTags);
+            }
 
-                    foreach (var terminalTags in RelatedDataHolder.GetTagsByTerminal(equipment, sourceTerminal.Id))
+
+            foreach (var traceItem in terminalTraceResult.All)
+            {
+                if (traceItem is UtilityGraphConnectedTerminal terminal)
+                {
+                    if (!terminal.IsDummyEnd && !terminal.IsSimpleTerminal)
                     {
-                        tags.Add(terminalTags);
+                        var equipment = terminal.TerminalEquipment(utilityNetwork);
+
+                        foreach (var terminalTags in RelatedDataHolder.GetTagsByTerminal(equipment, terminal.Id))
+                        {
+                            tags.Add(terminalTags);
+                        }
+                    }
+                }
+
+                if (traceItem is UtilityGraphConnectedSegment segment)
+                {
+                    var equipment = segment.SpanEquipment(utilityNetwork);
+
+                    foreach (var spanSegmentTags in RelatedDataHolder.GetTagsBySpanSegment(equipment, segment.Id))
+                    {
+                        tags.Add(spanSegmentTags);
                     }
                 }
             }
-            else if (terminalTraceResult.Source is UtilityGraphConnectedSegment sourceSegment)
-            {
-                var equipment = sourceSegment.SpanEquipment(utilityNetwork);
 
-                foreach (var spanSegmentTags in RelatedDataHolder.GetTagsBySpanSegment(equipment, sourceSegment.Id))
-                {
-                    tags.Add(spanSegmentTags);
-                }
+            return tags.ToList<string>();
+        }
+
+
+        public static List<string> GetTagsFromTrace(UtilityNetworkProjection utilityNetwork, SpanEquipment sourceEquipment, SpanSegment sourceSegment, UtilityGraphTraceResult terminalTraceResult)
+        {
+            HashSet<string> tags = new HashSet<string>();
+
+
+            foreach (var spanSegmentTags in RelatedDataHolder.GetTagsBySpanSegment(sourceEquipment, sourceSegment.Id))
+            {
+                tags.Add(spanSegmentTags);
             }
 
 

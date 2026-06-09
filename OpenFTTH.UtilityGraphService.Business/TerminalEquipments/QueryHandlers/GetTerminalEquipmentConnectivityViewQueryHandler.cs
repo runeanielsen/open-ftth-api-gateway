@@ -554,7 +554,7 @@ namespace OpenFTTH.UtilityGraphService.Business.TerminalEquipments.QueryHandling
                             traceInfo.Downstream = GetEndInfoFromTrace(terminal.Id, terminalTraceResult.Downstream);
                         }
 
-                        traceInfo.Tags = RelatedDataHolder.GetTagsFromTrace(_utilityNetwork, terminalTraceResult);
+                        traceInfo.Tags = RelatedDataHolder.GetTagsFromTrace(_utilityNetwork, terminalEquipment, terminal, terminalTraceResult);
                     }
 
                     traceInfosByTerminalId.Add(terminal.Id, traceInfo);
