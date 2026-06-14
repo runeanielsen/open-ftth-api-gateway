@@ -6,8 +6,8 @@ namespace OpenFTTH.UtilityGraphService.API.Commands
 {
     public record DisconnectSpanSegmentsFromTerminalsAtRouteNode : BaseCommand, ICommand<Result>
     {
-        public Guid RouteNodeId { get; }
-        public DisconnectSpanSegmentFromTerminalOperation[] Disconnects { get; }
+        public Guid RouteNodeId { get; set; }
+        public DisconnectSpanSegmentFromTerminalOperation[] Disconnects { get; set; }
         public DisconnectSpanSegmentsFromTerminalsAtRouteNode(Guid correlationId, UserContext userContext, Guid routeNodeId, DisconnectSpanSegmentFromTerminalOperation[] disconnects) : base(correlationId, userContext)
         {
             RouteNodeId = routeNodeId;
@@ -17,8 +17,8 @@ namespace OpenFTTH.UtilityGraphService.API.Commands
 
     public record DisconnectSpanSegmentFromTerminalOperation
     {
-        public Guid SpanSegmentId { get; }
-        public Guid TerminalId { get; }
+        public Guid SpanSegmentId { get; set; }
+        public Guid TerminalId { get; set; }
 
         public DisconnectSpanSegmentFromTerminalOperation(Guid spanSegmentId, Guid terminalId)
         {

@@ -1,0 +1,8 @@
+
+[*.cs]
+
+# CS8602: Disabled for now, so warnings are not flooding other errors.
+dotnet_diagnostic.CS8602.severity = none
+
+# CS8618: Disabled for now, so warnings are not flooding other errors.
+dotnet_diagnostic.CS8618.severity = none

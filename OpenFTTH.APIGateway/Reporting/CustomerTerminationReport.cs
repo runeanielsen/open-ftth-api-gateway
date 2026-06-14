@@ -2,8 +2,8 @@
 using Microsoft.Extensions.Logging;
 using NetTopologySuite.Geometries;
 using Newtonsoft.Json.Linq;
-using OpenFTTH.Events.RouteNetwork.Infos;
 using OpenFTTH.EventSourcing;
+using OpenFTTH.Events.RouteNetwork.Infos;
 using OpenFTTH.RouteNetwork.API.Model;
 using OpenFTTH.RouteNetwork.Business.Interest.Projections;
 using OpenFTTH.RouteNetwork.Business.RouteElements.Model;
@@ -64,8 +64,8 @@ namespace OpenFTTH.APIGateway.Reporting
 
                         // Collect installation information
                         var traceLine = new InstallationTraceResultLine();
-                        traceLine.inst_name = terminalEquipment.Name;
-                        traceLine.inst_card = sourceTerminalStructure.Name;
+                        traceLine.inst_name = terminalEquipment.Name ?? "";
+                        traceLine.inst_card = sourceTerminalStructure.Name ?? "";
                         traceLine.inst_port = sourceTerminal.Name;
                         traceLine.inst_spec = equipmentSpec.Name;
 
@@ -103,7 +103,7 @@ namespace OpenFTTH.APIGateway.Reporting
                                         traceLine.sd1_node_spec = currentHopContext.nodeContainerSpec.Name;
 
                                         traceLine.sd1_1sp_spec = firstHopInNodeContext.hopEquipmentSpec.Name;
-                                        traceLine.sd1_1sp_name = firstHopInNodeContext.hopEquipment.Name;
+                                        traceLine.sd1_1sp_name = firstHopInNodeContext.hopEquipment.Name ?? "";
                                         traceLine.sd1_1sp_card = firstHopInNodeContext.GetCardName();
                                         traceLine.sd1_1sp_port = firstHopInNodeContext.hopTerminal.Name;
                                     }
@@ -118,7 +118,7 @@ namespace OpenFTTH.APIGateway.Reporting
                                         traceLine.pd_node_spec = currentHopContext.nodeContainerSpec.Name;
 
                                         traceLine.pd_1sp_spec = firstHopInNodeContext.hopEquipmentSpec.Name;
-                                        traceLine.pd_1sp_name = firstHopInNodeContext.hopEquipment.Name;
+                                        traceLine.pd_1sp_name = firstHopInNodeContext.hopEquipment.Name ?? "";
                                         traceLine.pd_1sp_card = firstHopInNodeContext.GetCardName();
                                         traceLine.pd_1sp_port = firstHopInNodeContext.hopTerminal.Name;
                                     }
@@ -129,10 +129,10 @@ namespace OpenFTTH.APIGateway.Reporting
                                         traceLine.fp_node_spec = currentHopContext.nodeContainerSpec.Name;
 
                                         traceLine.fp_1sp_spec = firstHopInNodeContext.hopEquipmentSpec.Name;
-                                        traceLine.fp_1sp_name = firstHopInNodeContext.hopEquipment.Name;
+                                        traceLine.fp_1sp_name = firstHopInNodeContext.hopEquipment.Name ?? "";
                                         traceLine.fp_1sp_card = firstHopInNodeContext.GetCardName();
                                         traceLine.fp_1sp_port = firstHopInNodeContext.hopTerminal.Name;
-                                        traceLine.fp_1sp_rack = firstHopInNodeContext.GetRackName();
+                                        traceLine.fp_1sp_rack = firstHopInNodeContext.GetRackName() ?? "";
                                     }
 
                                     if (currentHopContext.IsCustomerSplitter)
@@ -141,15 +141,15 @@ namespace OpenFTTH.APIGateway.Reporting
                                         traceLine.fp_node_spec = currentHopContext.nodeContainerSpec.Name;
 
                                         traceLine.fp_1sp_spec = firstHopInNodeContext.hopEquipmentSpec.Name;
-                                        traceLine.fp_1sp_name = firstHopInNodeContext.hopEquipment.Name;
+                                        traceLine.fp_1sp_name = firstHopInNodeContext.hopEquipment.Name ?? "";
                                         traceLine.fp_1sp_card = firstHopInNodeContext.GetCardName();
                                         traceLine.fp_1sp_port = firstHopInNodeContext.hopTerminal.Name;
-                                        traceLine.fp_1sp_rack = firstHopInNodeContext.GetRackName();
+                                        traceLine.fp_1sp_rack = firstHopInNodeContext.GetRackName() ?? "";
 
                                         traceLine.fp_splitter_spec = currentHopContext.hopTerminalStructureSpec.Name;
                                         traceLine.fp_splitter_port = currentHopContext.hopTerminal.Name;
-                                        traceLine.fp_splitter_name = currentHopContext.hopTerminalStructure.Name;
-                                        traceLine.fp_splitter_rack = currentHopContext.GetRackName();
+                                        traceLine.fp_splitter_name = currentHopContext.hopTerminalStructure.Name ?? "";
+                                        traceLine.fp_splitter_rack = currentHopContext.GetRackName() ?? "";
                                     }
 
                                     if (traceLine.co_1sp_spec == null && currentHopContext.IsCentralOffice)
@@ -158,10 +158,10 @@ namespace OpenFTTH.APIGateway.Reporting
                                         traceLine.co_node_spec = currentHopContext.nodeContainerSpec.Name;
 
                                         traceLine.co_1sp_spec = firstHopInNodeContext.hopEquipmentSpec.Name;
-                                        traceLine.co_1sp_name = firstHopInNodeContext.hopEquipment.Name;
+                                        traceLine.co_1sp_name = firstHopInNodeContext.hopEquipment.Name ?? "";
                                         traceLine.co_1sp_card = firstHopInNodeContext.GetCardName();
                                         traceLine.co_1sp_port = firstHopInNodeContext.hopTerminal.Name;
-                                        traceLine.co_1sp_rack = firstHopInNodeContext.GetRackName();
+                                        traceLine.co_1sp_rack = firstHopInNodeContext.GetRackName() ?? "";
                                     }
 
                                     if (currentHopContext.IsLineTermination)
@@ -170,16 +170,16 @@ namespace OpenFTTH.APIGateway.Reporting
                                         traceLine.co_node_spec = currentHopContext.nodeContainerSpec.Name;
 
                                         traceLine.co_1sp_spec = firstHopInNodeContext.hopEquipmentSpec.Name;
-                                        traceLine.co_1sp_name = firstHopInNodeContext.hopEquipment.Name;
+                                        traceLine.co_1sp_name = firstHopInNodeContext.hopEquipment.Name ?? "";
                                         traceLine.co_1sp_card = firstHopInNodeContext.GetCardName();
                                         traceLine.co_1sp_port = firstHopInNodeContext.hopTerminal.Name;
-                                        traceLine.co_1sp_rack = firstHopInNodeContext.GetRackName();
+                                        traceLine.co_1sp_rack = firstHopInNodeContext.GetRackName() ?? "";
 
                                         traceLine.co_olt_spec = currentHopContext.hopEquipmentSpec.Name;
-                                        traceLine.co_olt_name = currentHopContext.hopEquipment.Name;
-                                        traceLine.co_olt_card = currentHopContext.hopTerminalStructure.Name;
+                                        traceLine.co_olt_name = currentHopContext.hopEquipment.Name ?? "";
+                                        traceLine.co_olt_card = currentHopContext.hopTerminalStructure.Name ?? "";
                                         traceLine.co_olt_port = currentHopContext.hopTerminal.Name;
-                                        traceLine.co_olt_rack = currentHopContext.GetRackName();
+                                        traceLine.co_olt_rack = currentHopContext.GetRackName() ?? "";
                                     }
 
                                     previousHopContext = currentHopContext;
@@ -422,7 +422,7 @@ namespace OpenFTTH.APIGateway.Reporting
                 return hopTerminalStructure.Name;
         }
 
-        public string GetRackName()
+        public string? GetRackName()
         {
             if (nodeContainer != null && nodeContainer.Racks != null)
             {
@@ -531,6 +531,7 @@ namespace OpenFTTH.APIGateway.Reporting
         public string sd1_1sp_port { get; set; }
         public string sd1_1sp_card { get; set; }
         public string sd1_1sp_name { get; set; }
+
         public string sd1_1sp_spec { get; set; }
         public string sd1_node_spec { get; set; }
         public string sd1_node_name { get; set; }

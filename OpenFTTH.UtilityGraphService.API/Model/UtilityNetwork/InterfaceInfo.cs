@@ -4,11 +4,11 @@ namespace OpenFTTH.UtilityGraphService.API.Model.UtilityNetwork
 {
     public record InterfaceInfo
     {
-        public string InterfaceType { get; }
-        public int SlotNumber { get; }
-        public int SubSlotNumber { get; }
-        public int PortNumber { get; }
-        public string CircuitName { get; }
+        public string InterfaceType { get; set; }
+        public int SlotNumber { get; set; }
+        public int SubSlotNumber { get; set; }
+        public int PortNumber { get; set; }
+        public string CircuitName { get; set; }
 
         public InterfaceInfo(string interfaceType, int slotNumber, int subSlotNumber, int portNumber, string circuitName)
         {

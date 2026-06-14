@@ -6,8 +6,8 @@ namespace OpenFTTH.UtilityGraphService.API.Commands
 {
     public record ConnectSpanSegmentsWithTerminalsAtRouteNode : BaseCommand, ICommand<Result>
     {
-        public Guid RouteNodeId { get; }
-        public ConnectSpanSegmentToTerminalOperation[] Connects { get; }
+        public Guid RouteNodeId { get; set; }
+        public ConnectSpanSegmentToTerminalOperation[] Connects { get; set; }
 
         public ConnectSpanSegmentsWithTerminalsAtRouteNode(Guid correlationId, UserContext userContext, Guid routeNodeId, ConnectSpanSegmentToTerminalOperation[] connects) : base(correlationId, userContext)
         {
@@ -18,8 +18,8 @@ namespace OpenFTTH.UtilityGraphService.API.Commands
 
     public record ConnectSpanSegmentToTerminalOperation
     {
-        public Guid SpanSegmentId { get; }
-        public Guid TerminalId { get; }
+        public Guid SpanSegmentId { get; set; }
+        public Guid TerminalId { get; set; }
 
         public ConnectSpanSegmentToTerminalOperation(Guid spanSegmentId, Guid terminalId)
         {
