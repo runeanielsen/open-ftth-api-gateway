@@ -638,7 +638,7 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Queries
 
             if (spanEquipment.IsCable)
             {
-                var equipmentTag = !tagByTerminalIdDict.TryGetValue(spanSegment.Id, out EquipmentTag value) ? null : value;
+                var equipmentTag = !tagByTerminalIdDict.TryGetValue(spanSegment.Id, out var value) ? null : value;
 
                 var displayName = spanEquipmentSpecification.GetFormattedCableString(spanEquipment.Name, structure.Position, false, spanStructureSpecifications);
 
@@ -658,7 +658,7 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Queries
             }
             else
             {
-                var equipmentTag = !tagByTerminalIdDict.TryGetValue(spanSegment.Id, out EquipmentTag value) ? null : value;
+                var equipmentTag = !tagByTerminalIdDict.TryGetValue(spanSegment.Id, out var value) ? null : value;
 
                 var displayName = $"Inderrør {structure.Position} ({spanStructureSpecification.Name} {spanStructureSpecification.Color})";
 
@@ -676,7 +676,7 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Queries
 
             Dictionary<Guid, EquipmentTag> tagByTerminalIdDict = terminalEquipment.EquipmentTags == null ? [] : terminalEquipment.EquipmentTags.ToDictionary(tag => tag.TerminalOrSpanId);
 
-            var tagData = !tagByTerminalIdDict.TryGetValue(terminal.Id, out EquipmentTag value) ? null : value;
+            var tagData = !tagByTerminalIdDict.TryGetValue(terminal.Id, out var value) ? null : value;
 
             var displayName = "Not impl.";
 

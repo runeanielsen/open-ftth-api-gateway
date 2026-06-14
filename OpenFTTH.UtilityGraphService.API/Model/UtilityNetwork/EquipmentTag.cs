@@ -4,9 +4,9 @@ namespace OpenFTTH.UtilityGraphService.API.Model.UtilityNetwork
 {
     public record EquipmentTag
     {
-        public Guid TerminalOrSpanId { get; }
-        public string[]? Tags { get; }
-        public string? Comment { get; }
+        public Guid TerminalOrSpanId { get; set; }
+        public string[]? Tags { get; set; }
+        public string? Comment { get; set; }
 
         public EquipmentTag(Guid terminalOrSpanId, string[] tags, string? comment = null)
         {
@@ -18,12 +18,12 @@ namespace OpenFTTH.UtilityGraphService.API.Model.UtilityNetwork
 
     public record EquipmentDisplayTag
     {
-        public Guid TerminalOrSpanId { get; }
-        public string DisplayName { get; }
-        public string[]? Tags { get; }
-        public string? Comment { get; }
+        public Guid TerminalOrSpanId { get; set; }
+        public string DisplayName { get; set; }
+        public string[]? Tags { get; set; }
+        public string? Comment { get; set; }
 
-        public EquipmentDisplayTag(Guid terminalOrSpanId, string displayName, string[] tags, string? comment = null)
+        public EquipmentDisplayTag(Guid terminalOrSpanId, string displayName, string[]? tags, string? comment = null)
         {
             TerminalOrSpanId = terminalOrSpanId;
             DisplayName = displayName;

@@ -523,7 +523,9 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                    var currentWorkTaskIdResult = WorkQueryHelper.GetUserCurrentWorkId(userName, queryDispatcher);
 
                    if (currentWorkTaskIdResult.IsFailed)
+                   {
                        return new CommandResult(currentWorkTaskIdResult);
+                   }
 
                    var commandUserContext = new UserContext(userName, currentWorkTaskIdResult.Value);
                    var connectCommand = new DisconnectSpanSegmentsFromTerminalsAtRouteNode(correlationId, commandUserContext, routeNodeId, connects);

@@ -234,10 +234,11 @@ namespace OpenFTTH.APIGateway.Specifications
 
             csvFile.Close();
         }
-        private List<TerminalTemplateSpec> GetTerminals(TerminalTemplate[] terminalTemplates)
+        private List<TerminalTemplateSpec>? GetTerminals(TerminalTemplate[] terminalTemplates)
         {
             if (terminalTemplates == null)
                 return null;
+
             List<TerminalTemplateSpec> specs = new();
 
             foreach (var terminal in terminalTemplates)
@@ -258,7 +259,7 @@ namespace OpenFTTH.APIGateway.Specifications
             return specs;
         }
 
-        private List<TerminalStructureTemplateSpec> GetTerminalStructures(TerminalStructureTemplate[] structureTemplates, LookupCollection<TerminalStructureSpecification> terminalStructureSpecs)
+        private List<TerminalStructureTemplateSpec>? GetTerminalStructures(TerminalStructureTemplate[] structureTemplates, LookupCollection<TerminalStructureSpecification> terminalStructureSpecs)
         {
             if (structureTemplates == null)
                 return null;
@@ -280,7 +281,7 @@ namespace OpenFTTH.APIGateway.Specifications
             return specs;
         }
 
-        private SpanStructureTemplateSpec GetSpanStructures(SpanStructureTemplate rootTemplate, LookupCollection<SpanStructureSpecification> spanStructureSpecs)
+        private SpanStructureTemplateSpec? GetSpanStructures(SpanStructureTemplate rootTemplate, LookupCollection<SpanStructureSpecification> spanStructureSpecs)
         {
             if (rootTemplate == null)
                 return null;
@@ -313,7 +314,7 @@ namespace OpenFTTH.APIGateway.Specifications
             return rootSpec;
         }
 
-        private List<string> GetManufacturesFromIds(LookupCollection<UtilityGraphService.API.Model.UtilityNetwork.Manufacturer> manufactures, Guid[] manufacturerRefs)
+        private List<string>? GetManufacturesFromIds(LookupCollection<UtilityGraphService.API.Model.UtilityNetwork.Manufacturer> manufactures, Guid[] manufacturerRefs)
         {
             if (manufacturerRefs == null)
                 return null;

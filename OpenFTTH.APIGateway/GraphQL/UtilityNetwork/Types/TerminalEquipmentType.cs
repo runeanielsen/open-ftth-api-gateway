@@ -97,7 +97,7 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Types
                   {
                       var addresses = eventStore.Projections.Get<AddressInfoProjection>();
 
-                      AddressInfo addrInfo = addresses.GetAddressInfo((Guid)installationInfo.UnitAddressId);
+                      AddressInfo addrInfo = addresses.GetAddressInfo(installationInfo.UnitAddressId.Value);
 
                       if (addrInfo != null)
                       {
