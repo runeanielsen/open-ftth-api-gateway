@@ -34,6 +34,10 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Types
             Field(x => x.IsLineTermination, type: typeof(BooleanGraphType)).Description("Whether the hop is a line termination (OLT)");
             Field(x => x.IsCustomerSplitter, type: typeof(BooleanGraphType)).Description("Whether the hop is a customer splitter");
             Field(x => x.Tags, type: typeof(StringGraphType)).Description("Tag info");
+            Field(x => x.TerminalEquipmentId, type: typeof(GuidGraphType));
+            Field(x => x.TerminalId, type: typeof(GuidGraphType));
+            Field(x => x.SpanEquipmentId, type: typeof(GuidGraphType));
+            Field(x => x.SpanId, type: typeof(GuidGraphType));
         }
     }
 }

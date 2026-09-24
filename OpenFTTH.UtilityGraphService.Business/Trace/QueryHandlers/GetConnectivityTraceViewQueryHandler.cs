@@ -89,6 +89,8 @@ namespace OpenFTTH.UtilityGraphService.Business.Trace.QueryHandling
 
                 if (currentGraphElement is IUtilityGraphTerminalRef terminalRef)
                 {
+                    var connectedSegment = GetConnectedSegment(relatedData, traceElements, graphElementIndex);
+
                     string connectionInfo = GetConnectionInfo(relatedData, traceElements, graphElementIndex);
 
                     var routeSegmentGeometries = GetSegmentGeometries(relatedData, traceElements, graphElementIndex);
@@ -117,9 +119,14 @@ namespace OpenFTTH.UtilityGraphService.Business.Trace.QueryHandling
                             routeSegmentIds: routeSegmentIds,
                             isCustomerSplitter: relatedData.IsCustomerSplitter(terminalRef),
                             isLineTermination: relatedData.IsLineTermination(terminalRef),
-                            tags: GetTags(relatedData, traceElements, graphElementIndex)
+                            tags: GetTags(relatedData, traceElements, graphElementIndex),
+                            terminalEquipmentId: terminalRef.TerminalEquipmentId,
+                            terminalId: terminalRef.TerminalId,
+                            spanEquipmentId: connectedSegment?.SpanEquipmentId,
+                            spanId: connectedSegment?.Id
                         )
                     );
+
 
                     // Add circuit names to list
                     var circuitName = relatedData.GetCircuitName(terminalRef);
@@ -171,6 +178,8 @@ namespace OpenFTTH.UtilityGraphService.Business.Trace.QueryHandling
                 {
                     string connectionInfo = GetConnectionInfo(relatedData, traceElements, graphElementIndex);
 
+                    var connectedSegment = GetConnectedSegment(relatedData, traceElements, graphElementIndex);
+
                     var routeSegmentGeometries = GetSegmentGeometries(relatedData, traceElements, graphElementIndex);
 
                     var routeSegmentIds = GetRouteSegmentIds(relatedData, traceElements, graphElementIndex);
@@ -197,9 +206,13 @@ namespace OpenFTTH.UtilityGraphService.Business.Trace.QueryHandling
                             routeSegmentIds: routeSegmentIds,
                             isCustomerSplitter: relatedData.IsCustomerSplitter(terminalRef),
                             isLineTermination: relatedData.IsLineTermination(terminalRef),
-                            tags: GetTags(relatedData, traceElements, graphElementIndex)
+                            tags: GetTags(relatedData, traceElements, graphElementIndex),
+                            terminalEquipmentId: terminalRef.IsDummyEnd ? null : terminalRef.TerminalEquipmentId,
+                            terminalId: terminalRef.IsDummyEnd ? null : terminalRef.TerminalId,
+                            spanEquipmentId: connectedSegment?.SpanEquipmentId,
+                            spanId: connectedSegment?.Id
                         )
-                    );
+                    ); 
 
                     // Add circuit names to list
                     var circuitName = relatedData.GetCircuitName(terminalRef);
@@ -340,6 +353,23 @@ namespace OpenFTTH.UtilityGraphService.Business.Trace.QueryHandling
 
             return new LineString(coordinates.ToArray()).Length;
         }
+
+        private UtilityGraphConnectedSegment? GetConnectedSegment(RelatedDataHolder relatedData, List<IGraphObject> traceElements, int graphElementIndex)
+        {
+            // If segment follow terminal, then write span segment information in connection info
+            if (graphElementIndex < (traceElements.Count - 1))
+            {
+                var graphElement = traceElements[graphElementIndex + 1];
+
+                if (graphElement is UtilityGraphConnectedSegment)
+                {
+                    return graphElement as UtilityGraphConnectedSegment;
+                }
+            }
+
+            return null;
+        }
+
 
         private string GetConnectionInfo(RelatedDataHolder relatedData, List<IGraphObject> traceElements, int graphElementIndex)
         {

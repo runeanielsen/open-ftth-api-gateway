@@ -22,8 +22,13 @@ namespace OpenFTTH.UtilityGraphService.API.Model.UtilityNetwork.Views
         public Guid[] RouteSegmentIds { get; }
         public string[] RouteSegmentGeometries { get; }
         public string? Tags { get; }
+        public Guid? TerminalEquipmentId { get; }
+        public Guid? TerminalId { get; }
+        public Guid? SpanEquipmentId { get; }
+        public Guid? SpanId { get; }
 
-        public ConnectivityTraceViewHopInfo(int hopSeqNo, int level, bool isSplitter, bool isLineTermination, bool isCustomerSplitter, bool isTraceSource, string node, string equipment, string terminalStructure, string terminal, string connectionInfo, double totalLength, Guid[] routeSegmentIds, string[] routeSegmentGeometries, string? tags)
+
+        public ConnectivityTraceViewHopInfo(int hopSeqNo, int level, bool isSplitter, bool isLineTermination, bool isCustomerSplitter, bool isTraceSource, string node, string equipment, string terminalStructure, string terminal, string connectionInfo, double totalLength, Guid[] routeSegmentIds, string[] routeSegmentGeometries, string? tags, Guid? terminalEquipmentId, Guid? terminalId, Guid? spanEquipmentId, Guid? spanId)
         {
             HopSeqNo = hopSeqNo;
             Level = level;
@@ -40,6 +45,10 @@ namespace OpenFTTH.UtilityGraphService.API.Model.UtilityNetwork.Views
             RouteSegmentIds = routeSegmentIds;
             RouteSegmentGeometries = routeSegmentGeometries;
             Tags = tags;
+            TerminalEquipmentId = terminalEquipmentId;
+            TerminalId = terminalId;
+            SpanEquipmentId = spanEquipmentId;
+            SpanId = spanId;
         }
     }
 }
