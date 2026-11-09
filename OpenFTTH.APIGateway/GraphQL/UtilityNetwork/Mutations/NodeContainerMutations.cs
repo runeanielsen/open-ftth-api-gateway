@@ -29,7 +29,7 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
             Description = "Node container mutations";
 
             Field<CommandResultType>("placeNodeContainerInRouteNetwork")
-                .Description("Place a node container (i.e. conduit closure, well, cabinet whatwever) in a route network node")
+                .Description("Place a node container (i.e. conduit closure, well, cabinet whatever) in a route network node")
                 .Arguments(new QueryArguments(
                     new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "routeNodeId" },
                     new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "nodeContainerId" },

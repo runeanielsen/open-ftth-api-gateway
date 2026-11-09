@@ -67,7 +67,7 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Types
                       // If no address is found with that id, just return null
                       if (result.Value.UnitAddresses.Count != 1)
                       {
-                          context.Errors.Add(new ExecutionError($"Problem find unit address with id {context.Source.UnitAddressId.Value} in address database. Expected one hit but gut {result.Value.UnitAddresses.Count}"));
+                          context.Errors.Add(new ExecutionError($"Problem finding unit address with id {context.Source.UnitAddressId.Value} in address database. Expected one hit but got {result.Value.UnitAddresses.Count}"));
                           return null;
                       }
 

@@ -28,7 +28,7 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
             Description = "Span equipment mutations";
 
             Field<CommandResultType>("placeSpanEquipmentInRouteNetwork")
-              .Description("Place a span equipment (i.e. conduit, cable whatwever) in the route network")
+              .Description("Place a span equipment (i.e. conduit, cable whatever) in the route network")
               .Arguments(new QueryArguments(
                   new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "spanEquipmentId" },
                   new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "spanEquipmentSpecificationId" },
