@@ -71,7 +71,7 @@ namespace OpenFTTH.APIGateway.GraphQL.Outage.Mutations
                   }
                   catch (Exception ex)
                   {
-                      logger.LogError(ex.Message, ex.StackTrace);
+                      logger.LogError(ex, "Failed sending trouble ticket: {ExceptionMessage}", ex.Message);
                       return new CommandResult(Result.Fail(new Error(ex.Message)));
                   }
               });

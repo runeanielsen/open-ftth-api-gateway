@@ -108,7 +108,7 @@ namespace OpenFTTH.APIGateway.Workers
                     catch (PostgresException ex)
                     {
                         const int RETRY_WAIT_TIME_SEC = 30;
-                        _logger.LogError("{}", ex);
+                        _logger.LogError(ex, "Failed catching up on events from the event store.");
 
                         _logger.LogInformation(
                             "Waiting {Seconds}, before retrying catchup.",

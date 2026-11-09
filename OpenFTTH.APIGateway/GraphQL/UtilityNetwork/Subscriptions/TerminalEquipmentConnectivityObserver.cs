@@ -111,7 +111,7 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Subscriptions
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Getting terminal equipment connectivity for equipment with id: {terminalEquipmentOrRackId} Failed with message: {ex.Message}", ex);
+                _logger.LogError(ex, "Getting terminal equipment connectivity for equipment with id: {TerminalEquipmentOrRackId} Failed with message: {ExceptionMessage}", terminalEquipmentOrRackId, ex.Message);
                 return null;
             }
         }

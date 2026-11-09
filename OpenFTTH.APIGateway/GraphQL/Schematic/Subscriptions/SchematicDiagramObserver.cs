@@ -95,7 +95,7 @@ namespace OpenFTTH.APIGateway.GraphQL.Schematic.Subscriptions
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Schematic diagram creation for route node element with id: {routeNetworkElementId} failed with message: {ex.Message}", ex);
+                _logger.LogError(ex, "Schematic diagram creation for route node element with id: {RouteNetworkElementId} failed with message: {ExceptionMessage}", routeNetworkElementId, ex.Message);
                 return new Diagram();
             }
         }

@@ -37,7 +37,7 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                     }
                     catch (Exception ex)
                     {
-                        logger.LogError("{Exception}", ex);
+                        logger.LogError(ex, "Failed importing specifications.");
                         return new CommandResult(false, "ERROR_IMPORTING_SPECIFICATIONS", ex.Message);
                     }
                 });
