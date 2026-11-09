@@ -32,7 +32,7 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Subscriptions
                     var routeNodeId = context.GetArgument<Guid>("routeNodeId");
                     if (routeNodeId == Guid.Empty)
                     {
-                        context.Errors.Add(new ExecutionError($"nameof(routeNodeId) guid cannot be empty."));
+                        context.Errors.Add(new ExecutionError($"{nameof(routeNodeId)} guid cannot be empty."));
                         return null;
                     }
 
