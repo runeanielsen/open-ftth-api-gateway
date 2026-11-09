@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 
 namespace OpenFTTH.APIGateway.RouteNetwork.Controllers
 {
+    // This controller intentionally has no [Authorize] attribute,
+    // the endpoints are meant to be accessible without authentication.
     [Route("api/[controller]")]
     [ApiController]
     public class WorkTaskController : ControllerBase
