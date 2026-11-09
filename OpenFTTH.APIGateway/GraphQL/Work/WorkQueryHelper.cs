@@ -4,12 +4,13 @@ using OpenFTTH.Work.API.Model;
 using OpenFTTH.Work.API.Queries;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace OpenFTTH.APIGateway.GraphQL.Work
 {
     public static class WorkQueryHelper
     {
-        public static Result<Guid> GetUserCurrentWorkId(string userName, IQueryDispatcher queryDispatcher)
+        public static async Task<Result<Guid>> GetUserCurrentWorkIdAsync(string userName, IQueryDispatcher queryDispatcher)
         {
             // If debug accept that no work task is selected
 #if DEBUG
@@ -19,7 +20,7 @@ namespace OpenFTTH.APIGateway.GraphQL.Work
 
             var queryRequest = new GetUserWorkContext(userName);
 
-            var queryResult = queryDispatcher.HandleAsync<GetUserWorkContext, Result<UserWorkContext>>(queryRequest).Result;
+            var queryResult = await queryDispatcher.HandleAsync<GetUserWorkContext, Result<UserWorkContext>>(queryRequest);
 
             if (queryResult.IsFailed)
                 return Result.Fail(queryResult.Errors.First());

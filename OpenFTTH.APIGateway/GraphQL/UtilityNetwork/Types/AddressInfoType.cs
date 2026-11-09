@@ -22,13 +22,13 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Types
 
             Field<AccessAddressType>("accessAddress")
                .Description("Access address and its containing unit addresses")
-               .Resolve(context =>
+               .ResolveAsync(async context =>
                {
                    if (context.Source.AccessAddressId != null && context.Source.AccessAddressId != Guid.Empty)
                    {
                        var getAddressInfoQuery = new GetAddressInfo(new Guid[] { context.Source.AccessAddressId.Value });
 
-                       var result = queryDispatcher.HandleAsync<GetAddressInfo, Result<GetAddressInfoResult>>(getAddressInfoQuery).Result;
+                       var result = await queryDispatcher.HandleAsync<GetAddressInfo, Result<GetAddressInfoResult>>(getAddressInfoQuery);
 
                        if (result.IsFailed)
                        {
@@ -50,13 +50,13 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Types
 
             Field<UnitAddressType>("unitAddress")
               .Description("Access address and its containing unit addresses")
-              .Resolve(context =>
+              .ResolveAsync(async context =>
               {
                   if (context.Source.UnitAddressId != null && context.Source.UnitAddressId != Guid.Empty)
                   {
                       var getAddressInfoQuery = new GetAddressInfo(new Guid[] { context.Source.UnitAddressId.Value });
 
-                      var result = queryDispatcher.HandleAsync<GetAddressInfo, Result<GetAddressInfoResult>>(getAddressInfoQuery).Result;
+                      var result = await queryDispatcher.HandleAsync<GetAddressInfo, Result<GetAddressInfoResult>>(getAddressInfoQuery);
 
                       if (result.IsFailed)
                       {

@@ -49,7 +49,7 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                     Guid correlationId = Guid.NewGuid();
 
                     // Get the users current work task (will fail, if user has not selected a work task)
-                    var currentWorkTaskIdResult = WorkQueryHelper.GetUserCurrentWorkId(userName, queryDispatcher);
+                    var currentWorkTaskIdResult = await WorkQueryHelper.GetUserCurrentWorkIdAsync(userName, queryDispatcher);
 
                     if (currentWorkTaskIdResult.IsFailed)
                         return new CommandResult(currentWorkTaskIdResult);
@@ -106,7 +106,7 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                     Guid correlationId = Guid.NewGuid();
 
                     // Get the users current work task (will fail, if user has not selected a work task)
-                    var currentWorkTaskIdResult = WorkQueryHelper.GetUserCurrentWorkId(userName, queryDispatcher);
+                    var currentWorkTaskIdResult = await WorkQueryHelper.GetUserCurrentWorkIdAsync(userName, queryDispatcher);
 
                     if (currentWorkTaskIdResult.IsFailed)
                         return new CommandResult(currentWorkTaskIdResult);
@@ -139,7 +139,7 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                     var userName = userContext.Username;
 
                     // Get the users current work task (will fail, if user has not selected a work task)
-                    var currentWorkTaskIdResult = WorkQueryHelper.GetUserCurrentWorkId(userName, queryDispatcher);
+                    var currentWorkTaskIdResult = await WorkQueryHelper.GetUserCurrentWorkIdAsync(userName, queryDispatcher);
 
                     if (currentWorkTaskIdResult.IsFailed)
                         return new CommandResult(currentWorkTaskIdResult);
@@ -172,7 +172,7 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                     var userName = userContext.Username;
 
                     // Get the users current work task (will fail, if user has not selected a work task)
-                    var currentWorkTaskIdResult = WorkQueryHelper.GetUserCurrentWorkId(userName, queryDispatcher);
+                    var currentWorkTaskIdResult = await WorkQueryHelper.GetUserCurrentWorkIdAsync(userName, queryDispatcher);
 
                     if (currentWorkTaskIdResult.IsFailed)
                         return new CommandResult(currentWorkTaskIdResult);
@@ -214,7 +214,7 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                     var userName = userContext.Username;
 
                     // Get the users current work task (will fail, if user has not selected a work task)
-                    var currentWorkTaskIdResult = WorkQueryHelper.GetUserCurrentWorkId(userName, queryDispatcher);
+                    var currentWorkTaskIdResult = await WorkQueryHelper.GetUserCurrentWorkIdAsync(userName, queryDispatcher);
 
                     if (currentWorkTaskIdResult.IsFailed)
                         return new CommandResult(currentWorkTaskIdResult);
@@ -253,7 +253,7 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                   var userName = userContext.Username;
 
                   // Get the users current work task (will fail, if user has not selected a work task)
-                  var currentWorkTaskIdResult = WorkQueryHelper.GetUserCurrentWorkId(userName, queryDispatcher);
+                  var currentWorkTaskIdResult = await WorkQueryHelper.GetUserCurrentWorkIdAsync(userName, queryDispatcher);
 
                   if (currentWorkTaskIdResult.IsFailed)
                       return new CommandResult(currentWorkTaskIdResult);
@@ -304,7 +304,7 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                     var userName = userContext.Username;
 
                     // Get the users current work task (will fail, if user has not selected a work task)
-                    var currentWorkTaskIdResult = WorkQueryHelper.GetUserCurrentWorkId(userName, queryDispatcher);
+                    var currentWorkTaskIdResult = await WorkQueryHelper.GetUserCurrentWorkIdAsync(userName, queryDispatcher);
 
                     if (currentWorkTaskIdResult.IsFailed)
                         return new CommandResult(currentWorkTaskIdResult);
@@ -313,7 +313,7 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
 
                     Guid nodeContainerId = Guid.NewGuid();
 
-                    var getNodeContainerResult = QueryHelper.GetNodeContainerFromRouteNodeId(queryDispatcher, routeNodeId);
+                    var getNodeContainerResult = await QueryHelper.GetNodeContainerFromRouteNodeIdAsync(queryDispatcher, routeNodeId);
 
                     if (getNodeContainerResult.IsFailed)
                     {
@@ -422,7 +422,7 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                    var userName = userContext.Username;
 
                    // Get the users current work task (will fail, if user has not selected a work task)
-                   var currentWorkTaskIdResult = WorkQueryHelper.GetUserCurrentWorkId(userName, queryDispatcher);
+                   var currentWorkTaskIdResult = await WorkQueryHelper.GetUserCurrentWorkIdAsync(userName, queryDispatcher);
 
                    if (currentWorkTaskIdResult.IsFailed)
                        return new CommandResult(currentWorkTaskIdResult);
@@ -456,7 +456,7 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                     var moveToRackId = context.GetArgument<Guid>("moveToRackId");
                     var moveToRackPosition = context.GetArgument<int>("moveToRackPosition");
 
-                    var getNodeContainerResult = QueryHelper.GetNodeContainerFromRouteNodeId(queryDispatcher, routeNodeId);
+                    var getNodeContainerResult = await QueryHelper.GetNodeContainerFromRouteNodeIdAsync(queryDispatcher, routeNodeId);
                     if (getNodeContainerResult.IsFailed)
                     {
                         foreach (var error in getNodeContainerResult.Errors)
@@ -470,7 +470,7 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                     var userName = userContext.Username;
 
                     // Get the users current work task (will fail, if user has not selected a work task)
-                    var currentWorkTaskIdResult = WorkQueryHelper.GetUserCurrentWorkId(userName, queryDispatcher);
+                    var currentWorkTaskIdResult = await WorkQueryHelper.GetUserCurrentWorkIdAsync(userName, queryDispatcher);
 
                     if (currentWorkTaskIdResult.IsFailed)
                         return new CommandResult(currentWorkTaskIdResult);
@@ -499,7 +499,7 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                     var arrangeMethod = context.GetArgument<RackEquipmentArrangeMethodEnum>("arrangeMethod");
                     var numberOfRackPositions = context.GetArgument<int>("numberOfRackPositions");
 
-                    var getNodeContainerResult = QueryHelper.GetNodeContainerFromRouteNodeId(queryDispatcher, routeNodeId);
+                    var getNodeContainerResult = await QueryHelper.GetNodeContainerFromRouteNodeIdAsync(queryDispatcher, routeNodeId);
                     if (getNodeContainerResult.IsFailed)
                     {
                         foreach (var error in getNodeContainerResult.Errors)
@@ -513,7 +513,7 @@ namespace OpenFTTH.APIGateway.GraphQL.RouteNetwork.Mutations
                     var userName = userContext.Username;
 
                     // Get the users current work task (will fail, if user has not selected a work task)
-                    var currentWorkTaskIdResult = WorkQueryHelper.GetUserCurrentWorkId(userName, queryDispatcher);
+                    var currentWorkTaskIdResult = await WorkQueryHelper.GetUserCurrentWorkIdAsync(userName, queryDispatcher);
 
                     if (currentWorkTaskIdResult.IsFailed)
                         return new CommandResult(currentWorkTaskIdResult);

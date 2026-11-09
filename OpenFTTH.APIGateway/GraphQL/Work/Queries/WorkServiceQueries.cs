@@ -24,11 +24,11 @@ namespace OpenFTTH.APIGateway.GraphQL.Work.Queries
 
             Field<ListGraphType<WorkTaskAndProjectType>>("workTasksWithProjectInformation")
                 .Description("Retrieve all work tasks including related project information")
-                .Resolve(context =>
+                .ResolveAsync(async context =>
                 {
                     var queryRequest = new GetAllWorkTaskAndProjects();
 
-                    var queryResult = this._queryDispatcher.HandleAsync<GetAllWorkTaskAndProjects, Result<List<WorkTaskAndProject>>>(queryRequest).Result;
+                    var queryResult = await this._queryDispatcher.HandleAsync<GetAllWorkTaskAndProjects, Result<List<WorkTaskAndProject>>>(queryRequest);
 
                     return queryResult.Value;
                 });
@@ -36,13 +36,13 @@ namespace OpenFTTH.APIGateway.GraphQL.Work.Queries
             Field<UserWorkContextType>("userWorkContext")
                 .Description("Used to get work task status information specific to a particular user.")
                 .Arguments(new QueryArguments(new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "userName" }))
-                .Resolve(context =>
+                .ResolveAsync(async context =>
                 {
                     var userName = context.GetArgument<string>("userName");
 
                     var queryRequest = new GetUserWorkContext(userName);
 
-                    var queryResult = this._queryDispatcher.HandleAsync<GetUserWorkContext, Result<UserWorkContext>>(queryRequest).Result;
+                    var queryResult = await this._queryDispatcher.HandleAsync<GetUserWorkContext, Result<UserWorkContext>>(queryRequest);
 
                     return queryResult.Value;
                 });

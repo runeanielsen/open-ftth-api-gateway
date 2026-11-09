@@ -304,12 +304,12 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Queries
                     new QueryArguments(
                         new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "routeNodeId" },
                         new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "rackId" }))
-                .Resolve(context =>
+                .ResolveAsync(async context =>
                 {
                     var routeNodeId = context.GetArgument<Guid>("routeNodeId");
                     var rackId = context.GetArgument<Guid>("rackId");
 
-                    var getNodeContainerResult = QueryHelper.GetNodeContainerFromRouteNodeId(queryDispatcher, routeNodeId);
+                    var getNodeContainerResult = await QueryHelper.GetNodeContainerFromRouteNodeIdAsync(queryDispatcher, routeNodeId);
 
                     if (getNodeContainerResult.IsFailed)
                     {
@@ -334,11 +334,11 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Queries
                 .Description("Query all racks within node")
                 .Arguments(new QueryArguments(
                                new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "routeNodeId" }))
-                .Resolve(context =>
+                .ResolveAsync(async context =>
                 {
                     var routeNodeId = context.GetArgument<Guid>("routeNodeId");
 
-                    var getNodeContainerResult = QueryHelper.GetNodeContainerFromRouteNodeId(queryDispatcher, routeNodeId);
+                    var getNodeContainerResult = await QueryHelper.GetNodeContainerFromRouteNodeIdAsync(queryDispatcher, routeNodeId);
 
                     if (getNodeContainerResult.IsFailed)
                     {

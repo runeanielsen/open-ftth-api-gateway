@@ -6,12 +6,13 @@ using OpenFTTH.UtilityGraphService.API.Model.UtilityNetwork;
 using OpenFTTH.UtilityGraphService.API.Queries;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace OpenFTTH.APIGateway.Util
 {
     public static class QueryHelper
     {
-        public static Result<NodeContainer> GetNodeContainerFromRouteNodeId(IQueryDispatcher queryDispatcher, Guid routeNodeId)
+        public static async Task<Result<NodeContainer>> GetNodeContainerFromRouteNodeIdAsync(IQueryDispatcher queryDispatcher, Guid routeNodeId)
         {
             // Query all route node interests
             var routeNetworkInterestQuery = new GetRouteNetworkDetails(new RouteNetworkElementIdList() { routeNodeId })
@@ -19,7 +20,7 @@ namespace OpenFTTH.APIGateway.Util
                 RelatedInterestFilter = RelatedInterestFilterOptions.ReferencesFromRouteElementOnly
             };
 
-            Result<GetRouteNetworkDetailsResult> interestsQueryResult = queryDispatcher.HandleAsync<GetRouteNetworkDetails, Result<GetRouteNetworkDetailsResult>>(routeNetworkInterestQuery).Result;
+            Result<GetRouteNetworkDetailsResult> interestsQueryResult = await queryDispatcher.HandleAsync<GetRouteNetworkDetails, Result<GetRouteNetworkDetailsResult>>(routeNetworkInterestQuery);
 
             if (interestsQueryResult.IsFailed)
                 return Result.Fail(interestsQueryResult.Errors.First());
@@ -31,12 +32,12 @@ namespace OpenFTTH.APIGateway.Util
             if (interestIdList.Count > 0)
             {
                 // Query all the equipments related to the route network element
-                var equipmentQueryResult = queryDispatcher.HandleAsync<GetEquipmentDetails, Result<GetEquipmentDetailsResult>>(
+                var equipmentQueryResult = await queryDispatcher.HandleAsync<GetEquipmentDetails, Result<GetEquipmentDetailsResult>>(
                     new GetEquipmentDetails(interestIdList)
                     {
                         EquipmentDetailsFilter = new EquipmentDetailsFilterOptions() { IncludeRouteNetworkTrace = false }
                     }
-                ).Result;
+                );
 
                 if (equipmentQueryResult.IsFailed)
                     return Result.Fail(equipmentQueryResult.Errors.First());
@@ -50,18 +51,18 @@ namespace OpenFTTH.APIGateway.Util
             return Result.Fail(new Error($"Failed to find node container in route node with id: {routeNodeId}"));
         }
 
-        public static Result<NodeContainer> GetNodeContainer(IQueryDispatcher queryDispatcher, Guid nodeContainerId)
+        public static async Task<Result<NodeContainer>> GetNodeContainerAsync(IQueryDispatcher queryDispatcher, Guid nodeContainerId)
         {
             var equipmentIdList = new EquipmentIdList();
             equipmentIdList.Add(nodeContainerId);
 
             // Query all the equipments related to the route network element
-            var equipmentQueryResult = queryDispatcher.HandleAsync<GetEquipmentDetails, Result<GetEquipmentDetailsResult>>(
+            var equipmentQueryResult = await queryDispatcher.HandleAsync<GetEquipmentDetails, Result<GetEquipmentDetailsResult>>(
                     new GetEquipmentDetails(equipmentIdList)
                     {
                         EquipmentDetailsFilter = new EquipmentDetailsFilterOptions() { IncludeRouteNetworkTrace = false }
                     }
-                ).Result;
+                );
 
             if (equipmentQueryResult.IsFailed)
                 return Result.Fail(equipmentQueryResult.Errors.First());
@@ -75,18 +76,18 @@ namespace OpenFTTH.APIGateway.Util
             return Result.Fail(new Error($"Failed to find node container with id: {nodeContainerId}"));
         }
 
-        public static Result<EquipmentTag[]> GetEquipmentTags(IQueryDispatcher queryDispatcher, Guid terminalOrSpanEquipmentId)
+        public static async Task<Result<EquipmentTag[]>> GetEquipmentTagsAsync(IQueryDispatcher queryDispatcher, Guid terminalOrSpanEquipmentId)
         {
             var equipmentIdList = new EquipmentIdList();
             equipmentIdList.Add(terminalOrSpanEquipmentId);
 
             // Query all the equipments related to the route network element
-            var equipmentQueryResult = queryDispatcher.HandleAsync<GetEquipmentDetails, Result<GetEquipmentDetailsResult>>(
+            var equipmentQueryResult = await queryDispatcher.HandleAsync<GetEquipmentDetails, Result<GetEquipmentDetailsResult>>(
                 new GetEquipmentDetails(equipmentIdList)
                 {
                     EquipmentDetailsFilter = new EquipmentDetailsFilterOptions() { IncludeRouteNetworkTrace = false }
                 }
-            ).Result;
+            );
 
             if (equipmentQueryResult.IsFailed)
                 return Result.Fail(equipmentQueryResult.Errors.First());

@@ -51,9 +51,9 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Types
 
             Field<SubrackPlacementInfoType>("subrackPlacementInfo")
                 .Description("information about where in a rack the terminal equipment is placed")
-                .Resolve(context =>
+                .ResolveAsync(async context =>
                 {
-                    var getNodeContainerResult = QueryHelper.GetNodeContainer(queryDispatcher, context.Source.NodeContainerId);
+                    var getNodeContainerResult = await QueryHelper.GetNodeContainerAsync(queryDispatcher, context.Source.NodeContainerId);
 
                     if (getNodeContainerResult.IsFailed)
                     {

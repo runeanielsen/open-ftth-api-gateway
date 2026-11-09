@@ -137,7 +137,7 @@ namespace OpenFTTH.APIGateway.Conversion
 
                 if (spec.Name.ToLower().Contains("splitterholder"))
                 {
-                    var nodeEquipmentResult = QueryHelper.GetNodeContainer(_queryDispatcher, terminalEquipment.NodeContainerId);
+                    var nodeEquipmentResult = QueryHelper.GetNodeContainerAsync(_queryDispatcher, terminalEquipment.NodeContainerId).Result;
 
                     if (nodeEquipmentResult.IsFailed)
                     {
