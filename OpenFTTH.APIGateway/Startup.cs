@@ -42,6 +42,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Net.WebSockets;
 using System.Reflection;
 using System.Threading.Tasks;
 using Typesense.Setup;
@@ -311,6 +312,20 @@ namespace OpenFTTH.APIGateway
             app.UseWebSockets(new WebSocketOptions
             {
                 KeepAliveInterval = TimeSpan.FromSeconds(30)
+            });
+
+            app.Use(async (context, next) =>
+            {
+                try
+                {
+                    await next();
+                }
+                // We do not care about clients disconnecting without completing the close handshake,
+                // it happens a lot when browsers close tabs, reload or lose network,
+                // resulting in many errors in the logs.
+                catch (WebSocketException ex) when (ex.WebSocketErrorCode == WebSocketError.ConnectionClosedPrematurely)
+                {
+                }
             });
 
             app.UseGraphQL<GraphQLHttpMiddlewareWithLogs<OpenFTTHSchema>>(
