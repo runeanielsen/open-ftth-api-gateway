@@ -49,7 +49,7 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Types
                });
 
             Field<UnitAddressType>("unitAddress")
-              .Description("Access address and its containing unit addresses")
+              .Description("Unit address (i.e. floor and suite) within the access address")
               .ResolveAsync(async context =>
               {
                   if (context.Source.UnitAddressId != null && context.Source.UnitAddressId != Guid.Empty)
