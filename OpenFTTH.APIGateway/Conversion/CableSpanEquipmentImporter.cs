@@ -467,7 +467,7 @@ namespace OpenFTTH.APIGateway.Conversion
 
                         var traceInfo = traceBuilder.Trace(new List<SpanEquipment> { conduit }, spanSegmentIdToTrace);
 
-                        if (traceInfo != null || traceInfo.RouteNetworkTraces.Count == 1)
+                        if (traceInfo != null && traceInfo.RouteNetworkTraces.Count == 1)
                         {
                             if (!alreadyUsedSpanSegmentIds.Contains(spanSegmentIdToTrace))
                             {
@@ -494,7 +494,7 @@ namespace OpenFTTH.APIGateway.Conversion
 
                         var traceInfo = traceBuilder.Trace(new List<SpanEquipment> { conduit }, spanSegmentIdToTrace);
 
-                        if (traceInfo != null || traceInfo.RouteNetworkTraces.Count == 1)
+                        if (traceInfo != null && traceInfo.RouteNetworkTraces.Count == 1)
                         {
                             if (!alreadyUsedSpanSegmentIds.Contains(spanSegmentIdToTrace))
                             {
@@ -521,7 +521,7 @@ namespace OpenFTTH.APIGateway.Conversion
 
                         var traceInfo = traceBuilder.Trace(new List<SpanEquipment> { conduit }, spanSegmentIdToTrace);
 
-                        if (traceInfo != null || traceInfo.RouteNetworkTraces.Count == 1)
+                        if (traceInfo != null && traceInfo.RouteNetworkTraces.Count == 1)
                         {
                             if (!alreadyUsedSpanSegmentIds.Contains(spanSegmentIdToTrace))
                             {

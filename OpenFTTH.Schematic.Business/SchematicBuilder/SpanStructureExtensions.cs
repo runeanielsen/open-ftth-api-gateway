@@ -11,7 +11,7 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
     {
         public static bool ContainsCutOrConnectedSpanSegments(this SpanStructure spanStructure)
         {
-            if (spanStructure.SpanSegments == null && spanStructure.SpanSegments.Length == 0)
+            if (spanStructure.SpanSegments == null || spanStructure.SpanSegments.Length == 0)
                 return false;
 
             if (spanStructure.SpanSegments.Length == 1 && spanStructure.SpanSegments[0].FromTerminalId == Guid.Empty && spanStructure.SpanSegments[0].ToTerminalId == Guid.Empty)
