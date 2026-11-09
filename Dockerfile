@@ -38,3 +38,6 @@ ENTRYPOINT ["dotnet", "OpenFTTH.APIGateway.dll"]
 
 ENV ASPNETCORE_URLS=http://+:8080
 EXPOSE 8080
+
+# Default thread stack size in hex bytes (0x800000 = 8 MB).
+ENV DOTNET_DefaultStackSize=800000
