@@ -30,9 +30,13 @@ RUN dotnet publish -c Release -o out --packages ./packages
 FROM mcr.microsoft.com/dotnet/aspnet:10.0-noble
 WORKDIR /app
 
+<<<<<<< Updated upstream
 RUN apt-get update \
     && apt-get install -y --no-install-recommends libgssapi-krb5-2 \
     && rm -rf /var/lib/apt/lists/*
+=======
+RUN apk upgrade --no-cache && apk add --no-cache icu-libs krb5-libs
+>>>>>>> Stashed changes
 
 COPY --from=build-env --chown=app:app /app/OpenFTTH.APIGateway/out .
 USER app
