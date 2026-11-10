@@ -21,14 +21,12 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments.CommandHandlers
     public class ConnectSpanSegmentsWithTerminalsAtRouteNodeCommandHandler : ICommandHandler<ConnectSpanSegmentsWithTerminalsAtRouteNode, Result>
     {
         private readonly IEventStore _eventStore;
-        private readonly IQueryDispatcher _queryDispatcher;
         private readonly IExternalEventProducer _externalEventProducer;
         private readonly UtilityNetworkProjection _utilityNetwork;
 
-        public ConnectSpanSegmentsWithTerminalsAtRouteNodeCommandHandler(IEventStore eventStore, IQueryDispatcher queryDispatcher, IExternalEventProducer externalEventProducer)
+        public ConnectSpanSegmentsWithTerminalsAtRouteNodeCommandHandler(IEventStore eventStore, IExternalEventProducer externalEventProducer)
         {
             _eventStore = eventStore;
-            _queryDispatcher = queryDispatcher;
             _externalEventProducer = externalEventProducer;
             _utilityNetwork = _eventStore.Projections.Get<UtilityNetworkProjection>();
         }

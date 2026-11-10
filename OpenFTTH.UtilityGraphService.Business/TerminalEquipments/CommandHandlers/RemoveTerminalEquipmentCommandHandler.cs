@@ -20,13 +20,11 @@ namespace OpenFTTH.UtilityGraphService.Business.TerminalEquipments.CommandHandle
     public class RemoveTerminalEquipmentCommandHandler : ICommandHandler<RemoveTerminalEquipment, Result>
     {
         private readonly IEventStore _eventStore;
-        private readonly IQueryDispatcher _queryDispatcher;
         private readonly IExternalEventProducer _externalEventProducer;
 
-        public RemoveTerminalEquipmentCommandHandler(IEventStore eventStore, IQueryDispatcher queryDispatcher, IExternalEventProducer externalEventProducer)
+        public RemoveTerminalEquipmentCommandHandler(IEventStore eventStore, IExternalEventProducer externalEventProducer)
         {
             _eventStore = eventStore;
-            _queryDispatcher = queryDispatcher;
             _externalEventProducer = externalEventProducer;
         }
 
