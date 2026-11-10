@@ -247,6 +247,59 @@ namespace OpenFTTH.Schematic.Tests.LineBlocks
                 new GeoJsonExporter(diagram).Export("c:/temp/diagram/test.geojson");
         }
 
+        [Theory]
+        [InlineData(BlockSideEnum.West, BlockSideEnum.East)]
+        [InlineData(BlockSideEnum.East, BlockSideEnum.West)]
+        [InlineData(BlockSideEnum.North, BlockSideEnum.South)]
+        [InlineData(BlockSideEnum.South, BlockSideEnum.North)]
+        [InlineData(BlockSideEnum.West, BlockSideEnum.North)]
+        [InlineData(BlockSideEnum.North, BlockSideEnum.West)]
+        [InlineData(BlockSideEnum.West, BlockSideEnum.South)]
+        [InlineData(BlockSideEnum.South, BlockSideEnum.West)]
+        [InlineData(BlockSideEnum.East, BlockSideEnum.North)]
+        [InlineData(BlockSideEnum.North, BlockSideEnum.East)]
+        [InlineData(BlockSideEnum.East, BlockSideEnum.South)]
+        [InlineData(BlockSideEnum.South, BlockSideEnum.East)]
+        [InlineData(BlockSideEnum.West, BlockSideEnum.West)]
+        [InlineData(BlockSideEnum.East, BlockSideEnum.East)]
+        [InlineData(BlockSideEnum.North, BlockSideEnum.North)]
+        [InlineData(BlockSideEnum.South, BlockSideEnum.South)]
+        public void PolygonConnection_ShouldHaveConstantWidth(BlockSideEnum fromSide, BlockSideEnum toSide)
+        {
+            Diagram diagram = new Diagram();
+
+            var lineBlock = new LineBlock()
+            {
+                MinHeight = 100,
+                MinWidth = 100,
+                Margin = 20,
+                IsVisible = false
+            };
+
+            foreach (var side in new[] { BlockSideEnum.West, BlockSideEnum.North, BlockSideEnum.East, BlockSideEnum.South })
+            {
+                var port = new BlockPort(side) { IsVisible = false };
+                lineBlock.AddPort(port);
+                AddTerminalsToPort(port, 10);
+            }
+
+            lineBlock.AddTerminalConnection(fromSide, 1, 3, toSide, 1, 8, null, "Conduit", LineShapeTypeEnum.Polygon);
+
+            // Act
+            lineBlock.CreateDiagramObjects(diagram, 0, 0);
+
+            // Assert
+            var geometry = diagram.DiagramObjects.Single(d => d.Style == "Conduit").Geometry;
+
+            geometry.Should().BeOfType<NetTopologySuite.Geometries.Polygon>();
+            geometry.IsValid.Should().BeTrue();
+
+            // A band of constant width w along a center line of length l has area w * l and perimeter 2 * l + 2 * w
+            var width = 8 / 10000.0;
+            var centerLineLength = (geometry.Length - 2 * width) / 2;
+            geometry.Area.Should().BeApproximately(width * centerLineLength, width * centerLineLength * 0.02);
+        }
+
         private void AddTerminalsToPort(BlockPort port, int nTerminals)
         {
             for (int i = 0; i < nTerminals; i++)
