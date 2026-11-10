@@ -68,14 +68,14 @@ namespace OpenFTTH.UtilityGraphService.Tests.UtilityNetwork
             connectivityTraceView.Name.Should().Be("CO-1 - ODF - Bakke 1");
         }
 
-        private SpanEquipment? FindSpanEquipmentRelatedToRouteNetworkElementByName(Guid routeNetworkElementId, string spanEquipmentName)
+        private async Task<SpanEquipment?> FindSpanEquipmentRelatedToRouteNetworkElementByNameAsync(Guid routeNetworkElementId, string spanEquipmentName)
         {
-            var routeNetworkQueryResult = _queryDispatcher.HandleAsync<GetRouteNetworkDetails, Result<GetRouteNetworkDetailsResult>>(
+            var routeNetworkQueryResult = await _queryDispatcher.HandleAsync<GetRouteNetworkDetails, Result<GetRouteNetworkDetailsResult>>(
               new GetRouteNetworkDetails(new RouteNetworkElementIdList() { routeNetworkElementId })
               {
                   RelatedInterestFilter = RelatedInterestFilterOptions.ReferencesFromRouteElementAndInterestObjects
               }
-            ).Result;
+            );
 
             InterestIdList interestIdList = new InterestIdList();
             foreach (var interestRel in routeNetworkQueryResult.Value.RouteNetworkElements[routeNetworkElementId].InterestRelations)
@@ -83,12 +83,12 @@ namespace OpenFTTH.UtilityGraphService.Tests.UtilityNetwork
                 interestIdList.Add(interestRel.RefId);
             }
 
-            var equipmentQueryResult = _queryDispatcher.HandleAsync<GetEquipmentDetails, Result<GetEquipmentDetailsResult>>(
+            var equipmentQueryResult = await _queryDispatcher.HandleAsync<GetEquipmentDetails, Result<GetEquipmentDetailsResult>>(
                     new GetEquipmentDetails(interestIdList)
                     {
                         EquipmentDetailsFilter = new EquipmentDetailsFilterOptions() { IncludeRouteNetworkTrace = true }
                     }
-                ).Result;
+                );
 
             foreach (var spanEquipment in equipmentQueryResult.Value.SpanEquipment)
             {

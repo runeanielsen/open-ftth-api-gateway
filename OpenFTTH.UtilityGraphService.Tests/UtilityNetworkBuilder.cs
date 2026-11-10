@@ -6,6 +6,7 @@ using OpenFTTH.UtilityGraphService.API.Model.UtilityNetwork;
 using OpenFTTH.UtilityGraphService.Business.Graph;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace OpenFTTH.Tests.Util
 {
@@ -22,7 +23,7 @@ namespace OpenFTTH.Tests.Util
             _queryDispatcher = queryDispatcher;
         }
 
-        public Result ConnectTwoSpanSegments(Guid nodeId, Guid fromSpanEquipmentId, int fromSpanStructureIndex, int fromSpanSegmentIndex, Guid toSpanEquipmentId, int toSpanStructureIndex, int toSpanSegmentIndex)
+        public async Task<Result> ConnectTwoSpanSegmentsAsync(Guid nodeId, Guid fromSpanEquipmentId, int fromSpanStructureIndex, int fromSpanSegmentIndex, Guid toSpanEquipmentId, int toSpanStructureIndex, int toSpanSegmentIndex)
         {
             var utilityNetwork = _eventStore.Projections.Get<UtilityNetworkProjection>();
 
@@ -37,7 +38,7 @@ namespace OpenFTTH.Tests.Util
                 }
             );
 
-            var result = _commandDispatcher.HandleAsync<ConnectSpanSegmentsAtRouteNode, Result>(connectCmd).Result;
+            var result = await _commandDispatcher.HandleAsync<ConnectSpanSegmentsAtRouteNode, Result>(connectCmd);
 
             if (result.IsFailed)
                 throw new ApplicationException(result.Errors.First().Message);

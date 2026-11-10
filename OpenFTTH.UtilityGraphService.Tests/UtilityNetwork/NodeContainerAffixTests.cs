@@ -40,7 +40,7 @@ namespace OpenFTTH.UtilityGraphService.Tests.UtilityNetwork
         [Fact, Order(10)]
         public async Task TestAffixConduitToContainer_ShouldSucceed()
         {
-            var nodeContainerId = PlaceNodeContainer(TestRouteNetwork.HH_2);
+            var nodeContainerId = await PlaceNodeContainerAsync(TestRouteNetwork.HH_2);
 
             var testNetwork = new TestUtilityNetwork(_commandDispatcher, _queryDispatcher).Run();
 
@@ -143,7 +143,7 @@ namespace OpenFTTH.UtilityGraphService.Tests.UtilityNetwork
         [Fact, Order(1000)]
         public async Task TestAffixConduitToContainerTwoTimes_ShouldFaild()
         {
-            var nodeContainerId = PlaceNodeContainer(TestRouteNetwork.HH_10);
+            var nodeContainerId = await PlaceNodeContainerAsync(TestRouteNetwork.HH_10);
 
             var testConduits = new TestUtilityNetwork(_commandDispatcher, _queryDispatcher).Run();
 
@@ -168,21 +168,21 @@ namespace OpenFTTH.UtilityGraphService.Tests.UtilityNetwork
         }
 
 
-        private Guid PlaceNodeContainer(Guid routeNodeId)
+        private async Task<Guid> PlaceNodeContainerAsync(Guid routeNodeId)
         {
             var specs = new TestSpecifications(_commandDispatcher, _queryDispatcher).Run();
 
             var nodeContainerId = Guid.NewGuid();
             var nodeOfInterestId = Guid.NewGuid();
             var registerNodeOfInterestCommand = new RegisterNodeOfInterest(Guid.NewGuid(), new UserContext("test", Guid.Empty), nodeOfInterestId, routeNodeId);
-            var registerNodeOfInterestCommandResult = _commandDispatcher.HandleAsync<RegisterNodeOfInterest, Result<RouteNetworkInterest>>(registerNodeOfInterestCommand).Result;
+            var registerNodeOfInterestCommandResult = await _commandDispatcher.HandleAsync<RegisterNodeOfInterest, Result<RouteNetworkInterest>>(registerNodeOfInterestCommand);
 
             var placeNodeContainerCommand = new PlaceNodeContainerInRouteNetwork(Guid.NewGuid(), new UserContext("test", Guid.Empty), nodeContainerId, TestSpecifications.Conduit_Closure_Emtelle_Branch_Box, registerNodeOfInterestCommandResult.Value)
             {
                 ManufacturerId = TestSpecifications.Manu_Emtelle
             };
 
-            var placeNodeContainerResult = _commandDispatcher.HandleAsync<PlaceNodeContainerInRouteNetwork, Result>(placeNodeContainerCommand).Result;
+            var placeNodeContainerResult = await _commandDispatcher.HandleAsync<PlaceNodeContainerInRouteNetwork, Result>(placeNodeContainerCommand);
 
             return nodeContainerId;
         }

@@ -13,6 +13,7 @@ using System;
 using System.Linq;
 using Xunit;
 using Xunit.Extensions.Ordering;
+using System.Threading.Tasks;
 
 namespace OpenFTTH.Schematic.Tests.NodeSchematic
 {
@@ -45,8 +46,8 @@ namespace OpenFTTH.Schematic.Tests.NodeSchematic
 
             var utilityNetwork = _eventStore.Projections.Get<UtilityNetworkProjection>();
 
-            PlaceCableBetweenCC1AndJ1(_commandDispatcher, _cable1, "flex-flex-1");
-            PlaceCableBetweenCC1AndJ1(_commandDispatcher, _cable2, "flex-flex-2");
+            await PlaceCableBetweenCC1AndJ1Async(_commandDispatcher, _cable1, "flex-flex-1");
+            await PlaceCableBetweenCC1AndJ1Async(_commandDispatcher, _cable2, "flex-flex-2");
 
             TestUtilityNetwork.AffixCableToSingleConduit(_eventStore, _commandDispatcher, TestRouteNetwork.SP_1, _cable1, TestUtilityNetwork.FlexConduit_40_Red_CC_1_to_SP_1);
             TestUtilityNetwork.AffixCableToSingleConduit(_eventStore, _commandDispatcher, TestRouteNetwork.SP_1, _cable1, TestUtilityNetwork.FlexConduit_40_Red_SP_1_to_J_1);
@@ -72,7 +73,7 @@ namespace OpenFTTH.Schematic.Tests.NodeSchematic
         }
 
 
-        private Guid PlaceCableBetweenCC1AndJ1(ICommandDispatcher commandDispatcher, Guid cableId, string name)
+        private async Task<Guid> PlaceCableBetweenCC1AndJ1Async(ICommandDispatcher commandDispatcher, Guid cableId, string name)
         {
             // Cable directly in route network from HH_1 to CC_1
             var routingHops = new RoutingHop[]
@@ -90,17 +91,9 @@ namespace OpenFTTH.Schematic.Tests.NodeSchematic
             };
 
             // Act
-            var placeSpanEquipmentResult = commandDispatcher.HandleAsync<PlaceSpanEquipmentInUtilityNetwork, Result>(placeSpanEquipmentCommand).Result;
+            var placeSpanEquipmentResult = await commandDispatcher.HandleAsync<PlaceSpanEquipmentInUtilityNetwork, Result>(placeSpanEquipmentCommand);
 
             return cableId;
         }
-
-
-
-
-
-
-
-
     }
 }

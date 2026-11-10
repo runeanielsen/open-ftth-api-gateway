@@ -44,7 +44,7 @@ namespace OpenFTTH.UtilityGraphService.Tests.UtilityNetwork
         {
             var sutRouteNetworkElementId = TestRouteNetwork.FP_2;
 
-            var cable = FindSpanEquipmentRelatedToRouteNetworkElementByName(sutRouteNetworkElementId, "1u-1r-1u-1r");
+            var cable = await FindSpanEquipmentRelatedToRouteNetworkElementByNameAsync(sutRouteNetworkElementId, "1u-1r-1u-1r");
 
             var connectivityTrace = new GetSpanEquipmentPassageView(sutRouteNetworkElementId, new Guid[] { cable.Id });
 
@@ -112,7 +112,7 @@ namespace OpenFTTH.UtilityGraphService.Tests.UtilityNetwork
             // NB: cable K667 goes through connected conduits
             var sutRouteNetworkElementId = TestRouteNetwork.CC_1;
 
-            var cable = FindSpanEquipmentRelatedToRouteNetworkElementByName(sutRouteNetworkElementId, "K667");
+            var cable = await FindSpanEquipmentRelatedToRouteNetworkElementByNameAsync(sutRouteNetworkElementId, "K667");
 
             var connectivityTrace = new GetSpanEquipmentPassageView(sutRouteNetworkElementId, new Guid[] { cable.Id });
 
@@ -271,14 +271,14 @@ namespace OpenFTTH.UtilityGraphService.Tests.UtilityNetwork
 
 
 
-        private SpanEquipment? FindSpanEquipmentRelatedToRouteNetworkElementByName(Guid routeNetworkElementId, string spanEquipmentName)
+        private async Task<SpanEquipment?> FindSpanEquipmentRelatedToRouteNetworkElementByNameAsync(Guid routeNetworkElementId, string spanEquipmentName)
         {
-            var routeNetworkQueryResult = _queryDispatcher.HandleAsync<GetRouteNetworkDetails, Result<GetRouteNetworkDetailsResult>>(
+            var routeNetworkQueryResult = await _queryDispatcher.HandleAsync<GetRouteNetworkDetails, Result<GetRouteNetworkDetailsResult>>(
               new GetRouteNetworkDetails(new RouteNetworkElementIdList() { routeNetworkElementId })
               {
                   RelatedInterestFilter = RelatedInterestFilterOptions.ReferencesFromRouteElementAndInterestObjects
               }
-            ).Result;
+            );
 
             InterestIdList interestIdList = new InterestIdList();
             foreach (var interestRel in routeNetworkQueryResult.Value.RouteNetworkElements[routeNetworkElementId].InterestRelations)
@@ -286,12 +286,12 @@ namespace OpenFTTH.UtilityGraphService.Tests.UtilityNetwork
                 interestIdList.Add(interestRel.RefId);
             }
 
-            var equipmentQueryResult = _queryDispatcher.HandleAsync<GetEquipmentDetails, Result<GetEquipmentDetailsResult>>(
+            var equipmentQueryResult = await _queryDispatcher.HandleAsync<GetEquipmentDetails, Result<GetEquipmentDetailsResult>>(
                     new GetEquipmentDetails(interestIdList)
                     {
                         EquipmentDetailsFilter = new EquipmentDetailsFilterOptions() { IncludeRouteNetworkTrace = true }
                     }
-                ).Result;
+                );
 
             foreach (var spanEquipment in equipmentQueryResult.Value.SpanEquipment)
             {
@@ -302,14 +302,14 @@ namespace OpenFTTH.UtilityGraphService.Tests.UtilityNetwork
             return null;
         }
 
-        private SpanEquipment? FindSpanEquipmentRelatedToRouteNetworkElementById(Guid routeNetworkElementId, Guid spanEquipmentId)
+        private async Task<SpanEquipment?> FindSpanEquipmentRelatedToRouteNetworkElementByIdAsync(Guid routeNetworkElementId, Guid spanEquipmentId)
         {
-            var routeNetworkQueryResult = _queryDispatcher.HandleAsync<GetRouteNetworkDetails, Result<GetRouteNetworkDetailsResult>>(
+            var routeNetworkQueryResult = await _queryDispatcher.HandleAsync<GetRouteNetworkDetails, Result<GetRouteNetworkDetailsResult>>(
               new GetRouteNetworkDetails(new RouteNetworkElementIdList() { routeNetworkElementId })
               {
                   RelatedInterestFilter = RelatedInterestFilterOptions.ReferencesFromRouteElementAndInterestObjects
               }
-            ).Result;
+            );
 
             InterestIdList interestIdList = new InterestIdList();
             foreach (var interestRel in routeNetworkQueryResult.Value.RouteNetworkElements[routeNetworkElementId].InterestRelations)
@@ -317,12 +317,12 @@ namespace OpenFTTH.UtilityGraphService.Tests.UtilityNetwork
                 interestIdList.Add(interestRel.RefId);
             }
 
-            var equipmentQueryResult = _queryDispatcher.HandleAsync<GetEquipmentDetails, Result<GetEquipmentDetailsResult>>(
+            var equipmentQueryResult = await _queryDispatcher.HandleAsync<GetEquipmentDetails, Result<GetEquipmentDetailsResult>>(
                     new GetEquipmentDetails(interestIdList)
                     {
                         EquipmentDetailsFilter = new EquipmentDetailsFilterOptions() { IncludeRouteNetworkTrace = true }
                     }
-                ).Result;
+                );
 
             foreach (var spanEquipment in equipmentQueryResult.Value.SpanEquipment)
             {

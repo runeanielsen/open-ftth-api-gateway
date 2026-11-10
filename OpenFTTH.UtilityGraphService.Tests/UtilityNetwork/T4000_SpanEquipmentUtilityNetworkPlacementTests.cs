@@ -574,7 +574,7 @@ namespace OpenFTTH.UtilityGraphService.Tests.UtilityNetwork
         public async Task TestPlaceSpanEquipmenInHopThatRunsForthAndBackInTheSameRouteSegment_ShouldSucceed()
         {
             // Connect sub conduit 1 and 2 of the same multi conduit in CC_1
-            _utilityNetworkBuilder.ConnectTwoSpanSegments(
+            await _utilityNetworkBuilder.ConnectTwoSpanSegmentsAsync(
                 nodeId: TestRouteNetwork.CC_1,
                 fromSpanEquipmentId: TestUtilityNetwork.MultiConduit_6x10_HH_1_to_HH_10,
                 fromSpanStructureIndex: 1,
