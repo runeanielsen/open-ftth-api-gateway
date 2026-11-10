@@ -96,7 +96,7 @@ namespace OpenFTTH.APIGateway.Search
             {
                 PerPage = maxHits,
                 LimitHits = maxHits,
-                NumberOfTypos = 0
+                NumberOfTypos = "0"
             };
 
             var searchResult = await _typesenseClient.Search<RouteNodeSearchHit>("RouteNodes", query);
@@ -148,7 +148,7 @@ namespace OpenFTTH.APIGateway.Search
             {
                 PerPage = maxHits,
                 LimitHits = maxHits,
-                NumberOfTypos = 0
+                NumberOfTypos = "0"
             };
 
             var searchResult = await _typesenseClient.Search<EquipmentSearchHit>("equipments", query);
