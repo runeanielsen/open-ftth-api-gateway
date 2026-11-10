@@ -667,7 +667,7 @@ namespace OpenFTTH.UtilityGraphService.Business.Trace.Util
         public static List<string> GetTagsFromTrace(UtilityNetworkProjection utilityNetwork, TerminalEquipment sourceEquipment, Terminal sourceTerminal, UtilityGraphTraceResult terminalTraceResult)
         {
             HashSet<string> tags = new HashSet<string>();
-     
+
             foreach (var terminalTags in RelatedDataHolder.GetTagsByTerminal(sourceEquipment, sourceTerminal.Id))
             {
                 tags.Add(terminalTags);

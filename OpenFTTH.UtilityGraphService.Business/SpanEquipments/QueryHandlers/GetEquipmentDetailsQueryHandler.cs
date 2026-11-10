@@ -246,8 +246,8 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments.QueryHandlers
 
         private static Dictionary<Guid, string[]> GetAllTagsFromTraceBySpanEquipmentId(SwissArmyKnifeTraceResult traceInfo, SpanEquipmentWithRelatedInfo spanEquipment)
         {
-            HashSet<Guid> segmentIdsToCheck = new HashSet<Guid>();  
-            
+            HashSet<Guid> segmentIdsToCheck = new HashSet<Guid>();
+
             foreach (var structure in spanEquipment.SpanStructures)
             {
                 foreach (var segment in structure.SpanSegments)

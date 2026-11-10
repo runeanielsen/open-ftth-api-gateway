@@ -673,7 +673,7 @@ namespace OpenFTTH.APIGateway.GraphQL.UtilityNetwork.Queries
                     displayName = $"Yderrør ({spanStructureSpecification.Name} {spanStructureSpecification.Color})";
                 }
 
-               if (equipmentTag != null)
+                if (equipmentTag != null)
                     return new EquipmentDisplayTag(spanSegment.Id, displayName, equipmentTag.Tags, equipmentTag.Comment);
                 else
                     return new EquipmentDisplayTag(spanSegment.Id, displayName, null, null);

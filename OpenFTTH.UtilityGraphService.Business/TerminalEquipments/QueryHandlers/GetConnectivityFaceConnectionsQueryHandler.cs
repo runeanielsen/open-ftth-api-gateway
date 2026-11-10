@@ -96,7 +96,7 @@ namespace OpenFTTH.UtilityGraphService.Business.TerminalEquipments.QueryHandling
                 tagString = " (" + String.Join(",", tags) + ")";
 
             var equipmentName = spanEquipment.Name + " (" + numberOfFibers + ") - Fiber " + structureIndex + tagString;
-                    
+
 
             return new ConnectivityFaceConnection()
             {
@@ -174,7 +174,7 @@ namespace OpenFTTH.UtilityGraphService.Business.TerminalEquipments.QueryHandling
 
             var tags = GetTags(terminal, terminalEquipment);
 
-            if (tags != null) 
+            if (tags != null)
                 tagString = " (" + String.Join(",", tags) + ")";
 
 
@@ -288,7 +288,7 @@ namespace OpenFTTH.UtilityGraphService.Business.TerminalEquipments.QueryHandling
             }
         }
 
-       
+
 
         private static void AddTags(SpanSegment spanSegment, SpanEquipment spanEquipment, HashSet<string> tags)
         {

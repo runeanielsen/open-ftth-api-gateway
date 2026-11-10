@@ -212,7 +212,7 @@ namespace OpenFTTH.UtilityGraphService.Business.Trace.QueryHandling
                             spanEquipmentId: connectedSegment?.SpanEquipmentId,
                             spanId: connectedSegment?.Id
                         )
-                    ); 
+                    );
 
                     // Add circuit names to list
                     var circuitName = relatedData.GetCircuitName(terminalRef);

@@ -394,7 +394,7 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
         public List<KeyValuePair<string, string>>? GetUniqueTagsBySpanSegmentId(Guid spanSegmentId)
         {
             HashSet<string> uniqueTags = new HashSet<string>();
-          
+
             if (SpanEquipment.TagsByBySpanSegmentId.ContainsKey(spanSegmentId))
             {
                 var traceTags = SpanEquipment.TagsByBySpanSegmentId[spanSegmentId];
@@ -418,7 +418,7 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
             if (uniqueTags.Count > 0)
             {
                 List<KeyValuePair<string, string>> properties = new List<KeyValuePair<string, string>>();
-                
+
                 properties.Add(new KeyValuePair<string, string>("Tags", String.Join(',', uniqueTags)));
 
                 return properties;

@@ -85,7 +85,7 @@ public class InstallationQueries : ObjectGraphType
                     // Find installations within search radius
                     List<InstallationSearchResponse> installationsWithinSearchRadius = new List<InstallationSearchResponse>();
 
-                
+
                     RouteNode routeNode = (RouteNode)routeNetworkState.GetRouteNetworkElement(routeNodeId);
 
                     if (routeNode == null)
