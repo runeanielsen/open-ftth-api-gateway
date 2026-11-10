@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/sdk:10.0-alpine AS build-env
+FROM mcr.microsoft.com/dotnet/sdk:10.0-noble AS build-env
 WORKDIR /app
 
 COPY ./*sln ./
@@ -27,10 +27,12 @@ WORKDIR /app/OpenFTTH.APIGateway
 RUN dotnet publish -c Release -o out --packages ./packages
 
 # Build runtime image
-FROM mcr.microsoft.com/dotnet/aspnet:10.0-alpine-extra
+FROM mcr.microsoft.com/dotnet/aspnet:10.0-noble
 WORKDIR /app
 
-RUN apk add --no-cache icu-libs krb5-libs
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends libgssapi-krb5-2 \
+    && rm -rf /var/lib/apt/lists/*
 
 COPY --from=build-env --chown=app:app /app/OpenFTTH.APIGateway/out .
 USER app
