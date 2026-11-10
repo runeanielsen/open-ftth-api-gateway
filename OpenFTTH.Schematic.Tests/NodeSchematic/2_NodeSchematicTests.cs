@@ -18,6 +18,7 @@ using System;
 using System.Linq;
 using Xunit;
 using Xunit.Extensions.Ordering;
+using System.Threading.Tasks;
 
 namespace OpenFTTH.Schematic.Tests.NodeSchematic
 {
@@ -41,13 +42,13 @@ namespace OpenFTTH.Schematic.Tests.NodeSchematic
         }
 
         [Fact, Order(1)]
-        public void TestDrawingSingleDetachedMultiConduit_5x10_HH_1_to_HH_10()
+        public async Task TestDrawingSingleDetachedMultiConduit_5x10_HH_1_to_HH_10()
         {
             var logger = Mock.Of<ILogger<GetDiagramQueryHandler>>();
 
             var sutRouteNode = TestRouteNetwork.CC_1;
 
-            var data = RouteNetworkElementRelatedData.FetchData(_queryDispatcher, sutRouteNode).Value;
+            var data = (await RouteNetworkElementRelatedData.FetchDataAsync(_queryDispatcher, sutRouteNode)).Value;
 
             var spanEquipment = data.SpanEquipments[TestUtilityNetwork.MultiConduit_12x7_HH_1_to_HH_10];
 

@@ -33,21 +33,21 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
             _queryDispatcher = queryDispatcher;
         }
 
-        public Task<Result<Diagram>> GetDiagram(Guid routeNetworkElementId)
+        public async Task<Result<Diagram>> GetDiagram(Guid routeNetworkElementId)
         {
             _routeNetworkElementId = routeNetworkElementId;
 
-            var fetchNeedeDataResult = RouteNetworkElementRelatedData.FetchData(_queryDispatcher, routeNetworkElementId);
+            var fetchNeedeDataResult = await RouteNetworkElementRelatedData.FetchDataAsync(_queryDispatcher, routeNetworkElementId).ConfigureAwait(false);
 
             if (fetchNeedeDataResult.IsFailed)
-                return Task.FromResult(Result.Fail<Diagram>(fetchNeedeDataResult.Errors.First()));
+                return Result.Fail<Diagram>(fetchNeedeDataResult.Errors.First());
             else
                 _data = fetchNeedeDataResult.Value;
 
             // If no equipment found, just return an empty diagram
             if (_data.SpanEquipments.Count == 0 && _data.NodeContainer == null)
             {
-                return Task.FromResult(Result.Ok<Diagram>(new Diagram()));
+                return Result.Ok(new Diagram());
             }
 
             double yOffset = 0;
@@ -64,7 +64,7 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
             _diagram.OrderDiagramObjects();
 
 
-            return Task.FromResult((Result.Ok<Diagram>(_diagram)));
+            return Result.Ok(_diagram);
         }
 
         private double AddNodeContainerToDiagram(double yOffsetInitial)

@@ -19,25 +19,22 @@ namespace OpenFTTH.Schematic.Business.QueryHandler
             _queryDispatcher = queryDispatcher;
         }
 
-        public Task<Result<GetDiagramResult>> HandleAsync(GetDiagram query)
+        public async Task<Result<GetDiagramResult>> HandleAsync(GetDiagram query)
         {
             var builder = new RouteNetworkElementDiagramBuilder(_logger, _queryDispatcher);
 
-            var diagramBuildingResult = builder.GetDiagram(query.RouteNetworkElementId).Result;
+            var diagramBuildingResult = await builder.GetDiagram(query.RouteNetworkElementId).ConfigureAwait(false);
 
             if (diagramBuildingResult.IsFailed)
             {
-                return Task.FromResult(
-                       Result.Fail<GetDiagramResult>(new GetDiagramError(GetDiagramErrorCodes.DIAGRAM_BUILDING_FAILED, $"Error building diagram for route network element with id: {query.RouteNetworkElementId}")).
-                       WithError(diagramBuildingResult.Errors.First())
-                   );
+                return Result.Fail<GetDiagramResult>(
+                    new GetDiagramError(
+                        GetDiagramErrorCodes.DIAGRAM_BUILDING_FAILED,
+                        $"Error building diagram for route network element with id: {query.RouteNetworkElementId}"))
+                    .WithError(diagramBuildingResult.Errors.First());
             }
 
-            return Task.FromResult(
-                Result.Ok<GetDiagramResult>(
-                    new GetDiagramResult(diagramBuildingResult.Value)
-                )
-            );
+            return Result.Ok(new GetDiagramResult(diagramBuildingResult.Value));
         }
     }
 }

@@ -9,6 +9,7 @@ using OpenFTTH.UtilityGraphService.API.Queries;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 
 namespace OpenFTTH.Schematic.Business.SchematicBuilder
@@ -33,7 +34,7 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
         public Dictionary<Guid, List<Guid>> CableToConduitSegmentParentRelations = new();
         public Dictionary<Guid, List<Guid>> ConduitSegmentToCableChildRelations = new();
 
-        public static Result<RouteNetworkElementRelatedData> FetchData(IQueryDispatcher queryDispatcher, Guid routeNetworkElementId)
+        public static async Task<Result<RouteNetworkElementRelatedData>> FetchDataAsync(IQueryDispatcher queryDispatcher, Guid routeNetworkElementId)
         {
             RouteNetworkElementRelatedData result = new RouteNetworkElementRelatedData();
 
@@ -42,19 +43,19 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
             // TODO: All specifications should be cached and only re-queried if some spec is missing.
 
             // Query all span equipment specifications
-            result.SpanEquipmentSpecifications = queryDispatcher.HandleAsync<GetSpanEquipmentSpecifications, Result<LookupCollection<SpanEquipmentSpecification>>>(new GetSpanEquipmentSpecifications()).Result.Value;
+            result.SpanEquipmentSpecifications = (await queryDispatcher.HandleAsync<GetSpanEquipmentSpecifications, Result<LookupCollection<SpanEquipmentSpecification>>>(new GetSpanEquipmentSpecifications()).ConfigureAwait(false)).Value;
 
             // Query all span structure specifications
-            result.SpanStructureSpecifications = queryDispatcher.HandleAsync<GetSpanStructureSpecifications, Result<LookupCollection<SpanStructureSpecification>>>(new GetSpanStructureSpecifications()).Result.Value;
+            result.SpanStructureSpecifications = (await queryDispatcher.HandleAsync<GetSpanStructureSpecifications, Result<LookupCollection<SpanStructureSpecification>>>(new GetSpanStructureSpecifications()).ConfigureAwait(false)).Value;
 
             // Query all node container specifications
-            result.NodeContainerSpecifications = queryDispatcher.HandleAsync<GetNodeContainerSpecifications, Result<LookupCollection<NodeContainerSpecification>>>(new GetNodeContainerSpecifications()).Result.Value;
+            result.NodeContainerSpecifications = (await queryDispatcher.HandleAsync<GetNodeContainerSpecifications, Result<LookupCollection<NodeContainerSpecification>>>(new GetNodeContainerSpecifications()).ConfigureAwait(false)).Value;
 
             // Query all rack specifications
-            result.RackSpecifications = queryDispatcher.HandleAsync<GetRackSpecifications, Result<LookupCollection<RackSpecification>>>(new GetRackSpecifications()).Result.Value;
+            result.RackSpecifications = (await queryDispatcher.HandleAsync<GetRackSpecifications, Result<LookupCollection<RackSpecification>>>(new GetRackSpecifications()).ConfigureAwait(false)).Value;
 
             // Query all terminal equipment specifications
-            result.TerminalEquipmentSpecifications = queryDispatcher.HandleAsync<GetTerminalEquipmentSpecifications, Result<LookupCollection<TerminalEquipmentSpecification>>>(new GetTerminalEquipmentSpecifications()).Result.Value;
+            result.TerminalEquipmentSpecifications = (await queryDispatcher.HandleAsync<GetTerminalEquipmentSpecifications, Result<LookupCollection<TerminalEquipmentSpecification>>>(new GetTerminalEquipmentSpecifications()).ConfigureAwait(false)).Value;
 
 
             // Query all route node interests
@@ -63,7 +64,7 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
                 RelatedInterestFilter = RelatedInterestFilterOptions.ReferencesFromRouteElementAndInterestObjects
             };
 
-            Result<GetRouteNetworkDetailsResult> interestsQueryResult = queryDispatcher.HandleAsync<GetRouteNetworkDetails, Result<GetRouteNetworkDetailsResult>>(routeNetworkInterestQuery).Result;
+            Result<GetRouteNetworkDetailsResult> interestsQueryResult = await queryDispatcher.HandleAsync<GetRouteNetworkDetails, Result<GetRouteNetworkDetailsResult>>(routeNetworkInterestQuery).ConfigureAwait(false);
 
             if (interestsQueryResult.IsFailed)
                 return Result.Fail(interestsQueryResult.Errors.First());
@@ -79,12 +80,12 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
             if (interestIdList.Count > 0)
             {
                 // Query all the equipments related to the route network element
-                var equipmentQueryResult = queryDispatcher.HandleAsync<GetEquipmentDetails, Result<GetEquipmentDetailsResult>>(
+                var equipmentQueryResult = await queryDispatcher.HandleAsync<GetEquipmentDetails, Result<GetEquipmentDetailsResult>>(
                     new GetEquipmentDetails(interestIdList)
                     {
                         EquipmentDetailsFilter = new EquipmentDetailsFilterOptions() { IncludeRouteNetworkTrace = true }
                     }
-                ).Result;
+                ).ConfigureAwait(false);
 
                 if (equipmentQueryResult.IsFailed)
                     return Result.Fail(equipmentQueryResult.Errors.First());
@@ -100,7 +101,7 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
 
                 // Query all route network elements of all the equipments
                 var routeNetworkElementsQuery = new GetRouteNetworkDetails(interestIdList);
-                Result<GetRouteNetworkDetailsResult> routeElementsQueryResult = queryDispatcher.HandleAsync<GetRouteNetworkDetails, Result<GetRouteNetworkDetailsResult>>(routeNetworkElementsQuery).Result;
+                Result<GetRouteNetworkDetailsResult> routeElementsQueryResult = await queryDispatcher.HandleAsync<GetRouteNetworkDetails, Result<GetRouteNetworkDetailsResult>>(routeNetworkElementsQuery).ConfigureAwait(false);
 
                 result.RouteNetworkElements = routeElementsQueryResult.Value.RouteNetworkElements;
             }
@@ -135,9 +136,9 @@ namespace OpenFTTH.Schematic.Business.SchematicBuilder
 
             if (terminalEquipmentIds.Count > 0)
             {
-                var terminalEquipmentQueryResult = queryDispatcher.HandleAsync<GetEquipmentDetails, Result<GetEquipmentDetailsResult>>(
+                var terminalEquipmentQueryResult = await queryDispatcher.HandleAsync<GetEquipmentDetails, Result<GetEquipmentDetailsResult>>(
                     new GetEquipmentDetails(new EquipmentIdList(terminalEquipmentIds))
-                ).Result;
+                ).ConfigureAwait(false);
 
                 if (terminalEquipmentQueryResult.IsFailed)
                     return Result.Fail(terminalEquipmentQueryResult.Errors.First());
