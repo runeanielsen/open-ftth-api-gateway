@@ -90,42 +90,6 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments.CommandHandlers
             return Task.FromResult(Result.Ok());
         }
 
-        private List<SpanEquipment> GetRelatedSpanEquipments(Guid routeNodeId)
-        {
-            // Get interest information for all equipments in node
-            var queryResult = _queryDispatcher.HandleAsync<GetRouteNetworkDetails, Result<GetRouteNetworkDetailsResult>>(new GetRouteNetworkDetails(new RouteNetworkElementIdList() { routeNodeId })).Result;
-
-            if (queryResult.IsFailed)
-                throw new ApplicationException($"Got unexpected error result: {queryResult.Errors.First().Message} trying to query interest information for node container and/or span equipment while processing the AffixSpanEquipmentToNodeContainer command");
-
-            if (queryResult.Value.RouteNetworkElements == null)
-                throw new ApplicationException($"Got unexpected result querying route node: {routeNodeId} Expected one route node but got null");
-
-            if (queryResult.Value.RouteNetworkElements.Count != 1)
-                throw new ApplicationException($"Got unexpected result querying route node: {routeNodeId} Expected one route node but got: {queryResult.Value.RouteNetworkElements.Count}");
-
-
-            var _utilityNetwork = _eventStore.Projections.Get<UtilityNetworkProjection>();
-
-            List<SpanEquipment> result = new();
-
-            var routeNode = queryResult.Value.RouteNetworkElements.First();
-
-            if (routeNode.InterestRelations != null)
-            {
-                foreach (var interestRel in routeNode.InterestRelations)
-                {
-                    // Find span equipment
-                    if (_utilityNetwork.TryGetEquipment<SpanEquipment>(interestRel.RefId, out SpanEquipment spanEquipment))
-                    {
-                        result.Add(spanEquipment);
-                    }
-                }
-            }
-
-            return result;
-        }
-
         private async void NotifyExternalServicesAboutChange(NodeContainer nodeContainer)
         {
             var idChangeSets = new List<IdChangeSet>

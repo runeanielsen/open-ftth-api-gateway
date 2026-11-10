@@ -132,23 +132,6 @@ namespace OpenFTTH.UtilityGraphService.Business.SpanEquipments.CommandHandlers
             return nodeIds.ToArray();
         }
 
-        private ValidatedRouteNetworkWalk GetInterestInformation(SpanEquipment spanEquipment)
-        {
-            // Get interest information from existing span equipment
-            var interestQueryResult = _queryDispatcher.HandleAsync<GetRouteNetworkDetails, Result<GetRouteNetworkDetailsResult>>(new GetRouteNetworkDetails(new InterestIdList() { spanEquipment.WalkOfInterestId })).Result;
-
-            if (interestQueryResult.IsFailed)
-                throw new ApplicationException($"Got unexpected error result: {interestQueryResult.Errors.First().Message} trying to query interest information for span equipment: {spanEquipment.Id} walk of interest id: {spanEquipment.WalkOfInterestId}");
-
-            if (interestQueryResult.Value.Interests == null)
-                throw new ApplicationException($"Error querying interest information belonging to span equipment with id: {spanEquipment.Id}. No interest information returned from route network service.");
-
-            if (!interestQueryResult.Value.Interests.TryGetValue(spanEquipment.WalkOfInterestId, out var routeNetworkInterest))
-                throw new ApplicationException($"Error querying interest information belonging to span equipment with id: {spanEquipment.Id}. No interest information returned from route network service.");
-
-            return new ValidatedRouteNetworkWalk(routeNetworkInterest.RouteNetworkElementRefs);
-        }
-
         private async void NotifyExternalServicesAboutConnectivityChange(Guid spanEquipmentId, Guid[] routeNodeIds, string category)
         {
             var idChangeSets = new List<IdChangeSet>
