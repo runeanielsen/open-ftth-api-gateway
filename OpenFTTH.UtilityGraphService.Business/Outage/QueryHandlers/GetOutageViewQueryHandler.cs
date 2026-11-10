@@ -43,25 +43,25 @@ namespace OpenFTTH.UtilityGraphService.Business.Outage.QueryHandlers
             _utilityNetwork = _eventStore.Projections.Get<UtilityNetworkProjection>();
         }
 
-        public Task<Result<OutageViewNode>> HandleAsync(GetOutageView query)
+        public async Task<Result<OutageViewNode>> HandleAsync(GetOutageView query)
         {
 
-            var networkInterestsResult = GetRouteNetworkElementEquipmentOfInterest(query.RouteNetworkElementId);
+            var networkInterestsResult = await GetRouteNetworkElementEquipmentOfInterestAsync(query.RouteNetworkElementId).ConfigureAwait(false);
 
             if (networkInterestsResult.IsFailed)
-                return Task.FromResult(Result.Fail<OutageViewNode>(networkInterestsResult.Errors.First()));
+                return Result.Fail<OutageViewNode>(networkInterestsResult.Errors.First());
 
             if (networkInterestsResult.Value.IsNode)
             {
-                return Task.FromResult(Result.Ok(GetOutageViewForRouteNode(networkInterestsResult.Value, query.EquipmentId)));
+                return Result.Ok(await GetOutageViewForRouteNodeAsync(networkInterestsResult.Value, query.EquipmentId).ConfigureAwait(false));
             }
             else
             {
-                return Task.FromResult(Result.Ok(GetOutageViewForRouteSegment(networkInterestsResult.Value)));
+                return Result.Ok(await GetOutageViewForRouteSegmentAsync(networkInterestsResult.Value).ConfigureAwait(false));
             }
         }
 
-        private OutageViewNode GetOutageViewForRouteNode(OutageProcessingState processingState, Guid? equipmentId)
+        private async Task<OutageViewNode> GetOutageViewForRouteNodeAsync(OutageProcessingState processingState, Guid? equipmentId)
         {
             if (equipmentId == null)
                 throw new ApplicationException($"EquipmentId is missing. Must be provided when doing outage queries inside route nodes");
@@ -98,7 +98,7 @@ namespace OpenFTTH.UtilityGraphService.Business.Outage.QueryHandlers
                 }
             }
 
-            AddAddressInformationToInstallations(processingState);
+            await AddAddressInformationToInstallationsAsync(processingState).ConfigureAwait(false);
 
             return rootNode;
         }
@@ -214,7 +214,7 @@ namespace OpenFTTH.UtilityGraphService.Business.Outage.QueryHandlers
             return nInstallationsFoundTerminalLevel;
         }
 
-        private OutageViewNode GetOutageViewForRouteSegment(OutageProcessingState processingState)
+        private async Task<OutageViewNode> GetOutageViewForRouteSegmentAsync(OutageProcessingState processingState)
         {
             _spanEquipmentSpecifications = _eventStore.Projections.Get<SpanEquipmentSpecificationsProjection>().Specifications;
 
@@ -291,14 +291,14 @@ namespace OpenFTTH.UtilityGraphService.Business.Outage.QueryHandlers
                 }
             }
 
-            AddAddressInformationToInstallations(processingState);
+            await AddAddressInformationToInstallationsAsync(processingState).ConfigureAwait(false);
 
-            AddNodeNamesToCablesAndOuterConduits(processingState);
+            await AddNodeNamesToCablesAndOuterConduitsAsync(processingState).ConfigureAwait(false);
 
             return rootNode;
         }
 
-        private void AddNodeNamesToCablesAndOuterConduits(OutageProcessingState processingState)
+        private async Task AddNodeNamesToCablesAndOuterConduitsAsync(OutageProcessingState processingState)
         {
             if (processingState.CableNodes.Any())
             {
@@ -314,7 +314,7 @@ namespace OpenFTTH.UtilityGraphService.Business.Outage.QueryHandlers
                     wois.Add(conduit.InterestId.Value);
                 }
 
-                var routeNetworkInfo = GatherRouteNetworkInformation(_queryDispatcher, wois);
+                var routeNetworkInfo = await GatherRouteNetworkInformationAsync(_queryDispatcher, wois).ConfigureAwait(false);
 
 
                 foreach (var cable in processingState.CableNodes)
@@ -355,7 +355,7 @@ namespace OpenFTTH.UtilityGraphService.Business.Outage.QueryHandlers
             }
         }
 
-        private void AddAddressInformationToInstallations(OutageProcessingState processingState)
+        private async Task AddAddressInformationToInstallationsAsync(OutageProcessingState processingState)
         {
             HashSet<Guid> adresseIdsToFetch = new();
 
@@ -371,7 +371,7 @@ namespace OpenFTTH.UtilityGraphService.Business.Outage.QueryHandlers
 
             if (adresseIdsToFetch.Count > 0)
             {
-                var addresses = GatherAddressInformation(adresseIdsToFetch);
+                var addresses = await GatherAddressInformationAsync(adresseIdsToFetch).ConfigureAwait(false);
 
                 foreach (var installation in processingState.InstallationNodes)
                 {
@@ -395,14 +395,14 @@ namespace OpenFTTH.UtilityGraphService.Business.Outage.QueryHandlers
             return null;
         }
 
-        private Dictionary<Guid, string> GatherAddressInformation(HashSet<Guid>? addressIdsToQuery)
+        private async Task<Dictionary<Guid, string>> GatherAddressInformationAsync(HashSet<Guid>? addressIdsToQuery)
         {
             if (addressIdsToQuery == null)
                 return new Dictionary<Guid, string>();
 
             var getAddressInfoQuery = new GetAddressInfo(addressIdsToQuery.ToArray());
 
-            var addressResult = _queryDispatcher.HandleAsync<GetAddressInfo, Result<GetAddressInfoResult>>(getAddressInfoQuery).Result;
+            var addressResult = await _queryDispatcher.HandleAsync<GetAddressInfo, Result<GetAddressInfoResult>>(getAddressInfoQuery).ConfigureAwait(false);
 
             Dictionary<Guid, string> result = new();
 
@@ -605,7 +605,7 @@ namespace OpenFTTH.UtilityGraphService.Business.Outage.QueryHandlers
             return label;
         }
 
-        public Result<OutageProcessingState> GetRouteNetworkElementEquipmentOfInterest(Guid routeNetworkElementId)
+        public async Task<Result<OutageProcessingState>> GetRouteNetworkElementEquipmentOfInterestAsync(Guid routeNetworkElementId)
         {
             // Query all interests related to route network element
             var routeNetworkInterestQuery = new GetRouteNetworkDetails(new RouteNetworkElementIdList() { routeNetworkElementId })
@@ -613,7 +613,7 @@ namespace OpenFTTH.UtilityGraphService.Business.Outage.QueryHandlers
                 RelatedInterestFilter = RelatedInterestFilterOptions.ReferencesFromRouteElementAndInterestObjects
             };
 
-            Result<GetRouteNetworkDetailsResult> interestsQueryResult = _queryDispatcher.HandleAsync<GetRouteNetworkDetails, Result<GetRouteNetworkDetailsResult>>(routeNetworkInterestQuery).Result;
+            Result<GetRouteNetworkDetailsResult> interestsQueryResult = await _queryDispatcher.HandleAsync<GetRouteNetworkDetails, Result<GetRouteNetworkDetailsResult>>(routeNetworkInterestQuery).ConfigureAwait(false);
 
             if (interestsQueryResult.IsFailed)
                 return Result.Fail(interestsQueryResult.Errors.First());
@@ -630,12 +630,12 @@ namespace OpenFTTH.UtilityGraphService.Business.Outage.QueryHandlers
             var interestIdList = new InterestIdList();
             interestIdList.AddRange(interestsQueryResult.Value.Interests.Select(r => r.Id));
 
-            var equipmentQueryResult = _queryDispatcher.HandleAsync<GetEquipmentDetails, Result<GetEquipmentDetailsResult>>(
+            var equipmentQueryResult = await _queryDispatcher.HandleAsync<GetEquipmentDetails, Result<GetEquipmentDetailsResult>>(
                 new GetEquipmentDetails(interestIdList)
                 {
                     EquipmentDetailsFilter = new EquipmentDetailsFilterOptions() { IncludeRouteNetworkTrace = false }
                 }
-            ).Result;
+            ).ConfigureAwait(false);
 
             if (equipmentQueryResult.IsFailed)
                 return Result.Fail(equipmentQueryResult.Errors.First());
@@ -674,12 +674,12 @@ namespace OpenFTTH.UtilityGraphService.Business.Outage.QueryHandlers
 
             if (equipmentIdList.Count > 0)
             {
-                equipmentQueryResult = _queryDispatcher.HandleAsync<GetEquipmentDetails, Result<GetEquipmentDetailsResult>>(
+                equipmentQueryResult = await _queryDispatcher.HandleAsync<GetEquipmentDetails, Result<GetEquipmentDetailsResult>>(
                      new GetEquipmentDetails(equipmentIdList)
                      {
                          EquipmentDetailsFilter = new EquipmentDetailsFilterOptions() { IncludeRouteNetworkTrace = false }
                      }
-                 ).Result;
+                 ).ConfigureAwait(false);
 
                 if (equipmentQueryResult.IsFailed)
                     return Result.Fail(equipmentQueryResult.Errors.First());
@@ -693,17 +693,17 @@ namespace OpenFTTH.UtilityGraphService.Business.Outage.QueryHandlers
             return Result.Ok(result);
         }
 
-        private static GetRouteNetworkDetailsResult GatherRouteNetworkInformation(IQueryDispatcher queryDispatcher, IEnumerable<Guid> walkOfInterestIds)
+        private static async Task<GetRouteNetworkDetailsResult> GatherRouteNetworkInformationAsync(IQueryDispatcher queryDispatcher, IEnumerable<Guid> walkOfInterestIds)
         {
             InterestIdList interestIdList = new();
             interestIdList.AddRange(walkOfInterestIds);
 
-            var interestQueryResult = queryDispatcher.HandleAsync<GetRouteNetworkDetails, Result<GetRouteNetworkDetailsResult>>(
+            var interestQueryResult = await queryDispatcher.HandleAsync<GetRouteNetworkDetails, Result<GetRouteNetworkDetailsResult>>(
                 new GetRouteNetworkDetails(interestIdList)
                 {
                     RouteNetworkElementFilter = new RouteNetworkElementFilterOptions() { IncludeNamingInfo = true, IncludeCoordinates = false }
                 }
-            ).Result;
+            ).ConfigureAwait(false);
 
             if (interestQueryResult.IsFailed)
                 throw new ApplicationException("Failed to query route network information. Got error: " + interestQueryResult.Errors.First().Message);

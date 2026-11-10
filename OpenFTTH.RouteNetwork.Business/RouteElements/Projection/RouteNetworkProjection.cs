@@ -52,22 +52,20 @@ namespace OpenFTTH.RouteNetwork.Business.RouteElements.Projection
             get { return _networkState; }
         }
 
-        private Task ProjectAsync(IEventEnvelope eventEnvelope)
+        private async Task ProjectAsync(IEventEnvelope eventEnvelope)
         {
             switch (eventEnvelope.Data)
             {
                 case (RouteNetworkEditOperationOccuredEvent @event):
-                    HandleEvent(@event);
+                    await HandleEventAsync(@event).ConfigureAwait(false);
                     break;
                 default:
                     throw new ArgumentException(
                         $"Could not handle event of type '{eventEnvelope.GetType().Name}'.");
             }
-
-            return Task.CompletedTask;
         }
 
-        internal void HandleEvent(RouteNetworkEditOperationOccuredEvent request)
+        internal async Task HandleEventAsync(RouteNetworkEditOperationOccuredEvent request)
         {
             _logger.LogDebug("Got route network edit opreation occured message:");
 
@@ -146,7 +144,7 @@ namespace OpenFTTH.RouteNetwork.Business.RouteElements.Projection
                         // Process eventually splits that might requires updates to route network interests
                         if (command.CmdType == "ExistingRouteSegmentSplitted")
                         {
-                            HandleSplitCommand(request, command, trans);
+                            await HandleSplitCommandAsync(request, command, trans).ConfigureAwait(false);
                         }
                     }
 
@@ -154,7 +152,7 @@ namespace OpenFTTH.RouteNetwork.Business.RouteElements.Projection
             }
         }
 
-        private void HandleSplitCommand(RouteNetworkEditOperationOccuredEvent request, Events.RouteNetworkCommand command, ITransaction trans)
+        private async Task HandleSplitCommandAsync(RouteNetworkEditOperationOccuredEvent request, Events.RouteNetworkCommand command, ITransaction trans)
         {
             if (!_networkState.IsLoadMode)
             {
@@ -224,7 +222,7 @@ namespace OpenFTTH.RouteNetwork.Business.RouteElements.Projection
 
                         _logger.LogInformation($"Route network split handler is invoking {updateWalkOfInterestCommand.GetType().Name} command with id: {updateWalkOfInterestCommand.CmdId}, correlation id: {correlationId}");
 
-                        var updateWalkOfInterestCommandResult = _commandDispatcher.HandleAsync<UpdateWalkOfInterest, Result<RouteNetworkInterest>>(updateWalkOfInterestCommand).Result;
+                        var updateWalkOfInterestCommandResult = await _commandDispatcher.HandleAsync<UpdateWalkOfInterest, Result<RouteNetworkInterest>>(updateWalkOfInterestCommand).ConfigureAwait(false);
 
                         if (updateWalkOfInterestCommandResult.IsFailed)
                         {

@@ -83,7 +83,8 @@ namespace OpenFTTH.RouteNetwork.Business.RouteElements.StateHandling
 
             foreach (var editOperationEvent in editOperationEvents)
             {
-                routeNetworkEventHandler.HandleEvent(editOperationEvent);
+                // Seeding happens in load mode where no split commands are dispatched, so this completes synchronously.
+                routeNetworkEventHandler.HandleEventAsync(editOperationEvent).GetAwaiter().GetResult();
             }
 
             FinishLoadMode();

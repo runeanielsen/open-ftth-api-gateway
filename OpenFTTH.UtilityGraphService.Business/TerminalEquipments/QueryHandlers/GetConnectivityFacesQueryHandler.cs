@@ -41,19 +41,19 @@ namespace OpenFTTH.UtilityGraphService.Business.TerminalEquipments.QueryHandling
             _utilityNetwork = _eventStore.Projections.Get<UtilityNetworkProjection>();
         }
 
-        public Task<Result<List<ConnectivityFace>>> HandleAsync(GetConnectivityFaces query)
+        public async Task<Result<List<ConnectivityFace>>> HandleAsync(GetConnectivityFaces query)
         {
             _rackSpecifications = _eventStore.Projections.Get<RackSpecificationsProjection>().Specifications;
             _terminalStructureSpecifications = _eventStore.Projections.Get<TerminalStructureSpecificationsProjection>().Specifications;
             _terminalEquipmentSpecifications = _eventStore.Projections.Get<TerminalEquipmentSpecificationsProjection>().Specifications;
             _spanEquipmentSpecifications = _eventStore.Projections.Get<SpanEquipmentSpecificationsProjection>().Specifications;
 
-            var relatedEquipmentsResult = FetchRelatedEquipments(_queryDispatcher, query.routeNodeId);
+            var relatedEquipmentsResult = await FetchRelatedEquipmentsAsync(_queryDispatcher, query.routeNodeId).ConfigureAwait(false);
 
             if (relatedEquipmentsResult.IsFailed)
-                return Task.FromResult(Result.Fail<List<ConnectivityFace>>(relatedEquipmentsResult.Errors.First()));
+                return Result.Fail<List<ConnectivityFace>>(relatedEquipmentsResult.Errors.First());
 
-            return Task.FromResult(Result.Ok(BuildConnectivityFaces(relatedEquipmentsResult.Value)));
+            return Result.Ok(BuildConnectivityFaces(relatedEquipmentsResult.Value));
         }
 
         private List<ConnectivityFace> BuildConnectivityFaces(RouteNetworkElementRelatedData data)
@@ -201,7 +201,7 @@ namespace OpenFTTH.UtilityGraphService.Business.TerminalEquipments.QueryHandling
         }
 
 
-        private Result<RouteNetworkElementRelatedData> FetchRelatedEquipments(IQueryDispatcher queryDispatcher, Guid routeNetworkElementId)
+        private async Task<Result<RouteNetworkElementRelatedData>> FetchRelatedEquipmentsAsync(IQueryDispatcher queryDispatcher, Guid routeNetworkElementId)
         {
             RouteNetworkElementRelatedData result = new RouteNetworkElementRelatedData();
 
@@ -213,7 +213,7 @@ namespace OpenFTTH.UtilityGraphService.Business.TerminalEquipments.QueryHandling
                 RelatedInterestFilter = RelatedInterestFilterOptions.ReferencesFromRouteElementAndInterestObjects
             };
 
-            Result<GetRouteNetworkDetailsResult> interestsQueryResult = queryDispatcher.HandleAsync<GetRouteNetworkDetails, Result<GetRouteNetworkDetailsResult>>(routeNetworkInterestQuery).Result;
+            Result<GetRouteNetworkDetailsResult> interestsQueryResult = await queryDispatcher.HandleAsync<GetRouteNetworkDetails, Result<GetRouteNetworkDetailsResult>>(routeNetworkInterestQuery).ConfigureAwait(false);
 
             if (interestsQueryResult.IsFailed)
                 return Result.Fail(interestsQueryResult.Errors.First());
@@ -229,12 +229,12 @@ namespace OpenFTTH.UtilityGraphService.Business.TerminalEquipments.QueryHandling
             if (interestIdList.Count > 0)
             {
                 // Query all the equipments related to the route network element
-                var equipmentQueryResult = queryDispatcher.HandleAsync<GetEquipmentDetails, Result<GetEquipmentDetailsResult>>(
+                var equipmentQueryResult = await queryDispatcher.HandleAsync<GetEquipmentDetails, Result<GetEquipmentDetailsResult>>(
                     new GetEquipmentDetails(interestIdList)
                     {
                         EquipmentDetailsFilter = new EquipmentDetailsFilterOptions() { IncludeRouteNetworkTrace = true }
                     }
-                ).Result;
+                ).ConfigureAwait(false);
 
                 if (equipmentQueryResult.IsFailed)
                     return Result.Fail(equipmentQueryResult.Errors.First());
@@ -250,7 +250,7 @@ namespace OpenFTTH.UtilityGraphService.Business.TerminalEquipments.QueryHandling
 
                 // Query all route network elements of all the equipments
                 var routeNetworkElementsQuery = new GetRouteNetworkDetails(interestIdList);
-                Result<GetRouteNetworkDetailsResult> routeElementsQueryResult = queryDispatcher.HandleAsync<GetRouteNetworkDetails, Result<GetRouteNetworkDetailsResult>>(routeNetworkElementsQuery).Result;
+                Result<GetRouteNetworkDetailsResult> routeElementsQueryResult = await queryDispatcher.HandleAsync<GetRouteNetworkDetails, Result<GetRouteNetworkDetailsResult>>(routeNetworkElementsQuery).ConfigureAwait(false);
 
                 result.RouteNetworkElements = routeElementsQueryResult.Value.RouteNetworkElements;
             }
@@ -285,9 +285,9 @@ namespace OpenFTTH.UtilityGraphService.Business.TerminalEquipments.QueryHandling
 
             if (terminalEquipmentIds.Count > 0)
             {
-                var terminalEquipmentQueryResult = queryDispatcher.HandleAsync<GetEquipmentDetails, Result<GetEquipmentDetailsResult>>(
+                var terminalEquipmentQueryResult = await queryDispatcher.HandleAsync<GetEquipmentDetails, Result<GetEquipmentDetailsResult>>(
                     new GetEquipmentDetails(new EquipmentIdList(terminalEquipmentIds))
-                ).Result;
+                ).ConfigureAwait(false);
 
                 if (terminalEquipmentQueryResult.IsFailed)
                     return Result.Fail(terminalEquipmentQueryResult.Errors.First());
@@ -336,20 +336,20 @@ namespace OpenFTTH.UtilityGraphService.Business.TerminalEquipments.QueryHandling
                 }
             }
 
-            result.AddressStrings = GatherAddressInformation(adresseIdsToQuery);
+            result.AddressStrings = await GatherAddressInformationAsync(adresseIdsToQuery).ConfigureAwait(false);
 
 
             return Result.Ok(result);
         }
 
-        private Dictionary<Guid, string> GatherAddressInformation(HashSet<Guid>? addressIdsToQuery)
+        private async Task<Dictionary<Guid, string>> GatherAddressInformationAsync(HashSet<Guid>? addressIdsToQuery)
         {
             if (addressIdsToQuery == null)
                 return new Dictionary<Guid, string>();
 
             var getAddressInfoQuery = new GetAddressInfo(addressIdsToQuery.ToArray());
 
-            var addressResult = _queryDispatcher.HandleAsync<GetAddressInfo, Result<GetAddressInfoResult>>(getAddressInfoQuery).Result;
+            var addressResult = await _queryDispatcher.HandleAsync<GetAddressInfo, Result<GetAddressInfoResult>>(getAddressInfoQuery).ConfigureAwait(false);
 
             Dictionary<Guid, string> result = new();
 

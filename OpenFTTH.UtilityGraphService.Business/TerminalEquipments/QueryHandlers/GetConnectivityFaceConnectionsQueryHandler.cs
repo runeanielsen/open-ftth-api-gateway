@@ -42,25 +42,25 @@ namespace OpenFTTH.UtilityGraphService.Business.TerminalEquipments.QueryHandling
             _utilityNetwork = _eventStore.Projections.Get<UtilityNetworkProjection>();
         }
 
-        public Task<Result<List<ConnectivityFaceConnection>>> HandleAsync(GetConnectivityFaceConnections query)
+        public async Task<Result<List<ConnectivityFaceConnection>>> HandleAsync(GetConnectivityFaceConnections query)
         {
             _rackSpecifications = _eventStore.Projections.Get<RackSpecificationsProjection>().Specifications;
             _terminalStructureSpecifications = _eventStore.Projections.Get<TerminalStructureSpecificationsProjection>().Specifications;
             _terminalEquipmentSpecifications = _eventStore.Projections.Get<TerminalEquipmentSpecificationsProjection>().Specifications;
             _spanEquipmentSpecifications = _eventStore.Projections.Get<SpanEquipmentSpecificationsProjection>().Specifications;
 
-            var relatedData = FetchRelatedEquipments(_queryDispatcher, query.routeNodeId).Value;
+            var relatedData = (await FetchRelatedEquipmentsAsync(_queryDispatcher, query.routeNodeId).ConfigureAwait(false)).Value;
 
             if (_utilityNetwork.TryGetEquipment<TerminalEquipment>(query.spanOrTerminalEquipmentId, out var terminalEquipment))
             {
-                return Task.FromResult(Result.Ok(BuildConnectivityFaceConnectionsForTerminalEquipment(terminalEquipment, query, relatedData)));
+                return Result.Ok(BuildConnectivityFaceConnectionsForTerminalEquipment(terminalEquipment, query, relatedData));
             }
             else if (_utilityNetwork.TryGetEquipment<SpanEquipment>(query.spanOrTerminalEquipmentId, out var spanEquipment))
             {
-                return Task.FromResult(Result.Ok(BuildConnectivityFaceConnectionsForSpanEquipment(spanEquipment, query, relatedData)));
+                return Result.Ok(BuildConnectivityFaceConnectionsForSpanEquipment(spanEquipment, query, relatedData));
             }
             else
-                return Task.FromResult(Result.Fail<List<ConnectivityFaceConnection>>(new GetEquipmentDetailsError(GetEquipmentDetailsErrorCodes.INVALID_QUERY_ARGUMENT_ERROR_LOOKING_UP_SPECIFIED_EQUIPMENT_BY_EQUIPMENT_ID, $"Cannot find any span or terminal equipment with id: {query.spanOrTerminalEquipmentId}")));
+                return Result.Fail<List<ConnectivityFaceConnection>>(new GetEquipmentDetailsError(GetEquipmentDetailsErrorCodes.INVALID_QUERY_ARGUMENT_ERROR_LOOKING_UP_SPECIFIED_EQUIPMENT_BY_EQUIPMENT_ID, $"Cannot find any span or terminal equipment with id: {query.spanOrTerminalEquipmentId}"));
         }
 
         private List<ConnectivityFaceConnection> BuildConnectivityFaceConnectionsForSpanEquipment(SpanEquipment spanEquipment, GetConnectivityFaceConnections query, RouteNetworkElementRelatedData relatedData)
@@ -457,7 +457,7 @@ namespace OpenFTTH.UtilityGraphService.Business.TerminalEquipments.QueryHandling
             return null;
         }
 
-        private static Result<RouteNetworkElementRelatedData> FetchRelatedEquipments(IQueryDispatcher queryDispatcher, Guid routeNetworkElementId)
+        private static async Task<Result<RouteNetworkElementRelatedData>> FetchRelatedEquipmentsAsync(IQueryDispatcher queryDispatcher, Guid routeNetworkElementId)
         {
             RouteNetworkElementRelatedData result = new RouteNetworkElementRelatedData();
 
@@ -469,7 +469,7 @@ namespace OpenFTTH.UtilityGraphService.Business.TerminalEquipments.QueryHandling
                 RelatedInterestFilter = RelatedInterestFilterOptions.ReferencesFromRouteElementAndInterestObjects
             };
 
-            Result<GetRouteNetworkDetailsResult> interestsQueryResult = queryDispatcher.HandleAsync<GetRouteNetworkDetails, Result<GetRouteNetworkDetailsResult>>(routeNetworkInterestQuery).Result;
+            Result<GetRouteNetworkDetailsResult> interestsQueryResult = await queryDispatcher.HandleAsync<GetRouteNetworkDetails, Result<GetRouteNetworkDetailsResult>>(routeNetworkInterestQuery).ConfigureAwait(false);
 
             if (interestsQueryResult.IsFailed)
                 return Result.Fail(interestsQueryResult.Errors.First());
@@ -485,12 +485,12 @@ namespace OpenFTTH.UtilityGraphService.Business.TerminalEquipments.QueryHandling
             if (interestIdList.Count > 0)
             {
                 // Query all the equipments related to the route network element
-                var equipmentQueryResult = queryDispatcher.HandleAsync<GetEquipmentDetails, Result<GetEquipmentDetailsResult>>(
+                var equipmentQueryResult = await queryDispatcher.HandleAsync<GetEquipmentDetails, Result<GetEquipmentDetailsResult>>(
                     new GetEquipmentDetails(interestIdList)
                     {
                         EquipmentDetailsFilter = new EquipmentDetailsFilterOptions() { IncludeRouteNetworkTrace = true }
                     }
-                ).Result;
+                ).ConfigureAwait(false);
 
                 if (equipmentQueryResult.IsFailed)
                     return Result.Fail(equipmentQueryResult.Errors.First());
@@ -506,7 +506,7 @@ namespace OpenFTTH.UtilityGraphService.Business.TerminalEquipments.QueryHandling
 
                 // Query all route network elements of all the equipments
                 var routeNetworkElementsQuery = new GetRouteNetworkDetails(interestIdList);
-                Result<GetRouteNetworkDetailsResult> routeElementsQueryResult = queryDispatcher.HandleAsync<GetRouteNetworkDetails, Result<GetRouteNetworkDetailsResult>>(routeNetworkElementsQuery).Result;
+                Result<GetRouteNetworkDetailsResult> routeElementsQueryResult = await queryDispatcher.HandleAsync<GetRouteNetworkDetails, Result<GetRouteNetworkDetailsResult>>(routeNetworkElementsQuery).ConfigureAwait(false);
 
                 result.RouteNetworkElements = routeElementsQueryResult.Value.RouteNetworkElements;
             }
@@ -541,9 +541,9 @@ namespace OpenFTTH.UtilityGraphService.Business.TerminalEquipments.QueryHandling
 
             if (terminalEquipmentIds.Count > 0)
             {
-                var terminalEquipmentQueryResult = queryDispatcher.HandleAsync<GetEquipmentDetails, Result<GetEquipmentDetailsResult>>(
+                var terminalEquipmentQueryResult = await queryDispatcher.HandleAsync<GetEquipmentDetails, Result<GetEquipmentDetailsResult>>(
                     new GetEquipmentDetails(new EquipmentIdList(terminalEquipmentIds))
-                ).Result;
+                ).ConfigureAwait(false);
 
                 if (terminalEquipmentQueryResult.IsFailed)
                     return Result.Fail(terminalEquipmentQueryResult.Errors.First());
