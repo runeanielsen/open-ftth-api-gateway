@@ -25,11 +25,9 @@ namespace OpenFTTH.Schematic.Business.Lines
 
         public List<KeyValuePair<string, string>> Properties { get; set; }
 
-
         private Guid _refId;
         private string _refClass;
         private Envelope _canvasEnvelope = null;
-
 
         public void SetReference(Guid refId, string refClass)
         {
