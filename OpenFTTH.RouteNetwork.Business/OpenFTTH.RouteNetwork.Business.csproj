@@ -7,7 +7,7 @@
 
   <ItemGroup>
     <PackageReference Include="DAX.ObjectVersioning.Graph" Version="2.0.0" />
-    <PackageReference Include="OpenFTTH.Results" Version="11.1.0" />
+    <PackageReference Include="OpenFTTH.Results" Version="11.2.0" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="11.0.0" />
     <PackageReference Include="NetTopologySuite.IO.GeoJSON" Version="4.0.0" />
     <PackageReference Include="OpenFTTH.Core" Version="11.1.0" />

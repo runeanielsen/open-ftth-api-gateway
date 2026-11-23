@@ -7,7 +7,7 @@
   <ItemGroup>
     <PackageReference Include="NetTopologySuite" Version="2.6.0" />
     <PackageReference Include="OpenFTTH.Address.API" Version="11.1.0" />
-    <PackageReference Include="OpenFTTH.Address.Business" Version="11.1.0" />
+    <PackageReference Include="OpenFTTH.Address.Business" Version="11.2.0" />
     <PackageReference Include="OpenFTTH.CQRS" Version="11.1.0" />
     <PackageReference Include="OpenFTTH.EventSourcing" Version="11.1.0" />
   </ItemGroup>
